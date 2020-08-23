@@ -11,6 +11,8 @@ import check from './icons/check.svg'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 
+// TODO: Support clearing authors
+
 class Note extends React.Component {
   state = { loading: true }
 

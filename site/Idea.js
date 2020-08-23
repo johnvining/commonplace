@@ -1,80 +1,40 @@
 import React from 'react'
-import axios from 'axios'
 import Note from './Note'
+import * as db from './Database'
 
 class Idea extends React.Component {
   state = { loading: true }
 
   // TODO: Clean up -- https://stackoverflow.com/questions/48139281/react-doesnt-reload-component-data-on-route-param-change-or-query-change
   // TODO: DRY
-  // TODO: Fix infinite loop
+  // TODO: Update for idea ID changing
   componentDidMount() {
-    let url = `http://localhost:3000/api/idea/${this.props.id}/notes`
-    console.log(url)
-    console.log(this.props)
-    axios
-      .get(url)
+    db.getNotesForIdea(this.props.id)
       .then(response => {
-        console.log('response')
-        console.log(response)
-        this.setState({
-          notes: response.data.data
-        })
-
-        console.log(this.state.notes[0]._id)
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-
-  componentDidUpdate() {
-    let url = `http://localhost:3000/api/idea/${this.props.id}/notes`
-    console.log(url)
-    console.log(this.props)
-    axios
-      .get(url)
-      .then(response => {
-        console.log('response')
-        console.log(response)
         this.setState({
           notes: response.data.data
         })
       })
       .catch(error => {
-        console.log(error)
+        console.error(error)
+      })
+
+    db.getIdeaInfo(this.props.id)
+      .then(response => {
+        this.setState({
+          ideaName: response.data.data.name
+        })
+      })
+      .catch(error => {
+        console.error(error)
       })
   }
-
-  // let authorUrl = `http://localhost:3000/api/auth/${this.props.id}`
-  // console.log(authorUrl)
-  // axios
-  //   .get(authorUrl)
-  //   .then(response => {
-  //     console.log('response')
-  //     console.log(response)
-  //     this.setState({
-  //       authorName: response.data.data.name,
-  //       bornYear: response.data.data.bornYear,
-  //       diedYear: response.data.data.diedYear
-  //     })
-
-  //     console.log(this.state.notes[0]._id)
-  //   })
-  //   .catch(error => {
-  //     console.log(error)
-  //   })
 
   render() {
     return (
       <div>
         <div align="right">
-          {/* <span className="title">
-            <small>
-              <small>{this.state.ideaName}</small>
-            </small>
-          </span> */}
-          hi
+          <span className="title">{this.state.ideaName}</span>
         </div>
 
         {this.state.notes === undefined ? (
@@ -84,12 +44,13 @@ class Idea extends React.Component {
             {this.state.notes.map(note => {
               return (
                 <Note
+                  key={'note-' + note._id}
                   title={note.title}
                   author={note.author?.name}
                   authorId={note.author?._id}
                   text={note.text}
                   ideas={note.ideas}
-                  _id={note._id}
+                  id={note._id}
                 />
               )
             })}

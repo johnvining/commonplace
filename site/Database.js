@@ -6,22 +6,22 @@ export async function deleteNote(id) {
   return axios.delete(urls.note.delete + id)
 }
 
-export async function addIdeaToNote(ideaID, noteID) {
+export async function addIdeaToNote(ideaID, nodeId) {
   const data = { newTopic: ideaID }
-  return axios.put(url_api + `note/${noteID}/idea`, data)
+  return axios.put(url_api + `note/${nodeId}/idea`, data)
 }
 
-export async function createTopicAndAssign(ideaName, noteID) {
+export async function createTopicAndAssign(ideaName, nodeId) {
   const data = { newTopic: ideaName }
-  return axios.put(url_api + `note/${noteID}/idea/create`, data)
+  return axios.put(url_api + `note/${nodeId}/idea/create`, data)
 }
 
-export async function getNoteInfo(noteID) {
-  return axios.get(url_api + `note/${noteID}`)
+export async function getNoteInfo(nodeId) {
+  return axios.get(url_api + `note/${nodeId}`)
 }
 
-export async function updateNoteInfo(noteID, params) {
-  return axios.put(url_api + `note/${noteID}`, params)
+export async function updateNoteInfo(nodeId, params) {
+  return axios.put(url_api + `note/${nodeId}`, params)
 }
 
 export async function getIdeaSuggestions(search) {
@@ -37,4 +37,12 @@ export async function getAuthorSuggestions(search) {
 export async function createAuthor(authorName) {
   const data = { name: authorName }
   return axios.post(url_api + `auth`, data)
+}
+
+export async function getNotesForIdea(ideaId) {
+  return axios.get(url_api + `idea/${ideaId}/notes`)
+}
+
+export async function getIdeaInfo(ideaId) {
+  return axios.get(url_api + `idea/${ideaId}`)
 }
