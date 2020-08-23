@@ -15,26 +15,33 @@ class Note extends React.Component {
   state = { loading: true }
 
   componentDidMount() {
-    console.log(this)
-    console.log(this.props)
-    this.setState(
-      {
-        authorId: this.props.authorId,
-        title: this.props.title,
-        text: this.props.text,
-        ideas: this.props.ideas,
-        edit: this.props.edit,
-        _id: this.props._id
-      },
-      () => {
-        console.log(this.state)
+    this.setState({
+      authorId: this.props.authorId,
+      title: this.props.title,
+      text: this.props.text,
+      ideas: this.props.ideas,
+      edit: this.props.edit,
+      id: this.props.id
+    })
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (prevState.edit) {
+      return prevState
+    } else {
+      return {
+        authorId: nextProps.authorId,
+        title: nextProps.title,
+        text: nextProps.text,
+        ideas: nextProps.ideas,
+        id: nextProps.id
       }
-    )
+    }
   }
 
   handleDelete() {
     if (confirm('Are you sure you want to delete this note?')) {
-      db.deleteNote(this.props._id)
+      db.deleteNote(this.props.id)
         .then(() => {
           this.setState({ deleted: true })
         })
@@ -70,7 +77,7 @@ class Note extends React.Component {
   }
 
   handleNewTopic = topicID => {
-    db.addIdeaToNote(topicID, this.props._id)
+    db.addIdeaToNote(topicID, this.props.id)
       .then(() => {
         this.setState({ addIdea: false })
         this.props.refetch()
@@ -85,7 +92,7 @@ class Note extends React.Component {
   }
 
   handleCreateTopicAndAssign = topicName => {
-    db.createTopicAndAssign(topicName, this.props._id)
+    db.createTopicAndAssign(topicName, this.props.id)
       .then(() => {
         this.setState({ addIdea: false })
         // this.props.refetch()
@@ -97,20 +104,19 @@ class Note extends React.Component {
 
   handleCreateAuthorAndAssign = authorName => {
     db.createAuthor(authorName).then(response => {
-      this.setState({ authorID: response.data.data._id })
+      this.setState({ authorID: response.data.data.id })
     })
   }
 
   async handleAccept() {
-    this.setState({ edit: false })
     const updateObject = {
       title: this.state.title,
       text: this.state.text,
       authorId: this.state.authorId
     }
-
+    this.setState({ edit: false })
     await db
-      .updateNoteInfo(this.props._id, updateObject)
+      .updateNoteInfo(this.state.id, updateObject)
       .then(response => {
         // TODO: DRY
         this.setState({
@@ -123,19 +129,22 @@ class Note extends React.Component {
       .catch(error => {
         console.log(error)
       })
+
+    //TODO: Refresh the screen after saving changes
   }
 
   render() {
-    const { title, _id, author, ideas, text, authorId, edit } = this.state
-
-    console.log(this.state)
+    const { title, id, author, ideas, text, authorId, edit } = this.state
 
     if (this.state.deleted) {
       return <div> </div>
     }
 
     return (
-      <div className={edit ? 'quote-instance-edit' : 'quote-instance'}>
+      <div
+        className={edit ? 'quote-instance-edit' : 'quote-instance'}
+        key={this.props.id}
+      >
         <div className="quote-bar">
           {edit ? (
             <input
@@ -185,7 +194,7 @@ class Note extends React.Component {
           <div className="idea-list">
             <div className="nothing">
               {ideas?.map(idea => (
-                <Link to={'/idea/' + idea._id}>
+                <Link to={'/idea/' + idea.id}>
                   <button className="idea-label">{idea.name}</button>
                 </Link>
               ))}
@@ -232,7 +241,7 @@ class Note extends React.Component {
                   >
                     <img src={plus}></img>
                   </button>
-                  <Link to={'/note/' + _id}>
+                  <Link to={'/note/' + id}>
                     <button className="action-button">
                       <img src={document}></img>
                     </button>

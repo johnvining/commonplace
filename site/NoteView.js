@@ -10,8 +10,6 @@ class NoteView extends React.Component {
 
   constructor(props) {
     super(props)
-
-    console.log(props)
   }
 
   componentDidMount() {
@@ -38,6 +36,7 @@ class NoteView extends React.Component {
   }
 
   render() {
+    console.log('NoteView Render ' + this.state.title)
     return (
       <Note
         title={this.state.title}
@@ -45,7 +44,7 @@ class NoteView extends React.Component {
         authorId={this.state.author?._id}
         text={this.state.text}
         ideas={this.state.ideas}
-        _id={this.state._id}
+        id={this.props.id}
       />
     )
   }
