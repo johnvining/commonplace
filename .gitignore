@@ -1,0 +1,6 @@
+/server/dist/
+/server/node_modules/
+/site/.cache/
+/site/dist/
+/site/node_modules/
+.vscode
