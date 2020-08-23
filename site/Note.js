@@ -17,7 +17,7 @@ class Note extends React.Component {
   componentDidMount() {
     this.setState({
       authorId: this.props.authorId,
-      // edit: this.props.edit,
+      author: this.props.author,
       id: this.props.id,
       ideas: this.props.ideas,
       refetch: this.props.refetch,
@@ -33,6 +33,7 @@ class Note extends React.Component {
     } else {
       return {
         authorId: next.authorId,
+        author: next.author,
         title: next.title,
         text: next.text,
         ideas: next.ideas,
@@ -89,10 +90,6 @@ class Note extends React.Component {
       })
   }
 
-  handleNewAuthor = authorID => {
-    this.setState({ authorID: authorID })
-  }
-
   handleCreateTopicAndAssign = topicName => {
     db.createTopicAndAssign(topicName, this.props.id)
       .then(() => {
@@ -104,9 +101,13 @@ class Note extends React.Component {
       })
   }
 
+  handleUpdateAuthor = authorId => {
+    this.setState({ authorId: authorId })
+  }
+
   handleCreateAuthorAndAssign = authorName => {
     db.createAuthor(authorName).then(response => {
-      this.setState({ authorID: response.data.data.id })
+      this.setState({ authorId: response.data.data.id })
     })
   }
 
@@ -114,8 +115,9 @@ class Note extends React.Component {
     const updateObject = {
       title: this.state.title,
       text: this.state.text,
-      authorId: this.state.authorId
+      author: this.state.authorId
     }
+
     this.setState({ edit: false, keep: true })
     await db
       .updateNoteInfo(this.state.id, updateObject)
@@ -171,7 +173,7 @@ class Note extends React.Component {
               escape={() => {
                 this.setState({ edit: false })
               }}
-              onSelect={this.handleNewAuthor}
+              onSelect={this.handleUpdateAuthor}
               getSuggestions={db.getAuthorSuggestions}
               handleNewSelect={this.handleCreateAuthorAndAssign}
             />

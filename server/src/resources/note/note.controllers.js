@@ -61,7 +61,7 @@ export const reqUpdateNote = async (req, res) => {
     res
       .status(200)
       .json(docs)
-      .end() // TODO: return value here?
+      .end()
   } catch (e) {
     console.error(e)
     res.status(400).end()

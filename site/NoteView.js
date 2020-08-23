@@ -40,11 +40,11 @@ class NoteView extends React.Component {
   }
 
   render() {
-    console.log('NoteView Render ' + this.state.title)
+    console.log('NoteView Render ' + this.state.author)
     return (
       <Note
         title={this.state.title}
-        author={this.state.author?.name}
+        author={this.state.author}
         authorId={this.state.author?._id}
         text={this.state.text}
         ideas={this.state.ideas}

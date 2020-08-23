@@ -21,7 +21,6 @@ export async function getNoteInfo(noteID) {
 }
 
 export async function updateNoteInfo(noteID, params) {
-  console.log('update Note Info')
   return axios.put(url_api + `note/${noteID}`, params)
 }
 
