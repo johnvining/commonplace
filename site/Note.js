@@ -194,8 +194,10 @@ class Note extends React.Component {
           <div className="idea-list">
             <div className="nothing">
               {ideas?.map(idea => (
-                <Link to={'/idea/' + idea.id}>
-                  <button className="idea-label">{idea.name}</button>
+                <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
+                  <button className="idea-label" key={'idea-button' + idea._id}>
+                    {idea.name}
+                  </button>
                 </Link>
               ))}
             </div>
