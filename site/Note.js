@@ -17,11 +17,12 @@ class Note extends React.Component {
   componentDidMount() {
     this.setState({
       authorId: this.props.authorId,
-      title: this.props.title,
-      text: this.props.text,
-      ideas: this.props.ideas,
       edit: this.props.edit,
-      id: this.props.id
+      id: this.props.id,
+      ideas: this.props.ideas,
+      refetch: this.props.refetch,
+      text: this.props.text,
+      title: this.props.title
     })
   }
 
@@ -80,7 +81,7 @@ class Note extends React.Component {
     db.addIdeaToNote(topicID, this.props.id)
       .then(() => {
         this.setState({ addIdea: false })
-        this.props.refetch()
+        this.state.refetch()
       })
       .catch(e => {
         console.log(e)
@@ -95,7 +96,7 @@ class Note extends React.Component {
     db.createTopicAndAssign(topicName, this.props.id)
       .then(() => {
         this.setState({ addIdea: false })
-        // this.props.refetch()
+        this.state.refetch()
       })
       .catch(e => {
         console.log(e)

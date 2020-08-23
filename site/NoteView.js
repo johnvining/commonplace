@@ -12,7 +12,7 @@ class NoteView extends React.Component {
     super(props)
   }
 
-  componentDidMount() {
+  getNoteData() {
     db.getNoteInfo(this.props.id)
       .then(response => {
         const data = response.data.data
@@ -31,8 +31,12 @@ class NoteView extends React.Component {
       })
   }
 
+  componentDidMount() {
+    this.getNoteData()
+  }
+
   refetch() {
-    // this.getNoteData()
+    this.getNoteData()
   }
 
   render() {
@@ -45,6 +49,7 @@ class NoteView extends React.Component {
         text={this.state.text}
         ideas={this.state.ideas}
         id={this.props.id}
+        refetch={this.refetch.bind(this)}
       />
     )
   }
