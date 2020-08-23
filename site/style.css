@@ -73,57 +73,82 @@ body {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 }
 
-/* .main {
-  display: block;
-  max-width: 820px;
-  border-radius: 6px;
-  padding: 10px;
-  margin: 10px auto;
-} */
+.title {
+  font-size: 50px;
+}
 
-.quote-instance {
+/* NOTE STYLING */
+/* Note Style: Outer Div */
+.noteNormal-outer,
+.noteEdit-outer,
+.noteInFocus-outer,
+.noteEditIdea-outer {
   display: block;
   max-width: 800px;
   background-color: #efefef;
   border-radius: 4px;
   padding: 10px;
   margin: 4px auto;
-}
-
-.quote-instance-edit {
-  display: block;
-  max-width: 800px;
-  background-color: #efffff;
-  border-radius: 4px;
-  padding: 10px;
-  margin: 3px auto;
   border-style: solid;
-  border-color: black;
+  border-color: white;
   border-width: 1px;
-  /* box-shadow: 0px 0px 6px 6px #efefef; */
 }
 
-.title {
-  font-size: 50px;
+.noteNormal-outer {
+  border-color: white;
+}
+.noteEdit-outer {
+  border-color: gray;
+  background: #eeeeee;
+}
+.noteInFocus-outer {
+  border-color: gray;
+  background: lightblue;
+}
+.noteEditIdea-outer {
+  border-color: gray;
 }
 
-a.note-link {
-  text-decoration: none;
+.noteNormal-outer:focus {
+  border-color: lightblue;
+  outline: none;
+}
+.noteEdit-outer:focus {
+  border-color: black;
+  outline: none;
+}
+.noteInFocus-outer:focus {
+  border-color: black;
+  outline: none;
+}
+.noteEditIdea-outer:focus {
+  border-color: black;
+  outline: none;
 }
 
-a.title-link {
-  text-decoration: none;
-}
-
-.item-bottom {
+.noteNormal-item-bottom,
+.noteEdit-item-bottom,
+.noteInFocus-item-bottom,
+.noteEditIdea-item-bottom {
+  align-items: top;
   display: flex;
   justify-content: space-between;
-  align-items: top;
   margin: 0px;
   padding: 0px;
-} /* flax grow? */
+}
 
-div.quote-title {
+div.noteNormal-title,
+div.noteEdit-title,
+div.noteInFocus-title,
+div.noteEditIdea-bottom {
+  border: none;
+  font-size: 18px;
+  margin: auto;
+  padding: 8px;
+  width: 100%;
+}
+
+input.noteEdit-title {
   background-color: transparent;
   width: 100%;
   border: none;
@@ -133,24 +158,17 @@ div.quote-title {
   padding: 8px;
 }
 
-input.quote-title {
-  background-color: transparent;
-  width: 100%;
-  border: none;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  font-size: 18px;
-  margin: auto;
-  padding: 8px;
-}
-
-.quote-title:focus {
+input.noteEdit-title:focus {
   outline: none;
   background-color: white;
   margin: auto;
   padding: 8px;
 }
 
-.quote-text {
+.noteNormal-text,
+.noteInFocus-text,
+.noteEditIdea-text,
+.noteEdit-text {
   background-color: transparent;
   width: 100%;
   height: 18em;
@@ -162,26 +180,9 @@ input.quote-title {
   resize: none;
   display: block;
   box-sizing: border-box;
-  /* margin-block-start: 0em;
-  margin-block-end: 0em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px; */
 }
-/* textarea.quote-text {
-  background-color: transparent;
-  width: 100%;
-  height: 20em;
-  border: none;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  font-size: 14px;
-  margin: auto;
-  padding: 8px;
-  resize: none;
-  display: block;
-  box-sizing: border-box;
-} */
 
-.quote-text:focus {
+.noteEdit-text:focus {
   width: 100%;
   outline: none;
   background-color: white;
@@ -189,7 +190,10 @@ input.quote-title {
   padding: 8px;
 }
 
-div.author-label {
+div.noteNormal-author-label,
+div.noteInFocus-author-label,
+div.noteEditIdea-author-label,
+div.noteEdit-author-label {
   background-color: transparent;
   width: 100%;
   border: none;
@@ -197,6 +201,12 @@ div.author-label {
   font-size: 18px;
   margin: auto;
   padding: 8px;
+}
+
+a.noteNormal-author,
+a.noteInFocus-author,
+a.noteEditIdea-author {
+  text-decoration: none;
 }
 
 input.author-label {
@@ -215,7 +225,10 @@ input.author-label:focus {
 }
 
 /* Action button related */
-.action-button {
+.noteNormal-action-button,
+.noteEdit-action-button,
+.noteEditIdea-action-button,
+.noteInFocus-action-button {
   border-radius: 4px;
   border-style: none;
   cursor: pointer;
@@ -231,6 +244,7 @@ input.author-label:focus {
   text-decoration: none;
 }
 
+/* TODO: Todo */
 .idea-exit-button {
   border-radius: 4px;
   border-style: none;
@@ -247,7 +261,10 @@ input.author-label:focus {
   text-decoration: none;
 }
 
-.actionBar {
+.noteNormal-actionBar,
+.noteEdit-actionBar,
+.noteInFocus-actionBar,
+.noteEditIdea-actionBar {
   height: 100%;
   font-size: 15px;
   background-color: transparent;
@@ -270,7 +287,10 @@ input.author-label:focus {
 
 /* IDEA RELATED */
 
-.idea-list {
+.noteNormal-idea-list,
+.noteEditIdea-idea-list,
+.noteEdit-idea-list,
+.noteInFocus-idea-list {
   height: 100%;
   font-size: 15px;
   background-color: transparent;
@@ -281,7 +301,10 @@ input.author-label:focus {
   padding: 8px;
 }
 
-.idea-search-box {
+.noteNormal-idea-search-box,
+.noteEdit-idea-search-box,
+.noteEditIdea-idea-search-box,
+.noteInFocus-idea-search-box {
   background-color: #ffe6f2;
   border-radius: 4px;
   border-style: none;
@@ -292,7 +315,10 @@ input.author-label:focus {
   text-decoration: none;
 }
 
-.idea-search-box:focus {
+.noteNormal-idea-search-box:focus,
+.noteEdit-idea-search-box:focus,
+.noteEditIdea-idea-search-box:focus,
+.noteInFocus-idea-search-box:focus {
   outline: none;
   border-style: dashed;
   border-color: black;
@@ -300,18 +326,27 @@ input.author-label:focus {
   border-width: 1px;
 }
 
-.idea-ul {
+.noteNormal-idea-ul,
+.noteEdit-idea-ul,
+.noteEditIdea-idea-ul,
+.noteInFocus-idea-ul {
   margin: 0px;
   padding: 0px;
 }
-.idea-li {
+.noteNormal-idea-li,
+.noteEdit-idea-li,
+.noteEditIdea-idea-li,
+.noteInFocus-idea-li {
   display: inline;
   margin: 0px;
   padding: 0px;
 }
 
 /* Existing idea button */
-.idea-label {
+.noteNormal-idea-label,
+.noteEditIdea-idea-label,
+.noteInFocus-idea-label,
+.noteEdit-idea-label {
   background-color: white;
   border-radius: 2px;
   border-radius: 4px;
@@ -323,14 +358,17 @@ input.author-label:focus {
   text-decoration: none;
 }
 
-.idea-label:hover {
+.noteNormal-idea-label:hover,
+.noteEdit-idea-label:hover,
+.noteInFocus-idea-label:hover,
+.noteEditIdea-idea-label:hover {
   background-color: #ffe6f2;
   cursor: pointer;
 }
 
-/* Possible idea to add */
-.idea-option,
-.idea-option-new {
+/* Possible ideas to add */
+.noteEditIdea-idea-option,
+.noteEditIdea-idea-option-new {
   background-color: #efffff;
   border-radius: 2px;
   border-radius: 4px;
@@ -344,11 +382,11 @@ input.author-label:focus {
   text-decoration: none;
 }
 
-.idea-option-new {
+.noteEditIdea-idea-option-new {
   background-color: #efffef;
 }
 
-.idea-option-new::before {
+.noteEditIdea-idea-option-new::before {
   background-image: url('/icons/plus.svg');
   background-size: 17px 17px;
   display: inline-block;
@@ -357,8 +395,8 @@ input.author-label:focus {
   content: '';
 }
 
-.idea-option:focus,
-.idea-option-new:focus {
+.noteEditIdea-idea-option:focus,
+.noteEditIdea-idea-option-new:focus {
   border-color: black;
   background-color: white;
   border-style: solid;
@@ -368,8 +406,8 @@ input.author-label:focus {
   padding: 3px;
 }
 
-.idea-option:hover,
-.idea-option-new:hover {
+.noteEditIdea-idea-option:hover,
+.noteEditIdea-idea-option-new:hover {
   border-color: black;
   background-color: white;
   border-style: solid;
@@ -379,7 +417,7 @@ input.author-label:focus {
   padding: 3px;
 }
 
-.author-label-search-box {
+.noteEdit-author-label-search-box {
   background-color: transparent;
   border: none;
   font-size: 18px;
@@ -388,22 +426,22 @@ input.author-label:focus {
   width: 25%;
 }
 
-.author-label-search-box:focus {
+.noteEdit-author-label-search-box:focus {
   background-color: white;
 }
 
-.author-label-ul {
+.noteEdit-author-label-ul {
   display: inline;
   margin: 0px;
   padding: 0px;
 }
-.author-label-li {
+.noteEdit-author-label-li {
   display: inline;
   margin: 0px;
   padding: 0px;
 }
 
-.author-label-option {
+.noteEdit-author-label-option {
   border: none;
   color: #393939;
   background: transparent;
@@ -411,18 +449,18 @@ input.author-label:focus {
   margin: 4px;
 }
 
-.author-label-option::after {
+.noteEdit-author-label-option::after {
   content: '? ';
 }
 
-.author-label-option-new {
+.noteEdit-author-label-option-new {
   border: none;
   background: transparent;
   padding: 4px;
   margin: 4px;
 }
 
-.author-label-option-new::before {
+.noteEdit-author-label-option-new::before {
   background-image: url('/icons/plus.svg');
   background-size: 16px 16px;
   display: inline-block;
@@ -431,10 +469,10 @@ input.author-label:focus {
   content: '';
 }
 
-.author-label-option:hover,
-.author-label-option-new:hover,
-.author-label-option:focus,
-.author-label-option-new:focus {
+.noteEdit-author-label-option:hover,
+.noteEdit-author-label-option-new:hover,
+.noteEdit-author-label-option:focus,
+.noteEdit-author-label-option-new:focus {
   outline: none;
   border: solid;
   border-color: black;

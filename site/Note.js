@@ -10,9 +10,13 @@ import plus from './icons/plus.svg'
 import check from './icons/check.svg'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
+import { Model } from 'mongoose'
 
 // TODO: Support clearing authors
+// TODO: Support removing idea links
 // FIXME: Cancel should return UI to original state
+// FIXME: Saving newlines from Text Area doesn't work
+
 class Note extends React.Component {
   state = { loading: true }
 
@@ -26,7 +30,8 @@ class Note extends React.Component {
       ideas: this.props.ideas,
       refetch: this.props.refetch,
       text: this.props.text,
-      title: this.props.title
+      title: this.props.title,
+      inFocus: this.props.inFocus
     })
   }
 
@@ -40,7 +45,9 @@ class Note extends React.Component {
 
   // FIXME: Keyboard shortcuts apply to all notes on the page, rather than a specific one. Way of selecting a note-focus on lists?
   handleKeyDown(event) {
-    console.log(event)
+    if (!this.state.inFocus) {
+      return
+    }
     // TODO: Keyboard short cuts will interfere with Ctrl + A on Windows
     if (this.state.edit && event.ctrlKey && event.keyCode == 65) {
       this.handleAccept()
@@ -48,6 +55,8 @@ class Note extends React.Component {
       this.handleEdit()
     } else if (this.state.edit && event.keyCode == 27) {
       this.handleCancel()
+    } else if (!this.state.edit && event.ctrlKey && event.keyCode == 84) {
+      this.addIdea()
     }
   }
 
@@ -152,48 +161,80 @@ class Note extends React.Component {
       })
   }
 
-  render() {
-    const { title, id, author, ideas, text, authorId, edit } = this.state
+  // FIXME: When a button is pressed in a note, tell the parent that I now should be inFocus
 
-    if (this.state.deleted) {
+  render() {
+    const {
+      addIdea,
+      author,
+      authorId,
+      deleted,
+      edit,
+      id,
+      ideas,
+      text,
+      title
+    } = this.state
+    const inFocus = this.props.id == this.props.inFocus
+
+    // Four possible states for a note:
+    var mode = { name: 'Normal', class: 'noteNormal-' }
+    if (edit) {
+      mode.name = 'Editing'
+      mode.class = 'noteEdit-'
+    } else if (addIdea) {
+      mode.name = 'Editing Ideas'
+      mode.class = 'noteEditIdea-'
+    } else if (inFocus) {
+      mode.name = 'In Focus'
+      mode.class = 'noteInFocus-'
+    }
+
+    // If just deleted, hide
+    if (deleted) {
       return <div> </div>
     }
 
     return (
       <div
-        className={edit ? 'quote-instance-edit' : 'quote-instance'}
+        className={mode.class + 'outer'}
         key={this.props.id}
+        id={this.props.id}
+        tabIndex={this.props.tabIndex}
       >
-        <div className="quote-bar">
+        <div className={mode.class + 'bar'}>
+          <span>
+            <small>DEBUG</small> {mode.name}
+          </span>
           {edit ? (
             <input
-              className="quote-title"
+              className={mode.class + 'title'}
               name="title"
               autoFocus
               defaultValue={title}
               onChange={this.handleTitleChange}
             ></input>
           ) : !title?.length ? (
-            <div className="quote-title">
+            <div className={mode.class + 'title'}>
               <em>Untitled Note</em>
             </div>
           ) : (
-            <div className="quote-title">{title}</div>
+            <div className={mode.class + 'title'}>{title}</div>
           )}
           {edit ? (
             <textarea
-              className="quote-text"
+              className={mode.class + 'text'}
               onChange={this.handleTextChange}
               value={text}
             ></textarea>
           ) : (
-            <div className="quote-text">{text}</div>
+            <div className={mode.class + 'text'}>{text}</div>
           )}
         </div>
-        <div className="author-bar">
+        <div className={mode.class + 'author-bar'}>
           {edit ? (
             <Autocomplete
-              className="author-label"
+              className={mode.class + 'author-label'}
               defaultValue={author}
               escape={() => {
                 this.setState({ edit: false })
@@ -203,19 +244,23 @@ class Note extends React.Component {
               handleNewSelect={this.handleCreateAuthorAndAssign}
             />
           ) : (
-            <div className={'author-label'}>
-              <Link to={'/auth/' + authorId} className="author">
+            <div className={mode.class + 'author-label'}>
+              <Link to={'/auth/' + authorId} className={mode.class + 'author'}>
                 {author}
               </Link>
             </div>
           )}
         </div>
-        <div className="item-bottom">
-          <div className="idea-list">
+        <div className={mode.class + 'item-bottom'}>
+          <div className={mode.class + 'idea-list'}>
             <div className="nothing">
               {ideas?.map(idea => (
                 <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
-                  <button className="idea-label" key={'idea-button' + idea._id}>
+                  <button
+                    className={mode.class + 'idea-label'}
+                    key={'idea-button' + idea._id}
+                    tabIndex="-1"
+                  >
                     {idea.name}
                   </button>
                 </Link>
@@ -224,16 +269,16 @@ class Note extends React.Component {
           </div>
 
           {edit ? (
-            <div className="action-bar">
+            <div className={mode.class + 'action-bar'}>
               <span>
                 <button
-                  className="action-button"
+                  className={mode.class + 'action-button'}
                   onClick={this.handleAccept.bind(this)}
                 >
                   <img src={check_circle}></img>
                 </button>
                 <button
-                  className="action-button"
+                  className={mode.class + 'action-button'}
                   onClick={this.handleCancel.bind(this)}
                 >
                   <img src={cross_circle}></img>
@@ -241,11 +286,10 @@ class Note extends React.Component {
               </span>
             </div>
           ) : (
-            <div className="actionBar">
+            <div className={mode.class + 'actionBar'}>
               {this.state.addIdea ? (
                 <Autocomplete
-                  className="idea"
-                  exitButtonImage={check}
+                  className={mode.class + 'idea'}
                   escape={() => {
                     this.setState({ addIdea: false })
                   }}
@@ -254,30 +298,35 @@ class Note extends React.Component {
                   getSuggestions={db.getIdeaSuggestions}
                 />
               ) : (
-                // // </div>
                 // Neither editing whole note nor ideas
                 <span className="nothing">
                   <button
-                    className="action-button"
+                    className={mode.class + 'action-button'}
                     onClick={this.addIdea.bind(this)}
+                    tabIndex="-1"
                   >
                     <img src={plus}></img>
                   </button>
                   <Link to={'/note/' + id}>
-                    <button className="action-button">
+                    <button
+                      className={mode.class + 'action-button'}
+                      tabIndex="-1"
+                    >
                       <img src={document_image}></img>
                     </button>
                   </Link>
 
                   <button
-                    className="action-button"
+                    className={mode.class + 'action-button'}
                     onClick={this.handleEdit.bind(this)}
+                    tabIndex="-1"
                   >
                     <img src={write}></img>
                   </button>
                   <button
                     onClick={this.handleDelete.bind(this)}
-                    className="action-button"
+                    className={mode.class + 'action-button'}
+                    tabIndex="-1"
                   >
                     <img src={trash}></img>
                   </button>

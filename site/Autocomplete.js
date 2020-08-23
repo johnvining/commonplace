@@ -83,6 +83,7 @@ class Autocomplete extends React.Component {
       <div className="nothing">
         <input
           id="mainInput"
+          autoFocus
           className={this.style.searchBox}
           value={this.state.currentTypedText}
           onChange={this.handleTypingChange.bind(this)}
