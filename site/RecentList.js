@@ -44,7 +44,7 @@ class RecentList extends React.Component {
                   authorId={note.author?._id}
                   text={note.text}
                   ideas={note.ideas}
-                  _id={note._id}
+                  id={note._id}
                 />
               )
             })}

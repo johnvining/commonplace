@@ -273,6 +273,5 @@ class Note extends React.Component {
 
 // TODO: Update the ideas display to work everywhere
 // TODO: Create an idea page and API
-// TODO: Fix 'key' prop problem
 
 export default Note

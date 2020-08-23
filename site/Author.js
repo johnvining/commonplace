@@ -45,6 +45,8 @@ class Author extends React.Component {
       <div>
         <div align="right">
           <span className="title">
+            {' '}
+            {/* TODO: This is horrible */}
             <small>
               <small>{this.state.authorName}</small>
               <small>
@@ -75,7 +77,7 @@ class Author extends React.Component {
                   authorId={note.authorId}
                   text={note.text}
                   ideas={note.ideas}
-                  _id={note._id}
+                  id={note._id}
                 />
               )
             })}
