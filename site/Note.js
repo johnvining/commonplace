@@ -43,9 +43,9 @@ class Note extends React.Component {
     )
   }
 
-  // FIXME: Keyboard shortcuts apply to all notes on the page, rather than a specific one. Way of selecting a note-focus on lists?
   handleKeyDown(event) {
-    if (!this.state.inFocus) {
+    // TODO: Update to pass in the status rather than the ID from parent
+    if (this.props.inFocus != this.props.id) {
       return
     }
     // TODO: Keyboard short cuts will interfere with Ctrl + A on Windows
@@ -94,6 +94,7 @@ class Note extends React.Component {
 
   handleEdit() {
     this.setState({ edit: true })
+    this.props.becomeInFocus(this.props.id)
   }
 
   addIdea() {

@@ -32,10 +32,8 @@ class RecentList extends React.Component {
     )
   }
 
-  // FIXME: Keyboard shortcuts apply to all notes on the page, rather than a specific one. Way of selecting a note-focus on lists?
   handleKeyDown(event) {
     // TODO: Keyboard short cuts will interfere with Ctrl + A on Windows
-    console.log('recent' + event)
     if (event.keyCode == 13) {
       this.setIsFocused(document.activeElement.id)
     }
@@ -45,6 +43,10 @@ class RecentList extends React.Component {
     this.setState({
       inFocus: id
     })
+  }
+
+  becomeInFocus(id) {
+    this.setState({ inFocus: id })
   }
 
   // TODO: Split up note page and note display so I can use the note diplsay here
@@ -66,6 +68,7 @@ class RecentList extends React.Component {
                   id={note._id}
                   tabIndex={index + 1}
                   inFocus={this.state.inFocus}
+                  becomeInFocus={this.becomeInFocus.bind(this)}
                 />
               )
             })}
