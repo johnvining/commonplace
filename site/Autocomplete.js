@@ -62,7 +62,7 @@ class Autocomplete extends React.Component {
         hideResults: true
       },
       () => {
-        this.props.onSelect(this.state.selectedID)
+        this.props.onSelect(this.state.selectedID, this.state.currentTypedText)
         mainInput.value = this.state.currentTypedText
       }
     )

@@ -101,13 +101,13 @@ class Note extends React.Component {
       })
   }
 
-  handleUpdateAuthor = authorId => {
-    this.setState({ authorId: authorId })
+  handleUpdateAuthor = (authorId, authorName) => {
+    this.setState({ authorId: authorId, author: authorName })
   }
 
   handleCreateAuthorAndAssign = authorName => {
     db.createAuthor(authorName).then(response => {
-      this.setState({ authorId: response.data.data.id })
+      this.setState({ authorId: response.data.data.id, author: authorName })
     })
   }
 
@@ -129,6 +129,8 @@ class Note extends React.Component {
 
   render() {
     const { title, id, author, ideas, text, authorId, edit } = this.state
+
+    console.log('render: ' + author)
 
     if (this.state.deleted) {
       return <div> </div>
