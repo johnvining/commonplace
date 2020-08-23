@@ -22,10 +22,6 @@ class RecentList extends React.Component {
       })
   }
 
-  componentWillUpdate() {
-    console.log('list update')
-  }
-
   // TODO: Split up note page and note display so I can use the note diplsay here
   // TODO: Better formatting for author name
   // TODO: Way to do this without two database calls?
@@ -39,6 +35,7 @@ class RecentList extends React.Component {
             {this.state.notes.map(note => {
               return (
                 <Note
+                  key={'note' + note._id}
                   title={note.title}
                   author={note.author?.name}
                   authorId={note.author?._id}

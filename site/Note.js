@@ -17,7 +17,7 @@ class Note extends React.Component {
   componentDidMount() {
     this.setState({
       authorId: this.props.authorId,
-      edit: this.props.edit,
+      // edit: this.props.edit,
       id: this.props.id,
       ideas: this.props.ideas,
       refetch: this.props.refetch,
@@ -26,7 +26,11 @@ class Note extends React.Component {
     })
   }
 
+  // TODO: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
   static getDerivedStateFromProps(nextProps, prevState) {
+    console.log(prevState)
+    console.log(nextProps)
+
     if (prevState.edit) {
       return prevState
     } else {
@@ -163,10 +167,11 @@ class Note extends React.Component {
             <div className="quote-title">{title}</div>
           )}
           {edit ? (
-            // <textarea className="quote">{text}</textarea>
-            <textarea className="quote-text" onInput={this.handleTextChange}>
-              {text}
-            </textarea>
+            <textarea
+              className="quote-text"
+              onChange={this.handleTextChange}
+              value={text}
+            ></textarea>
           ) : (
             <div className="quote-text">{text}</div>
           )}

@@ -5,7 +5,7 @@ import { Link } from '@reach/router'
 import * as db from './Database'
 
 class Autocomplete extends React.Component {
-  state = { loading: true, currentTypedText: '', hideResults: false }
+  state = { loading: true, currentTypedText: ' ', hideResults: false }
   className = this.props.className
   style = {
     searchBox: this.className + '-search-box',
@@ -68,6 +68,7 @@ class Autocomplete extends React.Component {
       },
       () => {
         this.props.onSelect(this.state.selectedID)
+        mainInput.value = this.state.currentTypedText
       }
     )
   }
@@ -75,6 +76,7 @@ class Autocomplete extends React.Component {
   handleNewSelect = val => {
     this.props.handleNewSelect(this.state.currentTypedText)
     this.setState({ hideResults: true })
+    mainInput.value = this.state.currentTypedText
   }
 
   render() {
@@ -82,9 +84,7 @@ class Autocomplete extends React.Component {
     return (
       <div className="nothing">
         <input
-          autoFocus
           id="mainInput"
-          value={this.state.currentTypedText}
           className={this.style.searchBox}
           onChange={this.handleTypingChange.bind(this)}
         ></input>
