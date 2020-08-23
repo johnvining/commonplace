@@ -28,9 +28,7 @@ class RecentList extends React.Component {
   render() {
     return (
       <div>
-        {this.state.notes === undefined ? (
-          <h2>Nothing</h2>
-        ) : (
+        {this.state.notes === undefined ? null : (
           <div>
             {this.state.notes.map(note => {
               return (

@@ -36,11 +36,10 @@ class NoteView extends React.Component {
   }
 
   refetch() {
-    this.getNoteData()
+    this.getNoteData() // TODO: Can we skip the re-fetch?
   }
 
   render() {
-    console.log('NoteView Render ' + this.state.author)
     return (
       <Note
         title={this.state.title}

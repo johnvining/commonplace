@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Link, redirectTo } from '@reach/router'
 import check_circle from './icons/check_circle.svg'
 import cross_circle from './icons/cross_circle.svg'
-import document from './icons/document.svg'
+import document_image from './icons/document.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 import plus from './icons/plus.svg'
@@ -12,11 +12,13 @@ import Autocomplete from './Autocomplete'
 import * as db from './Database'
 
 // TODO: Support clearing authors
-
+// FIXME: Cancel should return UI to original state
 class Note extends React.Component {
   state = { loading: true }
 
   componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
+
     this.setState({
       authorId: this.props.authorId,
       author: this.props.author,
@@ -26,6 +28,27 @@ class Note extends React.Component {
       text: this.props.text,
       title: this.props.title
     })
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener(
+      'keydown',
+      this.handleKeyDown.bind(this),
+      false
+    )
+  }
+
+  // FIXME: Keyboard shortcuts apply to all notes on the page, rather than a specific one. Way of selecting a note-focus on lists?
+  handleKeyDown(event) {
+    console.log(event)
+    // TODO: Keyboard short cuts will interfere with Ctrl + A on Windows
+    if (this.state.edit && event.ctrlKey && event.keyCode == 65) {
+      this.handleAccept()
+    } else if (!this.state.edit && event.ctrlKey && event.keyCode == 69) {
+      this.handleEdit()
+    } else if (this.state.edit && event.keyCode == 27) {
+      this.handleCancel()
+    }
   }
 
   // TODO: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
@@ -242,7 +265,7 @@ class Note extends React.Component {
                   </button>
                   <Link to={'/note/' + id}>
                     <button className="action-button">
-                      <img src={document}></img>
+                      <img src={document_image}></img>
                     </button>
                   </Link>
 

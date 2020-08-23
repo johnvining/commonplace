@@ -7,7 +7,7 @@ class Idea extends React.Component {
 
   // TODO: Clean up -- https://stackoverflow.com/questions/48139281/react-doesnt-reload-component-data-on-route-param-change-or-query-change
   // TODO: DRY
-  // TODO: Update for idea ID changing
+  // TODO: Adding ideas doesn't refresh automatically
   componentDidMount() {
     db.getNotesForIdea(this.props.id)
       .then(response => {
@@ -71,9 +71,7 @@ class Idea extends React.Component {
           <span className="title">{this.state.ideaName}</span>
         </div>
 
-        {this.state.notes === undefined ? (
-          <h2>Nothing</h2>
-        ) : (
+        {this.state.notes === undefined ? null : (
           <div>
             {this.state.notes.map(note => {
               return (
