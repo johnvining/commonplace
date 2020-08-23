@@ -255,12 +255,6 @@ class Note extends React.Component {
             </div>
           )}
         </div>
-        <div>
-          <small>
-            <pre>{JSON.stringify(this.state, null, 4)}</pre>
-            <pre>{JSON.stringify(this.props, null, 2)}</pre>
-          </small>
-        </div>
       </div>
     )
   }

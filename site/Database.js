@@ -1,4 +1,3 @@
-import * as urls from './urls'
 import axios from 'axios'
 
 export const url_api = 'http://localhost:3000/api/'
