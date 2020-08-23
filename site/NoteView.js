@@ -44,7 +44,7 @@ class NoteView extends React.Component {
       <Note
         title={this.state.title}
         author={this.state.author}
-        authorId={this.state.author?._id}
+        authorId={this.state.authorId}
         text={this.state.text}
         ideas={this.state.ideas}
         id={this.props.id}
