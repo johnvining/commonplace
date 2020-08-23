@@ -130,8 +130,6 @@ class Note extends React.Component {
   render() {
     const { title, id, author, ideas, text, authorId, edit } = this.state
 
-    console.log('render: ' + author)
-
     if (this.state.deleted) {
       return <div> </div>
     }

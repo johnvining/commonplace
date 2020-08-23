@@ -379,6 +379,19 @@ input.author-label:focus {
   padding: 3px;
 }
 
+.author-label-search-box {
+  background-color: transparent;
+  border: none;
+  font-size: 18px;
+  margin: auto;
+  padding: 8px;
+  width: 25%;
+}
+
+.author-label-search-box:focus {
+  background-color: white;
+}
+
 .author-label-ul {
   display: inline;
   margin: 0px;

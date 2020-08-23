@@ -17,7 +17,10 @@ class Autocomplete extends React.Component {
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
-    this.setState({ currentTypedText: this.props.default })
+    this.setState({
+      currentTypedText: this.props.defaultValue,
+      hideResults: true
+    })
   }
 
   componentWillUnmount() {
@@ -81,6 +84,7 @@ class Autocomplete extends React.Component {
         <input
           id="mainInput"
           className={this.style.searchBox}
+          value={this.state.currentTypedText}
           onChange={this.handleTypingChange.bind(this)}
         ></input>
         {this.state.hideResults ? (
