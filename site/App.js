@@ -6,7 +6,6 @@ import { Router, Link } from '@reach/router'
 import RecentList from './RecentList'
 import Idea from './Idea'
 import NewNote from './NewNote'
-import Test from './Test'
 
 const App = () => {
   document.title = 'Commonplace'
@@ -27,11 +26,10 @@ const App = () => {
 
       <br />
       <Router>
-        <Test path="/test" />
         <NewNote path="/new" />
         <RecentList path="/" />
         <Idea path="/idea/:id" />
-        <NoteView path="/note/:id" alreadyLoaded={false} />
+        <NoteView path="/note/:id" />
         <Author path="/auth/:id" />
       </Router>
     </div>
