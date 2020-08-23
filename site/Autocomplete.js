@@ -1,8 +1,4 @@
 import React from 'react'
-import axios from 'axios'
-import Note from './Note'
-import { Link } from '@reach/router'
-import * as db from './Database'
 
 class Autocomplete extends React.Component {
   state = { loading: true, currentTypedText: ' ', hideResults: false }
@@ -17,7 +13,6 @@ class Autocomplete extends React.Component {
     exitButtonImage: this.props.exitButtonImage
   }
 
-  // TODO: Support for different databases
   // TODO: Support for filtering what we already have
 
   componentDidMount() {

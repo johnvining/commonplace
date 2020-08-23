@@ -27,19 +27,16 @@ class Note extends React.Component {
   }
 
   // TODO: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
-  static getDerivedStateFromProps(nextProps, prevState) {
-    console.log(prevState)
-    console.log(nextProps)
-
-    if (prevState.edit) {
-      return prevState
+  static getDerivedStateFromProps(next, prev) {
+    if (prev.edit || prev.keep) {
+      return prev
     } else {
       return {
-        authorId: nextProps.authorId,
-        title: nextProps.title,
-        text: nextProps.text,
-        ideas: nextProps.ideas,
-        id: nextProps.id
+        authorId: next.authorId,
+        title: next.title,
+        text: next.text,
+        ideas: next.ideas,
+        id: next.id
       }
     }
   }
@@ -119,23 +116,13 @@ class Note extends React.Component {
       text: this.state.text,
       authorId: this.state.authorId
     }
-    this.setState({ edit: false })
+    this.setState({ edit: false, keep: true })
     await db
       .updateNoteInfo(this.state.id, updateObject)
-      .then(response => {
-        // TODO: DRY
-        this.setState({
-          authorId: response.data.authorId,
-          title: response.data.title,
-          text: response.data.text,
-          updated: true
-        })
-      })
+      .then()
       .catch(error => {
         console.log(error)
       })
-
-    //TODO: Refresh the screen after saving changes
   }
 
   render() {
