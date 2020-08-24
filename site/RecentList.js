@@ -53,7 +53,6 @@ class RecentList extends React.Component {
   }
 
   // TODO: Split up note page and note display so I can use the note diplsay here
-  // TODO: Better formatting for author name
   render() {
     return (
       <div>
@@ -71,6 +70,8 @@ class RecentList extends React.Component {
                   id={note._id}
                   tabIndex={index + 1}
                   inFocus={this.state.inFocus}
+                  work={note.work?.name}
+                  workId={note.work?._id}
                   becomeInFocus={this.becomeInFocus.bind(this)}
                 />
               )

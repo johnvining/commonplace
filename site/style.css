@@ -190,40 +190,6 @@ input.noteEdit-title:focus {
   padding: 8px;
 }
 
-div.noteNormal-author-label,
-div.noteInFocus-author-label,
-div.noteEditIdea-author-label,
-div.noteEdit-author-label {
-  background-color: transparent;
-  width: 100%;
-  border: none;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  font-size: 18px;
-  margin: auto;
-  padding: 8px;
-}
-
-a.noteNormal-author,
-a.noteInFocus-author,
-a.noteEditIdea-author {
-  text-decoration: none;
-}
-
-input.author-label {
-  background-color: transparent;
-  width: 60%;
-  border: none;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  font-size: 18px;
-  margin: auto;
-  padding: 8px;
-}
-
-input.author-label:focus {
-  outline: none;
-  background-color: white;
-}
-
 /* Action button related */
 .noteNormal-action-button,
 .noteEdit-action-button,
@@ -417,31 +383,87 @@ input.author-label:focus {
   padding: 3px;
 }
 
-.noteEdit-author-label-search-box {
+div.noteNormal-author-label,
+div.noteInFocus-author-label,
+div.noteEditIdea-author-label,
+div.noteEdit-author-label,
+div.noteNormal-work-label,
+div.noteInFocus-work-label,
+div.noteEditIdea-work-label,
+div.noteEdit-work-label {
+  background-color: transparent;
+  width: 100%;
+  border: none;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 18px;
+  margin: auto;
+  padding: 8px;
+}
+
+div.noteNormal-work-label,
+div.noteInFocus-work-label,
+div.noteEditIdea-work-label,
+div.noteEdit-work-label {
+  font-style: italic;
+}
+
+a.noteNormal-author,
+a.noteInFocus-author,
+a.noteEditIdea-author,
+a.noteNormal-work,
+a.noteInFocus-work,
+a.noteEditIdea-work {
+  text-decoration: none;
+}
+
+input.noteEdit-author-label,
+input.noteEdit-work-label {
+  background-color: transparent;
+  width: 60%;
+  border: none;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-size: 18px;
+  margin: auto;
+  padding: 8px;
+}
+
+.noteEdit-author-label-search-box,
+.noteEdit-work-label-search-box {
   background-color: transparent;
   border: none;
   font-size: 18px;
   margin: auto;
+  width: 300px;
   padding: 8px;
   width: 25%;
 }
 
-.noteEdit-author-label-search-box:focus {
+/* TODO: Make inputs grow with entry */
+.noteEdit-work-label-search-box {
+  font-style: italic;
+  width: 300px;
+}
+
+.noteEdit-author-label-search-box:focus,
+.noteEdit-work-label-search-box:focus {
   background-color: white;
 }
 
-.noteEdit-author-label-ul {
+.noteEdit-author-label-ul,
+.noteEdit-work-label-ul {
   display: inline;
   margin: 0px;
   padding: 0px;
 }
-.noteEdit-author-label-li {
+.noteEdit-author-label-li,
+.noteEdit-work-label-li {
   display: inline;
   margin: 0px;
   padding: 0px;
 }
 
-.noteEdit-author-label-option {
+.noteEdit-author-label-option,
+.noteEdit-work-label-option {
   border: none;
   color: #393939;
   background: transparent;
@@ -449,18 +471,26 @@ input.author-label:focus {
   margin: 4px;
 }
 
-.noteEdit-author-label-option::after {
+.noteEdit-work-label-option,
+.noteEdit-work-label-option-new {
+  font-style: italic;
+}
+
+.noteEdit-author-label-option::after,
+.noteEdit-work-label-option::after {
   content: '? ';
 }
 
-.noteEdit-author-label-option-new {
+.noteEdit-author-label-option-new,
+.noteEdit-work-label-option-new {
   border: none;
   background: transparent;
   padding: 4px;
   margin: 4px;
 }
 
-.noteEdit-author-label-option-new::before {
+.noteEdit-author-label-option-new::before,
+.noteEdit-work-label-option-new::before {
   background-image: url('/icons/plus.svg');
   background-size: 16px 16px;
   display: inline-block;
@@ -472,7 +502,11 @@ input.author-label:focus {
 .noteEdit-author-label-option:hover,
 .noteEdit-author-label-option-new:hover,
 .noteEdit-author-label-option:focus,
-.noteEdit-author-label-option-new:focus {
+.noteEdit-author-label-option-new:focus,
+.noteEdit-work-label-option:hover,
+.noteEdit-work-label-option-new:hover,
+.noteEdit-work-label-option:focus,
+.noteEdit-work-label-option-new:focus {
   outline: none;
   border: solid;
   border-color: black;

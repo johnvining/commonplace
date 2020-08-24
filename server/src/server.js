@@ -7,6 +7,7 @@ import { connect } from './utils/db'
 import noteRouter from './resources/note/note.router'
 import authRouter from './resources/auth/auth.router'
 import ideaRouter from './resources/idea/idea.router'
+import workRouter from './resources/work/work.router'
 
 export const app = express()
 
@@ -20,6 +21,7 @@ app.use(morgan('dev'))
 app.use('/api/note', noteRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/idea', ideaRouter)
+app.use('/api/work', workRouter)
 
 export const start = async () => {
   try {

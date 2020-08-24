@@ -8,7 +8,11 @@ const noteSchema = new mongoose.Schema(
       ref: 'author'
     },
     text: String,
-    ideas: [{ type: mongoose.Schema.Types.ObjectId, ref: 'idea' }]
+    ideas: [{ type: mongoose.Schema.Types.ObjectId, ref: 'idea' }],
+    work: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'work'
+    }
   },
   { timestamps: true }
 )

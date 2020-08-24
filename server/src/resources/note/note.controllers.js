@@ -2,6 +2,7 @@ import Note from './note.model.js'
 import { crudControllers } from '../../utils/crud.js'
 import Idea from '../idea/idea.model.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
+import * as WorkControllers from '../work/work.controllers.js'
 
 // Note
 export const createNote = async function(title, author) {
@@ -21,6 +22,7 @@ export const getTenMostRecentNotes = async (req, res) => {
       .limit(30)
       .populate('author')
       .populate('ideas')
+      .populate('work')
       .lean()
       .exec()
 
@@ -32,8 +34,6 @@ export const getTenMostRecentNotes = async (req, res) => {
 }
 
 export const addTopic = async (req, res) => {
-  console.log(req)
-
   try {
     const docs = await addTopicToID(req.params.id, req.body.newTopic)
     res.status(200).json({ data: docs })
@@ -68,13 +68,38 @@ export const reqUpdateNote = async (req, res) => {
   }
 }
 
+export const addWork = async (req, res) => {
+  try {
+    const docs = await addWorkToID(req.params.id, req.body.newWork)
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const addNewWork = async (req, res) => {
+  try {
+    const newWork = await WorkControllers.createWork(req.body.newWork)
+    const docs = await addWorkToID(req.params.id, newWork._id)
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 export const addTopicToID = async (noteID, topicID) => {
-  console.log('adding topic to id' + noteID + ' ' + topicID)
-  // TODO: Doesn't update until closing the program sometimes?
   return await Note.findOneAndUpdate(
     { _id: noteID },
     { $addToSet: { ideas: topicID } }
   )
+    .lean()
+    .exec()
+}
+
+export const addWorkToID = async (noteID, workID) => {
+  return await Note.findOneAndUpdate({ _id: noteID }, { work: workID })
     .lean()
     .exec()
 }

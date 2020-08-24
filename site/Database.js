@@ -34,6 +34,16 @@ export async function getAuthorSuggestions(search) {
   return axios.post(url_api + `auth/autocomplete`, data)
 }
 
+export async function getWorkSuggestions(search) {
+  const data = { string: search }
+  return axios.post(url_api + `work/autocomplete`, data)
+}
+
+export async function createWork(workName) {
+  const data = { name: workName }
+  return axios.post(url_api + `work`, data)
+}
+
 export async function createAuthor(authorName) {
   const data = { name: authorName }
   return axios.post(url_api + `auth`, data)

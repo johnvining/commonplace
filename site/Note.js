@@ -26,6 +26,8 @@ class Note extends React.Component {
     this.setState({
       authorId: this.props.authorId,
       author: this.props.author,
+      work: this.props.work,
+      workId: this.props.workId,
       id: this.props.id,
       ideas: this.props.ideas,
       refetch: this.props.refetch,
@@ -71,7 +73,9 @@ class Note extends React.Component {
         title: next.title,
         text: next.text,
         ideas: next.ideas,
-        id: next.id
+        id: next.id,
+        work: next.work,
+        workId: next.workId
       }
     }
   }
@@ -146,11 +150,22 @@ class Note extends React.Component {
     })
   }
 
+  handleUpdateWork = (workId, workName) => {
+    this.setState({ workId: workId, work: workName })
+  }
+
+  handleCreateWorkAndAssign = workName => {
+    db.createWork(workName).then(response => {
+      this.setState({ workId: response.data.data.id, work: workName })
+    })
+  }
+
   async handleAccept() {
     const updateObject = {
       title: this.state.title,
       text: this.state.text,
-      author: this.state.authorId
+      author: this.state.authorId,
+      work: this.state.workId
     }
 
     this.setState({ edit: false, keep: true })
@@ -174,7 +189,9 @@ class Note extends React.Component {
       id,
       ideas,
       text,
-      title
+      title,
+      work,
+      workId
     } = this.state
     const inFocus = this.props.id == this.props.inFocus
 
@@ -196,6 +213,7 @@ class Note extends React.Component {
       return <div> </div>
     }
 
+    // TODO: Do autocomplete's need their out ESC handling? Remove it.
     return (
       <div
         className={mode.class + 'outer'}
@@ -248,6 +266,26 @@ class Note extends React.Component {
             <div className={mode.class + 'author-label'}>
               <Link to={'/auth/' + authorId} className={mode.class + 'author'}>
                 {author}
+              </Link>
+            </div>
+          )}
+        </div>
+        <div className={mode.class + 'work-bar'}>
+          {edit ? (
+            <Autocomplete
+              className={mode.class + 'work-label'}
+              defaultValue={work}
+              escape={() => {
+                this.setState({ edit: false })
+              }}
+              onSelect={this.handleUpdateWork}
+              getSuggestions={db.getWorkSuggestions}
+              handleNewSelect={this.handleCreateWorkAndAssign}
+            />
+          ) : (
+            <div className={mode.class + 'work-label'}>
+              <Link to={'/work/' + workId} className={mode.class + 'work'}>
+                {work}
               </Link>
             </div>
           )}
