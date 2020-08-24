@@ -1,11 +1,13 @@
 import Work from '../work/work.model.js'
+import Note from '../note/note.model.js'
 
 // Request response
 export const getNotesFromWork = async (req, res) => {
   try {
-    const doc = await Work.find({ work: req.params.id })
+    const doc = await Note.find({ work: req.params.id })
       .populate('author')
       .populate('ideas')
+      .populate('work')
       .lean()
       .exec()
     if (!doc) {
@@ -31,7 +33,7 @@ export const getAutoComplete = async (req, res) => {
   }
 }
 
-export const reqGetIdeaInfo = async (req, res) => {
+export const reqGetWorkInfo = async (req, res) => {
   try {
     const doc = await getWorkInfo(req.params.id)
     if (!doc) {

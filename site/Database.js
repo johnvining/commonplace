@@ -56,3 +56,13 @@ export async function getNotesForIdea(ideaId) {
 export async function getIdeaInfo(ideaId) {
   return axios.get(url_api + `idea/${ideaId}`)
 }
+
+export async function getNotesForWork(workId) {
+  console.log('getNotesForWork')
+  console.log(url_api + `work/${workId}/notes`)
+  return axios.get(url_api + `work/${workId}/notes`)
+}
+
+export async function getWorkInfo(workId) {
+  return axios.get(url_api + `work/${workId}`)
+}
