@@ -156,7 +156,8 @@ class Note extends React.Component {
 
   handleCreateWorkAndAssign = workName => {
     db.createWork(workName).then(response => {
-      this.setState({ workId: response.data.data.id, work: workName })
+      console.log(response)
+      this.setState({ workId: response.data.data._id, work: workName })
     })
   }
 
@@ -222,9 +223,6 @@ class Note extends React.Component {
         tabIndex={this.props.tabIndex}
       >
         <div className={mode.class + 'bar'}>
-          <span>
-            <small>DEBUG</small> {mode.name}
-          </span>
           {edit ? (
             <input
               className={mode.class + 'title'}

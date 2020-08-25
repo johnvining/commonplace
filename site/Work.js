@@ -3,6 +3,7 @@ import Note from './Note'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 
+// TODO: Display Work in notes
 class Work extends React.Component {
   state = { loading: true, newId: false, editAuthor: false }
 
@@ -38,8 +39,7 @@ class Work extends React.Component {
         db.getNotesForWork(this.props.id)
           .then(response => {
             this.setState({
-              notes: response.data.data,
-              authorName: response.data.data.author?.name
+              notes: response.data.data
             })
           })
           .catch(error => {
@@ -48,7 +48,8 @@ class Work extends React.Component {
         db.getWorkInfo(this.props.id)
           .then(response => {
             this.setState({
-              workName: response.data.data.name
+              workName: response.data.data.name,
+              authorName: response.data.data.author?.name
             })
           })
           .catch(error => {
@@ -97,7 +98,7 @@ class Work extends React.Component {
             <span className="title">{this.state.ideaName}</span>
           </div>
           <div>
-            {editAuthor ? (
+            {editAuthor || authorName == null || authorName?.length == 0 ? (
               <Autocomplete
                 className={'work-author-label'}
                 defaultValue={authorName}
