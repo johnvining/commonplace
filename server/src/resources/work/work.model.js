@@ -2,12 +2,16 @@ import mongoose from 'mongoose'
 
 // TODO: Add year
 // TODO: Add author
-const ideaSchema = new mongoose.Schema(
+const workSchema = new mongoose.Schema(
   {
-    name: String
+    name: String,
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'author'
+    }
   },
   { timestamps: true }
 )
 
 // TODO: Add indices
-export default mongoose.model('work', ideaSchema)
+export default mongoose.model('work', workSchema)

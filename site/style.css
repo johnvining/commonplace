@@ -16,6 +16,8 @@
 .title {
   width: 50%;
   display: inline-block;
+  margin: 0px;
+  padding: 0px;
 }
 
 .topButton {
@@ -513,4 +515,66 @@ input.noteEdit-work-label {
   border-width: 1px;
   border-radius: 4px;
   margin: 3px;
+}
+
+.top-right {
+  text-align: right;
+}
+
+/* TODO: Alignment isn't working right */
+div.work-author-label,
+input.work-author-label {
+  font-size: 28px;
+  margin: 0px;
+  width: 100%;
+  padding: 0px;
+}
+
+.work-author-label-search-box {
+  background-color: transparent;
+  border: none;
+  font-size: 28px;
+  text-align: right;
+  margin: auto;
+  width: 300px;
+  padding: 8px;
+}
+
+.work-author-label-ul {
+}
+.work-author-label-li {
+  display: inline;
+}
+
+.work-author-label-option,
+.work-author-label-option-new {
+  border: none;
+  background: transparent;
+  padding: 4px;
+  margin: 4px;
+  font-size: 18px;
+}
+
+.work-author-label-option {
+  color: #303030;
+}
+
+.work-author-label-option::after {
+  content: '?';
+}
+
+.work-author-label-option-new {
+  border: none;
+  background: transparent;
+  padding: 4px;
+  margin: 4px;
+}
+
+.work-author-label-option-new::before {
+  background-image: url('/icons/plus.svg');
+  background-size: 16px 16px;
+  display: inline-block;
+  width: 15px;
+  height: 13px;
+  content: '';
 }

@@ -58,11 +58,19 @@ export async function getIdeaInfo(ideaId) {
 }
 
 export async function getNotesForWork(workId) {
-  console.log('getNotesForWork')
-  console.log(url_api + `work/${workId}/notes`)
   return axios.get(url_api + `work/${workId}/notes`)
 }
 
 export async function getWorkInfo(workId) {
   return axios.get(url_api + `work/${workId}`)
+}
+
+export async function addAuthorToWork(workId, authorId) {
+  const data = { author: authorId }
+  return axios.put(url_api + `work/${workId}/auth`, data)
+}
+
+export async function createAuthorAndAddToWork(workId, authorName) {
+  const data = { author: authorName }
+  return axios.put(url_api + `work/${workId}/auth/create`, data)
 }

@@ -2,7 +2,7 @@ import React from 'react'
 
 // FIXME: Only some auto-completes should have autoFocus on create (Yes: idea, no: author)
 class Autocomplete extends React.Component {
-  state = { loading: true, currentTypedText: ' ', hideResults: false }
+  state = { loading: true, currentTypedText: '', hideResults: false }
   className = this.props.className
   style = {
     searchBox: this.className + '-search-box',
