@@ -43,12 +43,6 @@ class SearchBar extends React.Component {
           case this.modifiers.work:
           case this.modifiers.idea:
           case this.modifiers.find:
-            this.setState({
-              modifier: text,
-              modifierSelected: true,
-              typedText: ''
-            })
-            break
           case this.modifiers.note:
             this.setState({
               modifier: text,
@@ -101,12 +95,20 @@ class SearchBar extends React.Component {
         this.props.toggleSlim() // TODO: Update to use context
         this.props.beforeNavigate()
       })
+    } else if (
+      this.state.modifier == this.modifiers.find &&
+      event.keyCode == 13
+    ) {
+      console.log('find' + this.state.typedText)
+      let search = this.state.typedText
+      this.setState({ typedText: '' }, () => {
+        this.props.beforeNavigate()
+        navigate('/find/' + search)
+      })
     }
   }
 
   handleUpdate(id, name) {
-    console.log('handle update')
-    console.log(this.state.modifier)
     switch (this.state.modifier) {
       case this.modifiers.auth:
         this.props.beforeNavigate()

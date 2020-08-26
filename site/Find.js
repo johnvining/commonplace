@@ -4,8 +4,7 @@ import NoteList from './NoteList'
 import { decodeBase64 } from 'bcryptjs'
 import * as db from './Database'
 
-// TODO: Clean up all URLs
-// TODO: Fix going author -> author now that it's possible with search bar
+// TODO: Fix going search -> search
 class Find extends React.Component {
   state = { loading: true }
 
@@ -15,9 +14,6 @@ class Find extends React.Component {
     })
   }
 
-  // TODO: Split up note page and note display so I can use the note diplsay here
-  // TODO: Better formatting for author name
-  // TODO: Way to do this without two database calls?
   render() {
     return (
       <div>
