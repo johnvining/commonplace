@@ -2,9 +2,8 @@ import React, { useRef } from 'react'
 import { Link, redirectTo } from '@reach/router'
 
 class NoteSlim extends React.Component {
-  state = {
-    author: ''
-  }
+  state = {}
+
   componentDidMount() {
     this.setState({
       authorId: this.props.authorId,
@@ -20,32 +19,12 @@ class NoteSlim extends React.Component {
   }
 
   render() {
-    const {
-      author,
-      authorId,
-      deleted,
-
-      id,
-      text,
-      title,
-      work,
-      workId
-    } = this.state
+    const { author, text, title, work } = this.state
     const inFocus = this.props.id == this.props.inFocus
-
-    // If just deleted, hide
-    if (deleted) {
-      return <div> </div>
-    }
 
     return (
       <Link to={'/note/' + this.props.id} className="note-slim">
-        <div
-          key={this.props.id}
-          id={this.props.id}
-          tabIndex={this.props.tabIndex}
-          className="note-slim"
-        >
+        <div tabIndex={this.props.tabIndex} className="note-slim">
           {author?.length ? author : <em>No author</em>}
           {work?.length ? <em>,&nbsp;&nbsp;{work}</em> : null}
           &nbsp;&nbsp;&#8212;&nbsp; {title?.length ? title : <em>No title</em>}

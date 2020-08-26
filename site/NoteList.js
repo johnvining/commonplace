@@ -44,7 +44,7 @@ class NoteList extends React.Component {
           <div>
             {this.props.notes.map((note, index) => {
               return (
-                <div>
+                <div key={'note-view-' + note._id}>
                   {this.props.useSlim ? (
                     <NoteSlim
                       author={note.author?.name}
