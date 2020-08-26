@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios'
-import Note from './Note'
+import NoteList from './NoteList'
 import { Link } from '@reach/router'
 import { decodeBase64 } from 'bcryptjs'
 import * as db from './Database'
@@ -40,16 +40,27 @@ class NoteView extends React.Component {
   }
 
   render() {
+    const note = {
+      title: this.state.title,
+      author: this.state.author,
+      authorId: this.state.authorId,
+      text: this.state.text,
+      ideas: this.state.ideas,
+      id: this.props.id
+    }
+
     return (
-      <Note
-        title={this.state.title}
-        author={this.state.author}
-        authorId={this.state.authorId}
-        text={this.state.text}
-        ideas={this.state.ideas}
-        id={this.props.id}
-        refetch={this.refetch.bind(this)}
-      />
+      // <Note
+      //   title={this.state.title}
+      //   author={this.state.author}
+      //   authorId={this.state.authorId}
+      //   text={this.state.text}
+      //   ideas={this.state.ideas}
+      //   id={this.props.id}
+      //   refetch={this.refetch.bind(this)}
+      // />
+
+      <NoteList notes={[note]} />
     )
   }
 }

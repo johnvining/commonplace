@@ -1,5 +1,5 @@
 import React from 'react'
-import Note from './Note'
+import NoteList from './NoteList'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 
@@ -123,23 +123,7 @@ class Work extends React.Component {
           </div>
         </div>
 
-        {this.state.notes === undefined ? null : (
-          <div>
-            {this.state.notes.map(note => {
-              return (
-                <Note
-                  key={'note-' + note._id}
-                  title={note.title}
-                  author={note.author?.name}
-                  authorId={note.author?._id}
-                  text={note.text}
-                  ideas={note.ideas}
-                  id={note._id}
-                />
-              )
-            })}
-          </div>
-        )}
+        <NoteList notes={this.state.notes} />
       </div>
     )
   }

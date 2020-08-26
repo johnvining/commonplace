@@ -82,7 +82,7 @@ class SearchBar extends React.Component {
     ) {
       const response = await db.createNewNoteFromTitle(this.state.typedText)
       this.props.beforeNavigate()
-      navigate('note/' + response.data._id)
+      navigate('/note/' + response.data._id)
     }
   }
 

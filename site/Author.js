@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios'
-import Note from './Note'
+import NoteList from './NoteList'
 
 // TODO: Clean up all URLs
 // TODO: Fix going author -> author now that it's possible with search bar
@@ -65,24 +65,7 @@ class Author extends React.Component {
           </span>
         </div>
 
-        {this.state.notes === undefined ? (
-          <h2>Nothing</h2>
-        ) : (
-          <div>
-            {this.state.notes.map(note => {
-              return (
-                <Note
-                  title={note.title}
-                  author={note.author.name}
-                  authorId={note.authorId}
-                  text={note.text}
-                  ideas={note.ideas}
-                  id={note._id}
-                />
-              )
-            })}
-          </div>
-        )}
+        <NoteList notes={this.state.notes} />
       </div>
     )
   }

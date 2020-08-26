@@ -1,25 +1,11 @@
 import React from 'react'
 import axios from 'axios'
-import NoteList from './NoteList'
+import Note from './Note'
 
-class RecentList extends React.Component {
-  state = { loading: true }
-
+class NoteList extends React.Component {
+  state = { inFocus: null }
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
-
-    // TODO: Replace with call to db.
-    let url = `http://localhost:3000/api/note/all`
-    axios
-      .get(url)
-      .then(response => {
-        this.setState({
-          notes: response.data.data
-        })
-      })
-      .catch(error => {
-        console.error(error)
-      })
   }
 
   componentWillUnmount() {
@@ -50,13 +36,29 @@ class RecentList extends React.Component {
     this.setState({ inFocus: id })
   }
 
-  // TODO: Split up note page and note display so I can use the note diplsay here
   render() {
     return (
       <div>
-        {this.state.notes === undefined ? null : (
+        {this.props.notes === undefined ? null : (
           <div>
-            <NoteList notes={this.state.notes} />
+            {this.props.notes.map((note, index) => {
+              return (
+                <Note
+                  key={note._id}
+                  title={note.title}
+                  author={note.author?.name}
+                  authorId={note.author?._id}
+                  text={note.text}
+                  ideas={note.ideas}
+                  id={note._id}
+                  tabIndex={index + 1}
+                  inFocus={this.state.inFocus}
+                  work={note.work?.name}
+                  workId={note.work?._id}
+                  becomeInFocus={this.becomeInFocus.bind(this)}
+                />
+              )
+            })}
           </div>
         )}
       </div>
@@ -64,4 +66,4 @@ class RecentList extends React.Component {
   }
 }
 
-export default RecentList
+export default NoteList
