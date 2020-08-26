@@ -3,7 +3,7 @@ import axios from 'axios'
 export const url_api = 'http://localhost:3000/api/'
 
 export async function deleteNote(id) {
-  return axios.delete(urls.note.delete + id)
+  return axios.delete(url_api + `note/${id}`)
 }
 
 export async function addIdeaToNote(ideaID, nodeId) {
