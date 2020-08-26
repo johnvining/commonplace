@@ -7,6 +7,7 @@ import RecentList from './RecentList'
 import Idea from './Idea'
 import NewNote from './NewNote'
 import Work from './Work'
+import SearchBar from './SearchBar'
 
 const App = () => {
   document.title = 'Commonplace'
@@ -27,11 +28,12 @@ const App = () => {
 
       <br />
       <Router>
-        <NewNote path="/new" />
-        <RecentList path="/" />
-        <Idea path="/idea/:id" />
-        <NoteView path="/note/:id" />
         <Author path="/auth/:id" />
+        <Idea path="/idea/:id" />
+        <NewNote path="/new" />
+        <NoteView path="/note/:id" />
+        <RecentList path="/" />
+        <SearchBar path="/search" />
         <Work path="/work/:id" />
       </Router>
     </div>
