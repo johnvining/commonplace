@@ -10,7 +10,7 @@ import Work from './Work'
 import SearchBar from './SearchBar'
 
 class App extends React.Component {
-  state = { barOpen: false, slim: false }
+  state = { barOpen: false, slim: true }
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)

@@ -39,14 +39,14 @@ class NoteSlim extends React.Component {
     }
 
     return (
-      <Link to={'note/' + this.props.id} className="note-slim">
+      <Link to={'/note/' + this.props.id} className="note-slim">
         <div
           key={this.props.id}
           id={this.props.id}
           tabIndex={this.props.tabIndex}
           className="note-slim"
         >
-          {author?.length ? author : <em>No author</em>} -{' '}
+          {author?.length ? author : <em>No author</em>} &#8212;{' '}
           {title?.length ? title : <em>No title</em>}
           <br />
           {text?.length ? text : <span>&#8212;</span>}
