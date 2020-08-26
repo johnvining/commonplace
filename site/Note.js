@@ -18,7 +18,7 @@ import { Model } from 'mongoose'
 // FIXME: Saving newlines from Text Area doesn't work
 
 class Note extends React.Component {
-  state = { loading: true }
+  state = {}
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
@@ -121,7 +121,6 @@ class Note extends React.Component {
   handleNewTopic = ideaId => {
     db.addIdeaToNote(ideaId, this.props.id)
       .then(response => {
-        console.log(response.data.data.ideas)
         this.setState({ ideas: response.data.data.ideas })
       })
       .catch(e => {
@@ -133,7 +132,6 @@ class Note extends React.Component {
   handleCreateTopicAndAssign = topicName => {
     db.createTopicAndAssign(topicName, this.props.id)
       .then(response => {
-        console.log(response.data.data.ideas)
         this.setState({ ideas: response.data.data.ideas })
       })
       .catch(e => {
@@ -337,6 +335,7 @@ class Note extends React.Component {
               {this.state.addIdea ? (
                 <Autocomplete
                   className={mode.class + 'idea'}
+                  clearOnSelect={true}
                   escape={() => {
                     this.setState({ addIdea: false })
                   }}

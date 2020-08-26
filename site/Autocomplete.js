@@ -2,7 +2,11 @@ import React from 'react'
 
 // FIXME: Only some auto-completes should have autoFocus on create (Yes: idea, no: author)
 class Autocomplete extends React.Component {
-  state = { loading: true, currentTypedText: '', hideResults: false }
+  state = {
+    loading: true,
+    currentTypedText: '',
+    hideResults: false
+  }
   className = this.props.className
   style = {
     searchBox: this.className + '-search-box',
@@ -70,12 +74,24 @@ class Autocomplete extends React.Component {
         mainInput.value = this.state.currentTypedText
       }
     )
+
+    if (this.props.clearOnSelect) {
+      mainInput.value = ''
+      mainInput.focus()
+      this.setState({ currentTypedText: '' })
+    }
   }
 
   handleNewSelect = val => {
     this.props.handleNewSelect(this.state.currentTypedText)
     this.setState({ hideResults: true })
-    mainInput.value = this.state.currentTypedText
+    if (this.props.clearOnSelect) {
+      mainInput.value = ''
+      mainInput.focus()
+      this.setState({ currentTypedText: '' })
+    } else {
+      mainInput.value = this.state.currentTypedText
+    }
   }
 
   render() {
