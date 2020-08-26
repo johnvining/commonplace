@@ -71,7 +71,7 @@ class Idea extends React.Component {
           <span className="title">{this.state.ideaName}</span>
         </div>
 
-        <NoteList notes={this.state.notes} />
+        <NoteList notes={this.state.notes} useSlim={this.props.slim} />
       </div>
     )
   }

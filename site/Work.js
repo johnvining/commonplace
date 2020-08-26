@@ -123,7 +123,7 @@ class Work extends React.Component {
           </div>
         </div>
 
-        <NoteList notes={this.state.notes} />
+        <NoteList notes={this.state.notes} useSlim={this.props.slim} />
       </div>
     )
   }

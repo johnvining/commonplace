@@ -18,7 +18,8 @@ class SearchBar extends React.Component {
     home: 'home',
     idea: 'idea',
     note: 'note',
-    work: 'work'
+    work: 'work',
+    slim: 'slim'
   }
 
   componentDidMount() {
@@ -64,7 +65,6 @@ class SearchBar extends React.Component {
   async handleKeyDown(event) {
     if (
       //Delete to go back
-      // FIXME: Bug where there is already text
       event.keyCode == 8 &&
       this.state.modifierSelected &&
       this.state.typedText == ''
@@ -85,10 +85,20 @@ class SearchBar extends React.Component {
       navigate('/note/' + response.data._id)
     } else if (
       !this.state.modifierSelected &&
-      this.state.typedText == this.modifiers.home
+      this.state.typedText == this.modifiers.home &&
+      event.keyCode == 13
     ) {
       this.props.beforeNavigate()
       navigate('/')
+    } else if (
+      !this.state.modifierSelected &&
+      this.state.typedText == this.modifiers.slim &&
+      event.keyCode == 13
+    ) {
+      this.setState({ typedText: '' }, () => {
+        this.props.toggleSlim() // TODO: Update to use context
+        this.props.beforeNavigate()
+      })
     }
   }
 

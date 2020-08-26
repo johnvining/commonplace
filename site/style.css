@@ -663,3 +663,17 @@ div.currentModifier {
   border-style: none;
   border-radius: 4px;
 }
+
+div.note-slim {
+  padding: 4px;
+  margin: 4px;
+}
+
+a.note-slim {
+  text-decoration: none;
+}
+
+div.note-slim:hover {
+  background: #ddd;
+  border-radius: 4px;
+}

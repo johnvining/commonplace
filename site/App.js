@@ -10,7 +10,7 @@ import Work from './Work'
 import SearchBar from './SearchBar'
 
 class App extends React.Component {
-  state = { barOpen: false }
+  state = { barOpen: false, slim: false }
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
@@ -34,12 +34,19 @@ class App extends React.Component {
     this.setState({ barOpen: false })
   }
 
+  toggleSlim() {
+    this.setState({ slim: !this.state.slim })
+  }
+
   render() {
     return (
       <div className="main">
         {this.state.barOpen ? (
           <div className="topBar">
-            <SearchBar beforeNavigate={this.beforeSearchNavigate.bind(this)} />
+            <SearchBar
+              beforeNavigate={this.beforeSearchNavigate.bind(this)}
+              toggleSlim={this.toggleSlim.bind(this)}
+            />
           </div>
         ) : (
           <div className="topBar">
@@ -55,15 +62,14 @@ class App extends React.Component {
             </div>
           </div>
         )}
-
         <br />
         <Router>
-          <Author path="/auth/:id" />
-          <Idea path="/idea/:id" />
+          <Author path="/auth/:id" slim={this.state.slim} />
+          <Idea path="/idea/:id" slim={this.state.slim} />
           <NewNote path="/new" />
           <NoteView path="/note/:id" />
-          <RecentList path="/" />
-          <Work path="/work/:id" />
+          <RecentList path="/" slim={this.state.slim} />
+          <Work path="/work/:id" slim={this.state.slim} />
         </Router>
       </div>
     )

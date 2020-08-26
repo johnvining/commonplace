@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import Note from './Note'
+import NoteSlim from './NoteSlim'
 
 class NoteList extends React.Component {
   state = { inFocus: null }
@@ -43,20 +44,37 @@ class NoteList extends React.Component {
           <div>
             {this.props.notes.map((note, index) => {
               return (
-                <Note
-                  key={note._id}
-                  title={note.title}
-                  author={note.author?.name}
-                  authorId={note.author?._id}
-                  text={note.text}
-                  ideas={note.ideas}
-                  id={note._id}
-                  tabIndex={index + 1}
-                  inFocus={this.state.inFocus}
-                  work={note.work?.name}
-                  workId={note.work?._id}
-                  becomeInFocus={this.becomeInFocus.bind(this)}
-                />
+                <div>
+                  {this.props.useSlim ? (
+                    <NoteSlim
+                      author={note.author?.name}
+                      authorId={note.author?._id}
+                      id={note._id}
+                      inFocus={this.state.inFocus}
+                      key={note._id}
+                      tabIndex={index + 1}
+                      text={note.text}
+                      title={note.title}
+                      work={note.work?.name}
+                      workId={note.work?._id}
+                    />
+                  ) : (
+                    <Note
+                      author={note.author?.name}
+                      authorId={note.author?._id}
+                      becomeInFocus={this.becomeInFocus.bind(this)}
+                      id={note._id}
+                      ideas={note.ideas}
+                      inFocus={this.state.inFocus}
+                      key={note._id}
+                      tabIndex={index + 1}
+                      text={note.text}
+                      title={note.title}
+                      work={note.work?.name}
+                      workId={note.work?._id}
+                    />
+                  )}
+                </div>
               )
             })}
           </div>

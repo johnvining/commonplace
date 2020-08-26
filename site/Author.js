@@ -65,7 +65,7 @@ class Author extends React.Component {
           </span>
         </div>
 
-        <NoteList notes={this.state.notes} />
+        <NoteList notes={this.state.notes} useSlim={this.props.slim} />
       </div>
     )
   }
