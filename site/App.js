@@ -8,6 +8,7 @@ import Idea from './Idea'
 import NewNote from './NewNote'
 import Work from './Work'
 import SearchBar from './SearchBar'
+import Find from './Find'
 
 class App extends React.Component {
   state = { barOpen: false, slim: true }
@@ -65,6 +66,7 @@ class App extends React.Component {
         <br />
         <Router>
           <Author path="/auth/:id" slim={this.state.slim} />
+          <Find path="/find/:search" />
           <Idea path="/idea/:id" slim={this.state.slim} />
           <NewNote path="/new" />
           <NoteView path="/note/:id" />

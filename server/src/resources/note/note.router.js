@@ -5,17 +5,20 @@ import controllers, {
   addNewTopic,
   reqUpdateNote,
   addWork,
-  addNewWork
+  addNewWork,
+  reqFindNotesByString
 } from './note.controllers'
 
 const router = Router()
+
+router.route('/find').put(reqFindNotesByString)
 
 router
   .route('/')
   .get(controllers.getMany)
   .post(controllers.createOne)
 
-router.route('/all').get(getTenMostRecentNotes)
+router.route('/all').get(getTenMostRecentNotes) // TODO: Change to list
 
 router.route('/:id/idea').put(addTopic)
 router.route('/:id/idea/create').put(addNewTopic)

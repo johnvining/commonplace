@@ -89,6 +89,24 @@ export const addNewWork = async (req, res) => {
   }
 }
 
+export const reqFindNotesByString = async (req, res) => {
+  try {
+    const docs = await findNotesByString(req.body.searchString)
+
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const findNotesByString = async searchString => {
+  return Note.find({ $text: { $search: searchString } })
+    .populate('author')
+    .lean()
+    .exec()
+}
+
 export const addTopicToID = async (noteID, topicID) => {
   return await Note.findOneAndUpdate(
     { _id: noteID },

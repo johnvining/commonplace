@@ -217,7 +217,6 @@ class Note extends React.Component {
       mode.class = 'noteInFocus-'
     }
 
-    // If just deleted, hide
     if (deleted) {
       return <div> </div>
     }

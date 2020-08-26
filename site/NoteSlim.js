@@ -19,8 +19,12 @@ class NoteSlim extends React.Component {
   }
 
   render() {
-    const { author, text, title, work } = this.state
+    const { author, text, title, work, deleted } = this.state
     const inFocus = this.props.id == this.props.inFocus
+
+    if (deleted) {
+      return <div> </div>
+    }
 
     return (
       <Link to={'/note/' + this.props.id} className="note-slim">
