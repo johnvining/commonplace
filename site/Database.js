@@ -74,3 +74,8 @@ export async function createAuthorAndAddToWork(workId, authorName) {
   const data = { author: authorName }
   return axios.put(url_api + `work/${workId}/auth/create`, data)
 }
+
+export async function createNewNoteFromTitle(title) {
+  const data = { title: title }
+  return axios.post(url_api + 'note', data)
+}

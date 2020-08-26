@@ -13,10 +13,12 @@ class SearchBar extends React.Component {
   }
   modifiers = {
     auth: 'auth',
-    work: 'work',
-    idea: 'idea',
     find: 'find',
-    note: 'note'
+    help: 'help',
+    home: 'home',
+    idea: 'idea',
+    note: 'note',
+    work: 'work'
   }
 
   componentDidMount() {
@@ -40,6 +42,12 @@ class SearchBar extends React.Component {
           case this.modifiers.work:
           case this.modifiers.idea:
           case this.modifiers.find:
+            this.setState({
+              modifier: text,
+              modifierSelected: true,
+              typedText: ''
+            })
+            break
           case this.modifiers.note:
             this.setState({
               modifier: text,
@@ -47,14 +55,16 @@ class SearchBar extends React.Component {
               typedText: ''
             })
             break
-          default:
         }
       }
     })
   }
 
-  handleKeyDown(event) {
+  // TODO: Does async make sense here?
+  async handleKeyDown(event) {
     if (
+      //Delete to go back
+      // FIXME: Bug where there is already text
       event.keyCode == 8 &&
       this.state.modifierSelected &&
       this.state.typedText == ''
@@ -66,6 +76,13 @@ class SearchBar extends React.Component {
         modifierSelected: false
       })
       // TODO: Set focus back on the input
+    } else if (
+      this.state.modifier == this.modifiers.note &&
+      event.keyCode == 13
+    ) {
+      const response = await db.createNewNoteFromTitle(this.state.typedText)
+      this.props.beforeNavigate()
+      navigate('note/' + response.data._id)
     }
   }
 
@@ -106,16 +123,27 @@ class SearchBar extends React.Component {
   handleCreate() {}
 
   render() {
+    const { modifier, typedText } = this.state
+
+    let showAutocomplete = false
+    switch (modifier) {
+      case this.modifiers.auth:
+      case this.modifiers.idea:
+      case this.modifiers.work:
+        showAutocomplete = true
+        break
+    }
+
     return (
       <div className="searchBar-container">
-        {this.state.modifier.length ? (
-          <div className="currentModifier">{this.state.modifier}</div>
+        {modifier.length ? (
+          <div className="currentModifier">{modifier}</div>
         ) : null}
 
-        {this.state.modifier.length ? (
+        {showAutocomplete ? (
           <Autocomplete
             className={'searchBar'}
-            defaultValue={this.state.typedText}
+            defaultValue={typedText}
             onSelect={this.handleUpdate.bind(this)}
             getSuggestions={this.getSuggestions.bind(this)}
             handleNewSelect={this.handleCreate.bind(this)}
@@ -124,7 +152,7 @@ class SearchBar extends React.Component {
           <input
             className="searchBar"
             autoFocus
-            value={this.state.typedText}
+            value={typedText}
             onChange={this.handleTextChange.bind(this)}
           ></input>
         )}
