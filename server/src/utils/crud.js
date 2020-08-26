@@ -17,10 +17,9 @@ export const getMany = model => async (req, res) => {
 }
 
 export const getOne = model => async (req, res) => {
-  console.log('get one ' + req.params.id)
   try {
     const doc = await model
-      .findOne({ _id: req.params.id })
+      .find({ _id: req.params.id })
       .populate('author')
       .populate('ideas')
       .populate('work')
