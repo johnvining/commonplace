@@ -92,8 +92,10 @@ export const addNewWork = async (req, res) => {
 export const addTopicToID = async (noteID, topicID) => {
   return await Note.findOneAndUpdate(
     { _id: noteID },
-    { $addToSet: { ideas: topicID } }
+    { $addToSet: { ideas: topicID } },
+    { new: true }
   )
+    .populate('ideas')
     .lean()
     .exec()
 }

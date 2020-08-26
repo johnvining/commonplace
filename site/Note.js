@@ -64,7 +64,7 @@ class Note extends React.Component {
 
   // TODO: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
   static getDerivedStateFromProps(next, prev) {
-    if (prev.edit || prev.keep) {
+    if (prev.edit || prev.keep || prev.addIdea) {
       return prev
     } else {
       return {
@@ -118,30 +118,41 @@ class Note extends React.Component {
     this.setState({ text: val.target.value })
   }
 
-  handleNewTopic = topicID => {
-    db.addIdeaToNote(topicID, this.props.id)
-      .then(() => {
-        this.setState({ addIdea: false })
-        this.state.refetch()
+  handleNewTopic = ideaId => {
+    db.addIdeaToNote(ideaId, this.props.id)
+      .then(response => {
+        console.log(response.data.data.ideas)
+        this.setState({ ideas: response.data.data.ideas })
       })
       .catch(e => {
         console.log(e)
       })
   }
 
+  // TODO: Clear entry after assignment
   handleCreateTopicAndAssign = topicName => {
     db.createTopicAndAssign(topicName, this.props.id)
-      .then(() => {
-        this.setState({ addIdea: false })
-        this.state.refetch()
+      .then(response => {
+        console.log(response.data.data.ideas)
+        this.setState({ ideas: response.data.data.ideas })
       })
       .catch(e => {
         console.log(e)
       })
   }
 
-  handleUpdateAuthor = (authorId, authorName) => {
-    this.setState({ authorId: authorId, author: authorName })
+  addIdeaToState(ideaId, ideaName) {
+    let ideas = this.state.ideas
+    const newIdea = {
+      name: ideaName,
+      _id: ideaId
+    }
+    ideas.push(newIdea)
+
+    this.setState({
+      ideas: ideas,
+      addIdea: false
+    })
   }
 
   handleCreateAuthorAndAssign = authorName => {
@@ -156,7 +167,6 @@ class Note extends React.Component {
 
   handleCreateWorkAndAssign = workName => {
     db.createWork(workName).then(response => {
-      console.log(response)
       this.setState({ workId: response.data.data._id, work: workName })
     })
   }
