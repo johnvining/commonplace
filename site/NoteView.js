@@ -17,11 +17,11 @@ class NoteView extends React.Component {
       .then(response => {
         const data = response.data.data
         this.setState({
-          author: data.author?.name,
-          authorId: data.author?._id,
+          author: data.author,
+          ideas: data.ideas,
           text: data.text,
           title: data.title,
-          ideas: data.ideas
+          work: data.work
         })
 
         document.title = this.state.title
@@ -40,13 +40,17 @@ class NoteView extends React.Component {
   }
 
   render() {
+    console.log(this.state)
+
     const note = {
-      title: this.state.title,
+      _id: this.props.id,
       author: this.state.author,
       authorId: this.state.authorId,
-      text: this.state.text,
       ideas: this.state.ideas,
-      _id: this.props.id
+      text: this.state.text,
+      title: this.state.title,
+      work: this.state.work,
+      workId: this.state.workId
     }
 
     return <NoteList notes={[note]} />
