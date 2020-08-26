@@ -46,7 +46,7 @@ class NoteView extends React.Component {
       authorId: this.state.authorId,
       text: this.state.text,
       ideas: this.state.ideas,
-      id: this.props.id
+      _id: this.props.id
     }
 
     return <NoteList notes={[note]} />
