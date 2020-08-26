@@ -24,6 +24,7 @@ export const getNotesFromAuthor = async (req, res) => {
       .sort({ updatedAt: -1 })
       .populate('author')
       .populate('ideas')
+      .populate('work')
       .lean()
       .exec()
     if (!doc) {
