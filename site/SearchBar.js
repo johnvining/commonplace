@@ -74,12 +74,15 @@ class SearchBar extends React.Component {
     console.log(this.state.modifier)
     switch (this.state.modifier) {
       case this.modifiers.auth:
+        this.props.beforeNavigate()
         navigate('/auth/' + id)
         return
       case this.modifiers.idea:
+        this.props.beforeNavigate()
         navigate('/idea/' + id)
         return
       case this.modifiers.work:
+        this.props.beforeNavigate()
         navigate('/work/' + id)
         return
     }
@@ -120,6 +123,7 @@ class SearchBar extends React.Component {
         ) : (
           <input
             className="searchBar"
+            autoFocus
             value={this.state.typedText}
             onChange={this.handleTextChange.bind(this)}
           ></input>

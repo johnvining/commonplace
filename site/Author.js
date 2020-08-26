@@ -3,7 +3,7 @@ import axios from 'axios'
 import Note from './Note'
 
 // TODO: Clean up all URLs
-
+// TODO: Fix going author -> author now that it's possible with search bar
 class Author extends React.Component {
   state = { loading: true }
 

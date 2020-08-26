@@ -9,7 +9,7 @@
 
 .topBar {
   width: 100%;
-
+  min-height: 5em;
   display: block;
 }
 
@@ -582,6 +582,7 @@ input.work-author-label {
 .searchBar-container {
   border: 2px;
   border-style: solid;
+  border-radius: 4px;
 }
 
 input.searchBar,
