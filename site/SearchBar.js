@@ -80,9 +80,11 @@ class SearchBar extends React.Component {
       this.state.modifier == this.modifiers.note &&
       event.keyCode == 13
     ) {
-      const response = await db.createNewNoteFromTitle(this.state.typedText)
-      this.props.beforeNavigate()
-      navigate('/note/' + response.data._id)
+      this.setState({ modifier: '' }, async () => {
+        const response = await db.createNewNoteFromTitle(this.state.typedText)
+        this.props.beforeNavigate()
+        navigate('/note/' + response.data._id)
+      })
     } else if (
       !this.state.modifierSelected &&
       this.state.typedText == this.modifiers.home &&
