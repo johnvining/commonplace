@@ -153,6 +153,10 @@ class Note extends React.Component {
     })
   }
 
+  handleUpdateAuthor = (authorId, authorName) => {
+    this.setState({ authorId: authorId, author: authorName })
+  }
+
   handleCreateAuthorAndAssign = authorName => {
     db.createAuthor(authorName).then(response => {
       this.setState({ authorId: response.data.data.id, author: authorName })

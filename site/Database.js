@@ -84,3 +84,11 @@ export async function search(searchString) {
   const data = { searchString: searchString }
   return axios.put(url_api + 'note/find', data)
 }
+
+export async function getNotesForAuthor(authorId) {
+  return axios.get(`http://localhost:3000/api/auth/${authorId}/notes`)
+}
+
+export async function getAuthorInfo(authorId) {
+  return axios.get(`http://localhost:3000/api/auth/${authorId}`)
+}
