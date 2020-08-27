@@ -1,17 +1,31 @@
 import React from 'react'
-import axios from 'axios'
 import NoteList from './NoteList'
-import { decodeBase64 } from 'bcryptjs'
 import * as db from './Database'
 
-// TODO: Fix going search -> search
 class Find extends React.Component {
   state = { loading: true }
 
   componentDidMount() {
+    this.setState({ search: this.props.search })
     db.search(this.props.search).then(response => {
       this.setState({ notes: response.data.data })
     })
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.search !== prevState.search) {
+      return { search: nextProps.search }
+    }
+
+    return null
+  }
+
+  componentDidUpdate(prevState, prevProps) {
+    if (prevState.search !== this.state.search) {
+      db.search(this.state.search).then(response => {
+        this.setState({ notes: response.data.data })
+      })
+    }
   }
 
   render() {

@@ -99,7 +99,6 @@ class SearchBar extends React.Component {
       this.state.modifier == this.modifiers.find &&
       event.keyCode == 13
     ) {
-      console.log('find' + this.state.typedText)
       let search = this.state.typedText
       this.setState({ typedText: '' }, () => {
         this.props.beforeNavigate()
