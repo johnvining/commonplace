@@ -29,11 +29,14 @@ class NoteSlim extends React.Component {
     return (
       <Link to={'/note/' + this.props.id} className="note-slim">
         <div tabIndex={this.props.tabIndex} className="note-slim">
-          {author?.length ? author : <em>No author</em>}
-          {work?.length ? <em>,&nbsp;&nbsp;{work}</em> : null}
-          &nbsp;&nbsp;&#8212;&nbsp; {title?.length ? title : <em>No title</em>}
+          <b>{title?.length ? title : <em>No title</em>}</b>
           <br />
           {text?.length ? text : <span>&#8212;</span>}
+          <br />
+          <div align="right">
+            {author?.length ? author : <em>No author</em>}
+            {work?.length ? <em>,&nbsp;&nbsp;{work}</em> : null}
+          </div>
         </div>
       </Link>
     )
