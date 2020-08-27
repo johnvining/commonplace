@@ -3,29 +3,29 @@ import NoteList from './NoteList'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 
-// TODO: Display Work in notes
 class Work extends React.Component {
-  state = { loading: true, newId: false, editAuthor: false }
+  state = { id: '', editAuthor: false }
 
-  // TODO: Clean up -- https://stackoverflow.com/questions/48139281/react-doesnt-reload-component-data-on-route-param-change-or-query-change
-  // TODO: DRY
-  // TODO: Adding ideas doesn't refresh automatically
   componentDidMount() {
-    db.getNotesForWork(this.props.id)
+    this.fetchData(this.props.id)
+  }
+
+  componentDidUpdate(prevState) {
+    if (prevState.id !== this.state.id) {
+      this.fetchData(this.state.id)
+    }
+  }
+
+  fetchData(workId) {
+    const workNotesRequest = db.getNotesForWork(workId)
+    const workInfoRequest = db.getWorkInfo(workId)
+
+    Promise.all([workNotesRequest, workInfoRequest])
       .then(response => {
         this.setState({
-          notes: response.data.data
-        })
-      })
-      .catch(error => {
-        console.error(error)
-      })
-    db.getWorkInfo(this.props.id)
-      .then(response => {
-        console.log(response)
-        this.setState({
-          ideaName: response.data.data.name,
-          authorName: response.data.data.author?.name
+          notes: response[0].data.data,
+          work: response[1].data.data.name,
+          authorName: response[1].data.data.author?.name
         })
       })
       .catch(error => {
@@ -33,40 +33,12 @@ class Work extends React.Component {
       })
   }
 
-  componentDidUpdate() {
-    if (this.state.newId) {
-      this.setState({ newId: false }, () => {
-        db.getNotesForWork(this.props.id)
-          .then(response => {
-            this.setState({
-              notes: response.data.data
-            })
-          })
-          .catch(error => {
-            console.error(error)
-          })
-        db.getWorkInfo(this.props.id)
-          .then(response => {
-            this.setState({
-              workName: response.data.data.name,
-              authorName: response.data.data.author?.name
-            })
-          })
-          .catch(error => {
-            console.error(error)
-          })
-      })
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.id !== prevState.id) {
+      return { id: nextProps.id }
     }
-  }
 
-  static getDerivedStateFromProps(next, prev) {
-    if (next.id != prev.id) {
-      return {
-        id: next.id,
-        newId: true
-      }
-    }
-    return next
+    return null
   }
 
   handleUpdateAuthor = (authorId, authorName) => {
@@ -95,7 +67,7 @@ class Work extends React.Component {
       <div>
         <div className="top-right">
           <div>
-            <span className="title">{this.state.ideaName}</span>
+            <span className="title">{this.state.work}</span>
           </div>
           <div>
             {editAuthor || authorName == null || authorName?.length == 0 ? (
