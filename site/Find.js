@@ -1,13 +1,22 @@
 import React from 'react'
 import NoteList from './NoteList'
-import * as db from './Database'
+import { searchNotes } from './Database'
 
 class Find extends React.Component {
-  state = { loading: true }
+  state = { search: '' }
 
   componentDidMount() {
-    this.setState({ search: this.props.search })
-    db.search(this.props.search).then(response => {
+    this.fetchData(this.props.search)
+  }
+
+  componentDidUpdate(prevState) {
+    if (prevState.search !== this.state.search) {
+      this.fetchData(this.state.search)
+    }
+  }
+
+  fetchData(search) {
+    searchNotes(search).then(response => {
       this.setState({ notes: response.data.data })
     })
   }
@@ -18,14 +27,6 @@ class Find extends React.Component {
     }
 
     return null
-  }
-
-  componentDidUpdate(prevState, prevProps) {
-    if (prevState.search !== this.state.search) {
-      db.search(this.state.search).then(response => {
-        this.setState({ notes: response.data.data })
-      })
-    }
   }
 
   render() {
