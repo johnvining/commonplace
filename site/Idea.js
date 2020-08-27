@@ -1,27 +1,31 @@
 import React from 'react'
 import NoteList from './NoteList'
-import * as db from './Database'
+import { getNotesForIdea, getIdeaInfo } from './Database'
 
 class Idea extends React.Component {
-  state = { loading: true, newId: false }
+  state = {
+    id: ''
+  }
 
-  // TODO: Clean up -- https://stackoverflow.com/questions/48139281/react-doesnt-reload-component-data-on-route-param-change-or-query-change
-  // TODO: DRY
-  // TODO: Adding ideas doesn't refresh automatically
   componentDidMount() {
-    db.getNotesForIdea(this.props.id)
+    this.fetchData(this.props.id)
+  }
+
+  componentDidUpdate(prevState) {
+    if (prevState.id !== this.state.id) {
+      this.fetchData(this.state.id)
+    }
+  }
+
+  fetchData(ideaId) {
+    const ideaNotesRequest = getNotesForIdea(ideaId)
+    const ideaInfoRequest = getIdeaInfo(ideaId)
+
+    Promise.all([ideaNotesRequest, ideaInfoRequest])
       .then(response => {
         this.setState({
-          notes: response.data.data
-        })
-      })
-      .catch(error => {
-        console.error(error)
-      })
-    db.getIdeaInfo(this.props.id)
-      .then(response => {
-        this.setState({
-          ideaName: response.data.data.name
+          notes: response[0].data.data,
+          ideaName: response[1].data.data.name
         })
       })
       .catch(error => {
@@ -29,39 +33,12 @@ class Idea extends React.Component {
       })
   }
 
-  componentDidUpdate() {
-    if (this.state.newId) {
-      this.setState({ newId: false }, () => {
-        db.getNotesForIdea(this.props.id)
-          .then(response => {
-            this.setState({
-              notes: response.data.data
-            })
-          })
-          .catch(error => {
-            console.error(error)
-          })
-        db.getIdeaInfo(this.props.id)
-          .then(response => {
-            this.setState({
-              ideaName: response.data.data.name
-            })
-          })
-          .catch(error => {
-            console.error(error)
-          })
-      })
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.id !== prevState.id) {
+      return { id: nextProps.id }
     }
-  }
 
-  static getDerivedStateFromProps(next, prev) {
-    if (next.id != prev.id) {
-      return {
-        id: next.id,
-        newId: true
-      }
-    }
-    return next
+    return null
   }
 
   render() {

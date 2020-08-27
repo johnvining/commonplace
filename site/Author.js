@@ -2,10 +2,10 @@ import React from 'react'
 import NoteList from './NoteList'
 import { getAuthorInfo, getNotesForAuthor } from './Database'
 
-// TODO: Fix going author -> author now that it's possible with search bar
 class Author extends React.Component {
-  state = { loading: true }
-
+  state = {
+    id: ''
+  }
   componentDidMount() {
     this.fetchData(this.props.id)
   }
@@ -42,31 +42,13 @@ class Author extends React.Component {
     return null
   }
 
-  // TODO: Split up note page and note display so I can use the note diplsay here
-  // TODO: Better formatting for author name
   render() {
     return (
       <div>
         <div align="right">
-          <span className="title">
-            {' '}
-            {/* TODO: This is horrible */}
-            <small>
-              <small>{this.state.authorName}</small>
-              <small>
-                <small>
-                  <small>
-                    <small>
-                      <small>
-                        <br />
-                        {this.state.bornYear} - {this.state.diedYear}
-                      </small>
-                    </small>
-                  </small>
-                </small>
-              </small>
-            </small>
-          </span>
+          <span className="title">{this.state.authorName}</span>
+          <br />
+          {this.state.bornYear} - {this.state.diedYear}
         </div>
 
         <NoteList notes={this.state.notes} useSlim={this.props.slim} />
