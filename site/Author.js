@@ -6,6 +6,7 @@ class Author extends React.Component {
   state = {
     id: ''
   }
+
   componentDidMount() {
     this.fetchData(this.props.id)
   }
@@ -20,18 +21,14 @@ class Author extends React.Component {
     const authorNotesRequest = getNotesForAuthor(authorId)
     const authorInfoRequest = getAuthorInfo(authorId)
 
-    Promise.all([authorNotesRequest, authorInfoRequest])
-      .then(response => {
-        this.setState({
-          notes: response[0].data.data,
-          authorName: response[1].data.data.name,
-          bornYear: response[1].data.data.bornYear,
-          diedYear: response[1].data.data.diedYear
-        })
+    Promise.all([authorNotesRequest, authorInfoRequest]).then(response => {
+      this.setState({
+        notes: response[0].data.data,
+        authorName: response[1].data.data.name,
+        bornYear: response[1].data.data.bornYear,
+        diedYear: response[1].data.data.diedYear
       })
-      .catch(error => {
-        console.error(error)
-      })
+    })
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
