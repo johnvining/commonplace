@@ -4,7 +4,7 @@ import Note from './Note'
 import NoteSlim from './NoteSlim'
 
 class NoteList extends React.Component {
-  state = { inFocus: null }
+  state = { inFocus: null, selected: [] }
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
   }
@@ -37,7 +37,23 @@ class NoteList extends React.Component {
     this.setState({ inFocus: id })
   }
 
+  markChecked(id) {
+    if (this.state.selected.includes(id)) {
+      let tempArray = this.state.selected
+      const index = tempArray.indexOf(id)
+      if (index > -1) {
+        tempArray.splice(index, 1)
+      }
+      this.setState({ selected: tempArray })
+    } else {
+      let tempArray = this.state.selected
+      tempArray.push(id)
+      this.setState({ selected: tempArray })
+    }
+  }
+
   render() {
+    console.log(this.state.selected)
     return (
       <div>
         {this.props.notes === undefined ? null : (
@@ -48,6 +64,7 @@ class NoteList extends React.Component {
                   {this.props.useSlim ? (
                     <NoteSlim
                       author={note.author?.name}
+                      selected={this.state.selected.includes(note._id)}
                       authorId={note.author?._id}
                       id={note._id}
                       inFocus={this.state.inFocus}
@@ -57,6 +74,7 @@ class NoteList extends React.Component {
                       title={note.title}
                       work={note.work?.name}
                       workId={note.work?._id}
+                      markChecked={this.markChecked.bind(this)}
                     />
                   ) : (
                     <Note

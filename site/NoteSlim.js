@@ -18,6 +18,10 @@ class NoteSlim extends React.Component {
     })
   }
 
+  markChecked() {
+    this.props.markChecked(this.props.id)
+  }
+
   render() {
     const { author, text, title, work, deleted } = this.state
     const inFocus = this.props.id == this.props.inFocus
@@ -27,18 +31,22 @@ class NoteSlim extends React.Component {
     }
 
     return (
-      <Link to={'/note/' + this.props.id} className="note-slim">
-        <div tabIndex={this.props.tabIndex} className="note-slim">
-          <b>{title?.length ? title : <em>No title</em>}</b>
-          <br />
-          {text?.length ? text : <span>&#8212;</span>}
-          <br />
-          <div align="right">
-            {author?.length ? author : <em>No author</em>}
-            {work?.length ? <em>,&nbsp;&nbsp;{work}</em> : null}
+      <div className={this.props.selected ? 'slim-selected' : 'slim'}>
+        <button onClick={this.markChecked.bind(this)}>Mark</button>
+
+        <Link to={'/note/' + this.props.id} className="note-slim">
+          <div tabIndex={this.props.tabIndex} className="note-slim">
+            <b>{title?.length ? title : <em>No title</em>}</b>
+            <br />
+            {text?.length ? text : <span>&#8212;</span>}
+            <br />
+            <div align="right">
+              {author?.length ? author : <em>No author</em>}
+              {work?.length ? <em>,&nbsp;&nbsp;{work}</em> : null}
+            </div>
           </div>
-        </div>
-      </Link>
+        </Link>
+      </div>
     )
   }
 }

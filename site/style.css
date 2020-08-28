@@ -677,3 +677,16 @@ div.note-slim:hover {
   background: #ddd;
   border-radius: 4px;
 }
+
+.slim-selected {
+  border: 1px;
+  border-style: solid;
+  border-color: black;
+  border-radius: 4px;
+}
+.slim {
+  border: 1px;
+  border-style: solid;
+  border-color: lightgrey;
+  border-radius: 4px;
+}
