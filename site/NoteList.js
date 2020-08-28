@@ -5,7 +5,7 @@ import NoteSlim from './NoteSlim'
 import * as db from './Database'
 
 class NoteList extends React.Component {
-  state = { inFocus: null, selected: [] }
+  state = { inFocus: null, selected: [], deleted: [] }
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
   }
@@ -54,15 +54,19 @@ class NoteList extends React.Component {
   }
 
   delete() {
-    console.log('delete')
-    console.log(this.state.selected)
+    if (
+      !confirm(
+        `Do you want to permanently delete ${this.state.selected.length} notes?`
+      )
+    ) {
+      return
+    }
 
     for (let i = 0; i < this.state.selected.length; i++) {
-      console.log(this.state.selected[i])
       db.deleteNote(this.state.selected[i])
     }
 
-    this.setState({ selected: [] })
+    this.setState({ deleted: this.state.selected, selected: [] })
   }
 
   render() {
@@ -87,6 +91,7 @@ class NoteList extends React.Component {
                     <NoteSlim
                       author={note.author?.name}
                       selected={this.state.selected.includes(note._id)}
+                      deleted={this.state.deleted.includes(note._id)}
                       authorId={note.author?._id}
                       id={note._id}
                       inFocus={this.state.inFocus}
