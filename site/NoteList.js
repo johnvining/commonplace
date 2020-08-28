@@ -2,6 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import Note from './Note'
 import NoteSlim from './NoteSlim'
+import * as db from './Database'
 
 class NoteList extends React.Component {
   state = { inFocus: null, selected: [] }
@@ -52,10 +53,31 @@ class NoteList extends React.Component {
     }
   }
 
+  delete() {
+    console.log('delete')
+    console.log(this.state.selected)
+
+    for (let i = 0; i < this.state.selected.length; i++) {
+      console.log(this.state.selected[i])
+      db.deleteNote(this.state.selected[i])
+    }
+
+    this.setState({ selected: [] })
+  }
+
   render() {
     console.log(this.state.selected)
     return (
       <div>
+        {this.state.selected.length ? (
+          <div>
+            <button onClick={this.delete.bind(this)}>Delete</button>
+            <button>Idea</button>
+            <button>Work</button>
+            <button>Author</button>
+          </div>
+        ) : null}
+
         {this.props.notes === undefined ? null : (
           <div>
             {this.props.notes.map((note, index) => {
