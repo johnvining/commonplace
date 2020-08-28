@@ -18,8 +18,12 @@ class NoteSlim extends React.Component {
     })
   }
 
-  markChecked() {
-    this.props.markChecked(this.props.id)
+  markChecked(e) {
+    if (e.shiftKey) {
+      this.props.markShiftChecked(this.props.index)
+    } else {
+      this.props.markChecked(this.props.index)
+    }
   }
 
   render() {

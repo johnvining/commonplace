@@ -1,11 +1,12 @@
 import React from 'react'
-import axios from 'axios'
 import Note from './Note'
 import NoteSlim from './NoteSlim'
 import * as db from './Database'
 
+// TODO: Unselect on switching to slim
+
 class NoteList extends React.Component {
-  state = { inFocus: null, selected: [], deleted: [] }
+  state = { inFocus: null, selected: [], deleted: [], lastSelectedIndex: 0 }
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
   }
@@ -38,19 +39,31 @@ class NoteList extends React.Component {
     this.setState({ inFocus: id })
   }
 
-  markChecked(id) {
-    if (this.state.selected.includes(id)) {
+  markChecked(noteIndex) {
+    if (this.state.selected.includes(noteIndex)) {
       let tempArray = this.state.selected
-      const index = tempArray.indexOf(id)
+      const index = tempArray.indexOf(noteIndex)
       if (index > -1) {
         tempArray.splice(index, 1)
       }
       this.setState({ selected: tempArray })
     } else {
       let tempArray = this.state.selected
-      tempArray.push(id)
-      this.setState({ selected: tempArray })
+      tempArray.push(noteIndex)
+      this.setState({ selected: tempArray, lastSelectedIndex: noteIndex })
     }
+  }
+
+  markShiftChecked(id) {
+    let start = Math.min(this.state.lastSelectedIndex, id)
+    let end = Math.max(this.state.lastSelectedIndex, id)
+    let tempArray = this.state.selected
+    for (let i = start; i <= end; i++) {
+      if (!this.state.selected.includes(i) && !this.state.deleted.includes(i)) {
+        tempArray.push(i)
+      }
+    }
+    this.setState({ selected: tempArray })
   }
 
   delete() {
@@ -70,7 +83,6 @@ class NoteList extends React.Component {
   }
 
   render() {
-    console.log(this.state.selected)
     return (
       <div>
         {this.state.selected.length ? (
@@ -90,8 +102,9 @@ class NoteList extends React.Component {
                   {this.props.useSlim ? (
                     <NoteSlim
                       author={note.author?.name}
-                      selected={this.state.selected.includes(note._id)}
-                      deleted={this.state.deleted.includes(note._id)}
+                      index={index}
+                      selected={this.state.selected.includes(index)}
+                      deleted={this.state.deleted.includes(index)}
                       authorId={note.author?._id}
                       id={note._id}
                       inFocus={this.state.inFocus}
@@ -102,6 +115,7 @@ class NoteList extends React.Component {
                       work={note.work?.name}
                       workId={note.work?._id}
                       markChecked={this.markChecked.bind(this)}
+                      markShiftChecked={this.markShiftChecked.bind(this)}
                     />
                   ) : (
                     <Note
