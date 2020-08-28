@@ -66,6 +66,14 @@ class NoteList extends React.Component {
     this.setState({ selected: tempArray })
   }
 
+  selectAll() {
+    let selected = []
+    for (let i = 0; i < this.props.notes.length; i++) {
+      selected.push(i)
+    }
+    this.setState({ selected: selected })
+  }
+
   delete() {
     if (
       !confirm(
@@ -99,7 +107,9 @@ class NoteList extends React.Component {
               Unselect All
             </button>
           </div>
-        ) : null}
+        ) : (
+          <button onClick={this.selectAll.bind(this)}>Select All</button>
+        )}
 
         {this.props.notes === undefined ? null : (
           <div>

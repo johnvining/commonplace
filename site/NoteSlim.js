@@ -1,5 +1,7 @@
 import React, { useRef } from 'react'
 import { Link, redirectTo } from '@reach/router'
+import circle from './icons/circle.svg'
+import check_circle from './icons/check_circle.svg'
 
 class NoteSlim extends React.Component {
   state = {}
@@ -37,7 +39,15 @@ class NoteSlim extends React.Component {
 
     return (
       <div className={this.props.selected ? 'slim-selected' : 'slim'}>
-        <button onClick={this.markChecked.bind(this)}>Mark</button>
+        {this.props.selected ? (
+          <button onClick={this.markChecked.bind(this)}>
+            <img src={check_circle} />
+          </button>
+        ) : (
+          <button onClick={this.markChecked.bind(this)}>
+            <img src={circle} />
+          </button>
+        )}
 
         <Link to={'/note/' + this.props.id} className="note-slim">
           <div tabIndex={this.props.tabIndex} className="note-slim">
