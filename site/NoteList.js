@@ -91,6 +91,13 @@ class NoteList extends React.Component {
             <button>Idea</button>
             <button>Work</button>
             <button>Author</button>
+            <button
+              onClick={() => {
+                this.setState({ selected: [], lastSelectedIndex: 0 })
+              }}
+            >
+              Unselect All
+            </button>
           </div>
         ) : null}
 
