@@ -56,7 +56,11 @@ class RecentList extends React.Component {
       <div>
         {this.state.notes === undefined ? null : (
           <div>
-            <NoteList notes={this.state.notes} useSlim={this.props.slim} />
+            <NoteList
+              notes={this.state.notes}
+              useGridView={true}
+              useSlim={this.props.slim}
+            />
           </div>
         )}
       </div>

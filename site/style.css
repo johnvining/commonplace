@@ -690,3 +690,55 @@ div.note-slim:hover {
   border-color: white;
   border-radius: 4px;
 }
+
+.grid {
+  font-size: 14px;
+  display: block;
+  margin: auto;
+  display: flex;
+  align-items: center;
+}
+.grid-selected {
+  background: #eee;
+  font-size: 14px;
+  display: block;
+  margin: auto;
+  display: flex;
+  align-items: center;
+}
+
+.grid-button {
+  border: none;
+  display: inline-block;
+  background: transparent;
+}
+
+.grid-author {
+  display: inline-block;
+  width: 12%;
+  height: 18px;
+  text-overflow: clip;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.grid-title {
+  display: inline-block;
+  width: 24%;
+  height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.grid-text {
+  display: inline-block;
+  width: 50%;
+  height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 10px;
+}

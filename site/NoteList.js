@@ -1,6 +1,7 @@
 import React from 'react'
 import Note from './Note'
 import NoteSlim from './NoteSlim'
+import NoteGrid from './NoteGrid'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import { add, assign } from 'lodash'
@@ -8,7 +9,13 @@ import { add, assign } from 'lodash'
 // TODO: Unselect on switching to slim
 
 class NoteList extends React.Component {
-  state = { inFocus: null, selected: [], deleted: [], lastSelectedIndex: 0 }
+  state = {
+    inFocus: null,
+    selected: [],
+    deleted: [],
+    lastSelectedIndex: 0,
+    useGridView: 1
+  }
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
   }
@@ -207,7 +214,25 @@ class NoteList extends React.Component {
             {this.props.notes.map((note, index) => {
               return (
                 <div key={'note-view-' + note._id}>
-                  {this.props.useSlim ? (
+                  {this.props.useGridView ? (
+                    <NoteGrid
+                      author={note.author?.name}
+                      index={index}
+                      selected={this.state.selected.includes(index)}
+                      deleted={this.state.deleted.includes(index)}
+                      authorId={note.author?._id}
+                      id={note._id}
+                      inFocus={this.state.inFocus}
+                      key={note._id}
+                      tabIndex={index + 1}
+                      text={note.text}
+                      title={note.title}
+                      work={note.work?.name}
+                      workId={note.work?._id}
+                      markChecked={this.markChecked.bind(this)}
+                      markShiftChecked={this.markShiftChecked.bind(this)}
+                    />
+                  ) : this.props.useSlim ? (
                     <NoteSlim
                       author={note.author?.name}
                       index={index}
