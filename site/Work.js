@@ -2,6 +2,7 @@ import React from 'react'
 import NoteList from './NoteList'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
+import FreeEntry from './FreeEntry'
 
 class Work extends React.Component {
   state = { id: '', editAuthor: false }
@@ -25,7 +26,8 @@ class Work extends React.Component {
         this.setState({
           notes: response[0].data.data,
           work: response[1].data.data.name,
-          authorName: response[1].data.data.author?.name
+          authorName: response[1].data.data.author?.name,
+          url: response[1].data.data.url
         })
       })
       .catch(error => {
@@ -60,8 +62,15 @@ class Work extends React.Component {
     })
   }
 
+  submitUrl(text) {
+    console.log('submit')
+    // DB
+    this.setState({ editUrl: false })
+    db.addUrlToWork(this.props.id, text)
+  }
+
   render() {
-    const { authorName, editAuthor } = this.state
+    const { authorName, editAuthor, url } = this.state
 
     return (
       <div>
@@ -91,6 +100,36 @@ class Work extends React.Component {
               >
                 {authorName}
               </div>
+            )}
+          </div>
+          <div>
+            {this.state.editUrl ? (
+              <FreeEntry
+                defaultValue={this.props.url}
+                escape={() => {
+                  this.setState({ editUrl: false })
+                }}
+                submit={this.submitUrl.bind(this)}
+              />
+            ) : url?.length ? (
+              <span
+                className="url"
+                onClick={() => {
+                  // TODO: Fix accessibility
+                  this.setState({ editUrl: true })
+                }}
+              >
+                {url}
+              </span>
+            ) : (
+              <span
+                className="url"
+                onClick={() => {
+                  this.setState({ editUrl: true })
+                }}
+              >
+                no url
+              </span>
             )}
           </div>
         </div>

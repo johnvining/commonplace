@@ -8,7 +8,8 @@ const workSchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'author'
-    }
+    },
+    url: String
   },
   { timestamps: true }
 )

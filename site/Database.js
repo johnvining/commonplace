@@ -64,7 +64,14 @@ export async function getWorkInfo(workId) {
 
 export async function addAuthorToWork(workId, authorId) {
   const data = { author: authorId }
-  return axios.put(url_api + `work/${workId}/auth`, data)
+  return axios.put(url_api + `work/${workId}`, data)
+}
+
+export async function addUrlToWork(workId, url2) {
+  const data = { url: url2 }
+  console.log(url2)
+  console.log(url_api + `work/${workId}`)
+  return axios.put(url_api + `work/${workId}`, data)
 }
 
 export async function createAuthorAndAddToWork(workId, authorName) {

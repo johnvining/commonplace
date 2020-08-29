@@ -61,6 +61,7 @@ export const reqCreateWork = async (req, res) => {
 }
 
 export const reqUpdateWork = async (req, res) => {
+  console.log('update ' + req.body.url)
   try {
     const doc = await updateWorkInfo(req.params.id, req.body)
     if (!doc) {
