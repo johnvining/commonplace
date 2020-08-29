@@ -1,16 +1,14 @@
-import React, { useRef } from 'react'
-import axios from 'axios'
-import { Link, redirectTo } from '@reach/router'
+import React from 'react'
+import { Link } from '@reach/router'
 import check_circle from './icons/check_circle.svg'
 import cross_circle from './icons/cross_circle.svg'
 import document_image from './icons/document.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 import plus from './icons/plus.svg'
-import check from './icons/check.svg'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
-import { Model } from 'mongoose'
+import link from './icons/link.svg'
 
 // TODO: Support clearing authors
 // TODO: Support removing idea links
@@ -28,6 +26,7 @@ class Note extends React.Component {
       author: this.props.author,
       work: this.props.work,
       workId: this.props.workId,
+      workUrl: this.props.workUrl,
       id: this.props.id,
       ideas: this.props.ideas,
       refetch: this.props.refetch,
@@ -204,7 +203,8 @@ class Note extends React.Component {
       text,
       title,
       work,
-      workId
+      workId,
+      workUrl
     } = this.state
     const inFocus = this.props.id == this.props.inFocus
 
@@ -287,15 +287,20 @@ class Note extends React.Component {
               escape={() => {
                 this.setState({ edit: false })
               }}
-              onSelect={this.handleUpdateWork}
+              onSelect={this.handleUpdateWork.bind(this)}
               getSuggestions={db.getWorkSuggestions}
-              handleNewSelect={this.handleCreateWorkAndAssign}
+              handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
             />
           ) : (
             <div className={mode.class + 'work-label'}>
               <Link to={'/work/' + workId} className={mode.class + 'work'}>
                 {work}
               </Link>
+              {workUrl?.length ? (
+                <a href={workUrl}>
+                  <img src={link} />
+                </a>
+              ) : null}
             </div>
           )}
         </div>

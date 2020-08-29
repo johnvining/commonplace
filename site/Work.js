@@ -3,6 +3,7 @@ import NoteList from './NoteList'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import FreeEntry from './FreeEntry'
+import link from './icons/link.svg'
 
 class Work extends React.Component {
   state = { id: '', editAuthor: false }
@@ -105,22 +106,27 @@ class Work extends React.Component {
           <div>
             {this.state.editUrl ? (
               <FreeEntry
-                defaultValue={this.props.url}
+                defaultValue={url}
                 escape={() => {
                   this.setState({ editUrl: false })
                 }}
                 submit={this.submitUrl.bind(this)}
               />
             ) : url?.length ? (
-              <span
-                className="url"
-                onClick={() => {
-                  // TODO: Fix accessibility
-                  this.setState({ editUrl: true })
-                }}
-              >
-                {url}
-              </span>
+              <div>
+                <span
+                  className="url"
+                  onClick={() => {
+                    // TODO: Fix accessibility
+                    this.setState({ editUrl: true })
+                  }}
+                >
+                  {url}
+                </span>
+                <a href={url}>
+                  <img src={link} />
+                </a>
+              </div>
             ) : (
               <span
                 className="url"

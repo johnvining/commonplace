@@ -279,6 +279,7 @@ class NoteList extends React.Component {
                       title={note.title}
                       work={note.work?.name}
                       workId={note.work?._id}
+                      workUrl={note.work?.url}
                     />
                   )}
                 </div>

@@ -36,7 +36,6 @@ class FreeEntry extends React.Component {
   }
 
   render() {
-    // TODO: Escape handling
     // TODO: Validation function
 
     return (
