@@ -7,6 +7,7 @@ export const getNotesFromIdea = async (req, res) => {
     const doc = await Note.find({ ideas: req.params.id })
       .populate('author')
       .populate('ideas')
+      .populate('work')
       .lean()
       .exec()
     if (!doc) {

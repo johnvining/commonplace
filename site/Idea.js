@@ -2,36 +2,44 @@ import React from 'react'
 import NoteList from './NoteList'
 import { getNotesForIdea, getIdeaInfo } from './Database'
 
-// TODO: Convert to new NoteList structure - give NoteList call backs for fetching data
 class Idea extends React.Component {
   state = {
     id: ''
   }
 
   componentDidMount() {
-    this.fetchData(this.props.id)
+    this.fetchIdeaInfo(this.props.id)
   }
 
   componentDidUpdate(prevState) {
     if (prevState.id !== this.state.id) {
-      this.fetchData(this.state.id)
+      this.fetchIdeaInfo(this.state.id)
     }
   }
 
-  fetchData(ideaId) {
-    const ideaNotesRequest = getNotesForIdea(ideaId)
-    const ideaInfoRequest = getIdeaInfo(ideaId)
-
-    Promise.all([ideaNotesRequest, ideaInfoRequest])
+  fetchIdeaInfo(ideaId) {
+    getIdeaInfo(ideaId)
       .then(response => {
         this.setState({
-          notes: response[0].data.data,
-          ideaName: response[1].data.data.name
+          ideaName: response.data.data.name
         })
       })
       .catch(error => {
         console.error(error)
       })
+  }
+
+  async getListOfNotes() {
+    let notesResponse
+    await getNotesForIdea(this.state.id)
+      .then(response => {
+        notesResponse = response
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+    return notesResponse
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -49,7 +57,12 @@ class Idea extends React.Component {
           <span className="title">{this.state.ideaName}</span>
         </div>
 
-        <NoteList notes={this.state.notes} useSlim={this.props.slim} />
+        <NoteList
+          key={'idea' + this.props.id}
+          useGridView={false}
+          useSlim={false}
+          getListOfNotes={this.getListOfNotes.bind(this)}
+        />
       </div>
     )
   }
