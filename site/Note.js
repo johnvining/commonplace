@@ -16,23 +16,27 @@ import link from './icons/link.svg'
 // FIXME: Saving newlines from Text Area doesn't work
 
 class Note extends React.Component {
-  state = {}
+  state = {
+    pendingTitle: '',
+    pendingText: '',
+    pendingAuthorId: null,
+    pendingAuthorName: '',
+    pendingWorkId: null,
+    pendingWorkName: ''
+  }
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
 
+    // TODO: Do we need?
     this.setState({
-      authorId: this.props.authorId,
-      author: this.props.author,
-      work: this.props.work,
-      workId: this.props.workId,
-      workUrl: this.props.workUrl,
-      id: this.props.id,
-      ideas: this.props.ideas,
-      refetch: this.props.refetch,
-      text: this.props.text,
-      title: this.props.title,
-      inFocus: this.props.inFocus
+      inFocus: this.props.inFocus,
+      pendingTitle: this.props.note.title,
+      pendingText: this.props.note.text,
+      pendingAuthorId: this.props.note.author?._id,
+      pendingAuthorName: this.props.note.author?.name,
+      pendingWorkId: this.props.note.work?._id,
+      pendingWorkName: this.props.note.work?.name
     })
   }
 
@@ -61,24 +65,6 @@ class Note extends React.Component {
     }
   }
 
-  // TODO: https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html
-  static getDerivedStateFromProps(next, prev) {
-    if (prev.edit || prev.keep || prev.addIdea) {
-      return prev
-    } else {
-      return {
-        authorId: next.authorId,
-        author: next.author,
-        title: next.title,
-        text: next.text,
-        ideas: next.ideas,
-        id: next.id,
-        work: next.work,
-        workId: next.workId
-      }
-    }
-  }
-
   handleDelete() {
     if (confirm('Are you sure you want to delete this note?')) {
       db.deleteNote(this.props.id)
@@ -86,7 +72,7 @@ class Note extends React.Component {
           this.setState({ deleted: true })
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
         })
     }
   }
@@ -101,8 +87,7 @@ class Note extends React.Component {
   }
 
   addIdea() {
-    this.setState({ addIdea: true })
-    this.setState({ focus: this })
+    this.setState({ addIdea: true, focus: this })
   }
 
   endIdea() {
@@ -110,103 +95,79 @@ class Note extends React.Component {
   }
 
   handleTitleChange = val => {
-    this.setState({ title: val.target.value })
+    this.setState({ pendingTitle: val.target.value })
   }
 
   handleTextChange = val => {
-    this.setState({ text: val.target.value })
+    this.setState({ pendingText: val.target.value })
   }
 
   handleNewTopic = ideaId => {
     db.addIdeaToNote(ideaId, this.props.id)
-      .then(response => {
-        this.setState({ ideas: response.data.data.ideas })
-      })
+      .then(this.props.refetchMe(this.props.index))
       .catch(e => {
-        console.log(e)
+        console.error(e)
       })
   }
 
   // TODO: Clear entry after assignment
-  handleCreateTopicAndAssign = topicName => {
-    db.createTopicAndAssign(topicName, this.props.id)
-      .then(response => {
-        this.setState({ ideas: response.data.data.ideas })
-      })
+  handleCreateTopicAndAssign = ideaName => {
+    db.createTopicAndAssign(ideaName, this.props.id)
+      .then(this.props.refetchMe(this.props.index))
       .catch(e => {
-        console.log(e)
+        console.error(e)
       })
-  }
-
-  addIdeaToState(ideaId, ideaName) {
-    let ideas = this.state.ideas
-    const newIdea = {
-      name: ideaName,
-      _id: ideaId
-    }
-    ideas.push(newIdea)
-
-    this.setState({
-      ideas: ideas,
-      addIdea: false
-    })
   }
 
   handleUpdateAuthor = (authorId, authorName) => {
-    this.setState({ authorId: authorId, author: authorName })
+    this.setState({ pendingAuthorName: authorName, pendingAuthorId: authorId })
   }
 
   handleCreateAuthorAndAssign = authorName => {
     db.createAuthor(authorName).then(response => {
-      this.setState({ authorId: response.data.data._id, author: authorName })
+      this.setState({
+        pendingAuthorId: response.data.data._id,
+        pendingAuthorName: authorName
+      })
     })
   }
 
   handleUpdateWork = (workId, workName) => {
-    this.setState({ workId: workId, work: workName })
+    this.setState({ pendingWorkId: workId, pendingWorkName: workName })
   }
 
   handleCreateWorkAndAssign = workName => {
     db.createWork(workName).then(response => {
-      this.setState({ workId: response.data.data._id, work: workName })
+      this.setState({
+        pendingWorkId: response.data.data._id,
+        pendingWorkName: workName
+      })
     })
   }
 
   async handleAccept() {
     const updateObject = {
-      title: this.state.title,
-      text: this.state.text,
-      author: this.state.authorId,
-      work: this.state.workId
+      title: this.state.pendingTitle,
+      text: this.state.pendingText,
+      author: this.state.pendingAuthorId,
+      work: this.state.pendingWorkId
     }
 
     this.setState({ edit: false, keep: true })
     await db
-      .updateNoteInfo(this.state.id, updateObject)
-      .then()
+      .updateNoteInfo(this.props.id, updateObject)
+      .then(this.props.refetchMe(this.props.index))
       .catch(error => {
-        console.log(error)
+        console.error(error)
       })
   }
 
   // FIXME: When a button is pressed in a note, tell the parent that I now should be inFocus
 
   render() {
-    const {
-      addIdea,
-      author,
-      authorId,
-      deleted,
-      edit,
-      id,
-      ideas,
-      text,
-      title,
-      work,
-      workId,
-      workUrl
-    } = this.state
+    const { edit, id, addIdea, deleted } = this.state
     const inFocus = this.props.id == this.props.inFocus
+    const note = this.props.note
 
     // Four possible states for a note:
     var mode = { name: 'Normal', class: 'noteNormal-' }
@@ -239,31 +200,33 @@ class Note extends React.Component {
               className={mode.class + 'title'}
               name="title"
               autoFocus
-              defaultValue={title}
+              defaultValue={this.state.pendingTitle}
               onChange={this.handleTitleChange}
             ></input>
-          ) : !title?.length ? (
+          ) : !this.state.pendingTitle?.length ? (
             <div className={mode.class + 'title'}>
               <em>Untitled Note</em>
             </div>
           ) : (
-            <div className={mode.class + 'title'}>{title}</div>
+            <div className={mode.class + 'title'}>
+              {this.state.pendingTitle}
+            </div>
           )}
           {edit ? (
             <textarea
               className={mode.class + 'text'}
               onChange={this.handleTextChange}
-              value={text}
+              value={note.text}
             ></textarea>
           ) : (
-            <div className={mode.class + 'text'}>{text}</div>
+            <div className={mode.class + 'text'}>{note.text}</div>
           )}
         </div>
         <div className={mode.class + 'author-bar'}>
           {edit ? (
             <Autocomplete
               className={mode.class + 'author-label'}
-              defaultValue={author}
+              defaultValue={this.state.pendingAuthorName}
               escape={() => {
                 this.setState({ edit: false })
               }}
@@ -273,8 +236,11 @@ class Note extends React.Component {
             />
           ) : (
             <div className={mode.class + 'author-label'}>
-              <Link to={'/auth/' + authorId} className={mode.class + 'author'}>
-                {author}
+              <Link
+                to={'/auth/' + this.state.pendingAuthorId}
+                className={mode.class + 'author'}
+              >
+                {this.state.pendingAuthorName}
               </Link>
             </div>
           )}
@@ -283,7 +249,7 @@ class Note extends React.Component {
           {edit ? (
             <Autocomplete
               className={mode.class + 'work-label'}
-              defaultValue={work}
+              defaultValue={this.state.pendingWorkName}
               escape={() => {
                 this.setState({ edit: false })
               }}
@@ -293,13 +259,18 @@ class Note extends React.Component {
             />
           ) : (
             <div className={mode.class + 'work-label'}>
-              <Link to={'/work/' + workId} className={mode.class + 'work'}>
-                {work}
+              <Link
+                to={'/work/' + this.state.pendingWorkId}
+                className={mode.class + 'work'}
+              >
+                {this.state.pendingWorkName}
               </Link>
-              {workUrl?.length ? (
-                <a href={workUrl}>
-                  <img src={link} />
-                </a>
+              {this.state.pendingWorkId == note.work?._id ? (
+                note.work?.url?.length ? (
+                  <a href={note.work?.url}>
+                    <img src={link} />
+                  </a>
+                ) : null
               ) : null}
             </div>
           )}
@@ -307,7 +278,7 @@ class Note extends React.Component {
         <div className={mode.class + 'item-bottom'}>
           <div className={mode.class + 'idea-list'}>
             <div className="nothing">
-              {ideas?.map(idea => (
+              {note.ideas?.map(idea => (
                 <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
                   <button
                     className={mode.class + 'idea-label'}

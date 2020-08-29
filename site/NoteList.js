@@ -4,20 +4,33 @@ import NoteSlim from './NoteSlim'
 import NoteGrid from './NoteGrid'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
-import { add, assign } from 'lodash'
 
 // TODO: Unselect on switching to slim
-
 class NoteList extends React.Component {
   state = {
     inFocus: null,
+    notes: [],
     selected: [],
     deleted: [],
     lastSelectedIndex: 0,
     useGridView: 1
   }
-  componentDidMount() {
+
+  async componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
+
+    const response = await this.props.getListOfNotes()
+    this.setState({
+      notes: response.data.data
+    })
+  }
+
+  async refetchNoteAtIndex(index) {
+    let notes = this.state.notes
+    const response = await db.getNoteInfo(notes[index]._id)
+    const note = response.data.data[0]
+    notes[index] = note
+    this.setState({ notes: notes })
   }
 
   componentWillUnmount() {
@@ -77,7 +90,7 @@ class NoteList extends React.Component {
 
   selectAll() {
     let selected = []
-    for (let i = 0; i < this.props.notes.length; i++) {
+    for (let i = 0; i < this.state.notes.length; i++) {
       selected.push(i)
     }
     this.setState({ selected: selected })
@@ -94,7 +107,7 @@ class NoteList extends React.Component {
 
     // TODO: Create API to delete multiple
     for (let i = 0; i < this.state.selected.length; i++) {
-      let noteId = this.props.notes[this.state.selected[i]]._id
+      let noteId = this.state.notes[this.state.selected[i]]._id
       db.deleteNote(noteId)
     }
 
@@ -119,7 +132,7 @@ class NoteList extends React.Component {
 
     // TODO: Single API call for multiple changes
     for (let i = 0; i < this.state.selected.length; i++) {
-      let noteId = this.props.notes[this.state.selected[i]]._id
+      let noteId = this.state.notes[this.state.selected[i]]._id
       assignFunction(idToAdd, noteId)
     }
   }
@@ -224,9 +237,9 @@ class NoteList extends React.Component {
           </button>
         )}
 
-        {this.props.notes === undefined ? null : (
+        {this.state.notes === undefined ? null : (
           <div>
-            {this.props.notes.map((note, index) => {
+            {this.state.notes.map((note, index) => {
               return (
                 <div key={'note-view-' + note._id}>
                   {this.props.useGridView ? (
@@ -267,19 +280,14 @@ class NoteList extends React.Component {
                     />
                   ) : (
                     <Note
-                      author={note.author?.name}
-                      authorId={note.author?._id}
-                      becomeInFocus={this.becomeInFocus.bind(this)}
+                      note={note}
                       id={note._id}
-                      ideas={note.ideas}
-                      inFocus={this.state.inFocus}
                       key={note._id}
                       tabIndex={index + 1}
-                      text={note.text}
-                      title={note.title}
-                      work={note.work?.name}
-                      workId={note.work?._id}
-                      workUrl={note.work?.url}
+                      index={index}
+                      inFocus={this.state.inFocus}
+                      becomeInFocus={this.becomeInFocus.bind(this)}
+                      refetchMe={this.refetchNoteAtIndex.bind(this)}
                     />
                   )}
                 </div>

@@ -1,25 +1,29 @@
 import React from 'react'
 import axios from 'axios'
 import NoteList from './NoteList'
+import * as db from './Database'
 
 class RecentList extends React.Component {
   state = { loading: true }
 
   componentDidMount() {
+    console.log('recentList-componentDidMount')
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
+  }
 
-    // TODO: Replace with call to db.
-    let url = `http://localhost:3000/api/note/all`
-    axios
-      .get(url)
+  async getListOfNotes() {
+    console.log('recentList-fetchListOfNotes')
+    let notesResponse
+    await db
+      .getRecentNotes()
       .then(response => {
-        this.setState({
-          notes: response.data.data
-        })
+        notesResponse = response
       })
       .catch(error => {
         console.error(error)
       })
+
+    return notesResponse
   }
 
   componentWillUnmount() {
@@ -50,19 +54,14 @@ class RecentList extends React.Component {
     this.setState({ inFocus: id })
   }
 
-  // TODO: Split up note page and note display so I can use the note diplsay here
   render() {
     return (
       <div>
-        {this.state.notes === undefined ? null : (
-          <div>
-            <NoteList
-              notes={this.state.notes}
-              useGridView={true}
-              useSlim={this.props.slim}
-            />
-          </div>
-        )}
+        <NoteList
+          useGridView={false}
+          useSlim={false}
+          getListOfNotes={this.getListOfNotes.bind(this)}
+        />
       </div>
     )
   }

@@ -5,6 +5,7 @@ import Autocomplete from './Autocomplete'
 import FreeEntry from './FreeEntry'
 import link from './icons/link.svg'
 
+// TODO: Convert to new NoteList structure - give NoteList call backs for fetching data
 class Work extends React.Component {
   state = { id: '', editAuthor: false }
 
