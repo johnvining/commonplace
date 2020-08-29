@@ -90,11 +90,11 @@ export async function searchNotes(searchString) {
 }
 
 export async function getNotesForAuthor(authorId) {
-  return axios.get(api_url + `auth/${authorId}/notes`)
+  return axios.get(url_api + `auth/${authorId}/notes`)
 }
 
 export async function getAuthorInfo(authorId) {
-  return axios.get(api_url + `auth/${authorId}`)
+  return axios.get(url_api + `auth/${authorId}`)
 }
 
 export async function addIdeaToNote(ideaId, noteId) {

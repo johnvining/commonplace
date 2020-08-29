@@ -1,5 +1,4 @@
 import React from 'react'
-import axios from 'axios'
 import NoteList from './NoteList'
 import * as db from './Database'
 
