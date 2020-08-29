@@ -2,7 +2,6 @@ import React from 'react'
 import NoteList from './NoteList'
 import { getAuthorInfo, getNotesForAuthor } from './Database'
 
-// TODO: Convert to new NoteList structure - give NoteList call backs for fetching data
 class Author extends React.Component {
   state = {
     id: ''
@@ -59,6 +58,7 @@ class Author extends React.Component {
         </div>
 
         <NoteList
+          key={'auth' + this.props.id}
           useGridView={false}
           useSlim={false}
           getListOfNotes={this.getListOfNotes.bind(this)}
