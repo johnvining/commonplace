@@ -1,40 +1,55 @@
 import React from 'react'
 import NoteList from './NoteList'
-import * as db from './Database'
+import {
+  getWorkInfo,
+  getNotesForWork,
+  addAuthorToWork,
+  createAuthorAndAddToWork,
+  addUrlToWork,
+  getAuthorSuggestions
+} from './Database'
 import Autocomplete from './Autocomplete'
 import FreeEntry from './FreeEntry'
 import link from './icons/link.svg'
 
-// TODO: Convert to new NoteList structure - give NoteList call backs for fetching data
 class Work extends React.Component {
   state = { id: '', editAuthor: false }
 
   componentDidMount() {
-    this.fetchData(this.props.id)
+    this.fetchWorkInfo(this.props.id)
   }
 
   componentDidUpdate(prevState) {
     if (prevState.id !== this.state.id) {
-      this.fetchData(this.state.id)
+      this.fetchWorkInfo(this.state.id)
     }
   }
 
-  fetchData(workId) {
-    const workNotesRequest = db.getNotesForWork(workId)
-    const workInfoRequest = db.getWorkInfo(workId)
-
-    Promise.all([workNotesRequest, workInfoRequest])
+  fetchWorkInfo(workId) {
+    getWorkInfo(workId)
       .then(response => {
         this.setState({
-          notes: response[0].data.data,
-          work: response[1].data.data.name,
-          authorName: response[1].data.data.author?.name,
-          url: response[1].data.data.url
+          work: response.data.data.name,
+          authorName: response.data.data.author?.name,
+          url: response.data.data.url
         })
       })
       .catch(error => {
         console.error(error)
       })
+  }
+
+  async getListOfNotes() {
+    let notesResponse
+    await getNotesForWork(this.state.id)
+      .then(response => {
+        notesResponse = response
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+    return notesResponse
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -47,7 +62,7 @@ class Work extends React.Component {
 
   handleUpdateAuthor = (authorId, authorName) => {
     this.setState({ authorName: authorName, authorId: authorId })
-    db.addAuthorToWork(this.props.id, authorId).then(
+    addAuthorToWork(this.props.id, authorId).then(
       this.setState({
         editAuthor: false
       })
@@ -56,7 +71,7 @@ class Work extends React.Component {
 
   handleCreateAuthorAndAssign(authorName) {
     this.setState({ authorName: authorName })
-    db.createAuthorAndAddToWork(this.props.id, authorName).then(response => {
+    createAuthorAndAddToWork(this.props.id, authorName).then(response => {
       this.setState({
         authorId: response.data.data.id,
         editAuthor: false
@@ -65,10 +80,7 @@ class Work extends React.Component {
   }
 
   submitUrl(text) {
-    console.log('submit')
-    // DB
-    this.setState({ editUrl: false })
-    db.addUrlToWork(this.props.id, text)
+    addUrlToWork(this.props.id, text).then(this.setState({ editUrl: false }))
   }
 
   render() {
@@ -89,7 +101,7 @@ class Work extends React.Component {
                   this.setState({ editAuthor: false })
                 }}
                 onSelect={this.handleUpdateAuthor.bind(this)}
-                getSuggestions={db.getAuthorSuggestions}
+                getSuggestions={getAuthorSuggestions}
                 handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
               />
             ) : (
@@ -141,7 +153,12 @@ class Work extends React.Component {
           </div>
         </div>
 
-        <NoteList notes={this.state.notes} useSlim={this.props.slim} />
+        <NoteList
+          key={'work' + this.props.id}
+          useGridView={false}
+          useSlim={false}
+          getListOfNotes={this.getListOfNotes.bind(this)}
+        />
       </div>
     )
   }

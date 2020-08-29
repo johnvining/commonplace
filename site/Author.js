@@ -18,13 +18,17 @@ class Author extends React.Component {
   }
 
   fetchAuthorInfo(authorId) {
-    getAuthorInfo(authorId).then(response => {
-      this.setState({
-        authorName: response.data.data.name,
-        bornYear: response.data.data.bornYear,
-        diedYear: response.data.data.diedYear
+    getAuthorInfo(authorId)
+      .then(response => {
+        this.setState({
+          authorName: response.data.data.name,
+          bornYear: response.data.data.bornYear,
+          diedYear: response.data.data.diedYear
+        })
       })
-    })
+      .catch(error => {
+        console.error(error)
+      })
   }
 
   async getListOfNotes() {
