@@ -94,7 +94,8 @@ class NoteList extends React.Component {
 
     // TODO: Create API to delete multiple
     for (let i = 0; i < this.state.selected.length; i++) {
-      db.deleteNote(this.state.selected[i])
+      let noteId = this.props.notes[this.state.selected[i]]._id
+      db.deleteNote(noteId)
     }
 
     this.setState({ deleted: this.state.selected, selected: [] })
