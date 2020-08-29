@@ -174,11 +174,17 @@ class NoteList extends React.Component {
               />
             ) : (
               <div>
-                <button onClick={this.delete.bind(this)}>Delete</button>
+                <button
+                  onClick={this.delete.bind(this)}
+                  className="multi-select-button"
+                >
+                  Delete
+                </button>
                 <button
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: 'idea' })
                   }}
+                  className="multi-select-button"
                 >
                   Idea
                 </button>
@@ -186,6 +192,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: 'work' })
                   }}
+                  className="multi-select-button"
                 >
                   Work
                 </button>
@@ -193,6 +200,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: 'author' })
                   }}
+                  className="multi-select-button"
                 >
                   Author
                 </button>
@@ -200,6 +208,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ selected: [], lastSelectedIndex: 0 })
                   }}
+                  className="multi-select-button"
                 >
                   Unselect All
                 </button>
@@ -207,7 +216,12 @@ class NoteList extends React.Component {
             )}
           </div>
         ) : (
-          <button onClick={this.selectAll.bind(this)}>Select All</button>
+          <button
+            onClick={this.selectAll.bind(this)}
+            className="multi-select-button"
+          >
+            Select All
+          </button>
         )}
 
         {this.props.notes === undefined ? null : (

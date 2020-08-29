@@ -742,3 +742,68 @@ div.note-slim:hover {
   overflow: hidden;
   padding: 10px;
 }
+
+.multi-select-button {
+  padding: 8px;
+  margin: 2px;
+  border-width: 2px;
+  border-color: white;
+  border-radius: 4px;
+  border-style: solid;
+}
+
+.multi-select-button:hover {
+  background: lightblue;
+  cursor: pointer;
+}
+
+.multi-select-button:focus {
+  border-color: black;
+  outline: none;
+}
+
+.multi-select-search-box {
+  padding: 8px;
+  margin: 2px;
+  border-width: 2px;
+  border-color: black;
+  border-radius: 4px;
+  border-style: solid;
+}
+
+.multi-select-ul {
+  display: inline-block;
+  margin: 0px;
+  padding: 0px;
+}
+
+.multi-select-li {
+  display: inline-block;
+  margin: 0px;
+  padding: 0px;
+}
+
+.multi-select-option,
+.multi-select-option-new {
+  padding: 8px;
+  margin: 2px;
+  border-width: 2px;
+  border-color: lightgray;
+  border-radius: 4px;
+  border-style: solid;
+  background: transparent;
+}
+
+.multi-select-option:focus,
+.multi-select-option-new:focus {
+  border-color: black;
+}
+
+.multi-select-option-new::before {
+  background-image: url('/icons/plus.svg');
+  background-size: 17px 17px;
+  display: inline-block;
+  width: 15px;
+  height: 13px;
+  content: '';
+}
