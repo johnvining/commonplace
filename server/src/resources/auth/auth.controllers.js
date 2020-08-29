@@ -2,7 +2,6 @@ import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 
 export const getAuthorDetails = async (req, res) => {
-  console.log('Get author details')
   try {
     const doc = await Auth.findOne({ _id: req.params.id })
       .lean()
@@ -18,7 +17,6 @@ export const getAuthorDetails = async (req, res) => {
 }
 
 export const getNotesFromAuthor = async (req, res) => {
-  console.log('uthor get one ' + req.params.id)
   try {
     const doc = await Note.find({ author: req.params.id })
       .sort({ updatedAt: -1 })
@@ -69,7 +67,5 @@ export const createAuthor = async function(name) {
 }
 
 export const findAuthorsByString = async function(str) {
-  console.log('Looking for authors with str: ' + str)
-  // TODO: Set a minimum length
   return await Auth.find({ name: new RegExp(str, 'i') }).exec() // TODO when to use exec
 }

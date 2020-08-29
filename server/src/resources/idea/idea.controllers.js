@@ -2,7 +2,6 @@ import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
 
 export const getNotesFromIdea = async (req, res) => {
-  console.log('ideasnotes get one ' + req.params.id)
   try {
     const doc = await Note.find({ ideas: req.params.id })
       .populate('author')

@@ -68,7 +68,6 @@ class App extends React.Component {
           <Author path="/auth/:id" slim={this.state.slim} />
           <Find path="/find/:search" />
           <Idea path="/idea/:id" slim={this.state.slim} />
-          <NewNote path="/new" />
           <NoteView path="/note/:id" />
           <RecentList path="/" slim={this.state.slim} />
           <Work path="/work/:id" slim={this.state.slim} />

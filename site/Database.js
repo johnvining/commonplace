@@ -17,7 +17,6 @@ export async function getNoteInfo(noteId) {
 }
 
 export async function updateNoteInfo(noteId, params) {
-  console.log(url_api + `note/${noteId}`, params)
   return axios.put(url_api + `note/${noteId}`, params)
 }
 
@@ -69,8 +68,6 @@ export async function addAuthorToWork(workId, authorId) {
 
 export async function addUrlToWork(workId, url2) {
   const data = { url: url2 }
-  console.log(url2)
-  console.log(url_api + `work/${workId}`)
   return axios.put(url_api + `work/${workId}`, data)
 }
 

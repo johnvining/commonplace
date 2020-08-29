@@ -57,7 +57,7 @@ class Autocomplete extends React.Component {
           })
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
         })
     })
   }

@@ -37,17 +37,15 @@ export const getOne = model => async (req, res) => {
   }
 }
 
-// TODO: Make this specific to notes
+// TODO: Move to note controllers
 export const createOne = model => async (req, res) => {
   const toCreate = req.body
-  console.log(toCreate)
   const item = await model.create(toCreate)
   res.status(201).json(item)
 }
 
 export const updateOne = model => async (req, res) => {
   // TODO: Start here
-  console.log('update one')
 }
 
 export const removeOne = model => async (req, res) => {

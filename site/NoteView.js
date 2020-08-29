@@ -23,7 +23,7 @@ class NoteView extends React.Component {
         document.title = this.state.title
       })
       .catch(error => {
-        console.log(error)
+        console.error(error)
       })
   }
 

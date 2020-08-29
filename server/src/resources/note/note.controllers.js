@@ -4,7 +4,6 @@ import Idea from '../idea/idea.model.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 
-// Note
 export const createNote = async function(title, author) {
   return await Note.create({ title: title, author: author })
 }
@@ -14,9 +13,7 @@ export const addAuthor = async function(id, author) {
 }
 
 export const getTenMostRecentNotes = async (req, res) => {
-  console.log('Ten most recent notes')
   try {
-    console.log('h2')
     const docs = await Note.find({})
       .sort({ updatedAt: -1 })
       .limit(30)
@@ -55,7 +52,6 @@ export const addNewTopic = async (req, res) => {
 }
 
 export const reqUpdateNote = async (req, res) => {
-  console.log(req.params.id, req.body)
   try {
     const docs = await updateNote(req.params.id, req.body)
     res
