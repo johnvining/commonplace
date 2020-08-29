@@ -8,6 +8,8 @@ router.route('/:id/notes').get(controllers.getNotesFromIdea)
 
 router.route('/:id').get(controllers.reqGetIdeaInfo)
 
+router.route('/').post(controllers.reqCreateIdea)
+
 //   .put(controllers.updateOne)
 //   .delete(controllers.removeOne)
 

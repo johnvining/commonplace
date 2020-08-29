@@ -45,6 +45,19 @@ export const reqGetIdeaInfo = async (req, res) => {
   }
 }
 
+export const reqCreateIdea = async (req, res) => {
+  try {
+    const doc = await createIdea(req.body.name)
+    if (!doc) {
+      return res.status(400).end()
+    }
+    res.status(200).json({ data: doc })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 // Idea
 export const createIdea = async function(name) {
   return await Idea.create({ name: name })

@@ -2,6 +2,8 @@ import React from 'react'
 import Note from './Note'
 import NoteSlim from './NoteSlim'
 import * as db from './Database'
+import Autocomplete from './Autocomplete'
+import { add, assign } from 'lodash'
 
 // TODO: Unselect on switching to slim
 
@@ -83,6 +85,7 @@ class NoteList extends React.Component {
       return
     }
 
+    // TODO: Create API to delete multiple
     for (let i = 0; i < this.state.selected.length; i++) {
       db.deleteNote(this.state.selected[i])
     }
@@ -90,22 +93,110 @@ class NoteList extends React.Component {
     this.setState({ deleted: this.state.selected, selected: [] })
   }
 
+  handleAddNew(idToAdd) {
+    var assignFunction
+    switch (this.state.toAdd) {
+      case 'author':
+        assignFunction = db.addAuthorToNote
+        break
+      case 'idea':
+        assignFunction = db.addIdeaToNote
+        break
+      case 'work':
+        assignFunction = db.addWorkToNote
+        break
+      default:
+        return
+    }
+
+    // TODO: Single API call for multiple changes
+    for (let i = 0; i < this.state.selected.length; i++) {
+      let noteId = this.props.notes[this.state.selected[i]]._id
+      assignFunction(idToAdd, noteId)
+    }
+  }
+
+  async handleCreateAndAdd(name) {
+    var createFunction
+    switch (this.state.toAdd) {
+      case 'author':
+        createFunction = db.createAuthor
+        break
+      case 'idea':
+        createFunction = db.createIdea
+        break
+      case 'work':
+        createFunction = db.createWork
+        break
+      default:
+        return
+    }
+
+    // TODO: Create single API call
+    let newIdToAssign = await createFunction(name)
+    this.handleAddNew(newIdToAssign.data.data._id)
+  }
+
+  getSuggestions(string) {
+    switch (this.state.toAdd) {
+      case 'author':
+        return db.getAuthorSuggestions(string)
+      case 'idea':
+        return db.getIdeaSuggestions(string)
+      case 'work':
+        return db.getWorkSuggestions(string)
+    }
+  }
+
   render() {
     return (
       <div>
         {this.state.selected.length ? (
           <div>
-            <button onClick={this.delete.bind(this)}>Delete</button>
-            <button>Idea</button>
-            <button>Work</button>
-            <button>Author</button>
-            <button
-              onClick={() => {
-                this.setState({ selected: [], lastSelectedIndex: 0 })
-              }}
-            >
-              Unselect All
-            </button>
+            {this.state.addSomething ? (
+              <Autocomplete
+                className={'multi-select'}
+                clearOnSelect={true}
+                escape={() => {
+                  this.setState({ addSomething: false, toAdd: '' })
+                }}
+                onSelect={this.handleAddNew.bind(this)}
+                handleNewSelect={this.handleCreateAndAdd.bind(this)}
+                getSuggestions={this.getSuggestions.bind(this)}
+              />
+            ) : (
+              <div>
+                <button onClick={this.delete.bind(this)}>Delete</button>
+                <button
+                  onClick={() => {
+                    this.setState({ addSomething: true, toAdd: 'idea' })
+                  }}
+                >
+                  Idea
+                </button>
+                <button
+                  onClick={() => {
+                    this.setState({ addSomething: true, toAdd: 'work' })
+                  }}
+                >
+                  Work
+                </button>
+                <button
+                  onClick={() => {
+                    this.setState({ addSomething: true, toAdd: 'author' })
+                  }}
+                >
+                  Author
+                </button>
+                <button
+                  onClick={() => {
+                    this.setState({ selected: [], lastSelectedIndex: 0 })
+                  }}
+                >
+                  Unselect All
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <button onClick={this.selectAll.bind(this)}>Select All</button>

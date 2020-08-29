@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { addAuthor } from '../server/src/resources/note/note.controllers'
 
 export const url_api = 'http://localhost:3000/api/'
 
@@ -6,22 +7,18 @@ export async function deleteNote(id) {
   return axios.delete(url_api + `note/${id}`)
 }
 
-export async function addIdeaToNote(ideaID, nodeId) {
-  const data = { newTopic: ideaID }
-  return axios.put(url_api + `note/${nodeId}/idea`, data)
-}
-
-export async function createTopicAndAssign(ideaName, nodeId) {
+export async function createTopicAndAssign(ideaName, noteId) {
   const data = { newTopic: ideaName }
-  return axios.put(url_api + `note/${nodeId}/idea/create`, data)
+  return axios.put(url_api + `note/${noteId}/idea/create`, data)
 }
 
-export async function getNoteInfo(nodeId) {
-  return axios.get(url_api + `note/${nodeId}`)
+export async function getNoteInfo(noteId) {
+  return axios.get(url_api + `note/${noteId}`)
 }
 
-export async function updateNoteInfo(nodeId, params) {
-  return axios.put(url_api + `note/${nodeId}`, params)
+export async function updateNoteInfo(noteId, params) {
+  console.log(url_api + `note/${noteId}`, params)
+  return axios.put(url_api + `note/${noteId}`, params)
 }
 
 export async function getIdeaSuggestions(search) {
@@ -91,4 +88,36 @@ export async function getNotesForAuthor(authorId) {
 
 export async function getAuthorInfo(authorId) {
   return axios.get(`http://localhost:3000/api/auth/${authorId}`)
+}
+
+export async function addIdeaToNote(ideaId, noteId) {
+  const data = { newTopic: ideaId }
+  return axios.put(url_api + `note/${noteId}/idea`, data)
+}
+
+export async function addAuthorToNote(authorId, noteId) {
+  const updateObject = { author: authorId }
+  return updateNoteInfo(noteId, updateObject)
+}
+
+export async function addWorkToNote(workId, noteId) {
+  const updateObject = { work: workId }
+  return updateNoteInfo(noteId, updateObject)
+}
+
+export async function createAuthorAndAddToNote(authorName, noteId) {
+  // TODO: Make single request
+  const newAuthor = await createAuthor(authorName)
+  return addAuthorToNote(newAuthor._id, noteId)
+}
+
+export async function createWorkAndAddToNote(workName, noteId) {
+  // TODO: Make single request
+  const newWork = await createWork(workName)
+  return addWorkToNote(newWork._id, noteId)
+}
+
+export async function createIdea(ideaName) {
+  const data = { name: ideaName }
+  return axios.post(url_api + `idea`, data)
 }
