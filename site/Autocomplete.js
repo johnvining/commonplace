@@ -99,7 +99,7 @@ class Autocomplete extends React.Component {
   render() {
     const { responses } = this.state
     return (
-      <div className={this.props.className + ' outer'}>
+      <div className={this.props.className + ' autocomplete'}>
         <input
           id={this.props.inputName}
           autoFocus={this.props.dontAutofocus ? false : true}
