@@ -337,7 +337,7 @@ class Note extends React.Component {
                   >
                     <img src={plus}></img>
                   </button>
-                  <Link to={'/note/' + id}>
+                  <Link to={'/note/' + this.props.id}>
                     <button
                       className={mode.class + 'action-button'}
                       tabIndex="-1"

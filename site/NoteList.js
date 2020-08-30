@@ -46,7 +46,7 @@ class NoteList extends React.Component {
     // TODO: Keyboard short cuts will interfere with Ctrl + A on Windows
     if (event.keyCode == 13) {
       // TODO: This is clumsy -- need to avoid inner elements like Input's or anything that happens while note is being edited
-      if (document.activeElement.className == 'noteNormal-outer') {
+      if (document.activeElement.className == 'normal note outer') {
         this.setIsFocused(document.activeElement.id)
       }
     }

@@ -113,7 +113,7 @@ div.main {
 
   .title {
     background-color: transparent;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-family: $main_font;
     font-size: 18px;
     margin: auto;
     padding: 8px;
@@ -130,7 +130,7 @@ div.main {
     border: none;
     box-sizing: border-box;
     display: block;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-family: $main_font;
     font-size: 14px;
     height: 18em;
     margin: auto;
@@ -148,9 +148,9 @@ div.main {
     &.label {
       background-color: transparent;
       display: inline-block;
-      width: 28%;
+      width: 40%;
       border: none;
-      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      font-family: $main_font;
       font-size: 18px;
       padding: 8px 0px 8px 8px;
 
@@ -179,7 +179,7 @@ div.main {
       margin: 4px;
       padding: 4px;
       font-size: 18px;
-      font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+      font-family: $main_font;
 
       &::after {
         content: '? ';
@@ -502,89 +502,85 @@ input.work-author-label {
   content: '';
 }
 
-.searchBar-container {
-  border: 2px;
-  border-style: solid;
-  border-radius: 4px;
-}
+.search-bar {
+  &.container {
+    border: 2px;
+    border-style: solid;
+    border-radius: 4px;
+  }
 
-input.searchBar,
-input.searchBar-search-box {
-  background: transparent;
-  font-size: 32px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  display: inline-block;
-  padding: 8px;
-  margin: 4px auto;
-  border-style: none;
-}
+  &.outer {
+    display: inline-block;
+  }
 
-input.searchBar-search-box:focus {
-  outline: none;
-}
+  &.current-modifier {
+    background: black;
+    border-radius: 4px;
+    border-style: none;
+    color: white;
+    display: inline-block;
+    font-family: $main_font;
+    font-size: 32px;
+    margin: 4px;
+    padding: 8px;
+    vertical-align: top;
+  }
 
-ul.searchBar-ul {
-  display: block;
-  padding: 0px;
-  margin: 0px;
-}
+  &.label {
+    background: transparent;
+    border-style: none;
+    display: inline;
+    font-family: $main_font;
+    font-size: 32px;
+    margin: 4px auto;
+    padding: 8px;
+  }
 
-li.searchBar-li {
-  display: inline;
-}
+  &.ul {
+    display: block;
+    padding: 0px;
+    margin: 0px;
+    color: red;
+  }
 
-.searchBar-option,
-.searchBar-option-new {
-  background: transparent;
-  font-size: 28px;
-  border-color: #ddd;
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 1px;
-  margin: 4px;
-}
+  &.li {
+    display: inline;
+    color: green;
+  }
 
-.searchBar-option {
-  color: #303030;
-}
+  &.option {
+    background: transparent;
+    font-size: 28px;
+    border-color: #ddd;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    margin: 4px;
+    color: #404040;
+    font-family: $main_font;
 
-.searchBar-option-new::before {
-  background-image: url($image_add_background);
-  background-size: 24px 24px;
-  display: inline-block;
-  width: 22px;
-  height: 22px;
-  content: '';
-}
+    &:focus {
+      border-color: black;
+      border-radius: 4px;
+      border-style: solid;
+      border-width: 1px;
+      outline: none;
+      color: black;
+    }
 
-.searchBar-option::after {
-  content: '? ';
-}
+    &:not(.new)::after {
+      content: '?';
+    }
 
-.searchBar-option:focus,
-.searchBar-option-new:focus {
-  border-color: black;
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 1px;
-  outline: none;
-}
-
-/* TODO: Check accessibility */
-input.searchBar:focus {
-  outline: none;
-}
-
-div.currentModifier {
-  background: black;
-  color: white;
-  font-size: 32px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  display: inline-block;
-  padding: 8px;
-  margin: 4px;
-  border-style: none;
-  border-radius: 4px;
+    &.new::before {
+      background-image: url($image_add_background);
+      background-size: 24px 24px;
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      content: '';
+    }
+  }
 }
 
 div.note-slim {

@@ -154,15 +154,15 @@ class SearchBar extends React.Component {
     }
 
     return (
-      <div className="searchBar-container">
+      <div className="search-bar container">
         {modifier.length ? (
-          <div className="currentModifier">{modifier}</div>
+          <div className="search-bar current-modifier">{modifier}</div>
         ) : null}
 
         {showAutocomplete ? (
           <Autocomplete
             inputName="searchBar"
-            className="searchBar"
+            className="search-bar"
             defaultValue={typedText}
             onSelect={this.handleUpdate.bind(this)}
             getSuggestions={this.getSuggestions.bind(this)}
@@ -170,7 +170,7 @@ class SearchBar extends React.Component {
           />
         ) : (
           <input
-            className="searchBar"
+            className="search-bar label"
             autoFocus
             value={typedText}
             onChange={this.handleTextChange.bind(this)}

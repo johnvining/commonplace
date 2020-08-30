@@ -72,7 +72,7 @@ div .top-bar {
   padding: 0px; }
 .note .title {
   background-color: transparent;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
   margin: auto;
   padding: 8px;
@@ -87,7 +87,7 @@ div .top-bar {
   border: none;
   box-sizing: border-box;
   display: block;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 14px;
   height: 18em;
   margin: auto;
@@ -102,9 +102,9 @@ div .top-bar {
 .note .work.label {
   background-color: transparent;
   display: inline-block;
-  width: 28%;
+  width: 40%;
   border: none;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
   padding: 8px 0px 8px 8px; }
   .note .author.label:focus,
@@ -131,7 +131,7 @@ div .top-bar {
   margin: 4px;
   padding: 4px;
   font-size: 18px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; }
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
   .note .author .option::after,
   .note .work .option::after {
     content: '? '; }
@@ -409,78 +409,65 @@ input.work-author-label {
   height: 13px;
   content: ''; }
 
-.searchBar-container {
+.search-bar.container {
   border: 2px;
   border-style: solid;
   border-radius: 4px; }
-
-input.searchBar,
-input.searchBar-search-box {
-  background: transparent;
-  font-size: 32px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+.search-bar.outer {
+  display: inline-block; }
+.search-bar.current-modifier {
+  background: black;
+  border-radius: 4px;
+  border-style: none;
+  color: white;
   display: inline-block;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 32px;
+  margin: 4px;
   padding: 8px;
+  vertical-align: top; }
+.search-bar.label {
+  background: transparent;
+  border-style: none;
+  display: inline;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 32px;
   margin: 4px auto;
-  border-style: none; }
-
-input.searchBar-search-box:focus {
-  outline: none; }
-
-ul.searchBar-ul {
+  padding: 8px; }
+.search-bar.ul {
   display: block;
   padding: 0px;
-  margin: 0px; }
-
-li.searchBar-li {
-  display: inline; }
-
-.searchBar-option,
-.searchBar-option-new {
+  margin: 0px;
+  color: red; }
+.search-bar.li {
+  display: inline;
+  color: green; }
+.search-bar.option {
   background: transparent;
   font-size: 28px;
   border-color: #ddd;
   border-radius: 4px;
   border-style: solid;
   border-width: 1px;
-  margin: 4px; }
-
-.searchBar-option {
-  color: #303030; }
-
-.searchBar-option-new::before {
-  background-image: url("/icons/plus.svg");
-  background-size: 24px 24px;
-  display: inline-block;
-  width: 22px;
-  height: 22px;
-  content: ''; }
-
-.searchBar-option::after {
-  content: '? '; }
-
-.searchBar-option:focus,
-.searchBar-option-new:focus {
-  border-color: black;
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 1px;
-  outline: none; }
-
-/* TODO: Check accessibility */
-input.searchBar:focus {
-  outline: none; }
-
-div.currentModifier {
-  background: black;
-  color: white;
-  font-size: 32px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-  display: inline-block;
-  padding: 8px;
   margin: 4px;
-  border-style: none;
-  border-radius: 4px; }
+  color: #404040;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .search-bar.option:focus {
+    border-color: black;
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    outline: none;
+    color: black; }
+  .search-bar.option:not(.new)::after {
+    content: '?'; }
+  .search-bar.option.new::before {
+    background-image: url("/icons/plus.svg");
+    background-size: 24px 24px;
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    content: ''; }
 
 div.note-slim {
   padding: 4px;
