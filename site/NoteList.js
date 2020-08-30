@@ -173,7 +173,8 @@ class NoteList extends React.Component {
   render() {
     return (
       <div>
-        {this.state.selected.length ? (
+        {this.props.viewMode == constants.view_modes.FULL ? null : this.state
+            .selected.length ? (
           <div>
             {this.state.addSomething ? (
               <Autocomplete
