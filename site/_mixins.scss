@@ -1,0 +1,12 @@
+@mixin button-hover($background_color) {
+  background-color: $background_color;
+  cursor: pointer;
+  outline: none; // TODO: Fix -- accessibility
+  border-color: black;
+}
+
+@mixin autocomplete-option {
+}
+
+@mixin autocomplete-new {
+}

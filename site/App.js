@@ -48,20 +48,20 @@ class App extends React.Component {
     return (
       <div className="main">
         {this.state.barOpen ? (
-          <div className="topBar">
+          <div className="top-bar">
             <SearchBar
               beforeNavigate={this.beforeSearchNavigate.bind(this)}
               toggleSlim={this.toggleSlim.bind(this)}
             />
           </div>
         ) : (
-          <div className="topBar">
+          <div className="top-bar">
             <div className="title">
               <Link to="/" className="title-link">
                 <div className="title">commonplace</div>
               </Link>
             </div>
-            <div className="topActions">
+            <div className="top-action-bar">
               <ViewSelector
                 viewMode={this.state.viewMode}
                 setView={this.setView.bind(this)}

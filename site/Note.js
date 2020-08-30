@@ -281,7 +281,7 @@ class Note extends React.Component {
         </div>
         <div className={mode.class + 'item-bottom'}>
           <div className={mode.class + 'idea-list'}>
-            <div className="nothing">
+            <div>
               {note.ideas?.map(idea => (
                 <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
                   <button
@@ -329,7 +329,7 @@ class Note extends React.Component {
                 />
               ) : (
                 // Neither editing whole note nor ideas
-                <span className="nothing">
+                <span>
                   <button
                     className={mode.class + 'action-button'}
                     onClick={this.addIdea.bind(this)}

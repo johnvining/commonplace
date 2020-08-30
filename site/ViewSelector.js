@@ -7,12 +7,12 @@ import grid from './icons/grid.svg'
 class SearchBar extends React.Component {
   render() {
     return (
-      <div>
+      <div className="tool-bar">
         <button
           className={
             this.props.viewMode == constants.view_modes.FULL
-              ? 'toolbar-selected left'
-              : 'toolbar left'
+              ? 'button-selected left'
+              : 'button left'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.FULL)
@@ -23,8 +23,8 @@ class SearchBar extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.SLIM
-              ? 'toolbar-selected'
-              : 'toolbar'
+              ? 'button-selected'
+              : 'button'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.SLIM)
@@ -35,8 +35,8 @@ class SearchBar extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.GRID
-              ? 'toolbar-selected right'
-              : 'toolbar right'
+              ? 'button-selected right'
+              : 'button right'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.GRID)

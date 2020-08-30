@@ -1,47 +1,73 @@
+@import '_variables';
+@import '_mixins';
+
 body {
-  background: #f7fcf7;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  background: $background_color;
+  font-family: $main_font;
+}
 
 a {
-  color: black; }
+  color: black;
+}
 
 .url {
-  font-family: "Courier New", Courier, monospace; }
+  font-family: $monospace;
+}
 
 div.main {
   width: 96%;
-  margin: auto; }
+  margin: auto;
+}
 
-div .top-bar {
-  width: 100%;
-  min-height: 5em;
-  display: block; }
-.top-bar .title {
-  display: inline-block;
-  font-size: 50px;
-  width: 50%; }
-.top-bar .top-action-bar {
-  display: inline-block;
-  text-align: right;
-  width: 50%; }
-.top-bar .tool-bar button {
-  border-style: none;
-  padding: 4px; }
-.top-bar .tool-bar .button {
-  background: lightgrey; }
-.top-bar .tool-bar .button:hover {
-  background-color: lightcyan;
-  cursor: pointer;
-  outline: none;
-  border-color: black; }
-.top-bar .tool-bar .button-selected {
-  background: lightblue; }
-.top-bar .tool-bar .button-selected:focus {
-  outline: none; }
-.top-bar .tool-bar .left {
-  border-radius: 5px 0px 0px 5px; }
-.top-bar .tool-bar .right {
-  border-radius: 0px 5px 5px 0px; }
+.top-bar {
+  div & {
+    width: 100%;
+    min-height: 5em;
+    display: block;
+  }
+  .title {
+    display: inline-block;
+    font-size: 50px;
+    width: 50%;
+  }
+
+  .top-action-bar {
+    display: inline-block;
+    text-align: right;
+    width: 50%;
+  }
+
+  .tool-bar {
+    button {
+      border-style: none;
+      padding: 4px;
+    }
+
+    .button {
+      background: $button_background;
+    }
+
+    .button:hover {
+      @include button-hover($button_background_hover);
+    }
+
+    .button-selected {
+      background: lightblue;
+    }
+
+    .button-selected:focus {
+      outline: none;
+    }
+
+    .left {
+      border-radius: 5px 0px 0px 5px;
+    }
+
+    .right {
+      border-radius: 0px 5px 5px 0px;
+    }
+  }
+}
 
 /* NOTE STYLING */
 /* Note Style: Outer Div */
@@ -57,37 +83,40 @@ div .top-bar {
   margin: 4px auto;
   border-style: solid;
   border-color: white;
-  border-width: 1px; }
+  border-width: 1px;
+}
 
 .noteNormal-outer {
-  border-color: white; }
-
+  border-color: white;
+}
 .noteEdit-outer {
   border-color: gray;
-  background: #eeeeee; }
-
+  background: #eeeeee;
+}
 .noteInFocus-outer {
   border-color: gray;
-  background: lightblue; }
-
+  background: lightblue;
+}
 .noteEditIdea-outer {
-  border-color: gray; }
+  border-color: gray;
+}
 
 .noteNormal-outer:focus {
   border-color: lightblue;
-  outline: none; }
-
+  outline: none;
+}
 .noteEdit-outer:focus {
   border-color: black;
-  outline: none; }
-
+  outline: none;
+}
 .noteInFocus-outer:focus {
   border-color: black;
-  outline: none; }
-
+  outline: none;
+}
 .noteEditIdea-outer:focus {
   border-color: black;
-  outline: none; }
+  outline: none;
+}
 
 .noteNormal-item-bottom,
 .noteEdit-item-bottom,
@@ -97,7 +126,8 @@ div .top-bar {
   display: flex;
   justify-content: space-between;
   margin: 0px;
-  padding: 0px; }
+  padding: 0px;
+}
 
 div.noteNormal-title,
 div.noteEdit-title,
@@ -107,7 +137,8 @@ div.noteEditIdea-bottom {
   font-size: 18px;
   margin: auto;
   padding: 8px;
-  width: 100%; }
+  width: 100%;
+}
 
 input.noteEdit-title {
   background-color: transparent;
@@ -116,13 +147,15 @@ input.noteEdit-title {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 18px;
   margin: auto;
-  padding: 8px; }
+  padding: 8px;
+}
 
 input.noteEdit-title:focus {
   outline: none;
   background-color: white;
   margin: auto;
-  padding: 8px; }
+  padding: 8px;
+}
 
 .noteNormal-text,
 .noteInFocus-text,
@@ -138,14 +171,16 @@ input.noteEdit-title:focus {
   padding: 8px;
   resize: none;
   display: block;
-  box-sizing: border-box; }
+  box-sizing: border-box;
+}
 
 .noteEdit-text:focus {
   width: 100%;
   outline: none;
   background-color: white;
   margin: auto;
-  padding: 8px; }
+  padding: 8px;
+}
 
 /* Action button related */
 .noteNormal-action-button,
@@ -159,11 +194,13 @@ input.noteEdit-title:focus {
   margin: 4px;
   padding: 4px;
   text-decoration: none;
+
   color: black;
   font-size: 18px;
   margin: 2px;
   padding: 4px;
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 /* TODO: Todo */
 .idea-exit-button {
@@ -174,11 +211,13 @@ input.noteEdit-title:focus {
   margin: 4px;
   padding: 4px;
   text-decoration: none;
+
   color: black;
   font-size: 18px;
   margin: 2px;
   padding: 4px;
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 .noteNormal-actionBar,
 .noteEdit-actionBar,
@@ -192,16 +231,20 @@ input.noteEdit-title:focus {
   font-size: 18px;
   margin: 0px;
   padding: 8px;
-  text-align: right; }
+  text-align: right;
+}
 
 .action-button:hover {
-  background-color: white; }
+  background-color: white;
+}
 
 .action-button:focus {
   box-shadow: 0px 0px 4px 4px #dadada;
-  outline: none; }
+  outline: none;
+}
 
 /* IDEA RELATED */
+
 .noteNormal-idea-list,
 .noteEditIdea-idea-list,
 .noteEdit-idea-list,
@@ -213,7 +256,8 @@ input.noteEdit-title:focus {
   border: none;
   font-size: 18px;
   margin: 0px;
-  padding: 8px; }
+  padding: 8px;
+}
 
 .noteNormal-idea-search-box,
 .noteEdit-idea-search-box,
@@ -226,7 +270,8 @@ input.noteEdit-title:focus {
   font-size: 15px;
   margin: 2px;
   padding: 4px;
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 .noteNormal-idea-search-box:focus,
 .noteEdit-idea-search-box:focus,
@@ -236,22 +281,24 @@ input.noteEdit-title:focus {
   border-style: dashed;
   border-color: black;
   padding: 3px;
-  border-width: 1px; }
+  border-width: 1px;
+}
 
 .noteNormal-idea-ul,
 .noteEdit-idea-ul,
 .noteEditIdea-idea-ul,
 .noteInFocus-idea-ul {
   margin: 0px;
-  padding: 0px; }
-
+  padding: 0px;
+}
 .noteNormal-idea-li,
 .noteEdit-idea-li,
 .noteEditIdea-idea-li,
 .noteInFocus-idea-li {
   display: inline;
   margin: 0px;
-  padding: 0px; }
+  padding: 0px;
+}
 
 /* Existing idea button */
 .noteNormal-idea-label,
@@ -266,14 +313,16 @@ input.noteEdit-title:focus {
   font-size: 15px;
   margin: 2px;
   padding: 4px;
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 .noteNormal-idea-label:hover,
 .noteEdit-idea-label:hover,
 .noteInFocus-idea-label:hover,
 .noteEditIdea-idea-label:hover {
   background-color: #ffe6f2;
-  cursor: pointer; }
+  cursor: pointer;
+}
 
 /* Possible ideas to add */
 .noteEditIdea-idea-option,
@@ -288,18 +337,21 @@ input.noteEdit-title:focus {
   font-size: 15px;
   margin: 2px;
   padding: 4px;
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 .noteEditIdea-idea-option-new {
-  background-color: #efffef; }
+  background-color: #efffef;
+}
 
 .noteEditIdea-idea-option-new::before {
-  background-image: url("/icons/plus.svg");
+  background-image: url($image_add_background);
   background-size: 17px 17px;
   display: inline-block;
   width: 17px;
   height: 15px;
-  content: ''; }
+  content: '';
+}
 
 .noteEditIdea-idea-option:focus,
 .noteEditIdea-idea-option-new:focus {
@@ -309,7 +361,8 @@ input.noteEdit-title:focus {
   border-width: 1px;
   margin: 2px;
   outline: none;
-  padding: 3px; }
+  padding: 3px;
+}
 
 .noteEditIdea-idea-option:hover,
 .noteEditIdea-idea-option-new:hover {
@@ -319,7 +372,8 @@ input.noteEdit-title:focus {
   border-width: 1px;
   margin: 2px;
   outline: none;
-  padding: 3px; }
+  padding: 3px;
+}
 
 div.noteNormal-author-label,
 div.noteInFocus-author-label,
@@ -335,13 +389,15 @@ div.noteEdit-work-label {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 18px;
   margin: auto;
-  padding: 8px; }
+  padding: 8px;
+}
 
 div.noteNormal-work-label,
 div.noteInFocus-work-label,
 div.noteEditIdea-work-label,
 div.noteEdit-work-label {
-  font-style: italic; }
+  font-style: italic;
+}
 
 a.noteNormal-author,
 a.noteInFocus-author,
@@ -349,7 +405,8 @@ a.noteEditIdea-author,
 a.noteNormal-work,
 a.noteInFocus-work,
 a.noteEditIdea-work {
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 input.noteEdit-author-label,
 input.noteEdit-work-label {
@@ -359,7 +416,8 @@ input.noteEdit-work-label {
   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   font-size: 18px;
   margin: auto;
-  padding: 8px; }
+  padding: 8px;
+}
 
 .noteEdit-author-label-search-box,
 .noteEdit-work-label-search-box {
@@ -369,28 +427,32 @@ input.noteEdit-work-label {
   margin: auto;
   width: 300px;
   padding: 8px;
-  width: 25%; }
+  width: 25%;
+}
 
 /* TODO: Make inputs grow with entry */
 .noteEdit-work-label-search-box {
   font-style: italic;
-  width: 300px; }
+  width: 300px;
+}
 
 .noteEdit-author-label-search-box:focus,
 .noteEdit-work-label-search-box:focus {
-  background-color: white; }
+  background-color: white;
+}
 
 .noteEdit-author-label-ul,
 .noteEdit-work-label-ul {
   display: inline;
   margin: 0px;
-  padding: 0px; }
-
+  padding: 0px;
+}
 .noteEdit-author-label-li,
 .noteEdit-work-label-li {
   display: inline;
   margin: 0px;
-  padding: 0px; }
+  padding: 0px;
+}
 
 .noteEdit-author-label-option,
 .noteEdit-work-label-option {
@@ -398,31 +460,36 @@ input.noteEdit-work-label {
   color: #393939;
   background: transparent;
   padding: 4px;
-  margin: 4px; }
+  margin: 4px;
+}
 
 .noteEdit-work-label-option,
 .noteEdit-work-label-option-new {
-  font-style: italic; }
+  font-style: italic;
+}
 
 .noteEdit-author-label-option::after,
 .noteEdit-work-label-option::after {
-  content: '? '; }
+  content: '? ';
+}
 
 .noteEdit-author-label-option-new,
 .noteEdit-work-label-option-new {
   border: none;
   background: transparent;
   padding: 4px;
-  margin: 4px; }
+  margin: 4px;
+}
 
 .noteEdit-author-label-option-new::before,
 .noteEdit-work-label-option-new::before {
-  background-image: url("/icons/plus.svg");
+  background-image: url($image_add_background);
   background-size: 16px 16px;
   display: inline-block;
   width: 15px;
   height: 13px;
-  content: ''; }
+  content: '';
+}
 
 .noteEdit-author-label-option:hover,
 .noteEdit-author-label-option-new:hover,
@@ -437,10 +504,12 @@ input.noteEdit-work-label {
   border-color: black;
   border-width: 1px;
   border-radius: 4px;
-  margin: 3px; }
+  margin: 3px;
+}
 
 .top-right {
-  text-align: right; }
+  text-align: right;
+}
 
 /* TODO: Alignment isn't working right */
 div.work-author-label,
@@ -448,7 +517,8 @@ input.work-author-label {
   font-size: 28px;
   margin: 0px;
   width: 100%;
-  padding: 0px; }
+  padding: 0px;
+}
 
 .work-author-label-search-box {
   background-color: transparent;
@@ -457,10 +527,14 @@ input.work-author-label {
   text-align: right;
   margin: auto;
   width: 300px;
-  padding: 8px; }
+  padding: 8px;
+}
 
+.work-author-label-ul {
+}
 .work-author-label-li {
-  display: inline; }
+  display: inline;
+}
 
 .work-author-label-option,
 .work-author-label-option-new {
@@ -468,32 +542,38 @@ input.work-author-label {
   background: transparent;
   padding: 4px;
   margin: 4px;
-  font-size: 18px; }
+  font-size: 18px;
+}
 
 .work-author-label-option {
-  color: #303030; }
+  color: #303030;
+}
 
 .work-author-label-option::after {
-  content: '?'; }
+  content: '?';
+}
 
 .work-author-label-option-new {
   border: none;
   background: transparent;
   padding: 4px;
-  margin: 4px; }
+  margin: 4px;
+}
 
 .work-author-label-option-new::before {
-  background-image: url("/icons/plus.svg");
+  background-image: url($image_add_background);
   background-size: 16px 16px;
   display: inline-block;
   width: 15px;
   height: 13px;
-  content: ''; }
+  content: '';
+}
 
 .searchBar-container {
   border: 2px;
   border-style: solid;
-  border-radius: 4px; }
+  border-radius: 4px;
+}
 
 input.searchBar,
 input.searchBar-search-box {
@@ -503,18 +583,22 @@ input.searchBar-search-box {
   display: inline-block;
   padding: 8px;
   margin: 4px auto;
-  border-style: none; }
+  border-style: none;
+}
 
 input.searchBar-search-box:focus {
-  outline: none; }
+  outline: none;
+}
 
 ul.searchBar-ul {
   display: block;
   padding: 0px;
-  margin: 0px; }
+  margin: 0px;
+}
 
 li.searchBar-li {
-  display: inline; }
+  display: inline;
+}
 
 .searchBar-option,
 .searchBar-option-new {
@@ -524,21 +608,25 @@ li.searchBar-li {
   border-radius: 4px;
   border-style: solid;
   border-width: 1px;
-  margin: 4px; }
+  margin: 4px;
+}
 
 .searchBar-option {
-  color: #303030; }
+  color: #303030;
+}
 
 .searchBar-option-new::before {
-  background-image: url("/icons/plus.svg");
+  background-image: url($image_add_background);
   background-size: 24px 24px;
   display: inline-block;
   width: 22px;
   height: 22px;
-  content: ''; }
+  content: '';
+}
 
 .searchBar-option::after {
-  content: '? '; }
+  content: '? ';
+}
 
 .searchBar-option:focus,
 .searchBar-option-new:focus {
@@ -546,11 +634,13 @@ li.searchBar-li {
   border-radius: 4px;
   border-style: solid;
   border-width: 1px;
-  outline: none; }
+  outline: none;
+}
 
 /* TODO: Check accessibility */
 input.searchBar:focus {
-  outline: none; }
+  outline: none;
+}
 
 div.currentModifier {
   background: black;
@@ -561,54 +651,63 @@ div.currentModifier {
   padding: 8px;
   margin: 4px;
   border-style: none;
-  border-radius: 4px; }
+  border-radius: 4px;
+}
 
 div.note-slim {
   padding: 4px;
-  margin: 4px; }
+  margin: 4px;
+}
 
 a.note-slim {
-  text-decoration: none; }
+  text-decoration: none;
+}
 
 div.note-slim:hover {
   background: #ddd;
-  border-radius: 4px; }
+  border-radius: 4px;
+}
 
 .slim-selected {
   border: 1px;
   border-style: solid;
   border-color: black;
-  border-radius: 4px; }
-
+  border-radius: 4px;
+}
 .slim {
   border: 1px;
   border-style: solid;
   border-color: white;
-  border-radius: 4px; }
+  border-radius: 4px;
+}
 
 .grid {
   display: inline-block;
   vertical-align: middle;
-  width: 100%; }
+  width: 100%;
+}
 
 .grid-selected {
   display: inline-block;
   vertical-align: middle;
   width: 100%;
   background: lightgoldenrodyellow;
-  align-items: center; }
+  align-items: center;
+}
 
 .grid-div-button {
   display: inline-block;
   vertical-align: middle;
-  height: 30px; }
+  height: 30px;
+}
 
 .grid-link,
 a.grid-link {
   display: inline-block;
   vertical-align: middle;
   width: 95%;
-  height: 30px; }
+  height: 30px;
+}
 
 .grid-author,
 .grid-title,
@@ -619,68 +718,93 @@ a.grid-link {
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
-  padding: 2px; }
+  padding: 2px;
+}
 
 .grid-title {
-  width: 22%; }
+  width: 22%;
+}
 
 .grid-text {
-  width: 60%; }
+  width: 60%;
+}
 
 .grid-button {
   background: transparent;
-  border-style: none; }
+  border-style: none;
+}
 
 .multi-select {
   font-size: 14px;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .multi-select .multi-select-button {
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-family: $main_font;
+
+  .multi-select-button {
+    font-family: $main_font;
     padding: 8px;
     margin: 2px;
     border-width: 2px;
     border-color: white;
     border-radius: 4px;
-    border-style: solid; }
-  .multi-select .multi-select-button:hover {
+    border-style: solid;
+  }
+
+  .multi-select-button:hover {
     background: lightblue;
-    cursor: pointer; }
-  .multi-select .multi-select-button:focus {
+    cursor: pointer;
+  }
+
+  .multi-select-button:focus {
     border-color: black;
-    outline: none; }
-  .multi-select .multi-select-search-box {
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+    outline: none;
+  }
+
+  .multi-select-search-box {
+    font-family: $main_font;
     padding: 8px;
     margin: 2px;
     border-width: 2px;
     border-color: black;
     border-radius: 4px;
-    border-style: solid; }
-  .multi-select .multi-select-ul {
+    border-style: solid;
+  }
+
+  .multi-select-ul {
     display: inline-block;
     margin: 0px;
-    padding: 0px; }
-  .multi-select .multi-select-li {
+    padding: 0px;
+  }
+
+  .multi-select-li {
     display: inline-block;
     margin: 0px;
-    padding: 0px; }
-  .multi-select .multi-select-option,
-  .multi-select .multi-select-option-new {
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+    padding: 0px;
+  }
+
+  // TODO: Create a mixin for options
+  .multi-select-option,
+  .multi-select-option-new {
+    font-family: $main_font;
     padding: 8px;
     margin: 2px;
     border-width: 2px;
     border-color: lightgray;
     border-radius: 4px;
     border-style: solid;
-    background: transparent; }
-  .multi-select .multi-select-option:focus,
-  .multi-select .multi-select-option-new:focus {
-    border-color: black; }
-  .multi-select .multi-select-option-new::before {
-    background-image: url("/icons/plus.svg");
+    background: transparent;
+  }
+
+  .multi-select-option:focus,
+  .multi-select-option-new:focus {
+    border-color: black;
+  }
+
+  // TODO: Create a mixin for the add button
+  .multi-select-option-new::before {
+    background-image: url($image_add_background);
     background-size: 17px 17px;
     display: inline-block;
     width: 15px;
     height: 13px;
-    content: ''; }
+    content: '';
+  }
+}
