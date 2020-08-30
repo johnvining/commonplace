@@ -692,55 +692,56 @@ div.note-slim:hover {
 }
 
 .grid {
-  font-size: 14px;
-  display: block;
-  margin: auto;
-  display: flex;
-  align-items: center;
+  display: inline-block;
+  vertical-align: middle;
+  width: 100%;
 }
+
 .grid-selected {
-  background: #eee;
-  font-size: 14px;
-  display: block;
-  margin: auto;
-  display: flex;
+  display: inline-block;
+  vertical-align: middle;
+  width: 100%;
+  background: lightgoldenrodyellow;
   align-items: center;
 }
 
-.grid-button {
-  border: none;
+.grid-div-button {
   display: inline-block;
-  background: transparent;
+  vertical-align: middle;
+  height: 30px;
 }
 
-.grid-author {
+.grid-link,
+a.grid-link {
   display: inline-block;
-  width: 12%;
-  height: 18px;
-  text-overflow: clip;
+  vertical-align: middle;
+  width: 95%;
+  height: 30px;
+}
+
+.grid-author,
+.grid-title,
+.grid-text {
+  width: 15%;
+  display: inline-block;
   white-space: nowrap;
   overflow: hidden;
-  padding: 10px;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  padding: 2px;
 }
 
 .grid-title {
-  display: inline-block;
-  width: 24%;
-  height: 18px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding: 10px;
+  width: 22%;
 }
 
 .grid-text {
-  display: inline-block;
-  width: 50%;
-  height: 18px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding: 10px;
+  width: 60%;
+}
+
+.grid-button {
+  background: transparent;
+  border-style: none;
 }
 
 .multi-select-button {
