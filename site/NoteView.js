@@ -1,42 +1,34 @@
 import React from 'react'
-import axios from 'axios'
 import NoteList from './NoteList'
-import { Link } from '@reach/router'
-import { decodeBase64 } from 'bcryptjs'
-import * as db from './Database'
+import { getNoteInfo } from './Database'
+import * as constants from './constants'
 
 class NoteView extends React.Component {
-  state = {}
-
-  constructor(props) {
-    super(props)
+  state = {
+    id: ''
   }
 
-  getNoteData() {
-    db.getNoteInfo(this.props.id)
+  async getListOfOneNote() {
+    let notesResponse
+    await getNoteInfo(this.props.id)
       .then(response => {
-        const data = response.data.data
-        this.setState({
-          notes: data
-        })
-
-        document.title = this.state.title
+        notesResponse = response
       })
       .catch(error => {
         console.error(error)
       })
-  }
 
-  componentDidMount() {
-    this.getNoteData()
-  }
-
-  refetch() {
-    this.getNoteData() // TODO: Can we skip the re-fetch?
+    return notesResponse
   }
 
   render() {
-    return <NoteList notes={this.state.notes} />
+    return (
+      <NoteList
+        key={'note' + this.props.id}
+        viewMode={constants.view_modes.FULL}
+        getListOfNotes={this.getListOfOneNote.bind(this)}
+      />
+    )
   }
 }
 
