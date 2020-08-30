@@ -22,8 +22,7 @@ class RecentList extends React.Component {
       <div>
         <NoteList
           key={'recent'}
-          useGridView={false}
-          useSlim={false}
+          viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
       </div>

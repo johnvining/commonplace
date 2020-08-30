@@ -811,3 +811,34 @@ div.note-slim:hover {
 .url {
   font-family: 'Courier New', Courier, monospace;
 }
+
+.toolbar {
+  background: lightgrey;
+  border-style: none;
+  padding: 4px;
+}
+
+/* TODO: Fix accessibility */
+.toolbar:hover {
+  background: lightcyan;
+  cursor: pointer;
+  outline: none;
+}
+
+.toolbar-selected {
+  background: lightblue;
+  border-style: none;
+  padding: 4px;
+}
+
+.toolbar-selected:focus {
+  outline: none;
+}
+
+button.left {
+  border-radius: 5px 0px 0px 5px;
+}
+
+button.right {
+  border-radius: 0px 5px 5px 0px;
+}

@@ -63,8 +63,7 @@ class Author extends React.Component {
 
         <NoteList
           key={'auth' + this.props.id}
-          useGridView={false}
-          useSlim={false}
+          viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
       </div>

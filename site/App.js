@@ -5,13 +5,14 @@ import Author from './Author'
 import { Router, Link } from '@reach/router'
 import RecentList from './RecentList'
 import Idea from './Idea'
-import NewNote from './NewNote'
 import Work from './Work'
 import SearchBar from './SearchBar'
 import Find from './Find'
+import * as constants from './constants'
+import ViewSelector from './ViewSelector'
 
 class App extends React.Component {
-  state = { barOpen: false, slim: true }
+  state = { barOpen: false, viewMode: 1 }
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
@@ -39,6 +40,10 @@ class App extends React.Component {
     this.setState({ slim: !this.state.slim })
   }
 
+  setView(view) {
+    this.setState({ viewMode: view })
+  }
+
   render() {
     return (
       <div className="main">
@@ -57,20 +62,22 @@ class App extends React.Component {
               </Link>
             </div>
             <div className="topActions">
-              <Link to="/new">
-                <button className="topButton"></button>
-              </Link>
+              <ViewSelector
+                viewMode={this.state.viewMode}
+                setView={this.setView.bind(this)}
+              />
             </div>
           </div>
         )}
+
         <br />
         <Router>
-          <Author path="/auth/:id" slim={this.state.slim} />
+          <Author path="/auth/:id" viewMode={this.state.viewMode} />
           <Find path="/find/:search" />
-          <Idea path="/idea/:id" slim={this.state.slim} />
+          <Idea path="/idea/:id" viewMode={this.state.viewMode} />
           <NoteView path="/note/:id" />
-          <RecentList path="/" slim={this.state.slim} />
-          <Work path="/work/:id" slim={this.state.slim} />
+          <RecentList path="/" viewMode={this.state.viewMode} />
+          <Work path="/work/:id" viewMode={this.state.viewMode} />
         </Router>
       </div>
     )

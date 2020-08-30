@@ -4,6 +4,7 @@ import NoteSlim from './NoteSlim'
 import NoteGrid from './NoteGrid'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
+import * as constants from './constants'
 
 // TODO: Unselect on switching to slim
 class NoteList extends React.Component {
@@ -242,7 +243,7 @@ class NoteList extends React.Component {
             {this.state.notes.map((note, index) => {
               return (
                 <div key={'note-view-' + note._id}>
-                  {this.props.useGridView ? (
+                  {this.props.viewMode == constants.view_modes.GRID ? (
                     <NoteGrid
                       author={note.author?.name}
                       index={index}
@@ -260,7 +261,7 @@ class NoteList extends React.Component {
                       markChecked={this.markChecked.bind(this)}
                       markShiftChecked={this.markShiftChecked.bind(this)}
                     />
-                  ) : this.props.useSlim ? (
+                  ) : this.props.viewMode == constants.view_modes.SLIM ? (
                     <NoteSlim
                       author={note.author?.name}
                       index={index}

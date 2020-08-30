@@ -59,8 +59,7 @@ class Idea extends React.Component {
 
         <NoteList
           key={'idea' + this.props.id}
-          useGridView={false}
-          useSlim={false}
+          viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
       </div>
