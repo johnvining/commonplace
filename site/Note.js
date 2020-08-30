@@ -170,16 +170,16 @@ class Note extends React.Component {
     const note = this.props.note
 
     // Four possible states for a note:
-    var mode = { name: 'Normal', class: 'noteNormal-' }
+    var mode = { name: 'Normal', class: 'normal ' }
     if (edit) {
       mode.name = 'Editing'
-      mode.class = 'noteEdit-'
+      mode.class = 'edit '
     } else if (addIdea) {
       mode.name = 'Editing Ideas'
-      mode.class = 'noteEditIdea-'
+      mode.class = 'edit-idea '
     } else if (inFocus) {
       mode.name = 'In Focus'
-      mode.class = 'noteInFocus-'
+      mode.class = 'in-focus '
     }
 
     if (deleted) {
@@ -189,7 +189,7 @@ class Note extends React.Component {
     // TODO: Do autocomplete's need their out ESC handling? Remove it.
     return (
       <div
-        className={mode.class + 'outer'}
+        className={mode.class + 'note outer'}
         key={this.props.id}
         id={this.props.id}
         tabIndex={this.props.tabIndex}
@@ -197,14 +197,14 @@ class Note extends React.Component {
         <div className={mode.class + 'bar'}>
           {edit ? (
             <input
-              className={mode.class + 'title'}
+              className={'note title'}
               name="title"
               autoFocus
               defaultValue={this.state.pendingTitle}
               onChange={this.handleTitleChange}
             ></input>
           ) : !this.state.pendingTitle?.length ? (
-            <div className={mode.class + 'title'}>
+            <div className={'note title'}>
               <em>Untitled Note</em>
             </div>
           ) : (
@@ -214,20 +214,20 @@ class Note extends React.Component {
           )}
           {edit ? (
             <textarea
-              className={mode.class + 'text'}
+              className={'note text'}
               onChange={this.handleTextChange}
               value={note.text}
             ></textarea>
           ) : (
-            <div className={mode.class + 'text'}>{note.text}</div>
+            <div className={'note text'}>{note.text}</div>
           )}
         </div>
-        <div className={mode.class + 'author-bar'}>
+        <div>
           {edit ? (
             <Autocomplete
               inputName={this.props.id + 'author'}
               dontAutofocus={true}
-              className={mode.class + 'author-label'}
+              className={'note author'}
               defaultValue={this.state.pendingAuthorName}
               escape={() => {
                 this.setState({ edit: false })
@@ -237,22 +237,22 @@ class Note extends React.Component {
               handleNewSelect={this.handleCreateAuthorAndAssign}
             />
           ) : (
-            <div className={mode.class + 'author-label'}>
+            <div>
               <Link
                 to={'/auth/' + this.state.pendingAuthorId}
-                className={mode.class + 'author'}
+                className={'note author label'}
               >
                 {this.state.pendingAuthorName}
               </Link>
             </div>
           )}
         </div>
-        <div className={mode.class + 'work-bar'}>
+        <div>
           {edit ? (
             <Autocomplete
               inputName={this.props.id + 'work'}
               dontAutofocus={true}
-              className={mode.class + 'work-label'}
+              className={'note work'}
               defaultValue={this.state.pendingWorkName}
               escape={() => {
                 this.setState({ edit: false })
@@ -262,10 +262,10 @@ class Note extends React.Component {
               handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
             />
           ) : (
-            <div className={mode.class + 'work-label'}>
+            <div>
               <Link
                 to={'/work/' + this.state.pendingWorkId}
-                className={mode.class + 'work'}
+                className={'note work label'}
               >
                 {this.state.pendingWorkName}
               </Link>

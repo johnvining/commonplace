@@ -9,13 +9,11 @@ class Autocomplete extends React.Component {
   }
   className = this.props.className
   style = {
-    searchBox: this.className + '-search-box',
-    li: this.className + '-li',
-    ul: this.className + '-ul',
-    option: this.className + '-option',
-    newOption: this.className + '-option-new',
-    exitButton: this.className + '-exit-button',
-    exitButtonImage: this.props.exitButtonImage
+    searchBox: this.className + ' label',
+    li: this.className + ' li',
+    ul: this.className + ' ul',
+    option: this.className + ' option',
+    newOption: this.className + ' option new'
   }
 
   // TODO: Support for filtering what we already have

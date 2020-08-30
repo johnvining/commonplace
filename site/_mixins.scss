@@ -5,6 +5,12 @@
   border-color: black;
 }
 
+@mixin note-edit-focus() {
+  outline: none; // TODO: Fix -- accessibility
+  background-color: white;
+  border-radius: 4px;
+}
+
 @mixin autocomplete-option {
 }
 
