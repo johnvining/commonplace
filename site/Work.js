@@ -95,6 +95,7 @@ class Work extends React.Component {
           <div>
             {editAuthor || authorName == null || authorName?.length == 0 ? (
               <Autocomplete
+                inputName="work-author"
                 className={'work-author-label'}
                 defaultValue={authorName}
                 escape={() => {

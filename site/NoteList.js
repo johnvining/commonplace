@@ -178,7 +178,8 @@ class NoteList extends React.Component {
           <div>
             {this.state.addSomething ? (
               <Autocomplete
-                className={'multi-select'}
+                inputName="multiselect"
+                className="multi-select"
                 clearOnSelect={true}
                 escape={() => {
                   this.setState({ addSomething: false, toAdd: '' })

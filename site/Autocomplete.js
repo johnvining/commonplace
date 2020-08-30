@@ -71,13 +71,15 @@ class Autocomplete extends React.Component {
       },
       () => {
         this.props.onSelect(this.state.selectedID, this.state.currentTypedText)
-        mainInput.value = this.state.currentTypedText
+        document.getElementById(
+          this.props.inputName
+        ).value = this.state.currentTypedText
       }
     )
 
     if (this.props.clearOnSelect) {
-      mainInput.value = ''
-      mainInput.focus()
+      document.getElementById(this.props.inputName).value = ''
+      document.getElementById(this.props.inputName).focus()
       this.setState({ currentTypedText: '' })
     }
   }
@@ -86,11 +88,13 @@ class Autocomplete extends React.Component {
     this.props.handleNewSelect(this.state.currentTypedText)
     this.setState({ hideResults: true })
     if (this.props.clearOnSelect) {
-      mainInput.value = ''
-      mainInput.focus()
+      document.getElementById(this.props.inputName).value = ''
+      document.getElementById(this.props.inputName).focus()
       this.setState({ currentTypedText: '' })
     } else {
-      mainInput.value = this.state.currentTypedText
+      document.getElementById(
+        this.props.inputName
+      ).value = this.state.currentTypedText
     }
   }
 
@@ -99,8 +103,8 @@ class Autocomplete extends React.Component {
     return (
       <div className="nothing">
         <input
-          id="mainInput"
-          autoFocus
+          id={this.props.inputName}
+          autoFocus={this.props.dontAutofocus ? false : true}
           className={this.style.searchBox}
           value={this.state.currentTypedText}
           onChange={this.handleTypingChange.bind(this)}

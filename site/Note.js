@@ -225,6 +225,8 @@ class Note extends React.Component {
         <div className={mode.class + 'author-bar'}>
           {edit ? (
             <Autocomplete
+              inputName={this.props.id + 'author'}
+              dontAutofocus={true}
               className={mode.class + 'author-label'}
               defaultValue={this.state.pendingAuthorName}
               escape={() => {
@@ -248,6 +250,8 @@ class Note extends React.Component {
         <div className={mode.class + 'work-bar'}>
           {edit ? (
             <Autocomplete
+              inputName={this.props.id + 'work'}
+              dontAutofocus={true}
               className={mode.class + 'work-label'}
               defaultValue={this.state.pendingWorkName}
               escape={() => {
@@ -313,6 +317,7 @@ class Note extends React.Component {
             <div className={mode.class + 'actionBar'}>
               {this.state.addIdea ? (
                 <Autocomplete
+                  inputName={this.props.id + 'idea'}
                   className={mode.class + 'idea'}
                   clearOnSelect={true}
                   escape={() => {

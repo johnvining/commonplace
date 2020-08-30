@@ -161,7 +161,8 @@ class SearchBar extends React.Component {
 
         {showAutocomplete ? (
           <Autocomplete
-            className={'searchBar'}
+            inputName="searchBar"
+            className="searchBar"
             defaultValue={typedText}
             onSelect={this.handleUpdate.bind(this)}
             getSuggestions={this.getSuggestions.bind(this)}
