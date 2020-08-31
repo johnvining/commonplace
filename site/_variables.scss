@@ -3,6 +3,7 @@ $monospace: 'Courier New', Courier, monospace;
 $main_font: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 
 // Colors
+// TODO: Too many different grays
 $background_color: hsl(120, 50%, 98%);
 $selection_yellow: lightgoldenrodyellow;
 $option_blue: #efffff;
@@ -19,7 +20,7 @@ $button_shadow_color: #dadada;
 $note_background_edit: #efefef;
 $note_background_in_focus: #efefef;
 $note_background: #efefef;
-$note_border_edit: $selection_yellow;
+$note_border_edit: lightblue;
 $note_border_in_focus: lightgrey;
 $note_border: white;
 

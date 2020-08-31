@@ -55,7 +55,7 @@ div .top-bar {
     background-color: #efefef;
     border-color: white; }
   .note.outer.edit {
-    border-color: lightgoldenrodyellow;
+    border-color: lightblue;
     background-color: #efefef; }
   .note.outer.in-focus {
     border-color: lightgrey;
@@ -233,20 +233,9 @@ div .top-bar {
     height: 15px;
     content: ''; }
 
-.noteEdit-author-label-search-box,
-.noteEdit-work-label-search-box {
-  background-color: transparent;
-  border: none;
-  font-size: 18px;
-  margin: auto;
-  width: 300px;
-  padding: 8px;
-  width: 25%; }
-
 .top-right {
   text-align: right; }
 
-/* TODO: Alignment isn't working right */
 .search-bar.container {
   border: 2px;
   border-style: solid;
@@ -272,6 +261,8 @@ div .top-bar {
   font-size: 32px;
   margin: 4px auto;
   padding: 8px; }
+  .search-bar.label:focus {
+    outline: none; }
 .search-bar.ul {
   display: block;
   padding: 0px;

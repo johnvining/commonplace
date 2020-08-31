@@ -319,22 +319,9 @@ div.main {
   }
 }
 
-.noteEdit-author-label-search-box,
-.noteEdit-work-label-search-box {
-  background-color: transparent;
-  border: none;
-  font-size: 18px;
-  margin: auto;
-  width: 300px;
-  padding: 8px;
-  width: 25%;
-}
-
 .top-right {
   text-align: right;
 }
-
-/* TODO: Alignment isn't working right */
 
 .search-bar {
   &.container {
@@ -368,6 +355,10 @@ div.main {
     font-size: 32px;
     margin: 4px auto;
     padding: 8px;
+
+    &:focus {
+      outline: none; // TODO: Fix a11y
+    }
   }
 
   &.ul {
@@ -415,6 +406,7 @@ div.main {
   }
 }
 
+// TODO: Sassify Slim
 div.note-slim {
   padding: 4px;
   margin: 4px;
@@ -442,6 +434,7 @@ div.note-slim:hover {
   border-radius: 4px;
 }
 
+// TODO: Sassify Grid
 .grid {
   display: inline-block;
   vertical-align: middle;

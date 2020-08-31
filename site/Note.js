@@ -221,10 +221,10 @@ class Note extends React.Component {
             <textarea
               className={'note text'}
               onChange={this.handleTextChange}
-              value={note.text}
+              value={this.state.pendingText}
             ></textarea>
           ) : (
-            <div className={'note text'}>{note.text}</div>
+            <div className={'note text'}>{this.state.pendingText}</div>
           )}
         </div>
         <div>
