@@ -137,6 +137,7 @@ div.main {
     padding: 8px;
     resize: none;
     width: 100%;
+    white-space: pre-wrap;
 
     &:focus {
       @include note-edit-focus;

@@ -93,7 +93,8 @@ div .top-bar {
   margin: auto;
   padding: 8px;
   resize: none;
-  width: 100%; }
+  width: 100%;
+  white-space: pre-wrap; }
   .note .text:focus {
     outline: none;
     background-color: white;
