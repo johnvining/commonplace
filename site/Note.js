@@ -104,7 +104,9 @@ class Note extends React.Component {
 
   handleNewTopic = ideaId => {
     db.addIdeaToNote(ideaId, this.props.id)
-      .then(this.props.refetchMe(this.props.index))
+      .then(() => {
+        this.props.refetchMe(this.props.index)
+      })
       .catch(e => {
         console.error(e)
       })
@@ -112,8 +114,12 @@ class Note extends React.Component {
 
   // TODO: Clear entry after assignment
   handleCreateTopicAndAssign = ideaName => {
+    console.log('create and assing index: ' + this.props.index)
     db.createTopicAndAssign(ideaName, this.props.id)
-      .then(this.props.refetchMe(this.props.index))
+      .then(() => {
+        this.props.refetchMe(this.props.index)
+      })
+
       .catch(e => {
         console.error(e)
       })
@@ -186,7 +192,6 @@ class Note extends React.Component {
       return <div> </div>
     }
 
-    // TODO: Refresh on add note
     // TODO: Do autocomplete's need their out ESC handling? Remove it.
     return (
       <div

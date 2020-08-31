@@ -27,10 +27,14 @@ class NoteList extends React.Component {
   }
 
   async refetchNoteAtIndex(index) {
+    console.log('refetch at ' + index)
+
     let notes = this.state.notes
     const response = await db.getNoteInfo(notes[index]._id)
     const note = response.data.data[0]
+    console.log(notes[index])
     notes[index] = note
+    console.log(notes[index])
     this.setState({ notes: notes })
   }
 
@@ -171,6 +175,7 @@ class NoteList extends React.Component {
   }
 
   render() {
+    this.state.notes[1]
     return (
       <div className="multi-select">
         {this.props.viewMode == constants.view_modes.FULL ? null : this.state
