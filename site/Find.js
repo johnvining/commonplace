@@ -6,6 +6,7 @@ import {
   getWorkSuggestions,
   getAuthorSuggestions
 } from './Database'
+import * as constants from './constants'
 import { Link } from '@reach/router'
 
 class Find extends React.Component {
@@ -22,28 +23,25 @@ class Find extends React.Component {
   }
 
   fetchData(search) {
-    const notesFromTextSearch = searchNotes(search)
     const ideasFromTextSearch = getIdeaSuggestions(search)
     const worksFromTextSearch = getWorkSuggestions(search)
     const authsFromTextSearch = getAuthorSuggestions(search)
 
-    Promise.all([
-      notesFromTextSearch,
-      ideasFromTextSearch,
-      worksFromTextSearch,
-      authsFromTextSearch
-    ])
+    Promise.all([ideasFromTextSearch, worksFromTextSearch, authsFromTextSearch])
       .then(response => {
         this.setState({
-          notes: response[0].data.data,
-          ideas: response[1].data.data,
-          works: response[2].data.data,
-          authors: response[3].data.data
+          ideas: response[0].data.data,
+          works: response[1].data.data,
+          authors: response[2].data.data
         })
       })
       .catch(error => {
         console.error(error)
       })
+  }
+
+  async getListOfNotes() {
+    return await searchNotes(this.state.search)
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -66,7 +64,7 @@ class Find extends React.Component {
         Works:
         <ul className="search-ul">
           {works?.map(work => (
-            <Link to={'/work/' + work._id}>
+            <Link to={'/work/' + work._id} key={'work-' + work._id}>
               <li className="search-li">{work.name}</li>
             </Link>
           ))}
@@ -75,7 +73,7 @@ class Find extends React.Component {
         Ideas:
         <ul className="search-ul">
           {ideas?.map(idea => (
-            <Link to={'/idea/' + idea._id}>
+            <Link to={'/idea/' + idea._id} key={'idea-' + idea._id}>
               <li className="search-li">{idea.name}</li>
             </Link>
           ))}
@@ -84,14 +82,18 @@ class Find extends React.Component {
         Authors:
         <ul className="search-ul">
           {authors?.map(author => (
-            <Link to={'/auth/' + author._id}>
+            <Link to={'/auth/' + author._id} key={'author-' + author._id}>
               <li className="search-li">{author.name}</li>
             </Link>
           ))}
         </ul>
         <br />
         Notes:
-        <NoteList notes={notes} useSlim={true} />
+        <NoteList
+          notes={notes}
+          viewMode={constants.view_modes.SLIM}
+          getListOfNotes={this.getListOfNotes.bind(this)}
+        />
       </div>
     )
   }
