@@ -150,43 +150,7 @@ div .top-bar {
   height: 13px;
   content: ''; }
 
-/* Action button related */
-.noteNormal-action-button,
-.noteEdit-action-button,
-.noteEditIdea-action-button,
-.noteInFocus-action-button {
-  border-radius: 4px;
-  border-style: none;
-  cursor: pointer;
-  display: inline-block;
-  margin: 4px;
-  padding: 4px;
-  text-decoration: none;
-  color: black;
-  font-size: 18px;
-  margin: 2px;
-  padding: 4px;
-  text-decoration: none; }
-
-/* TODO: Todo */
-.idea-exit-button {
-  border-radius: 4px;
-  border-style: none;
-  cursor: pointer;
-  display: inline-block;
-  margin: 4px;
-  padding: 4px;
-  text-decoration: none;
-  color: black;
-  font-size: 18px;
-  margin: 2px;
-  padding: 4px;
-  text-decoration: none; }
-
-.noteNormal-actionBar,
-.noteEdit-actionBar,
-.noteInFocus-actionBar,
-.noteEditIdea-actionBar {
+.action-bar.container {
   height: 100%;
   font-size: 15px;
   background-color: transparent;
@@ -194,21 +158,24 @@ div .top-bar {
   border: none;
   font-size: 18px;
   margin: 0px;
-  padding: 8px;
+  padding: 0px;
   text-align: right; }
+.action-bar .action-button {
+  border-style: none;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 18px;
+  margin: 4px;
+  padding: 4px;
+  text-decoration: none;
+  border-radius: 6px; }
+  .action-bar .action-button:hover {
+    background-color: white; }
+  .action-bar .action-button:focus {
+    box-shadow: 0px 0px 4px 4px #dadada;
+    outline: none; }
 
-.action-button:hover {
-  background-color: white; }
-
-.action-button:focus {
-  box-shadow: 0px 0px 4px 4px #dadada;
-  outline: none; }
-
-/* IDEA RELATED */
-.noteNormal-idea-list,
-.noteEditIdea-idea-list,
-.noteEdit-idea-list,
-.noteInFocus-idea-list {
+.idea.container {
   height: 100%;
   font-size: 15px;
   background-color: transparent;
@@ -217,70 +184,34 @@ div .top-bar {
   font-size: 18px;
   margin: 0px;
   padding: 8px; }
-
-.noteNormal-idea-search-box,
-.noteEdit-idea-search-box,
-.noteEditIdea-idea-search-box,
-.noteInFocus-idea-search-box {
+.idea.label {
   background-color: #ffe6f2;
+  background-color: white;
+  border-radius: 4px;
   border-radius: 4px;
   border-style: none;
   color: black;
   font-size: 15px;
   margin: 2px;
   padding: 4px;
-  text-decoration: none; }
-
-.noteNormal-idea-search-box:focus,
-.noteEdit-idea-search-box:focus,
-.noteEditIdea-idea-search-box:focus,
-.noteInFocus-idea-search-box:focus {
-  outline: none;
-  border-style: dashed;
-  border-color: black;
-  padding: 3px;
-  border-width: 1px; }
-
-.noteNormal-idea-ul,
-.noteEdit-idea-ul,
-.noteEditIdea-idea-ul,
-.noteInFocus-idea-ul {
+  text-decoration: none;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .idea.label:focus {
+    outline: none;
+    background-color: white;
+    border-radius: 4px; }
+  .idea.label:hover {
+    background-color: #ffe6f2;
+    cursor: pointer; }
+.idea.ul {
+  display: block;
   margin: 0px;
   padding: 0px; }
-
-.noteNormal-idea-li,
-.noteEdit-idea-li,
-.noteEditIdea-idea-li,
-.noteInFocus-idea-li {
+.idea.li {
   display: inline;
   margin: 0px;
   padding: 0px; }
-
-/* Existing idea button */
-.noteNormal-idea-label,
-.noteEditIdea-idea-label,
-.noteInFocus-idea-label,
-.noteEdit-idea-label {
-  background-color: white;
-  border-radius: 2px;
-  border-radius: 4px;
-  border-style: none;
-  color: black;
-  font-size: 15px;
-  margin: 2px;
-  padding: 4px;
-  text-decoration: none; }
-
-.noteNormal-idea-label:hover,
-.noteEdit-idea-label:hover,
-.noteInFocus-idea-label:hover,
-.noteEditIdea-idea-label:hover {
-  background-color: #ffe6f2;
-  cursor: pointer; }
-
-/* Possible ideas to add */
-.noteEditIdea-idea-option,
-.noteEditIdea-idea-option-new {
+.idea .option {
   background-color: #efffff;
   border-radius: 2px;
   border-radius: 4px;
@@ -291,38 +222,17 @@ div .top-bar {
   font-size: 15px;
   margin: 2px;
   padding: 4px;
-  text-decoration: none; }
-
-.noteEditIdea-idea-option-new {
-  background-color: #efffef; }
-
-.noteEditIdea-idea-option-new::before {
-  background-image: url("/icons/plus.svg");
-  background-size: 17px 17px;
-  display: inline-block;
-  width: 17px;
-  height: 15px;
-  content: ''; }
-
-.noteEditIdea-idea-option:focus,
-.noteEditIdea-idea-option-new:focus {
-  border-color: black;
-  background-color: white;
-  border-style: solid;
-  border-width: 1px;
-  margin: 2px;
-  outline: none;
-  padding: 3px; }
-
-.noteEditIdea-idea-option:hover,
-.noteEditIdea-idea-option-new:hover {
-  border-color: black;
-  background-color: white;
-  border-style: solid;
-  border-width: 1px;
-  margin: 2px;
-  outline: none;
-  padding: 3px; }
+  text-decoration: none;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .idea .option::after {
+    content: '? '; }
+  .idea .option.new::before {
+    background-image: url("/icons/plus.svg");
+    background-size: 17px 17px;
+    display: inline-block;
+    width: 17px;
+    height: 15px;
+    content: ''; }
 
 .noteEdit-author-label-search-box,
 .noteEdit-work-label-search-box {
@@ -334,81 +244,10 @@ div .top-bar {
   padding: 8px;
   width: 25%; }
 
-/* TODO: Make inputs grow with entry */
-.noteEdit-work-label-search-box {
-  font-style: italic;
-  width: 300px; }
-
-.noteEdit-author-label-search-box:focus,
-.noteEdit-work-label-search-box:focus {
-  background-color: white; }
-
-.noteEdit-author-label-option:hover,
-.noteEdit-author-label-option-new:hover,
-.noteEdit-author-label-option:focus,
-.noteEdit-author-label-option-new:focus,
-.noteEdit-work-label-option:hover,
-.noteEdit-work-label-option-new:hover,
-.noteEdit-work-label-option:focus,
-.noteEdit-work-label-option-new:focus {
-  outline: none;
-  border: solid;
-  border-color: black;
-  border-width: 1px;
-  border-radius: 4px;
-  margin: 3px; }
-
 .top-right {
   text-align: right; }
 
 /* TODO: Alignment isn't working right */
-div.work-author-label,
-input.work-author-label {
-  font-size: 28px;
-  margin: 0px;
-  width: 100%;
-  padding: 0px; }
-
-.work-author-label-search-box {
-  background-color: transparent;
-  border: none;
-  font-size: 28px;
-  text-align: right;
-  margin: auto;
-  width: 300px;
-  padding: 8px; }
-
-.work-author-label-li {
-  display: inline; }
-
-.work-author-label-option,
-.work-author-label-option-new {
-  border: none;
-  background: transparent;
-  padding: 4px;
-  margin: 4px;
-  font-size: 18px; }
-
-.work-author-label-option {
-  color: #303030; }
-
-.work-author-label-option::after {
-  content: '?'; }
-
-.work-author-label-option-new {
-  border: none;
-  background: transparent;
-  padding: 4px;
-  margin: 4px; }
-
-.work-author-label-option-new::before {
-  background-image: url("/icons/plus.svg");
-  background-size: 16px 16px;
-  display: inline-block;
-  width: 15px;
-  height: 13px;
-  content: ''; }
-
 .search-bar.container {
   border: 2px;
   border-style: solid;

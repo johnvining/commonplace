@@ -186,6 +186,7 @@ class Note extends React.Component {
       return <div> </div>
     }
 
+    // TODO: Refresh on add note
     // TODO: Do autocomplete's need their out ESC handling? Remove it.
     return (
       <div
@@ -279,13 +280,13 @@ class Note extends React.Component {
             </div>
           )}
         </div>
-        <div className={mode.class + 'item-bottom'}>
-          <div className={mode.class + 'idea-list'}>
+        <div className={'note item-bottom'}>
+          <div className={'container idea-list'}>
             <div>
               {note.ideas?.map(idea => (
                 <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
                   <button
-                    className={mode.class + 'idea-label'}
+                    className={'idea label'}
                     key={'idea-button' + idea._id}
                     tabIndex="-1"
                   >
@@ -297,16 +298,17 @@ class Note extends React.Component {
           </div>
 
           {edit ? (
-            <div className={mode.class + 'action-bar'}>
+            <div className={'container action-bar'}>
               <span>
                 <button
-                  className={mode.class + 'action-button'}
+                  className={'action-button'}
                   onClick={this.handleAccept.bind(this)}
                 >
                   <img src={check_circle}></img>
                 </button>
+
                 <button
-                  className={mode.class + 'action-button'}
+                  className={'action-button'}
                   onClick={this.handleCancel.bind(this)}
                 >
                   <img src={cross_circle}></img>
@@ -314,11 +316,11 @@ class Note extends React.Component {
               </span>
             </div>
           ) : (
-            <div className={mode.class + 'actionBar'}>
+            <div className={'container action-bar'}>
               {this.state.addIdea ? (
                 <Autocomplete
                   inputName={this.props.id + 'idea'}
-                  className={mode.class + 'idea'}
+                  className={'idea'}
                   clearOnSelect={true}
                   escape={() => {
                     this.setState({ addIdea: false })
@@ -331,23 +333,20 @@ class Note extends React.Component {
                 // Neither editing whole note nor ideas
                 <span>
                   <button
-                    className={mode.class + 'action-button'}
+                    className={'action-button'}
                     onClick={this.addIdea.bind(this)}
                     tabIndex="-1"
                   >
                     <img src={plus}></img>
                   </button>
                   <Link to={'/note/' + this.props.id}>
-                    <button
-                      className={mode.class + 'action-button'}
-                      tabIndex="-1"
-                    >
+                    <button className={'action-button'} tabIndex="-1">
                       <img src={document_image}></img>
                     </button>
                   </Link>
 
                   <button
-                    className={mode.class + 'action-button'}
+                    className={'action-button'}
                     onClick={this.handleEdit.bind(this)}
                     tabIndex="-1"
                   >
@@ -355,7 +354,7 @@ class Note extends React.Component {
                   </button>
                   <button
                     onClick={this.handleDelete.bind(this)}
-                    className={mode.class + 'action-button'}
+                    className={'action-button'}
                     tabIndex="-1"
                   >
                     <img src={trash}></img>
