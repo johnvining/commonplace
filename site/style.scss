@@ -7,7 +7,7 @@ body {
 }
 
 a {
-  color: black;
+  color: $link_color;
 }
 
 .url {
@@ -52,7 +52,7 @@ div.main {
     }
 
     .button-selected {
-      background: lightblue;
+      background: $button_selected;
     }
 
     .button-selected:focus {
@@ -75,7 +75,6 @@ div.main {
     border-radius: 4px;
     border-style: solid;
     border-width: 8px;
-    border-color: green;
     display: block;
     margin: 4px auto;
     max-width: 1200px;
@@ -83,22 +82,22 @@ div.main {
 
     &.normal,
     &.edit-idea {
-      background-color: #efefef;
-      border-color: white;
+      background-color: $note_background;
+      border-color: $note_border;
     }
 
     &.edit {
-      border-color: gray;
-      background: #eeeeee;
+      border-color: $note_border_edit;
+      background-color: $note_background_edit;
     }
 
     &.in-focus {
-      border-color: gray;
-      background: lightblue;
+      border-color: $note_border_in_focus;
+      background-color: $note_background_in_focus;
     }
 
     &:focus {
-      border-color: red;
+      border-color: $note_border_focused;
       outline: none;
     }
   }
@@ -109,6 +108,7 @@ div.main {
     justify-content: space-between;
     margin: 0px;
     padding: 0px;
+    min-height: 36px;
   }
 
   .title {
@@ -238,7 +238,7 @@ div.main {
     }
 
     &:focus {
-      box-shadow: 0px 0px 4px 4px #dadada;
+      box-shadow: 0px 0px 4px 4px $button_shadow_color;
       outline: none;
     }
   }
@@ -257,7 +257,6 @@ div.main {
   }
 
   &.label {
-    background-color: #ffe6f2;
     background-color: white;
     border-radius: 4px;
     border-radius: 4px;
@@ -274,7 +273,7 @@ div.main {
     }
 
     &:hover {
-      background-color: #ffe6f2;
+      background-color: $selection_yellow;
       cursor: pointer;
     }
   }
@@ -292,7 +291,7 @@ div.main {
   }
 
   .option {
-    background-color: #efffff;
+    background-color: $option_blue;
     border-radius: 2px;
     border-radius: 4px;
     border-style: none;
@@ -375,23 +374,21 @@ div.main {
     display: block;
     padding: 0px;
     margin: 0px;
-    color: red;
   }
 
   &.li {
     display: inline;
-    color: green;
   }
 
   &.option {
     background: transparent;
     font-size: 28px;
-    border-color: #ddd;
+    border-color: $de-emphasized-border-color;
     border-radius: 4px;
     border-style: solid;
     border-width: 1px;
     margin: 4px;
-    color: #404040;
+    color: $de-emphasized-border-color;
     font-family: $main_font;
 
     &:focus {
@@ -428,7 +425,7 @@ a.note-slim {
 }
 
 div.note-slim:hover {
-  background: #ddd;
+  background: $note_background;
   border-radius: 4px;
 }
 
@@ -502,7 +499,7 @@ a.grid-link {
   font-size: 14px;
   font-family: $main_font;
 
-  .multi-select-button {
+  &.button {
     font-family: $main_font;
     padding: 8px;
     margin: 2px;
@@ -512,17 +509,17 @@ a.grid-link {
     border-style: solid;
   }
 
-  .multi-select-button:hover {
+  &.button:hover {
     background: lightblue;
     cursor: pointer;
   }
 
-  .multi-select-button:focus {
+  &.button:focus {
     border-color: black;
     outline: none;
   }
 
-  .multi-select-search-box {
+  &.label {
     font-family: $main_font;
     padding: 8px;
     margin: 2px;
@@ -532,38 +529,37 @@ a.grid-link {
     border-style: solid;
   }
 
-  .multi-select-ul {
+  &.ul {
     display: inline-block;
     margin: 0px;
     padding: 0px;
   }
 
-  .multi-select-li {
+  &.li {
     display: inline-block;
     margin: 0px;
     padding: 0px;
   }
 
-  // TODO: Create a mixin for options
-  .multi-select-option,
-  .multi-select-option-new {
+  &.option,
+  &.option-new {
     font-family: $main_font;
     padding: 8px;
     margin: 2px;
     border-width: 2px;
-    border-color: lightgray;
+    border-color: white;
     border-radius: 4px;
     border-style: solid;
     background: transparent;
   }
 
-  .multi-select-option:focus,
-  .multi-select-option-new:focus {
+  &.option:focus,
+  &.option-new:focus {
     border-color: black;
   }
 
   // TODO: Create a mixin for the add button
-  .multi-select-option-new::before {
+  &.option-new::before {
     background-image: url($image_add_background);
     background-size: 17px 17px;
     display: inline-block;

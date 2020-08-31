@@ -5,9 +5,25 @@ $main_font: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 // Colors
 $background_color: hsl(120, 50%, 98%);
 $selection_yellow: lightgoldenrodyellow;
+$option_blue: #efffff;
+$link_color: black;
 
-$button_background: lightgrey;
+$de-emphasized-border-color: #ddd;
+$de-emphasized-text-color: #404040;
+
+$button_background: #efefef;
 $button_background_hover: lightcyan;
+$button_selected: lightblue;
+$button_shadow_color: #dadada;
+
+$note_background_edit: #efefef;
+$note_background_in_focus: #efefef;
+$note_background: #efefef;
+$note_border_edit: $selection_yellow;
+$note_border_in_focus: lightgrey;
+$note_border: white;
+
+$note_border_focused: darkgray;
 // TODO: use darken
 // TODO: use saturdate/desaturate
 // $selected_quote_background: ;
@@ -15,5 +31,4 @@ $button_background_hover: lightcyan;
 // $standard_button_border: 2px;
 // $standard_button_border-radius: 4px;
 
-// $image_delete_background:
 $image_add_background: '/icons/plus.svg';

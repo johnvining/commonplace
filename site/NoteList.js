@@ -27,14 +27,10 @@ class NoteList extends React.Component {
   }
 
   async refetchNoteAtIndex(index) {
-    console.log('refetch at ' + index)
-
     let notes = this.state.notes
     const response = await db.getNoteInfo(notes[index]._id)
     const note = response.data.data[0]
-    console.log(notes[index])
     notes[index] = note
-    console.log(notes[index])
     this.setState({ notes: notes })
   }
 
@@ -197,7 +193,7 @@ class NoteList extends React.Component {
               <div>
                 <button
                   onClick={this.delete.bind(this)}
-                  className="multi-select-button"
+                  className="multi-select button"
                 >
                   Delete
                 </button>
@@ -205,7 +201,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: 'idea' })
                   }}
-                  className="multi-select-button"
+                  className="multi-select button"
                 >
                   Idea
                 </button>
@@ -213,7 +209,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: 'work' })
                   }}
-                  className="multi-select-button"
+                  className="multi-select button"
                 >
                   Work
                 </button>
@@ -221,7 +217,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: 'author' })
                   }}
-                  className="multi-select-button"
+                  className="multi-select button"
                 >
                   Author
                 </button>
@@ -229,7 +225,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ selected: [], lastSelectedIndex: 0 })
                   }}
-                  className="multi-select-button"
+                  className="multi-select button"
                 >
                   Unselect All
                 </button>
@@ -239,7 +235,7 @@ class NoteList extends React.Component {
         ) : (
           <button
             onClick={this.selectAll.bind(this)}
-            className="multi-select-button"
+            className="multi-select button"
           >
             Select All
           </button>

@@ -28,7 +28,7 @@ div .top-bar {
   border-style: none;
   padding: 4px; }
 .top-bar .tool-bar .button {
-  background: lightgrey; }
+  background: #efefef; }
 .top-bar .tool-bar .button:hover {
   background-color: lightcyan;
   cursor: pointer;
@@ -47,7 +47,6 @@ div .top-bar {
   border-radius: 4px;
   border-style: solid;
   border-width: 8px;
-  border-color: green;
   display: block;
   margin: 4px auto;
   max-width: 1200px;
@@ -56,20 +55,21 @@ div .top-bar {
     background-color: #efefef;
     border-color: white; }
   .note.outer.edit {
-    border-color: gray;
-    background: #eeeeee; }
+    border-color: lightgoldenrodyellow;
+    background-color: #efefef; }
   .note.outer.in-focus {
-    border-color: gray;
-    background: lightblue; }
+    border-color: lightgrey;
+    background-color: #efefef; }
   .note.outer:focus {
-    border-color: red;
+    border-color: darkgrey;
     outline: none; }
 .note .item-bottom {
   align-items: top;
   display: flex;
   justify-content: space-between;
   margin: 0px;
-  padding: 0px; }
+  padding: 0px;
+  min-height: 36px; }
 .note .title {
   background-color: transparent;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -185,7 +185,6 @@ div .top-bar {
   margin: 0px;
   padding: 8px; }
 .idea.label {
-  background-color: #ffe6f2;
   background-color: white;
   border-radius: 4px;
   border-radius: 4px;
@@ -201,7 +200,7 @@ div .top-bar {
     background-color: white;
     border-radius: 4px; }
   .idea.label:hover {
-    background-color: #ffe6f2;
+    background-color: lightgoldenrodyellow;
     cursor: pointer; }
 .idea.ul {
   display: block;
@@ -276,20 +275,18 @@ div .top-bar {
 .search-bar.ul {
   display: block;
   padding: 0px;
-  margin: 0px;
-  color: red; }
+  margin: 0px; }
 .search-bar.li {
-  display: inline;
-  color: green; }
+  display: inline; }
 .search-bar.option {
   background: transparent;
   font-size: 28px;
-  border-color: #ddd;
+  border-color: #dddddd;
   border-radius: 4px;
   border-style: solid;
   border-width: 1px;
   margin: 4px;
-  color: #404040;
+  color: #dddddd;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
   .search-bar.option:focus {
     border-color: black;
@@ -316,7 +313,7 @@ a.note-slim {
   text-decoration: none; }
 
 div.note-slim:hover {
-  background: #ddd;
+  background: #efefef;
   border-radius: 4px; }
 
 .slim-selected {
@@ -379,7 +376,7 @@ a.grid-link {
 .multi-select {
   font-size: 14px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .multi-select .multi-select-button {
+  .multi-select.button {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
     margin: 2px;
@@ -387,13 +384,13 @@ a.grid-link {
     border-color: white;
     border-radius: 4px;
     border-style: solid; }
-  .multi-select .multi-select-button:hover {
+  .multi-select.button:hover {
     background: lightblue;
     cursor: pointer; }
-  .multi-select .multi-select-button:focus {
+  .multi-select.button:focus {
     border-color: black;
     outline: none; }
-  .multi-select .multi-select-search-box {
+  .multi-select.label {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
     margin: 2px;
@@ -401,28 +398,26 @@ a.grid-link {
     border-color: black;
     border-radius: 4px;
     border-style: solid; }
-  .multi-select .multi-select-ul {
+  .multi-select.ul {
     display: inline-block;
     margin: 0px;
     padding: 0px; }
-  .multi-select .multi-select-li {
+  .multi-select.li {
     display: inline-block;
     margin: 0px;
     padding: 0px; }
-  .multi-select .multi-select-option,
-  .multi-select .multi-select-option-new {
+  .multi-select.option, .multi-select.option-new {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
     margin: 2px;
     border-width: 2px;
-    border-color: lightgray;
+    border-color: white;
     border-radius: 4px;
     border-style: solid;
     background: transparent; }
-  .multi-select .multi-select-option:focus,
-  .multi-select .multi-select-option-new:focus {
+  .multi-select.option:focus, .multi-select.option-new:focus {
     border-color: black; }
-  .multi-select .multi-select-option-new::before {
+  .multi-select.option-new::before {
     background-image: url("/icons/plus.svg");
     background-size: 17px 17px;
     display: inline-block;

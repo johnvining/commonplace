@@ -114,7 +114,6 @@ class Note extends React.Component {
 
   // TODO: Clear entry after assignment
   handleCreateTopicAndAssign = ideaName => {
-    console.log('create and assing index: ' + this.props.index)
     db.createTopicAndAssign(ideaName, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
@@ -286,7 +285,7 @@ class Note extends React.Component {
           )}
         </div>
         <div className={'note item-bottom'}>
-          <div className={'container idea-list'}>
+          <div className={'container idea'}>
             <div>
               {note.ideas?.map(idea => (
                 <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
