@@ -277,6 +277,19 @@ div.main {
       background-color: $selection_yellow;
       cursor: pointer;
     }
+
+    &.edit::after {
+      background-image: url($image_remove_background);
+      background-size: 15px 15px;
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      content: '';
+    }
+
+    &.edit:hover {
+      background-color: $removal;
+    }
   }
 
   &.ul {

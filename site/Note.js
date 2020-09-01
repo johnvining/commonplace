@@ -5,7 +5,7 @@ import cross_circle from './icons/cross_circle.svg'
 import document_image from './icons/document.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
-import plus from './icons/plus.svg'
+import tags from './icons/tags.svg'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import link from './icons/link.svg'
@@ -166,6 +166,11 @@ class Note extends React.Component {
         console.error(error)
       })
   }
+  removeIdea(ideaId) {
+    // TODO: Support passing the new version of a note back to parent instead of refetch
+    db.removeIdeaFromNote(this.props.id, ideaId)
+    this.props.refetchMe(this.props.index)
+  }
 
   // FIXME: When a button is pressed in a note, tell the parent that I now should be inFocus
 
@@ -287,17 +292,30 @@ class Note extends React.Component {
         <div className={'note item-bottom'}>
           <div className={'container idea'}>
             <div>
-              {note.ideas?.map(idea => (
-                <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
+              {note.ideas?.map(idea =>
+                this.state.addIdea ? (
                   <button
-                    className={'idea label'}
+                    className="idea label edit"
                     key={'idea-button' + idea._id}
                     tabIndex="-1"
+                    onClick={() => {
+                      this.removeIdea(idea._id)
+                    }}
                   >
                     {idea.name}
                   </button>
-                </Link>
-              ))}
+                ) : (
+                  <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
+                    <button
+                      className="idea label"
+                      key={'idea-button' + idea._id}
+                      tabIndex="-1"
+                    >
+                      {idea.name}
+                    </button>
+                  </Link>
+                )
+              )}
             </div>
           </div>
 
@@ -341,7 +359,7 @@ class Note extends React.Component {
                     onClick={this.addIdea.bind(this)}
                     tabIndex="-1"
                   >
-                    <img src={plus}></img>
+                    <img src={tags}></img>
                   </button>
                   <Link to={'/note/' + this.props.id}>
                     <button className={'action-button'} tabIndex="-1">

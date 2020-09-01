@@ -96,6 +96,28 @@ export const reqFindNotesByString = async (req, res) => {
   }
 }
 
+export const reqRemoveIdeaFromNote = async (req, res) => {
+  try {
+    const docs = await removeIdeaFromNote(req.params.id, req.params.ideaId)
+
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const removeIdeaFromNote = async (noteId, ideaId) => {
+  return await Note.findOneAndUpdate(
+    { _id: noteId },
+    { $pull: { ideas: ideaId } },
+    { new: true }
+  )
+    .populate('ideas')
+    .lean()
+    .exec()
+}
+
 export const findNotesByString = async searchString => {
   return Note.find({ $text: { $search: searchString } })
     .populate('author')
@@ -103,9 +125,9 @@ export const findNotesByString = async searchString => {
     .exec()
 }
 
-export const addTopicToID = async (noteID, topicID) => {
+export const addTopicToID = async (noteId, topicID) => {
   return await Note.findOneAndUpdate(
-    { _id: noteID },
+    { _id: noteId },
     { $addToSet: { ideas: topicID } },
     { new: true }
   )
@@ -114,14 +136,14 @@ export const addTopicToID = async (noteID, topicID) => {
     .exec()
 }
 
-export const addWorkToID = async (noteID, workID) => {
-  return await Note.findOneAndUpdate({ _id: noteID }, { work: workID })
+export const addWorkToID = async (noteId, workID) => {
+  return await Note.findOneAndUpdate({ _id: noteId }, { work: workID })
     .lean()
     .exec()
 }
 
-export const updateNote = async (noteID, updateObj) => {
-  return await Note.findOneAndUpdate({ _id: noteID }, updateObj, { new: true })
+export const updateNote = async (noteId, updateObj) => {
+  return await Note.findOneAndUpdate({ _id: noteId }, updateObj, { new: true })
     .lean()
     .exec()
 }

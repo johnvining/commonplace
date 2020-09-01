@@ -129,3 +129,7 @@ export async function createIdea(ideaName) {
 export async function getRecentNotes() {
   return axios.get(url_api + `note/all`)
 }
+
+export async function removeIdeaFromNote(noteId, ideaId) {
+  return axios.delete(url_api + 'note/' + noteId + '/idea/' + ideaId)
+}

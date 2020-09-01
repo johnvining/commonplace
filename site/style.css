@@ -203,6 +203,15 @@ div .top-bar {
   .idea.label:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
+  .idea.label.edit::after {
+    background-image: url("/icons/cross.svg");
+    background-size: 15px 15px;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    content: ''; }
+  .idea.label.edit:hover {
+    background-color: lightcoral; }
 .idea.ul {
   display: block;
   margin: 0px;
