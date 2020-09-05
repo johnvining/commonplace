@@ -54,15 +54,14 @@ async function saveImportObjectToDatabase(importObject) {
     .then(async function(response) {
       // TODO: Write note to database
       let newNote = {
-        author: response[0][0]._id,
-        work: response[0][1]._id,
-        ideas: response[1],
+        author: response[0][0]?._id,
+        work: response[0][1]?._id,
+        ideas: response[1].filter(x => x),
         text: importObject.text,
         title: importObject.title
       }
 
       await NoteControllers.createNoteObj(newNote)
-      console.log('go')
     })
     .catch(err => console.log(err))
 }
