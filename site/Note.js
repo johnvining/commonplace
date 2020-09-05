@@ -242,9 +242,15 @@ class Note extends React.Component {
               <div className={mode.class + 'title'}>
                 {this.state.pendingTitle}
               </div>
-              <div className={mode.class + 'year'}>
-                {this.state.pendingYear}
-              </div>
+              {this.state.pendingYear ? (
+                <div className={mode.class + 'year'}>
+                  {this.state.pendingYear}
+                </div>
+              ) : (
+                <div className={mode.class + 'year imputed'}>
+                  {this.props.note.work.year}
+                </div>
+              )}
             </div>
           )}
           {edit ? (

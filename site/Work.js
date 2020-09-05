@@ -31,7 +31,8 @@ class Work extends React.Component {
         this.setState({
           work: response.data.data.name,
           authorName: response.data.data.author?.name,
-          url: response.data.data.url
+          url: response.data.data.url,
+          year: response.data.data.year
         })
       })
       .catch(error => {
@@ -84,7 +85,7 @@ class Work extends React.Component {
   }
 
   render() {
-    const { authorName, editAuthor, url } = this.state
+    const { authorName, editAuthor, url, year } = this.state
 
     return (
       <div>
@@ -152,6 +153,7 @@ class Work extends React.Component {
               </span>
             )}
           </div>
+          <div>{this.state.year}</div>
         </div>
 
         <NoteList

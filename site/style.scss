@@ -125,6 +125,11 @@ div.main {
     &:focus {
       @include note-edit-focus;
     }
+
+    &.imputed {
+      color: $de-emphasized-text-color;
+      font-style: oblique;
+    }
   }
 
   .year {

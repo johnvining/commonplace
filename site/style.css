@@ -85,6 +85,10 @@ div .top-bar {
     outline: none;
     background-color: white;
     border-radius: 4px; }
+  .note .title.imputed,
+  .note .year.imputed {
+    color: #404040;
+    font-style: oblique; }
 .note .year {
   width: 6%;
   text-align: right; }
