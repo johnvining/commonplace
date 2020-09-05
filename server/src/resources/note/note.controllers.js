@@ -16,6 +16,7 @@ export const addAuthor = async function(id, author) {
   return await Note.findOneAndUpdate({ _id: id }, { author: author })
 }
 
+// TODO: Standardize note-fetching so all note lists have the same fields populated #36
 export const getRecentNotes = async (req, res) => {
   try {
     const docs = await Note.find({})
@@ -23,7 +24,12 @@ export const getRecentNotes = async (req, res) => {
       .limit(100)
       .populate('author')
       .populate('ideas')
-      .populate('work')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
       .lean()
       .exec()
 
