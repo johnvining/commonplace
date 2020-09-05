@@ -82,11 +82,15 @@ class Work extends React.Component {
   }
 
   submitUrl(text) {
-    addUrlToWork(this.props.id, text).then(this.setState({ editUrl: false }))
+    addUrlToWork(this.props.id, text).then(
+      this.setState({ editUrl: false, url: text })
+    )
   }
 
   submitYear(text) {
-    addYearToWork(this.props.id, text).then(this.setState({ editYear: false }))
+    addYearToWork(this.props.id, text).then(
+      this.setState({ editYear: false, year: text })
+    )
   }
 
   render() {
