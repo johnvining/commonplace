@@ -8,15 +8,19 @@ export const createNote = async function(title, author) {
   return await Note.create({ title: title, author: author })
 }
 
+export const createNoteObj = async function(obj) {
+  return await Note.create(obj)
+}
+
 export const addAuthor = async function(id, author) {
   return await Note.findOneAndUpdate({ _id: id }, { author: author })
 }
 
-export const getTenMostRecentNotes = async (req, res) => {
+export const getRecentNotes = async (req, res) => {
   try {
     const docs = await Note.find({})
       .sort({ updatedAt: -1 })
-      .limit(30)
+      .limit(100)
       .populate('author')
       .populate('ideas')
       .populate('work')

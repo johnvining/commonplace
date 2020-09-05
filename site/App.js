@@ -73,7 +73,7 @@ class App extends React.Component {
         <br />
         <Router>
           <Author path="/auth/:id" viewMode={this.state.viewMode} />
-          <Find path="/find/:search" />
+          <Find path="/find/:search" viewMode={this.state.viewMode} />
           <Idea path="/idea/:id" viewMode={this.state.viewMode} />
           <NoteView path="/note/:id" />
           <RecentList path="/" viewMode={this.state.viewMode} />

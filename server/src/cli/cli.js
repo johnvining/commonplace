@@ -1,8 +1,3 @@
-// const usertext = require ('./usertext.js')
-// var fs = require('fs')
-// var editor = require('editor')
-// const prompt = require('prompt-sync')();
-
 import promptFunc from 'prompt-sync'
 const prompt = promptFunc()
 import mongoose from 'mongoose'
@@ -128,6 +123,7 @@ async function doList() {
   let recent_notes = await NoteControllers.getTenMostRecentNotes()
 }
 
+// TODO: process.env + text editor
 async function text() {
   if (context.type != usertext.note || context.item == null) {
     console.log(usertext.no_note_selected)

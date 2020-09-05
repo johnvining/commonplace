@@ -91,7 +91,7 @@ class Find extends React.Component {
         Notes:
         <NoteList
           notes={notes}
-          viewMode={constants.view_modes.SLIM}
+          viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
       </div>

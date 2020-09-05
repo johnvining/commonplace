@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import controllers, {
-  getTenMostRecentNotes,
+  getRecentNotes,
   addTopic,
   addNewTopic,
   reqUpdateNote,
@@ -19,7 +19,7 @@ router
   .get(controllers.getMany)
   .post(controllers.createOne)
 
-router.route('/all').get(getTenMostRecentNotes) // TODO: Change to list
+router.route('/all').get(getRecentNotes)
 
 router.route('/:id/idea').put(addTopic)
 router.route('/:id/idea/create').put(addNewTopic)
