@@ -146,6 +146,10 @@ div .top-bar {
   .note .author .option::after,
   .note .work .option::after {
     content: '? '; }
+.note .author.imputed,
+.note .work.imputed {
+  color: #404040;
+  font-style: oblique; }
 .note a.author,
 .note a.work {
   text-decoration: none; }

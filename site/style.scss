@@ -200,6 +200,11 @@ div.main {
 
       // TODO: Add plus sign for new items
     }
+
+    &.imputed {
+      color: $de-emphasized-text-color;
+      font-style: oblique;
+    }
   }
 
   a.author,

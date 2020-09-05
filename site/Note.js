@@ -248,7 +248,7 @@ class Note extends React.Component {
                 </div>
               ) : (
                 <div className={mode.class + 'year imputed'}>
-                  {this.props.note.work.year}
+                  {this.props.note.work?.year}
                 </div>
               )}
             </div>
@@ -279,12 +279,21 @@ class Note extends React.Component {
             />
           ) : (
             <div>
-              <Link
-                to={'/auth/' + this.state.pendingAuthorId}
-                className={'note author label'}
-              >
-                {this.state.pendingAuthorName}
-              </Link>
+              {this.state.pendingAuthorName ? (
+                <Link
+                  to={'/auth/' + this.state.pendingAuthorId}
+                  className={'note author label'}
+                >
+                  {this.state.pendingAuthorName}
+                </Link>
+              ) : (
+                <Link
+                  to={'/auth/' + this.props.note?.work?.author?._id}
+                  className={'note author label imputed'}
+                >
+                  {this.props.note?.work?.author?.name}
+                </Link>
+              )}
             </div>
           )}
         </div>
