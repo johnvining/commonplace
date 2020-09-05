@@ -19,7 +19,6 @@ var database
 // const BASEPATH = path.resolve(process.env.BASEPATH || __dirname)
 
 var parser = parse({ delimiter: ',' }, async function(err, data) {
-  console.log(err)
   for (let i = 0; i < data.length; i++) {
     let importObject = parseIntoObject(data[i])
     await saveImportObjectToDatabase(importObject)

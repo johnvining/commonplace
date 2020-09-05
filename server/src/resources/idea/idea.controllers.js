@@ -32,6 +32,43 @@ export const getAutoComplete = async (req, res) => {
   }
 }
 
+export const getIdeasByStringWithNotes = async (req, res) => {
+  try {
+    var doc = await findIdeasByString(req.body.string)
+    if (!doc) {
+      return res.status(400).end()
+    }
+
+    // TODO: Refactor note from idea search out
+    var notePromises = []
+    for (let i = 0; i < doc.length; i++) {
+      notePromises.push(
+        Note.find({ ideas: doc[i]._id })
+          .populate('author')
+          .populate('ideas')
+          .populate('work')
+          .lean()
+          .exec()
+      )
+    }
+
+    const notes = await Promise.all(notePromises)
+
+    var responseData = []
+    for (let i = 0; i < doc.length; i++) {
+      let idea = doc[i]._doc
+      let notesValues = { notes: notes[i] }
+      idea = { ...idea, ...notesValues }
+      responseData[i] = idea
+    }
+
+    res.status(200).json({ data: responseData })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 export const reqGetIdeaInfo = async (req, res) => {
   try {
     const doc = await getIdeaInfo(req.params.id)

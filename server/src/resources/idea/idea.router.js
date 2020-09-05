@@ -4,6 +4,9 @@ import * as controllers from './idea.controllers'
 const router = Router()
 
 router.route('/autocomplete').post(controllers.getAutoComplete)
+router
+  .route('/autocomplete/with-notes')
+  .put(controllers.getIdeasByStringWithNotes)
 router.route('/:id/notes').get(controllers.getNotesFromIdea)
 
 router.route('/:id').get(controllers.reqGetIdeaInfo)

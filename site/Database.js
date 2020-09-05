@@ -20,9 +20,14 @@ export async function updateNoteInfo(noteId, params) {
   return axios.put(url_api + `note/${noteId}`, params)
 }
 
-export async function getIdeaSuggestions(search) {
+export async function getIdeaSuggestions(search, withNotes) {
   const data = { string: search }
-  return axios.post(url_api + `idea/autocomplete`, data)
+
+  if (!withNotes) {
+    return axios.post(url_api + `idea/autocomplete`, data)
+  } else {
+    return axios.put(url_api + `idea/autocomplete/with-notes`, data)
+  }
 }
 
 export async function getAuthorSuggestions(search) {

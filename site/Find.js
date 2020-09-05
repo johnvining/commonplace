@@ -6,7 +6,6 @@ import {
   getWorkSuggestions,
   getAuthorSuggestions
 } from './Database'
-import * as constants from './constants'
 import { Link } from '@reach/router'
 
 class Find extends React.Component {
@@ -23,7 +22,7 @@ class Find extends React.Component {
   }
 
   fetchData(search) {
-    const ideasFromTextSearch = getIdeaSuggestions(search)
+    const ideasFromTextSearch = getIdeaSuggestions(search, true)
     const worksFromTextSearch = getWorkSuggestions(search)
     const authsFromTextSearch = getAuthorSuggestions(search)
 
@@ -73,9 +72,16 @@ class Find extends React.Component {
         Ideas:
         <ul className="search-ul">
           {ideas?.map(idea => (
-            <Link to={'/idea/' + idea._id} key={'idea-' + idea._id}>
-              <li className="search-li">{idea.name}</li>
-            </Link>
+            <div>
+              <Link to={'/idea/' + idea._id} key={'idea-' + idea._id}>
+                <li className="search-li">{idea.name}</li>
+              </Link>
+
+              <div>
+                {idea.notes?.length}:{' '}
+                {idea.notes?.map(note => note.title + '. ')}
+              </div>
+            </div>
           ))}
         </ul>
         <br />
