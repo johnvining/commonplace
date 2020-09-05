@@ -111,18 +111,25 @@ div.main {
     min-height: 36px;
   }
 
-  .title {
+  .title,
+  .year {
     background-color: transparent;
     font-family: $main_font;
     font-size: 18px;
     margin: auto;
     padding: 8px;
-    width: 100%;
+    width: 90%;
     border-style: none;
+    display: inline-block;
 
     &:focus {
       @include note-edit-focus;
     }
+  }
+
+  .year {
+    width: 6%;
+    text-align: right;
   }
 
   .text {
@@ -149,7 +156,7 @@ div.main {
     &.label {
       background-color: transparent;
       display: inline-block;
-      width: 40%;
+      width: 50%;
       border: none;
       font-family: $main_font;
       font-size: 18px;

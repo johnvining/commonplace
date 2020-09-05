@@ -18,6 +18,7 @@ import link from './icons/link.svg'
 class Note extends React.Component {
   state = {
     pendingTitle: '',
+    pendingYear: '',
     pendingText: '',
     pendingAuthorId: null,
     pendingAuthorName: '',
@@ -32,6 +33,7 @@ class Note extends React.Component {
     this.setState({
       inFocus: this.props.inFocus,
       pendingTitle: this.props.note.title,
+      pendingYear: this.props.note.year,
       pendingText: this.props.note.text,
       pendingAuthorId: this.props.note.author?._id,
       pendingAuthorName: this.props.note.author?.name,
@@ -98,6 +100,10 @@ class Note extends React.Component {
     this.setState({ pendingTitle: val.target.value })
   }
 
+  handleYearChange = val => {
+    this.setState({ pendingYear: val.target.value })
+  }
+
   handleTextChange = val => {
     this.setState({ pendingText: val.target.value })
   }
@@ -158,6 +164,11 @@ class Note extends React.Component {
       work: this.state.pendingWorkId
     }
 
+    // TODO: Change to server-side validation, add client-side UI
+    if (this.state.pendingYear < 2100 && this.state.pendingYear > -5000) {
+      updateObject.year = this.state.pendingYear
+    }
+
     this.setState({ edit: false, keep: true })
     await db
       .updateNoteInfo(this.props.id, updateObject)
@@ -206,20 +217,34 @@ class Note extends React.Component {
       >
         <div className={mode.class + 'bar'}>
           {edit ? (
-            <input
-              className={'note title'}
-              name="title"
-              autoFocus
-              defaultValue={this.state.pendingTitle}
-              onChange={this.handleTitleChange}
-            ></input>
+            <div>
+              <input
+                className={'note title'}
+                name="title"
+                autoFocus
+                defaultValue={this.state.pendingTitle}
+                onChange={this.handleTitleChange}
+              ></input>
+              <input
+                className={'note year'}
+                name="year"
+                autoFocus
+                defaultValue={this.state.pendingYear}
+                onChange={this.handleYearChange}
+              ></input>
+            </div>
           ) : !this.state.pendingTitle?.length ? (
             <div className={'note title'}>
               <em>Untitled Note</em>
             </div>
           ) : (
-            <div className={mode.class + 'title'}>
-              {this.state.pendingTitle}
+            <div>
+              <div className={mode.class + 'title'}>
+                {this.state.pendingTitle}
+              </div>
+              <div className={mode.class + 'year'}>
+                {this.state.pendingYear}
+              </div>
             </div>
           )}
           {edit ? (

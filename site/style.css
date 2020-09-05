@@ -70,18 +70,24 @@ div .top-bar {
   margin: 0px;
   padding: 0px;
   min-height: 36px; }
-.note .title {
+.note .title,
+.note .year {
   background-color: transparent;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
   margin: auto;
   padding: 8px;
-  width: 100%;
-  border-style: none; }
-  .note .title:focus {
+  width: 90%;
+  border-style: none;
+  display: inline-block; }
+  .note .title:focus,
+  .note .year:focus {
     outline: none;
     background-color: white;
     border-radius: 4px; }
+.note .year {
+  width: 6%;
+  text-align: right; }
 .note .text {
   background-color: transparent;
   border: none;
@@ -103,7 +109,7 @@ div .top-bar {
 .note .work.label {
   background-color: transparent;
   display: inline-block;
-  width: 40%;
+  width: 50%;
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
