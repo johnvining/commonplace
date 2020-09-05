@@ -26,7 +26,8 @@ div .top-bar {
   width: 50%; }
 .top-bar .tool-bar button {
   border-style: none;
-  padding: 4px; }
+  padding: 4px;
+  margin: 0px; }
 .top-bar .tool-bar .button {
   background: #efefef; }
 .top-bar .tool-bar .button:hover {
@@ -166,7 +167,6 @@ div .top-bar {
   content: ''; }
 
 .action-bar.container {
-  height: 100%;
   font-size: 15px;
   background-color: transparent;
   width: 40%;
@@ -183,7 +183,8 @@ div .top-bar {
   margin: 4px;
   padding: 4px;
   text-decoration: none;
-  border-radius: 6px; }
+  border-radius: 6px;
+  background-color: transparent; }
   .action-bar .action-button:hover {
     background-color: white; }
   .action-bar .action-button:focus {
@@ -191,7 +192,6 @@ div .top-bar {
     outline: none; }
 
 .idea.container {
-  height: 100%;
   font-size: 15px;
   background-color: transparent;
   width: 60%;

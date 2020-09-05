@@ -41,6 +41,7 @@ div.main {
     button {
       border-style: none;
       padding: 4px;
+      margin: 0px;
     }
 
     .button {
@@ -229,7 +230,6 @@ div.main {
 
 .action-bar {
   &.container {
-    height: 100%;
     font-size: 15px;
     background-color: transparent;
     width: 40%;
@@ -249,7 +249,7 @@ div.main {
     padding: 4px;
     text-decoration: none;
     border-radius: 6px;
-    // TODO: Start HERE
+    background-color: transparent;
 
     &:hover {
       background-color: white;
@@ -264,7 +264,6 @@ div.main {
 
 .idea {
   &.container {
-    height: 100%;
     font-size: 15px;
     background-color: transparent;
     width: 60%;
