@@ -72,13 +72,13 @@ class Find extends React.Component {
         Ideas:
         <ul className="search-ul">
           {ideas?.map(idea => (
-            <div>
-              <Link to={'/idea/' + idea._id} key={'idea-' + idea._id}>
+            <div key={'idea-div-' + idea._id}>
+              <Link to={'/idea/' + idea._id}>
                 <li className="search-li">{idea.name}</li>
               </Link>
 
               <div>
-                {idea.notes?.length}:{' '}
+                {idea.notes?.length}:
                 {idea.notes?.map(note => note.title + '. ')}
               </div>
             </div>
@@ -88,7 +88,7 @@ class Find extends React.Component {
         Authors:
         <ul className="search-ul">
           {authors?.map(author => (
-            <Link to={'/auth/' + author._id} key={'author-' + author._id}>
+            <Link to={'/auth/' + author._id} key={'auth-link-' + author._id}>
               <li className="search-li">{author.name}</li>
             </Link>
           ))}

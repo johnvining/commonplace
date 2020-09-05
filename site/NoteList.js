@@ -6,7 +6,6 @@ import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import * as constants from './constants'
 
-// TODO: Unselect on switching to slim
 class NoteList extends React.Component {
   state = {
     inFocus: null,
