@@ -110,16 +110,16 @@ export const updateWorkInfo = async function(workID, updateObject) {
 }
 
 export const findWorkByString = async function(name) {
-  return await Work.findOne({ name: name })
+  return await Work.findOne({ name: name }).exec()
 }
 
 export const findOrCreateWork = async function(name) {
   if (name == '') return null
   // TODO: Can this be done with a single mongo call?
-  let work = await findWorkByString(name)
-  if (!work) {
-    work = await createWork(name)
+  const work = await findWorkByString(name)
+  if (work?._id != null) {
+    return work
   }
 
-  return work
+  return await createWork(name)
 }

@@ -125,10 +125,11 @@ export const findIdeaByString = async function(string) {
 export const findOrCreateIdea = async function(name) {
   if (name == '') return
   // TODO: Can this be done with a single mongo call?
-  let idea = await findIdeaByString(name)
-  if (!idea) {
-    idea = await createIdea(name)
+  const idea = await findIdeaByString(name)
+
+  if (idea?._id != null) {
+    return idea
   }
 
-  return idea
+  return await createIdea(name)
 }

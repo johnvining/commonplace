@@ -129,7 +129,7 @@ export const removeIdeaFromNote = async (noteId, ideaId) => {
 }
 
 export const findNotesByString = async searchString => {
-  return Note.find({ $text: { $search: searchString } })
+  return Note.find({ $text: { $search: '"' + searchString + '"' } })
     .populate('author')
     .populate('ideas')
     .populate({
