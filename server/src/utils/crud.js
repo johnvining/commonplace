@@ -22,7 +22,12 @@ export const getOne = model => async (req, res) => {
       .find({ _id: req.params.id })
       .populate('author')
       .populate('ideas')
-      .populate('work')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
       .lean()
       .exec()
 

@@ -22,7 +22,12 @@ export const getNotesFromAuthor = async (req, res) => {
       .sort({ updatedAt: -1 })
       .populate('author')
       .populate('ideas')
-      .populate('work')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
       .lean()
       .exec()
     if (!doc) {

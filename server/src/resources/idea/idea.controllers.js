@@ -6,7 +6,12 @@ export const getNotesFromIdea = async (req, res) => {
     const doc = await Note.find({ ideas: req.params.id })
       .populate('author')
       .populate('ideas')
-      .populate('work')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
       .lean()
       .exec()
     if (!doc) {
@@ -46,7 +51,12 @@ export const getIdeasByStringWithNotes = async (req, res) => {
         Note.find({ ideas: doc[i]._id })
           .populate('author')
           .populate('ideas')
-          .populate('work')
+          .populate({
+            path: 'work',
+            populate: {
+              path: 'author'
+            }
+          })
           .lean()
           .exec()
       )
