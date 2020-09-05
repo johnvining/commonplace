@@ -71,8 +71,13 @@ export async function addAuthorToWork(workId, authorId) {
   return axios.put(url_api + `work/${workId}`, data)
 }
 
-export async function addUrlToWork(workId, url2) {
-  const data = { url: url2 }
+export async function addUrlToWork(workId, newUrl) {
+  const data = { url: newUrl }
+  return axios.put(url_api + `work/${workId}`, data)
+}
+
+export async function addYearToWork(workId, newYear) {
+  const data = { year: newYear }
   return axios.put(url_api + `work/${workId}`, data)
 }
 

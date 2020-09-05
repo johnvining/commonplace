@@ -6,6 +6,7 @@ import {
   addAuthorToWork,
   createAuthorAndAddToWork,
   addUrlToWork,
+  addYearToWork,
   getAuthorSuggestions
 } from './Database'
 import Autocomplete from './Autocomplete'
@@ -84,6 +85,10 @@ class Work extends React.Component {
     addUrlToWork(this.props.id, text).then(this.setState({ editUrl: false }))
   }
 
+  submitYear(text) {
+    addYearToWork(this.props.id, text).then(this.setState({ editYear: false }))
+  }
+
   render() {
     const { authorName, editAuthor, url, year } = this.state
 
@@ -153,7 +158,38 @@ class Work extends React.Component {
               </span>
             )}
           </div>
-          <div>{this.state.year}</div>
+          <div>
+            {this.state.editYear ? (
+              <FreeEntry
+                defaultValue={year}
+                escape={() => {
+                  this.setState({ editYear: false })
+                }}
+                submit={this.submitYear.bind(this)}
+              />
+            ) : year != undefined ? (
+              <div>
+                <span
+                  className="year"
+                  onClick={() => {
+                    // TODO: Fix accessibility
+                    this.setState({ editYear: true })
+                  }}
+                >
+                  {year}
+                </span>
+              </div>
+            ) : (
+              <span
+                className="year"
+                onClick={() => {
+                  this.setState({ editYear: true })
+                }}
+              >
+                no year
+              </span>
+            )}
+          </div>
         </div>
 
         <NoteList
