@@ -1,29 +1,45 @@
-#!/usr/bin/env node
 'use strict'
 
-import mongoose from 'mongoose'
-import path from 'path'
 import fs from 'fs'
 import parse from 'csv-parse'
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
+import { resolve } from 'path'
+import Readable from 'readable-stream'
 
-var database
+export async function importNoteCSV(filePath) {
+  console.log('Importing notes from file ' + filePath)
+  console.log('')
 
-// var args = require('minimist')(process.argv.slice(2), {
-//   string: ['file']
-// })
+  var entries = []
+  var parser = parse({ delimiter: ',' })
+  fs.createReadStream(filePath)
+    .pipe(parser)
+    .on('data', async data => {
+      entries.push(data)
+    })
 
-// const BASEPATH = path.resolve(process.env.BASEPATH || __dirname)
+  await streamComplete(parser)
 
-var parser = parse({ delimiter: ',' }, async function(err, data) {
-  for (let i = 0; i < data.length; i++) {
-    let importObject = parseIntoObject(data[i])
-    await saveImportObjectToDatabase(importObject)
+  var totalImports = 0
+  for (let i = 0; i < entries.length; i++) {
+    let parsedObject = parseIntoObject(entries[0])
+    await saveImportObjectToDatabase(parsedObject)
+    totalImports++
   }
-})
+
+  console.log('Imported notes: ' + totalImports)
+}
+
+function streamComplete(stream) {
+  return new Promise(function c(res) {
+    stream.on('end', function() {
+      res()
+    })
+  })
+}
 
 function parseIntoObject(csvLine) {
   var obj = {}
@@ -39,6 +55,7 @@ async function saveImportObjectToDatabase(importObject) {
   let authorPromise = AuthControllers.findOrCreateAuthor(
     importObject.authorName
   )
+
   let workPromise = WorkControllers.findOrCreateWork(importObject.workName)
 
   var ideaPromises = []
@@ -47,11 +64,11 @@ async function saveImportObjectToDatabase(importObject) {
     ideaPromises.push(ideaPromise)
   }
 
+  // TODO: Fix awaiting here
   let dataPromise = Promise.all([authorPromise, workPromise])
   let ideaPromise = Promise.all(ideaPromises)
-  Promise.all([dataPromise, ideaPromise])
+  await Promise.all([dataPromise, ideaPromise])
     .then(async function(response) {
-      // TODO: Write note to database
       let newNote = {
         author: response[0][0]?._id,
         work: response[0][1]?._id,
@@ -64,38 +81,3 @@ async function saveImportObjectToDatabase(importObject) {
     })
     .catch(err => console.log(err))
 }
-
-const connect = () => {
-  return mongoose.connect('mongodb://localhost:27017/whatever', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
-  })
-}
-
-console.log('Starting database connection...')
-
-connect().then(async connection => {
-  database = connection
-  fs.createReadStream(
-    '/Users/johnvining/Documents/GitHub/commonplace/server/csvin.csv'
-  ).pipe(parser)
-})
-
-// if (args.help || process.argv.length <= 2) {
-//   console.log('wrong params')
-// } else if (args.file) {
-//   console.log('Importing from ' + args.file + '...')
-
-//   let filePath = path.join(BASEPATH, args.file)
-//   fs.readFile(filePath, function(err, contents) {
-//     if (err) console.log(err.toString())
-//     else processCSV(contents.toString())
-//   })
-// }
-
-// // TODO: Streamify
-// function processCSV(text) {
-//   text = text.toUpperCase()
-//   process.stdout.write(text)
-// }

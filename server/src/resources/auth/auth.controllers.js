@@ -76,16 +76,17 @@ export const findAuthorsByString = async function(str) {
 }
 
 export const findAuthorByString = async function(str) {
-  return await Auth.findOne({ name: str })
+  return await Auth.findOne({ name: str }).exec()
 }
 
 export const findOrCreateAuthor = async function(name) {
   if (name == '') return
   // TODO: Can this be done with a single mongo call?
-  let author = await findAuthorByString(name)
-  if (!author) {
-    author = await createAuthor(name)
+  const author = await findAuthorByString(name)
+
+  if (author?._id != null) {
+    return author
   }
 
-  return author
+  return await createAuthor(name)
 }

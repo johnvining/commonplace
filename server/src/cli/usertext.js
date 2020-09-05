@@ -30,6 +30,7 @@ export const command = {
   idea: 'idea',
   last: 'last',
   list: 'list',
+  load: 'load',
   note: 'note',
   quit: 'quit',
   text: 'text',

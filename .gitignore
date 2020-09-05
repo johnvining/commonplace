@@ -1,6 +1,7 @@
 /server/dist/
 /server/node_modules/
 /server/csvin.csv
+/server/input.csv
 /site/.cache/
 /site/dist/
 /site/node_modules/

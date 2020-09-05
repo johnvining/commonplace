@@ -2,9 +2,11 @@ import promptFunc from 'prompt-sync'
 const prompt = promptFunc()
 import mongoose from 'mongoose'
 import * as usertext from './usertext.js'
+import path from 'path'
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
+import * as importUtils from './import.js'
 
 var context = {
   type: null,
@@ -61,6 +63,9 @@ connect()
           break
         case usertext.command.last:
           await last()
+          break
+        case usertext.command.load:
+          await load()
           break
         case usertext.command.list:
           await doList()
@@ -242,6 +247,33 @@ async function last() {
   for (i = 0; i < last_notes.length; i++) {
     console.log(last_notes[i].title)
   }
+}
+
+async function load() {
+  var mode = 'csv' // TODO: Add kindle
+  if ((mode = 'csv')) {
+    console.log(' ] 1. Notes, 2. Authors, 3. Works')
+    let recordType = +prompt('?] ')
+    if (recordType > 3 || recordType <= 0 || recordType === NaN) {
+      return
+    }
+
+    printLoadHelp(recordType)
+    let filePath = getFilePath()
+    await importUtils.importNoteCSV(filePath)
+  }
+}
+
+function printLoadHelp(recordType) {
+  if (recordType == 1)
+    console.log(' format -> Author,Title,Text,Work,"idea1,idea2"')
+}
+
+function getFilePath() {
+  const BASEPATH = path.resolve(process.env.BASEPATH || __dirname)
+
+  let filePath = prompt('file?] ')
+  return path.resolve(BASEPATH, filePath)
 }
 
 async function idea(input) {
