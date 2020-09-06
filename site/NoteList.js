@@ -19,7 +19,7 @@ class NoteList extends React.Component {
   async componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
 
-    const response = await this.props.getListOfNotes()
+    const response = await this.props.getListOfNotes(this.props.index)
     this.setState({
       notes: response.data.data
     })
@@ -170,7 +170,8 @@ class NoteList extends React.Component {
   }
 
   render() {
-    this.state.notes[1]
+    console.log('hhhh')
+    console.log(this.state.notes)
     return (
       <div className="multi-select">
         {this.props.viewMode == constants.view_modes.FULL ? null : this.state

@@ -8,7 +8,12 @@ export const getNotesFromWork = async (req, res) => {
     const doc = await Note.find({ work: req.params.id })
       .populate('author')
       .populate('ideas')
-      .populate('work')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
       .lean()
       .exec()
     if (!doc) {

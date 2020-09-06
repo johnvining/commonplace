@@ -100,6 +100,10 @@ export async function getNotesForAuthor(authorId) {
   return axios.get(url_api + `auth/${authorId}/notes`)
 }
 
+export async function getWorksForAuthor(authorId) {
+  return axios.get(url_api + `auth/${authorId}/works`)
+}
+
 export async function getAuthorInfo(authorId) {
   return axios.get(url_api + `auth/${authorId}`)
 }

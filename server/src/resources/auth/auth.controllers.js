@@ -17,11 +17,9 @@ export const getAuthorDetails = async (req, res) => {
   }
 }
 
-// TODO: Will have duplicates if noted on work + note level
 export const getNotesFromAuthor = async (req, res) => {
-  console.log('party')
   try {
-    const noWorkNotes = await Note.find({ author: req.params.id })
+    const doc = await Note.find({ author: req.params.id })
       .sort({ updatedAt: -1 })
       .populate('author')
       .populate('ideas')
@@ -33,22 +31,10 @@ export const getNotesFromAuthor = async (req, res) => {
       })
       .lean()
       .exec()
-
-    const works = await Work.find({ author: req.params.id })
-
-    let response = []
-    response[0] = {}
-    response[0].notes = noWorkNotes
-    for (let i = 0; i < works.length; i++) {
-      response[i + 1] = {}
-      response[i + 1].notes = await Note.find({ work: works[i]._id })
-      response[i + 1].work = works[i]
-    }
-
-    if (!response) {
+    if (!doc) {
       return res.status(400).end()
     }
-    res.status(200).json({ data: response })
+    res.status(200).json({ data: doc })
   } catch (e) {
     console.error(e)
     res.status(400).end()
@@ -71,6 +57,19 @@ export const getAutoComplete = async (req, res) => {
 export const reqCreateAuthor = async (req, res) => {
   try {
     const doc = await createAuthor(req.body.name)
+    if (!doc) {
+      return res.status(400).end()
+    }
+    res.status(200).json({ data: doc })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqGetWorksForAuthor = async (req, res) => {
+  try {
+    const doc = await Work.find({ author: req.params.id })
     if (!doc) {
       return res.status(400).end()
     }

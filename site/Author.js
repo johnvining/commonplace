@@ -1,6 +1,11 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getAuthorInfo, getNotesForAuthor } from './Database'
+import {
+  getAuthorInfo,
+  getNotesForAuthor,
+  getWorksForAuthor,
+  getNotesForWork
+} from './Database'
 
 class Author extends React.Component {
   state = {
@@ -9,11 +14,13 @@ class Author extends React.Component {
 
   componentDidMount() {
     this.fetchAuthorInfo(this.props.id)
+    this.fetchAuthorWorks(this.props.id)
   }
 
   componentDidUpdate(prevState) {
     if (prevState.id !== this.state.id) {
       this.fetchAuthorInfo(this.state.id)
+      this.fetchAuthorWorks(this.state.id)
     }
   }
 
@@ -31,15 +38,47 @@ class Author extends React.Component {
       })
   }
 
-  async getListOfNotes() {
-    let notesResponse
-    await getNotesForAuthor(this.state.id)
+  fetchAuthorWorks(authorId) {
+    getWorksForAuthor(authorId)
       .then(response => {
-        notesResponse = response
+        this.setState({
+          works: response.data.data
+        })
       })
       .catch(error => {
         console.error(error)
       })
+  }
+
+  // fetchNotesForWork(workId) {}
+
+  // async fetchNotesforWorkIndex(workIndex) {
+  //   // TODO: Get the id
+  //   let notesResponse
+  //   fetchNotesForWork(workId)
+  //   return notesResponse
+  // }
+
+  async getListOfNotes(index) {
+    let notesResponse
+    if (index == undefined) {
+      await getNotesForAuthor(this.state.id)
+        .then(response => {
+          notesResponse = response
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    } else {
+      let workId = this.state.works[index]?._id
+      await getNotesForWork(workId)
+        .then(response => {
+          notesResponse = response
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    }
 
     return notesResponse
   }
@@ -60,10 +99,26 @@ class Author extends React.Component {
           <br />
           {this.state.bornYear} - {this.state.diedYear}
         </div>
-
+        {this.state.works?.map((work, workindex) => (
+          <div>
+            <section className="section-header">
+              {work.name} - {work?.year}
+            </section>
+            <div>
+              <NoteList
+                key={'notes-for-work' + work._id}
+                index={workindex}
+                viewMode={this.props.viewMode}
+                getListOfNotes={this.getListOfNotes.bind(this)}
+              />
+            </div>
+          </div>
+        ))}
+        <section className="section-header">Not attached to work</section>
         <NoteList
           key={'auth' + this.props.id}
           viewMode={this.props.viewMode}
+          useGroupings={true}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
       </div>

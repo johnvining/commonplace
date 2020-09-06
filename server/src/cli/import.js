@@ -68,7 +68,7 @@ async function saveImportObjectToDatabase(importObject) {
   await Promise.all([dataPromise, ideaPromise])
     .then(async function(response) {
       let newNote = {
-        // author: response[0][0]?._id,
+        author: response[0][0]?._id,
         work: response[0][1]?._id,
         ideas: response[1].filter(x => x),
         text: importObject.text,
