@@ -1,5 +1,6 @@
 import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
+import Work from '../work/work.model.js'
 
 export const getAuthorDetails = async (req, res) => {
   try {
@@ -16,9 +17,11 @@ export const getAuthorDetails = async (req, res) => {
   }
 }
 
+// TODO: Will have duplicates if noted on work + note level
 export const getNotesFromAuthor = async (req, res) => {
+  console.log('party')
   try {
-    const doc = await Note.find({ author: req.params.id })
+    const noWorkNotes = await Note.find({ author: req.params.id })
       .sort({ updatedAt: -1 })
       .populate('author')
       .populate('ideas')
@@ -30,10 +33,22 @@ export const getNotesFromAuthor = async (req, res) => {
       })
       .lean()
       .exec()
-    if (!doc) {
+
+    const works = await Work.find({ author: req.params.id })
+
+    let response = []
+    response[0] = {}
+    response[0].notes = noWorkNotes
+    for (let i = 0; i < works.length; i++) {
+      response[i + 1] = {}
+      response[i + 1].notes = await Note.find({ work: works[i]._id })
+      response[i + 1].work = works[i]
+    }
+
+    if (!response) {
       return res.status(400).end()
     }
-    res.status(200).json({ data: doc })
+    res.status(200).json({ data: response })
   } catch (e) {
     console.error(e)
     res.status(400).end()
