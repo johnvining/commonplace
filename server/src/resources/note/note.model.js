@@ -13,7 +13,8 @@ const noteSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'work'
     },
-    year: Number
+    year: Number,
+    url: String
   },
   { timestamps: true }
 )

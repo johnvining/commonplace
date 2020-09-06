@@ -45,7 +45,8 @@ function parseIntoObject(csvLine) {
   obj.title = csvLine[1]
   obj.text = csvLine[2]
   obj.workName = csvLine[3]
-  obj.ideas = csvLine[4].split(',')
+  obj.url = csvLine[4]
+  obj.ideas = csvLine[5].split(',')
   return obj
 }
 
@@ -72,7 +73,8 @@ async function saveImportObjectToDatabase(importObject) {
         work: response[0][1]?._id,
         ideas: response[1].filter(x => x),
         text: importObject.text,
-        title: importObject.title
+        title: importObject.title,
+        url: importObject.url
       }
 
       await NoteControllers.createNoteObj(newNote)

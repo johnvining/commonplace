@@ -17,13 +17,14 @@ import link from './icons/link.svg'
 
 class Note extends React.Component {
   state = {
-    pendingTitle: '',
-    pendingYear: '',
-    pendingText: '',
     pendingAuthorId: null,
     pendingAuthorName: '',
+    pendingText: '',
+    pendingTitle: '',
+    pendingUrl: '',
     pendingWorkId: null,
-    pendingWorkName: ''
+    pendingWorkName: '',
+    pendingYear: ''
   }
 
   componentDidMount() {
@@ -32,13 +33,14 @@ class Note extends React.Component {
     // TODO: Do we need?
     this.setState({
       inFocus: this.props.inFocus,
-      pendingTitle: this.props.note.title,
-      pendingYear: this.props.note.year,
-      pendingText: this.props.note.text,
       pendingAuthorId: this.props.note.author?._id,
       pendingAuthorName: this.props.note.author?.name,
+      pendingText: this.props.note.text,
+      pendingTitle: this.props.note.title,
+      pendingUrl: this.props.note.url,
       pendingWorkId: this.props.note.work?._id,
-      pendingWorkName: this.props.note.work?.name
+      pendingWorkName: this.props.note.work?.name,
+      pendingYear: this.props.note.year
     })
   }
 
@@ -108,6 +110,10 @@ class Note extends React.Component {
     this.setState({ pendingText: val.target.value })
   }
 
+  handleUrlChange = val => {
+    this.setState({ pendingUrl: val.target.value })
+  }
+
   handleNewTopic = ideaId => {
     db.addIdeaToNote(ideaId, this.props.id)
       .then(() => {
@@ -158,9 +164,10 @@ class Note extends React.Component {
 
   async handleAccept() {
     const updateObject = {
-      title: this.state.pendingTitle,
-      text: this.state.pendingText,
       author: this.state.pendingAuthorId,
+      text: this.state.pendingText,
+      title: this.state.pendingTitle,
+      url: this.state.pendingUrl,
       work: this.state.pendingWorkId
     }
 
@@ -168,6 +175,8 @@ class Note extends React.Component {
     if (this.state.pendingYear < 2100 && this.state.pendingYear > -5000) {
       updateObject.year = this.state.pendingYear
     }
+
+    // TODO: Add validation to URL
 
     this.setState({ edit: false, keep: true })
     await db
@@ -261,6 +270,20 @@ class Note extends React.Component {
             ></textarea>
           ) : (
             <div className={'note text'}>{this.state.pendingText}</div>
+          )}
+        </div>
+        <div>
+          {edit ? (
+            <input
+              className={'note url'}
+              name="url"
+              defaultValue={this.state.pendingUrl}
+              onChange={this.handleUrlChange}
+            ></input>
+          ) : (
+            <span className={'note url'}>
+              <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
+            </span>
           )}
         </div>
         <div>

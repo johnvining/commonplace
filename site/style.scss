@@ -216,6 +216,22 @@ div.main {
   .work {
     font-style: italic;
   }
+
+  &.url {
+    font-family: $monospace;
+    border-style: none;
+    padding: 4px;
+    margin: 4px;
+    background-color: transparent;
+
+    a {
+      text-decoration: none;
+    }
+
+    &:focus {
+      @include note-edit-focus;
+    }
+  }
 }
 
 .noteEdit-author-label-option-new::before,

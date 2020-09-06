@@ -156,6 +156,18 @@ div .top-bar {
   text-decoration: none; }
 .note .work {
   font-style: italic; }
+.note.url {
+  font-family: "Courier New", Courier, monospace;
+  border-style: none;
+  padding: 4px;
+  margin: 4px;
+  background-color: transparent; }
+  .note.url a {
+    text-decoration: none; }
+  .note.url:focus {
+    outline: none;
+    background-color: white;
+    border-radius: 4px; }
 
 .noteEdit-author-label-option-new::before,
 .noteEdit-work-label-option-new::before {

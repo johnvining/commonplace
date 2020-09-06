@@ -266,7 +266,7 @@ async function load() {
 
 function printLoadHelp(recordType) {
   if (recordType == 1)
-    console.log(' format -> Author,Title,Text,Work,"idea1,idea2"')
+    console.log(' format -> Author,Title,Text,Work,URL,"idea1,idea2"')
 }
 
 function getFilePath() {
