@@ -96,6 +96,7 @@ class Find extends React.Component {
         <br />
         Notes:
         <NoteList
+          key={'search-list-' + this.props.search}
           notes={notes}
           viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
