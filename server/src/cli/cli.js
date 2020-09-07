@@ -252,7 +252,7 @@ async function last() {
 async function load() {
   var mode = 'csv' // TODO: Add kindle
   if ((mode = 'csv')) {
-    console.log(' ] 1. Notes, 2. Authors, 3. Works')
+    console.log(' ] 1. Notes, 2. Works')
     let recordType = +prompt('?] ')
     if (recordType > 3 || recordType <= 0 || recordType === NaN) {
       return
@@ -260,7 +260,7 @@ async function load() {
 
     printLoadHelp(recordType)
     let filePath = getFilePath()
-    await importUtils.importNoteCSV(filePath)
+    await importUtils.importNoteCSV(filePath, recordType)
   }
 }
 

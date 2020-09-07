@@ -7,7 +7,7 @@ import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
 
-export async function importNoteCSV(filePath) {
+export async function importNoteCSV(filePath, recordType) {
   console.log('Importing notes from file ' + filePath)
   console.log('')
 
@@ -22,13 +22,16 @@ export async function importNoteCSV(filePath) {
   await streamComplete(parser)
 
   var totalImports = 0
+  const parseFunc = getParseFunction(recordType)
+  const importFunc = getImportFunction(recordType)
+
   for (let i = 0; i < entries.length; i++) {
-    let parsedObject = parseIntoObject(entries[i])
-    await saveImportObjectToDatabase(parsedObject)
+    let parsedObject = parseFunc(entries[i])
+    await importFunc(parsedObject)
     totalImports++
   }
 
-  console.log('Imported notes: ' + totalImports)
+  console.log('Imported records: ' + totalImports)
 }
 
 function streamComplete(stream) {
@@ -39,7 +42,27 @@ function streamComplete(stream) {
   })
 }
 
-function parseIntoObject(csvLine) {
+function getParseFunction(dataType) {
+  switch (dataType) {
+    case 1:
+      return parseNote
+    case 2:
+      return parseWork
+  }
+  return null
+}
+
+function getImportFunction(dataType) {
+  switch (dataType) {
+    case 1:
+      return importNote
+    case 2:
+      return importWork
+  }
+  return null
+}
+
+function parseNote(csvLine) {
   var obj = {}
   obj.authorName = csvLine[0]
   obj.title = csvLine[1]
@@ -47,10 +70,11 @@ function parseIntoObject(csvLine) {
   obj.workName = csvLine[3]
   obj.url = csvLine[4]
   obj.ideas = csvLine[5].split(',')
+  // TODO: Year
   return obj
 }
 
-async function saveImportObjectToDatabase(importObject) {
+async function importNote(importObject) {
   let authorPromise = AuthControllers.findOrCreateAuthor(
     importObject.authorName
   )
@@ -63,7 +87,6 @@ async function saveImportObjectToDatabase(importObject) {
     ideaPromises.push(ideaPromise)
   }
 
-  // TODO: Fix awaiting here
   let dataPromise = Promise.all([authorPromise, workPromise])
   let ideaPromise = Promise.all(ideaPromises)
   await Promise.all([dataPromise, ideaPromise])
@@ -80,4 +103,34 @@ async function saveImportObjectToDatabase(importObject) {
       await NoteControllers.createNoteObj(newNote)
     })
     .catch(err => console.log(err))
+}
+
+function parseWork(csvLine) {
+  var obj = {}
+  obj.title = csvLine[0]
+  obj.authorName = csvLine[1]
+  obj.year = csvLine[2]
+  obj.url = csvLine[3]
+  // TODO: obj.ideas = csvLine[4].split(',')
+  return obj
+}
+
+async function importWork(importObject) {
+  if (!importObject.title) return
+
+  let work = await WorkControllers.findOrCreateWork(importObject.title)
+
+  // TODO: Support different update behaviors: Overwrite,Clear,FillIn
+  let updateObject = {}
+  updateObject.author = await AuthControllers.findOrCreateAuthor(
+    importObject.authorName
+  )
+  if (importObject.year && !isNaN(updateObject.year)) {
+    updateObject.year = importObject.year // TODO: Support URL guessing
+  }
+  if (importObject.url) {
+    updateObject.url = importObject.url
+  }
+
+  await WorkControllers.updateWorkInfo(work._id, updateObject)
 }
