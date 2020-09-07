@@ -12,6 +12,7 @@ import {
 import Autocomplete from './Autocomplete'
 import FreeEntry from './FreeEntry'
 import link from './icons/link.svg'
+import { guessYearFromURL } from './utils'
 
 class Work extends React.Component {
   state = { id: '', editAuthor: false }
@@ -82,9 +83,17 @@ class Work extends React.Component {
   }
 
   submitUrl(text) {
-    addUrlToWork(this.props.id, text).then(
-      this.setState({ editUrl: false, url: text })
-    )
+    let year = guessYearFromURL(text)
+    console.log('year ' + year)
+    if (!this.state.year && year) {
+      addUrlToWork(this.props.id, text, year).then(
+        this.setState({ editUrl: false, url: text, year: year })
+      )
+    } else {
+      addUrlToWork(this.props.id, text).then(
+        this.setState({ editUrl: false, url: text })
+      )
+    }
   }
 
   submitYear(text) {

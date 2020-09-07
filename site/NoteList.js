@@ -170,8 +170,6 @@ class NoteList extends React.Component {
   }
 
   render() {
-    console.log('hhhh')
-    console.log(this.state.notes)
     return (
       <div className="multi-select">
         {this.props.viewMode == constants.view_modes.FULL ? null : this.state

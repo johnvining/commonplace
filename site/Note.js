@@ -9,6 +9,7 @@ import tags from './icons/tags.svg'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import link from './icons/link.svg'
+import { guessYearFromURL } from './utils'
 
 // TODO: Support clearing authors
 // TODO: Support removing idea links
@@ -111,7 +112,12 @@ class Note extends React.Component {
   }
 
   handleUrlChange = val => {
-    this.setState({ pendingUrl: val.target.value })
+    let year = guessYearFromURL(val.target.value)
+    if (!this.state.pendingYear && year) {
+      this.setState({ pendingUrl: val.target.value, pendingYear: year })
+    } else {
+      this.setState({ pendingUrl: val.target.value })
+    }
   }
 
   handleNewTopic = ideaId => {
