@@ -332,28 +332,17 @@ div .top-bar {
     height: 22px;
     content: ''; }
 
-div.note-slim {
-  padding: 4px;
-  margin: 4px; }
-
-a.note-slim {
-  text-decoration: none; }
-
-div.note-slim:hover {
-  background: #efefef;
-  border-radius: 4px; }
-
-.slim-selected {
-  border: 1px;
-  border-style: solid;
-  border-color: black;
-  border-radius: 4px; }
-
-.slim {
-  border: 1px;
-  border-style: solid;
-  border-color: white;
-  border-radius: 4px; }
+.note-slim-outer {
+  color: green;
+  display: flex;
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  background-color: #efefef; }
+  .note-slim-outer.selected {
+    background-color: lightgoldenrodyellow; }
+  .note-slim-outer a {
+    text-decoration: none; }
 
 .grid {
   display: inline-block;

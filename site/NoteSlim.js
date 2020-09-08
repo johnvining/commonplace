@@ -6,20 +6,6 @@ import check_circle from './icons/check_circle.svg'
 class NoteSlim extends React.Component {
   state = {}
 
-  componentDidMount() {
-    this.setState({
-      authorId: this.props.authorId,
-      author: this.props.author,
-      work: this.props.work,
-      workId: this.props.workId,
-      id: this.props.id,
-      refetch: this.props.refetch,
-      text: this.props.text,
-      title: this.props.title,
-      inFocus: this.props.inFocus
-    })
-  }
-
   markChecked(e) {
     if (e.shiftKey) {
       this.props.markShiftChecked(this.props.index)
@@ -29,38 +15,59 @@ class NoteSlim extends React.Component {
   }
 
   render() {
-    const { author, text, title, work } = this.state
-    const inFocus = this.props.id == this.props.inFocus
-
     if (this.props.deleted) {
-      // TODO: Read from state instead
       return <div> </div>
     }
 
     return (
-      <div className={this.props.selected ? 'slim-selected' : 'slim'}>
-        {this.props.selected ? (
-          <button onClick={this.markChecked.bind(this)}>
-            <img src={check_circle} />
-          </button>
-        ) : (
-          <button onClick={this.markChecked.bind(this)}>
-            <img src={circle} />
-          </button>
-        )}
-
-        <Link to={'/note/' + this.props.id} className="note-slim">
-          <div tabIndex={this.props.tabIndex} className="note-slim">
-            <b>{title?.length ? title : <em>No title</em>}</b>
-            <br />
-            {text?.length ? text : <span>&#8212;</span>}
-            <br />
-            <div align="right">
-              {author?.length ? author : <em>No author</em>}
-              {work?.length ? <em>,&nbsp;&nbsp;{work}</em> : null}
+      <div
+        className={
+          this.props.selected ? 'note-slim-outer selected' : 'note-slim-outer'
+        }
+      >
+        <div className="note-slim button">
+          {this.props.selected ? (
+            <button
+              onClick={this.markChecked.bind(this)}
+              className="grid-button"
+            >
+              <img src={check_circle} />
+            </button>
+          ) : (
+            <button
+              onClick={this.markChecked.bind(this)}
+              className="grid-button"
+            >
+              <img src={circle} />
+            </button>
+          )}
+        </div>
+        <div className="note-slim text">
+          <Link to={'/note/' + this.props.id} className="note-slim">
+            <div tabIndex={this.props.tabIndex} className="note-slim">
+              <b>
+                {this.props.title?.length ? (
+                  this.props.title
+                ) : (
+                  <em>No title</em>
+                )}
+              </b>
+              <br />
+              {this.props.text?.length ? this.props.text : <span>&#8212;</span>}
+              <br />
+              <div align="right">
+                {this.props.author?.length ? (
+                  this.props.author
+                ) : (
+                  <em>No author</em>
+                )}
+                {this.props.work?.length ? (
+                  <em>,&nbsp;&nbsp;{this.props.work}</em>
+                ) : null}
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
       </div>
     )
   }

@@ -15,11 +15,7 @@ class NoteGrid extends React.Component {
   }
 
   render() {
-    const { author, text, title, work } = this.state
-    const inFocus = this.props.id == this.props.inFocus
-
     if (this.props.deleted) {
-      // TODO: Read from state instead
       return <div> </div>
     }
 

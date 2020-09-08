@@ -453,31 +453,22 @@ div.main {
 }
 
 // TODO: Sassify Slim
-div.note-slim {
-  padding: 4px;
-  margin: 4px;
-}
 
-a.note-slim {
-  text-decoration: none;
-}
+.note-slim-outer {
+  color: green;
+  display: flex;
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  background-color: $note_background;
 
-div.note-slim:hover {
-  background: $note_background;
-  border-radius: 4px;
-}
+  &.selected {
+    background-color: $selection_yellow;
+  }
 
-.slim-selected {
-  border: 1px;
-  border-style: solid;
-  border-color: black;
-  border-radius: 4px;
-}
-.slim {
-  border: 1px;
-  border-style: solid;
-  border-color: white;
-  border-radius: 4px;
+  a {
+    text-decoration: none;
+  }
 }
 
 // TODO: Sassify Grid

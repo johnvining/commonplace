@@ -163,6 +163,13 @@ export const addWorkToID = async (noteId, workID) => {
 export const updateNote = async (noteId, updateObj) => {
   return await Note.findOneAndUpdate({ _id: noteId }, updateObj, { new: true })
     .populate('author')
+    .populate('ideas')
+    .populate({
+      path: 'work',
+      populate: {
+        path: 'author'
+      }
+    })
     .lean()
     .exec()
 }
