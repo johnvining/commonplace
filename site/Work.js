@@ -84,7 +84,6 @@ class Work extends React.Component {
 
   submitUrl(text) {
     let year = guessYearFromURL(text)
-    console.log('year ' + year)
     if (!this.state.year && year) {
       addUrlToWork(this.props.id, text, year).then(
         this.setState({ editUrl: false, url: text, year: year })

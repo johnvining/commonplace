@@ -8,13 +8,13 @@ import Idea from './Idea'
 import Work from './Work'
 import SearchBar from './SearchBar'
 import Find from './Find'
-import * as constants from './constants'
 import ViewSelector from './ViewSelector'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }
 
   componentDidMount() {
+    this.setState({ viewMode: localStorage.viewMode })
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
   }
 
@@ -42,6 +42,7 @@ class App extends React.Component {
 
   setView(view) {
     this.setState({ viewMode: view })
+    localStorage.viewMode = view
   }
 
   render() {
