@@ -163,7 +163,12 @@ class NoteList extends React.Component {
     // TODO: Single API call for multiple changes
     for (let i = 0; i < this.state.selected.length; i++) {
       let noteId = this.state.notes[this.state.selected[i]]._id
-      assignFunction(idToAdd, noteId)
+      assignFunction(idToAdd, noteId).then(response => {
+        let notes = this.state.notes
+        const note = response.data
+        notes[this.state.selected[i]] = note
+        this.setState({ notes: notes })
+      })
     }
   }
 
