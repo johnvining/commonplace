@@ -94,13 +94,13 @@ class Author extends React.Component {
   render() {
     return (
       <div>
-        <div align="right">
+        <div align="right" key="author-information">
           <span className="title">{this.state.authorName}</span>
           <br />
           {this.state.bornYear} - {this.state.diedYear}
         </div>
         {this.state.works?.map((work, workindex) => (
-          <div>
+          <div key={'work-listing-' + workindex}>
             <section className="section-header">
               {work.name} - {work?.year}
             </section>
