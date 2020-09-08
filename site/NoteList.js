@@ -13,15 +13,43 @@ class NoteList extends React.Component {
     selected: [],
     deleted: [],
     lastSelectedIndex: 0,
-    useGridView: 1
+    useGridView: 1,
+    page: 1
   }
 
   async componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
 
-    const response = await this.props.getListOfNotes(this.props.index)
+    const response = await this.props.getListOfNotes(
+      this.props.index,
+      this.state.page
+    )
     this.setState({
       notes: response.data.data
+    })
+  }
+
+  async incPage() {
+    const response = await this.props.getListOfNotes(
+      this.props.index,
+      this.state.page + 1
+    )
+    this.setState({
+      notes: response.data.data,
+      page: this.state.page + 1,
+      selected: []
+    })
+  }
+
+  async decPage() {
+    const response = await this.props.getListOfNotes(
+      this.props.index,
+      this.state.page - 1
+    )
+    this.setState({
+      notes: response.data.data,
+      page: this.state.page - 1,
+      selected: []
     })
   }
 
@@ -297,6 +325,8 @@ class NoteList extends React.Component {
             })}
           </div>
         )}
+        <button onClick={this.incPage.bind(this)}>forward</button>
+        <button onClick={this.decPage.bind(this)}>reverse</button>
       </div>
     )
   }

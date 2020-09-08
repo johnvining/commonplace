@@ -3,10 +3,10 @@ import NoteList from './NoteList'
 import * as db from './Database'
 
 class RecentList extends React.Component {
-  async getListOfNotes() {
+  async getListOfNotes(index, page) {
     let notesResponse
     await db
-      .getRecentNotes()
+      .getRecentNotes(page)
       .then(response => {
         notesResponse = response
       })

@@ -1,6 +1,5 @@
 import Note from './note.model.js'
 import { crudControllers } from '../../utils/crud.js'
-import Idea from '../idea/idea.model.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 
@@ -18,10 +17,12 @@ export const addAuthor = async function(id, author) {
 
 // TODO: Standardize note-fetching so all note lists have the same fields populated #36
 export const getRecentNotes = async (req, res) => {
+  const pageSize = 30
   try {
     const docs = await Note.find({})
       .sort({ updatedAt: -1 })
-      .limit(100)
+      .skip((req.params.skip - 1) * pageSize)
+      .limit(pageSize)
       .populate('author')
       .populate('ideas')
       .populate({

@@ -50,16 +50,7 @@ class Author extends React.Component {
       })
   }
 
-  // fetchNotesForWork(workId) {}
-
-  // async fetchNotesforWorkIndex(workIndex) {
-  //   // TODO: Get the id
-  //   let notesResponse
-  //   fetchNotesForWork(workId)
-  //   return notesResponse
-  // }
-
-  async getListOfNotes(index) {
+  async getListOfNotes(page, index) {
     let notesResponse
     if (index == undefined) {
       await getNotesForAuthor(this.state.id)

@@ -19,7 +19,7 @@ router
   .get(controllers.getMany)
   .post(controllers.createOne)
 
-router.route('/all').get(getRecentNotes)
+router.route('/all/:skip').get(getRecentNotes)
 
 router.route('/:id/idea').put(addTopic)
 router.route('/:id/idea/create').put(addNewTopic)
