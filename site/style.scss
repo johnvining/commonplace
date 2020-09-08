@@ -546,6 +546,11 @@ a.grid-link {
     border-color: white;
     border-radius: 4px;
     border-style: solid;
+    height: 42px;
+
+    &.hidden {
+      display: none;
+    }
   }
 
   &.button:hover {
@@ -606,6 +611,16 @@ a.grid-link {
     height: 13px;
     content: '';
   }
+}
+
+.multi-select-top-bar {
+  display: flex;
+  align-items: baseline;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.flex-end {
+  align-self: flex-end;
 }
 
 .section-header {

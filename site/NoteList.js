@@ -5,6 +5,8 @@ import NoteGrid from './NoteGrid'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import * as constants from './constants'
+import left from './icons/left.svg'
+import right from './icons/right.svg'
 
 class NoteList extends React.Component {
   state = {
@@ -259,12 +261,37 @@ class NoteList extends React.Component {
             )}
           </div>
         ) : (
-          <button
-            onClick={this.selectAll.bind(this)}
-            className="multi-select button"
-          >
-            Select All
-          </button>
+          <div className="multi-select-top-bar">
+            <div>
+              <button
+                onClick={this.selectAll.bind(this)}
+                className="multi-select button"
+              >
+                Select All
+              </button>
+            </div>
+            <div>p. {this.state.page}</div>
+            <div>
+              <button
+                className={
+                  this.state.page == 1
+                    ? 'multi-select button hidden'
+                    : 'multi-select button'
+                }
+                onClick={this.decPage.bind(this)}
+              >
+                {' '}
+                <img src={left} />
+              </button>
+
+              <button
+                className="multi-select button"
+                onClick={this.incPage.bind(this)}
+              >
+                <img src={right} />
+              </button>
+            </div>
+          </div>
         )}
 
         {this.state.notes === undefined ? null : (
@@ -325,8 +352,6 @@ class NoteList extends React.Component {
             })}
           </div>
         )}
-        <button onClick={this.incPage.bind(this)}>forward</button>
-        <button onClick={this.decPage.bind(this)}>reverse</button>
       </div>
     )
   }

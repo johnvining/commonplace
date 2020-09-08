@@ -410,7 +410,10 @@ a.grid-link {
     border-width: 2px;
     border-color: white;
     border-radius: 4px;
-    border-style: solid; }
+    border-style: solid;
+    height: 42px; }
+    .multi-select.button.hidden {
+      display: none; }
   .multi-select.button:hover {
     background: lightblue;
     cursor: pointer; }
@@ -451,6 +454,15 @@ a.grid-link {
     width: 15px;
     height: 13px;
     content: ''; }
+
+.multi-select-top-bar {
+  display: flex;
+  align-items: baseline;
+  flex-direction: row;
+  justify-content: space-between; }
+
+.flex-end {
+  align-self: flex-end; }
 
 .section-header {
   font-size: 28px;
