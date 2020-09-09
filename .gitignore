@@ -6,4 +6,5 @@
 /site/dist/
 /site/node_modules/
 /site/.sass-cache/
+/image-store/
 .vscode

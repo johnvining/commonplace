@@ -107,6 +107,31 @@ export const reqFindNotesByString = async (req, res) => {
   }
 }
 
+export const reqAddImageToNote = async (req, res) => {
+  try {
+    if (!req.files) {
+      res.send({ status: false, message: 'No file' })
+    } else {
+      let image = req.files.image
+      image.mv('../image-store/' + req.params.id + '/' + image.name)
+
+      res.send({
+        status: true,
+        message: 'File uploaded',
+        data: {
+          name: image.name,
+          mimetype: image.mimetype,
+          size: image.size
+        }
+      })
+    }
+    console.log(req.files)
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 export const reqRemoveIdeaFromNote = async (req, res) => {
   try {
     const docs = await removeIdeaFromNote(req.params.id, req.params.ideaId)

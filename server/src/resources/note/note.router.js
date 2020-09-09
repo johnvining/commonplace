@@ -7,7 +7,8 @@ import controllers, {
   addWork,
   addNewWork,
   reqFindNotesByString,
-  reqRemoveIdeaFromNote
+  reqRemoveIdeaFromNote,
+  reqAddImageToNote
 } from './note.controllers'
 
 const router = Router()
@@ -26,6 +27,7 @@ router.route('/:id/idea/create').put(addNewTopic)
 router.route('/:id/work').put(addWork)
 router.route('/:id/work/create').put(addNewWork)
 router.route('/:id/idea/:ideaId').delete(reqRemoveIdeaFromNote)
+router.route('/:id/image').put(reqAddImageToNote)
 
 router
   .route('/:id')

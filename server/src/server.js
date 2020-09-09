@@ -8,10 +8,17 @@ import noteRouter from './resources/note/note.router'
 import authRouter from './resources/auth/auth.router'
 import ideaRouter from './resources/idea/idea.router'
 import workRouter from './resources/work/work.router'
+import fileUpload from 'express-fileupload'
 
 export const app = express()
 
 app.disable('x-powered-by')
+
+app.use(
+  fileUpload({
+    createParentPath: true
+  })
+)
 
 app.use(cors())
 app.use(json())
