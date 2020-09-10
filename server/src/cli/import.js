@@ -102,7 +102,7 @@ async function importNote(importObject) {
 
       await NoteControllers.createNoteObj(newNote)
     })
-    .catch(err => console.log(err))
+    .catch(err => console.error(err))
 }
 
 function parseWork(csvLine) {

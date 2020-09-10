@@ -150,3 +150,9 @@ export async function getRecentNotes(page) {
 export async function removeIdeaFromNote(noteId, ideaId) {
   return axios.delete(url_api + 'note/' + noteId + '/idea/' + ideaId)
 }
+
+export async function addImageToNote(noteId, image) {
+  const data = new FormData()
+  data.append('image', image)
+  return axios.put(url_api + 'note/90000000/image', data) // TODO
+}
