@@ -1,15 +1,16 @@
 import React from 'react'
 import { Link } from '@reach/router'
+import { guessYearFromURL } from './utils'
+import * as db from './Database'
+import Autocomplete from './Autocomplete'
 import check_circle from './icons/check_circle.svg'
 import cross_circle from './icons/cross_circle.svg'
 import document_image from './icons/document.svg'
+import ImageUploader from './ImageUploader'
+import link from './icons/link.svg'
+import tags from './icons/tags.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
-import tags from './icons/tags.svg'
-import Autocomplete from './Autocomplete'
-import * as db from './Database'
-import link from './icons/link.svg'
-import { guessYearFromURL } from './utils'
 
 // TODO: Support clearing authors
 // TODO: Support removing idea links
@@ -198,8 +199,11 @@ class Note extends React.Component {
     this.props.refetchMe(this.props.index)
   }
 
-  // FIXME: When a button is pressed in a note, tell the parent that I now should be inFocus
+  async onImageUpload(image) {
+    db.addImageToNote(this.props.id, image)
+  }
 
+  // FIXME: When a button is pressed in a note, tell the parent that I now should be inFocus
   render() {
     const { edit, id, addIdea, deleted } = this.state
     const inFocus = this.props.id == this.props.inFocus
@@ -390,7 +394,7 @@ class Note extends React.Component {
 
           {edit ? (
             <div className={'container action-bar'}>
-              <span>
+              <div>
                 <button
                   className={'action-button'}
                   onClick={this.handleAccept.bind(this)}
@@ -404,7 +408,10 @@ class Note extends React.Component {
                 >
                   <img src={cross_circle}></img>
                 </button>
-              </span>
+              </div>
+              <div className={'container action-bar'}>
+                <ImageUploader onImageUpload={this.onImageUpload.bind(this)} />
+              </div>
             </div>
           ) : (
             <div className={'container action-bar'}>

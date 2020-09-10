@@ -154,5 +154,5 @@ export async function removeIdeaFromNote(noteId, ideaId) {
 export async function addImageToNote(noteId, image) {
   const data = new FormData()
   data.append('image', image)
-  return axios.put(url_api + 'note/90000000/image', data) // TODO
+  return axios.put(url_api + 'note/' + noteId + '/image', data) // TODO
 }

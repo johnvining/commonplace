@@ -23,7 +23,9 @@ div .top-bar {
 .top-bar .top-action-bar {
   display: inline-block;
   text-align: right;
-  width: 50%; }
+  width: 50%;
+  height: 45px;
+  align-items: center; }
 .top-bar .tool-bar button {
   border-style: none;
   padding: 4px;
@@ -457,3 +459,12 @@ a.grid-link {
   font-size: 28px;
   padding: 18px 4px 4px 4px;
   margin: 4px; }
+
+.upload-form {
+  display: inline;
+  margin: auto; }
+  .upload-form input {
+    border: none; }
+
+.inline {
+  display: inline-flex; }

@@ -1,15 +1,15 @@
 import React from 'react'
 import { render } from 'react-dom'
-import NoteView from './NoteView'
-import Author from './Author'
 import { Router, Link } from '@reach/router'
-import RecentList from './RecentList'
-import Idea from './Idea'
-import Work from './Work'
-import SearchBar from './SearchBar'
+import Author from './Author'
 import Find from './Find'
+import Idea from './Idea'
+import ImageUploader from './ImageUploader'
+import NoteView from './NoteView'
+import RecentList from './RecentList'
+import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
-import ImageUploadWrapper from './ImageUploadWrapper'
+import Work from './Work'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }
@@ -80,7 +80,7 @@ class App extends React.Component {
           <NoteView path="/note/:id" />
           <RecentList path="/" viewMode={this.state.viewMode} />
           <Work path="/work/:id" viewMode={this.state.viewMode} />
-          <ImageUploadWrapper path="/test" />
+          <ImageUploader path="/test" />
         </Router>
       </div>
     )
