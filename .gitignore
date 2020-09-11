@@ -1,11 +1,10 @@
 .vscode
-/image-store/
-/server/src/config/dev-mine.js
 /server/csvin.csv
 /server/dist/
+/server/image-store/
 /server/input.csv
 /server/node_modules/
-/server/image-store/
+/server/src/config/dev-mine.js
 /site/.cache/
 /site/.sass-cache/
 /site/dist/

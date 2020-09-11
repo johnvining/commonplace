@@ -155,3 +155,9 @@ export async function addImageToNote(noteId, image) {
   data.append('image', image)
   return axios.put(url_api + 'note/' + noteId + '/image', data) // TODO
 }
+
+export async function getImagesForNote(noteId, imageN) {
+  return axios.get(url_api + 'note/' + noteId + '/images/' + imageN, {
+    responseType: 'blob'
+  })
+}

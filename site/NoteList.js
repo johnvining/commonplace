@@ -26,9 +26,16 @@ class NoteList extends React.Component {
       this.props.index,
       this.state.page
     )
-    this.setState({
-      notes: response.data.data
-    })
+    this.setState(
+      {
+        notes: response.data.data
+      },
+      () => {
+        for (let i = 0; i < this.state.notes.length; i++) {
+          this.getImagesForNoteAtIndex(i)
+        }
+      }
+    )
   }
 
   async incPage() {
@@ -61,6 +68,29 @@ class NoteList extends React.Component {
     const note = response.data.data[0]
     notes[index] = note
     this.setState({ notes: notes })
+  }
+
+  async getImagesForNoteAtIndex(index) {
+    let notes = this.state.notes
+    var numberImages = notes[index].images?.length
+
+    if (numberImages == 0) return
+
+    let imagePromises = []
+    for (let i = 1; i <= numberImages; i++) {
+      imagePromises.push(db.getImagesForNote(notes[index]._id, i))
+    }
+
+    await Promise.all(imagePromises).then(responses => {
+      let imagesArray = []
+      let note = notes[index]
+      responses.map(response => {
+        imagesArray.push(response.data)
+      })
+      note.imageBlobs = imagesArray
+      notes[index] = note
+      this.setState({ notes: notes })
+    })
   }
 
   componentWillUnmount() {
@@ -350,6 +380,9 @@ class NoteList extends React.Component {
                       inFocus={this.state.inFocus}
                       becomeInFocus={this.becomeInFocus.bind(this)}
                       refetchMe={this.refetchNoteAtIndex.bind(this)}
+                      getImagesForNoteAtIndex={this.getImagesForNoteAtIndex.bind(
+                        this
+                      )}
                     />
                   )}
                 </div>

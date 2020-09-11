@@ -146,7 +146,9 @@ export const reqAddImageToNote = async (req, res) => {
 export const reqGetImageForNote = async function(req, res) {
   try {
     let note = await Note.findOne({ _id: req.params.id })
-    res.sendFile(config.imageStorePath + '/' + note.images[req.params.image])
+    res.sendFile(
+      config.imageStorePath + '/' + note.images[req.params.image - 1]
+    )
   } catch (e) {
     console.error(e)
     res.status(400).end()
