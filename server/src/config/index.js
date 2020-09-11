@@ -4,7 +4,6 @@ const env = process.env.NODE_ENV || 'development'
 const baseConfig = {
   env,
   isDev: env === 'development',
-  isTest: env === 'testing',
   port: 3000,
   secrets: {
     jwt: process.env.JWT_SECRET,
@@ -17,14 +16,10 @@ let envConfig = {}
 switch (env) {
   case 'dev':
   case 'development':
-    envConfig = require('./dev').config
-    break
-  case 'test':
-  case 'testing':
-    envConfig = require('./testing').config
+    envConfig = require('./dev-mine').config
     break
   default:
-    envConfig = require('./dev').config
+    envConfig = require('./dev-mine').config
 }
 
 export default merge(baseConfig, envConfig)

@@ -2,6 +2,7 @@ import Note from './note.model.js'
 import { crudControllers } from '../../utils/crud.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
+import config from '../../config'
 
 export const createNote = async function(title, author) {
   return await Note.create({ title: title, author: author })
@@ -113,18 +114,39 @@ export const reqAddImageToNote = async (req, res) => {
       res.send({ status: false, message: 'No file' })
     } else {
       let image = req.files.image
-      image.mv('../image-store/' + req.params.id + '/' + image.name)
+      let currentNote = await Note.findOne({ _id: req.params.id })
+      let numberNotes = currentNote.images.length + 1
+
+      let localPath = req.params.id + '/' + numberNotes + '-' + image.name
+
+      image.mv(config.imageStorePath + '/' + localPath)
+
+      const newNote = await Note.findOneAndUpdate(
+        { _id: req.params.id },
+        { $addToSet: { images: localPath } },
+        { new: true }
+      )
+        .lean()
+        .exec()
 
       res.send({
         status: true,
         message: 'File uploaded',
         data: {
-          name: image.name,
-          mimetype: image.mimetype,
-          size: image.size
+          newNote
         }
       })
     }
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqGetImageForNote = async function(req, res) {
+  try {
+    let note = await Note.findOne({ _id: req.params.id })
+    res.sendFile(config.imageStorePath + '/' + note.images[req.params.image])
   } catch (e) {
     console.error(e)
     res.status(400).end()

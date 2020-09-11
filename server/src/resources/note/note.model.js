@@ -14,7 +14,8 @@ const noteSchema = new mongoose.Schema(
       ref: 'work'
     },
     year: Number,
-    url: String
+    url: String,
+    images: [{ type: String }]
   },
   { timestamps: true }
 )

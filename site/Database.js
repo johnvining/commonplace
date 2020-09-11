@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { addAuthor } from '../server/src/resources/note/note.controllers'
 
 export const url_api = 'http://localhost:3000/api/'
 
