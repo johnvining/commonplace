@@ -489,3 +489,12 @@ div .image-row {
   max-width: 120px;
   margin: auto;
   display: block; }
+
+.half {
+  display: inline-block;
+  width: 50%;
+  vertical-align: top; }
+
+.large-image {
+  max-width: 97%;
+  margin: auto; }

@@ -665,3 +665,14 @@ a.grid-link {
     display: block;
   }
 }
+
+.half {
+  display: inline-block;
+  width: 50%;
+  vertical-align: top;
+}
+
+.large-image {
+  max-width: 97%;
+  margin: auto;
+}
