@@ -65,7 +65,8 @@ class NoteList extends React.Component {
   async refetchNoteAtIndex(index) {
     let notes = this.state.notes
     const response = await db.getNoteInfo(notes[index]._id)
-    const note = response.data.data[0]
+    let note = response.data.data[0]
+    note.imageBlobs = this.state.notes[index].imageBlobs
     notes[index] = note
     this.setState({ notes: notes })
   }
