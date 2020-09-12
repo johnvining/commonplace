@@ -22,6 +22,7 @@ class Note extends React.Component {
     largeImage: '',
     pendingAuthorId: null,
     pendingAuthorName: '',
+    pendingCitation: '',
     pendingText: '',
     pendingTitle: '',
     pendingUrl: '',
@@ -38,6 +39,7 @@ class Note extends React.Component {
       inFocus: this.props.inFocus,
       pendingAuthorId: this.props.note.author?._id,
       pendingAuthorName: this.props.note.author?.name,
+      pendingCitation: this.props.note.citation,
       pendingText: this.props.note.text,
       pendingTitle: this.props.note.title,
       pendingUrl: this.props.note.url,
@@ -103,6 +105,10 @@ class Note extends React.Component {
 
   handleTitleChange = val => {
     this.setState({ pendingTitle: val.target.value })
+  }
+
+  handleCitationChange = val => {
+    this.setState({ pendingCitation: val.target.value })
   }
 
   handleYearChange = val => {
@@ -173,6 +179,7 @@ class Note extends React.Component {
   async handleAccept() {
     const updateObject = {
       author: this.state.pendingAuthorId,
+      citation: this.state.pendingCitation,
       text: this.state.pendingText,
       title: this.state.pendingTitle,
       url: this.state.pendingUrl,
@@ -314,11 +321,19 @@ class Note extends React.Component {
               ))}
             </div>
             {edit ? (
-              <textarea
-                className={'note text'}
-                onChange={this.handleTextChange}
-                value={this.state.pendingText}
-              ></textarea>
+              <>
+                <textarea
+                  className={'note text'}
+                  onChange={this.handleTextChange}
+                  value={this.state.pendingText}
+                ></textarea>
+                <input
+                  className={'note citation'}
+                  name="citation"
+                  defaultValue={this.state.pendingCitation}
+                  onChange={this.handleCitationChange}
+                ></input>
+              </>
             ) : (
               <div className={'note text'}>{this.state.pendingText}</div>
             )}
@@ -392,6 +407,9 @@ class Note extends React.Component {
                   className={'note work label'}
                 >
                   {this.state.pendingWorkName}
+                  {this.state.pendingCitation ? (
+                    <>, {this.state.pendingCitation}</>
+                  ) : null}
                 </Link>
                 {this.state.pendingWorkId == note.work?._id ? (
                   note.work?.url?.length ? (

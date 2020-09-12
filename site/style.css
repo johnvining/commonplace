@@ -74,7 +74,8 @@ div .top-bar {
   padding: 0px;
   min-height: 36px; }
 .note .title,
-.note .year {
+.note .year,
+.note .citation {
   background-color: transparent;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
@@ -84,17 +85,16 @@ div .top-bar {
   border-style: none;
   display: inline-block; }
   .note .title:focus,
-  .note .year:focus {
+  .note .year:focus,
+  .note .citation:focus {
     outline: none;
     background-color: white;
     border-radius: 4px; }
   .note .title.imputed,
-  .note .year.imputed {
+  .note .year.imputed,
+  .note .citation.imputed {
     color: #404040;
     font-style: oblique; }
-.note .year {
-  width: 6%;
-  text-align: right; }
 .note .text {
   background-color: transparent;
   border: none;
@@ -153,6 +153,10 @@ div .top-bar {
 .note .work.imputed {
   color: #404040;
   font-style: oblique; }
+.note .year,
+.note .citation {
+  width: 6%;
+  text-align: right; }
 .note a.author,
 .note a.work {
   text-decoration: none; }

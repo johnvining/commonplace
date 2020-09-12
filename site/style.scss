@@ -115,7 +115,8 @@ div.main {
   }
 
   .title,
-  .year {
+  .year,
+  .citation {
     background-color: transparent;
     font-family: $main_font;
     font-size: 18px;
@@ -133,11 +134,6 @@ div.main {
       color: $de-emphasized-text-color;
       font-style: oblique;
     }
-  }
-
-  .year {
-    width: 6%;
-    text-align: right;
   }
 
   .text {
@@ -208,6 +204,12 @@ div.main {
       color: $de-emphasized-text-color;
       font-style: oblique;
     }
+  }
+
+  .year,
+  .citation {
+    width: 6%;
+    text-align: right;
   }
 
   a.author,

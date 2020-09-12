@@ -15,7 +15,8 @@ const noteSchema = new mongoose.Schema(
     },
     year: Number,
     url: String,
-    images: [{ type: String }]
+    images: [{ type: String }],
+    citation: String
   },
   { timestamps: true }
 )
