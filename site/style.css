@@ -469,6 +469,23 @@ a.grid-link {
 .inline {
   display: inline-flex; }
 
-img.quote-image {
-  max-height: 250px;
-  max-width: 200px; }
+div .image-row {
+  display: flex;
+  flex-wrap: wrap; }
+.image-row.image-frame {
+  height: 180px;
+  width: 130px;
+  background-color: #f7fcf7;
+  padding: 4px;
+  margin: 4px;
+  border-radius: 4px;
+  vertical-align: center;
+  display: flex; }
+  .image-row.image-frame:hover {
+    background-color: lightgoldenrodyellow;
+    cursor: pointer; }
+.image-row img {
+  max-height: 170px;
+  max-width: 120px;
+  margin: auto;
+  display: block; }

@@ -636,7 +636,32 @@ a.grid-link {
   display: inline-flex;
 }
 
-img.quote-image {
-  max-height: 250px;
-  max-width: 200px;
+.image-row {
+  div & {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &.image-frame {
+    height: 180px;
+    width: 130px;
+    background-color: $background_color;
+    padding: 4px;
+    margin: 4px;
+    border-radius: 4px;
+    vertical-align: center;
+    display: flex;
+
+    &:hover {
+      background-color: $selection_yellow;
+      cursor: pointer;
+    }
+  }
+
+  img {
+    max-height: 170px;
+    max-width: 120px;
+    margin: auto;
+    display: block;
+  }
 }

@@ -229,7 +229,7 @@ class Note extends React.Component {
       return <div> </div>
     }
 
-    // TODO: Do autocomplete's need their out ESC handling? Remove it.
+    // TODO: Do autocomplete's need their own ESC handling? Remove it.
     return (
       <div
         className={mode.class + 'note outer'}
@@ -237,14 +237,6 @@ class Note extends React.Component {
         id={this.props.id}
         tabIndex={this.props.tabIndex}
       >
-        {this.props.note?.imageBlobs?.map((image, index) => (
-          <img
-            key={this.props.id + index + 'img'}
-            src={URL.createObjectURL(image)}
-            className="quote-image"
-          />
-        ))}
-
         <div className={mode.class + 'bar'}>
           {edit ? (
             <div>
@@ -283,6 +275,22 @@ class Note extends React.Component {
               )}
             </div>
           )}
+          <div className="image-row">
+            {this.props.note?.images?.map((image, index) => (
+              <div
+                className="image-row image-frame"
+                key={this.props.id + index + 'div-img'}
+              >
+                {this.props.note?.imageBlobs ? (
+                  <img
+                    key={this.props.id + index + 'img'}
+                    src={URL.createObjectURL(this.props.note.imageBlobs[index])}
+                    className="image-row"
+                  />
+                ) : null}
+              </div>
+            ))}
+          </div>
           {edit ? (
             <textarea
               className={'note text'}
