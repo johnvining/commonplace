@@ -202,7 +202,8 @@ class Note extends React.Component {
   async onImageUpload(image) {
     await db.addImageToNote(this.props.id, image)
 
-    this.props.getImagesForNoteAtIndex(this.props.index)
+    // TODO: Don't fetch all the notes if we don't need to
+    this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
   // FIXME: When a button is pressed in a note, tell the parent that I now should be inFocus
@@ -236,8 +237,12 @@ class Note extends React.Component {
         id={this.props.id}
         tabIndex={this.props.tabIndex}
       >
-        {this.props.note?.imageBlobs?.map(image => (
-          <img src={URL.createObjectURL(image)} className="quote-image" />
+        {this.props.note?.imageBlobs?.map((image, index) => (
+          <img
+            key={this.props.id + index + 'img'}
+            src={URL.createObjectURL(image)}
+            className="quote-image"
+          />
         ))}
 
         <div className={mode.class + 'bar'}>

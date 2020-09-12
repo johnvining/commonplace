@@ -32,7 +32,7 @@ class NoteList extends React.Component {
       },
       () => {
         for (let i = 0; i < this.state.notes.length; i++) {
-          this.getImagesForNoteAtIndex(i)
+          this.getImagesForNoteAtIndex(i, false)
         }
       }
     )
@@ -70,7 +70,12 @@ class NoteList extends React.Component {
     this.setState({ notes: notes })
   }
 
-  async getImagesForNoteAtIndex(index) {
+  async getImagesForNoteAtIndex(index, refetch) {
+    if (refetch) {
+      // Need to refetch so we have the correct number of images to fetch
+      await this.refetchNoteAtIndex(index)
+    }
+
     let notes = this.state.notes
     var numberImages = notes[index].images?.length
 
