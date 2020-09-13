@@ -222,4 +222,8 @@ export const updateNote = async (noteId, updateObj) => {
     .exec()
 }
 
+export const removeWorkFromNote = async noteId => {
+  return await Note.findOneAndUpdate({ _id: noteId }, { work: null })
+}
+
 export default crudControllers(Note)

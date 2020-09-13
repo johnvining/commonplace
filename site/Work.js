@@ -7,12 +7,14 @@ import {
   createAuthorAndAddToWork,
   addUrlToWork,
   addYearToWork,
-  getAuthorSuggestions
+  getAuthorSuggestions,
+  deleteWork
 } from './Database'
 import Autocomplete from './Autocomplete'
 import FreeEntry from './FreeEntry'
 import link from './icons/link.svg'
 import { guessYearFromURL } from './utils'
+import { navigate } from '@reach/router'
 
 class Work extends React.Component {
   state = { id: '', editAuthor: false }
@@ -99,6 +101,15 @@ class Work extends React.Component {
     addYearToWork(this.props.id, text).then(
       this.setState({ editYear: false, year: text })
     )
+  }
+
+  async deleteWork() {
+    if (!confirm(`Do you want to permanently delete '${this.state.work}'?`)) {
+      return
+    }
+
+    await deleteWork(this.state.id)
+    navigate('/')
   }
 
   render() {
@@ -201,6 +212,14 @@ class Work extends React.Component {
                 no year
               </span>
             )}
+          </div>
+          <div>
+            <button
+              className="top-level button"
+              onClick={this.deleteWork.bind(this)}
+            >
+              Delete work
+            </button>
           </div>
         </div>
 

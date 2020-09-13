@@ -170,7 +170,6 @@ class NoteList extends React.Component {
       return
     }
 
-    // TODO: Create API to delete multiple
     for (let i = 0; i < this.state.selected.length; i++) {
       let noteId = this.state.notes[this.state.selected[i]]._id
       db.deleteNote(noteId)

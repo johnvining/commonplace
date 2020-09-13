@@ -1,5 +1,5 @@
-import React, { useRef } from 'react'
-import { Link, redirectTo } from '@reach/router'
+import React from 'react'
+import { Link } from '@reach/router'
 import circle from './icons/circle.svg'
 import check_circle from './icons/check_circle.svg'
 

@@ -153,11 +153,15 @@ export async function removeIdeaFromNote(noteId, ideaId) {
 export async function addImageToNote(noteId, image) {
   const data = new FormData()
   data.append('image', image)
-  return axios.put(url_api + 'note/' + noteId + '/image', data) // TODO
+  return axios.put(url_api + 'note/' + noteId + '/image', data)
 }
 
 export async function getImagesForNote(noteId, imageN) {
   return axios.get(url_api + 'note/' + noteId + '/images/' + imageN, {
     responseType: 'blob'
   })
+}
+
+export async function deleteWork(workId) {
+  return axios.post(url_api + 'work/' + workId + '/delete')
 }

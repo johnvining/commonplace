@@ -1,21 +1,12 @@
 import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
 import { createAuthor } from '../auth/auth.controllers.js'
+import { removeWorkFromNote } from '../note/note.controllers.js'
 
 // Request response
-export const getNotesFromWork = async (req, res) => {
+export const reqGetNotesForWork = async (req, res) => {
   try {
-    const doc = await Note.find({ work: req.params.id })
-      .populate('author')
-      .populate('ideas')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
+    const doc = await getNotesFromWork(req.params.id)
     if (!doc) {
       return res.status(400).end()
     }
@@ -93,6 +84,16 @@ export const reqCreateAndAddAuth = async (req, res) => {
   }
 }
 
+export const reqDeleteWork = async (req, res) => {
+  try {
+    await deleteWork(req.params.id)
+    res.status(200).json()
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 // Direct database
 export const createWork = async function(name) {
   return await Work.create({ name: name })
@@ -127,4 +128,35 @@ export const findOrCreateWork = async function(name) {
   }
 
   return await createWork(name)
+}
+
+export const getNotesFromWork = async function(workID, slim = false) {
+  if (slim) {
+    return Note.find({ work: workID })
+      .lean()
+      .exec()
+  } else {
+    return Note.find({ work: workID })
+      .populate('author')
+      .populate('ideas')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
+      .lean()
+      .exec()
+  }
+}
+
+export const deleteWork = async function(id) {
+  let notes = await getNotesFromWork(id, true)
+  let deletionPromises = []
+  notes.map(note => {
+    deletionPromises.push(removeWorkFromNote(note._id))
+  })
+
+  await Promise.all(deletionPromises)
+  await Work.findOneAndDelete({ _id: id })
 }

@@ -72,6 +72,25 @@ div.main {
   }
 }
 
+.top-level {
+  &.button {
+    font-family: $main_font;
+    padding: 8px;
+    margin: 2px;
+    border-width: 2px;
+    border-color: white;
+    border-radius: 4px;
+    border-style: solid;
+    background-color: white;
+    height: 42px;
+
+    &:hover {
+      background: lightblue;
+      cursor: pointer;
+    }
+  }
+}
+
 .note {
   &.outer {
     // TODO: Fix problem with children

@@ -19,8 +19,6 @@ var oldContext = {
   item: null
 }
 
-// TODO implement topics
-// TODO implement opening text in sublime
 // TODO move database functions to separate file
 // TODO implement last
 
