@@ -654,6 +654,10 @@ a.grid-link {
     vertical-align: center;
     display: flex;
 
+    &.selected {
+      background-color: $note_border_in_focus;
+    }
+
     &:hover {
       background-color: $selection_yellow;
       cursor: pointer;

@@ -19,7 +19,7 @@ import write from './icons/write.svg'
 
 class Note extends React.Component {
   state = {
-    largeImage: '',
+    largeImage: -1,
     pendingAuthorId: null,
     pendingAuthorName: '',
     pendingCitation: '',
@@ -214,9 +214,9 @@ class Note extends React.Component {
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
-  handleFocusImage(imageN) {
+  handleFocusImage(click) {
     this.setState({
-      largeImage: imageN.target.src
+      largeImage: click.target.id
     })
   }
 
@@ -251,18 +251,23 @@ class Note extends React.Component {
         id={this.props.id}
         tabIndex={this.props.tabIndex}
       >
-        {this.state.largeImage ? (
+        {this.state.largeImage >= 0 ? (
           <div
             className="half"
             onClick={() => {
-              this.setState({ largeImage: '' })
+              this.setState({ largeImage: -1 })
             }}
           >
-            <img className="large-image" src={this.state.largeImage} />
+            <img
+              className="large-image"
+              src={URL.createObjectURL(
+                this.props.note.imageBlobs[this.state.largeImage]
+              )}
+            />
           </div>
         ) : null}
 
-        <div className={this.state.largeImage ? 'half' : null}>
+        <div className={this.state.largeImage >= 0 ? 'half' : null}>
           <div className={mode.class + 'bar'}>
             {edit ? (
               <div>
@@ -304,9 +309,14 @@ class Note extends React.Component {
             <div className="image-row">
               {this.props.note?.images?.map((image, index) => (
                 <div
-                  className="image-row image-frame"
+                  className={
+                    this.state.largeImage == index
+                      ? 'image-row image-frame selected'
+                      : 'image-row image-frame'
+                  }
                   key={this.props.id + index + 'div-img'}
                   onClick={this.handleFocusImage.bind(this)}
+                  id={index}
                 >
                   {this.props.note?.imageBlobs ? (
                     <img
@@ -315,6 +325,7 @@ class Note extends React.Component {
                         this.props.note.imageBlobs[index]
                       )}
                       className="image-row"
+                      id={index}
                     />
                   ) : null}
                 </div>

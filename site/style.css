@@ -485,6 +485,8 @@ div .image-row {
   border-radius: 4px;
   vertical-align: center;
   display: flex; }
+  .image-row.image-frame.selected {
+    background-color: lightgrey; }
   .image-row.image-frame:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
