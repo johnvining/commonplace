@@ -80,16 +80,10 @@ class App extends React.Component {
           <NoteView path="/note/:id" />
           <RecentList path="/" viewMode={this.state.viewMode} />
           <Work path="/work/:id" viewMode={this.state.viewMode} />
-          <ImageUploader path="/test" />
         </Router>
       </div>
     )
   }
 }
-
-// TODO Implement a search functionality
-// TODO Implement deleting
-// TODO Implement adding a note
-// TODO Implement book/text categorization
 
 render(<App />, document.getElementById('root'))

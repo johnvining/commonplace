@@ -7,6 +7,7 @@ import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as importUtils from './import.js'
+import config from '../config'
 
 var context = {
   type: null,
@@ -21,25 +22,18 @@ var oldContext = {
 // TODO implement topics
 // TODO implement opening text in sublime
 // TODO move database functions to separate file
-// TODO change quote to note throughout
-// TODO figure out if we need to pass in the connection
-// TODO abstract out the URL to mongodb
 // TODO implement last
 
 const connect = () => {
-  return mongoose.connect('mongodb://localhost:27017/whatever', {
+  return mongoose.connect(config.dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false
   })
 }
 
-console.log('Starting database connection...')
-
 connect()
   .then(async connection => {
-    console.log('done')
-
     let go = true
     while (go) {
       console.log(writeContext())
@@ -250,7 +244,7 @@ async function last() {
 }
 
 async function load() {
-  var mode = 'csv' // TODO: Add kindle
+  var mode = 'csv'
   if ((mode = 'csv')) {
     console.log(' ] 1. Notes, 2. Works')
     let recordType = +prompt('?] ')
@@ -267,6 +261,7 @@ async function load() {
 function printLoadHelp(recordType) {
   if (recordType == 1)
     console.log(' format -> Author,Title,Text,Work,URL,"idea1,idea2"')
+  else if (recordType == 2) console.log(' format -> Title,Author,Year,URL')
 }
 
 function getFilePath() {
@@ -277,7 +272,7 @@ function getFilePath() {
 }
 
 async function idea(input) {
-  // TODO Move database ops to separate fileg
+  // TODO Move database ops to separate file
   let idea = await searchOrCreate(
     usertext.prompts.idea,
     input,

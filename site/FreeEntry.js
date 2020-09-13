@@ -1,6 +1,5 @@
 import React from 'react'
 
-// FIXME: Only some auto-completes should have autoFocus on create (Yes: idea, no: author)
 class FreeEntry extends React.Component {
   state = {
     currentTypedText: ''
@@ -36,8 +35,6 @@ class FreeEntry extends React.Component {
   }
 
   render() {
-    // TODO: Validation function
-
     return (
       <input
         value={this.state.currentTypedText}

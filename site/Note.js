@@ -12,11 +12,6 @@ import tags from './icons/tags.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 
-// TODO: Support clearing authors
-// TODO: Support removing idea links
-// FIXME: Cancel should return UI to original state
-// FIXME: Saving newlines from Text Area doesn't work
-
 class Note extends React.Component {
   state = {
     largeImage: -1,
@@ -34,7 +29,6 @@ class Note extends React.Component {
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
 
-    // TODO: Do we need?
     this.setState({
       inFocus: this.props.inFocus,
       pendingAuthorId: this.props.note.author?._id,
@@ -62,7 +56,6 @@ class Note extends React.Component {
     if (this.props.inFocus != this.props.id) {
       return
     }
-    // TODO: Keyboard short cuts will interfere with Ctrl + A on Windows
     if (this.state.edit && event.ctrlKey && event.keyCode == 65) {
       this.handleAccept()
     } else if (!this.state.edit && event.ctrlKey && event.keyCode == 69) {
@@ -191,8 +184,6 @@ class Note extends React.Component {
       updateObject.year = this.state.pendingYear
     }
 
-    // TODO: Add validation to URL
-
     this.setState({ edit: false, keep: true })
     await db
       .updateNoteInfo(this.props.id, updateObject)
@@ -210,7 +201,7 @@ class Note extends React.Component {
   async onImageUpload(image) {
     await db.addImageToNote(this.props.id, image)
 
-    // TODO: Don't fetch all the notes if we don't need to
+    // TODO: Don't fetch all the images if we don't need to
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
@@ -220,7 +211,6 @@ class Note extends React.Component {
     })
   }
 
-  // FIXME: When a button is pressed in a note, tell the parent that I now should be inFocus
   render() {
     const { edit, id, addIdea, deleted } = this.state
     const inFocus = this.props.id == this.props.inFocus
@@ -243,7 +233,6 @@ class Note extends React.Component {
       return <div> </div>
     }
 
-    // TODO: Do autocomplete's need their own ESC handling? Remove it.
     return (
       <div
         className={mode.class + 'note outer'}
@@ -539,8 +528,5 @@ class Note extends React.Component {
     )
   }
 }
-
-// TODO: Update the ideas display to work everywhere
-// TODO: Create an idea page and API
 
 export default Note

@@ -1,6 +1,5 @@
 import React from 'react'
 
-// FIXME: Only some auto-completes should have autoFocus on create (Yes: idea, no: author)
 class Autocomplete extends React.Component {
   state = {
     loading: true,
@@ -15,8 +14,6 @@ class Autocomplete extends React.Component {
     option: this.className + ' option',
     newOption: this.className + ' option new'
   }
-
-  // TODO: Support for filtering what we already have
 
   componentDidMount() {
     document.addEventListener('keydown', this.handleKeyDown.bind(this), false)

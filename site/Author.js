@@ -51,7 +51,6 @@ class Author extends React.Component {
   }
 
   async getListOfNotes(index, page) {
-    // TODO: Implement page
     let notesResponse
     if (index == undefined) {
       await getNotesForAuthor(this.state.id)

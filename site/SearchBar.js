@@ -55,10 +55,9 @@ class SearchBar extends React.Component {
     })
   }
 
-  // TODO: Does async make sense here?
   async handleKeyDown(event) {
     if (
-      //Delete to go back
+      // Delete to go back
       event.keyCode == 8 &&
       this.state.modifierSelected &&
       this.state.typedText == ''
@@ -92,7 +91,7 @@ class SearchBar extends React.Component {
       event.keyCode == 13
     ) {
       this.setState({ typedText: '' }, () => {
-        this.props.toggleSlim() // TODO: Update to use context
+        this.props.toggleSlim()
         this.props.beforeNavigate()
       })
     } else if (

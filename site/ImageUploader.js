@@ -1,5 +1,4 @@
 import React from 'react'
-import * as db from './Database'
 import upload from './icons/upload.svg'
 
 class ImageUploader extends React.Component {
