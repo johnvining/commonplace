@@ -1,19 +1,10 @@
 import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
+import { removeIdeaFromNote } from '../note/note.controllers'
 
 export const getNotesFromIdea = async (req, res) => {
   try {
-    const doc = await Note.find({ ideas: req.params.id })
-      .populate('author')
-      .populate('ideas')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
+    const doc = await getNotesForIdea(req.params.id)
     if (!doc) {
       return res.status(400).end()
     }
@@ -105,6 +96,16 @@ export const reqCreateIdea = async (req, res) => {
   }
 }
 
+export const reqDeleteIdea = async (req, res) => {
+  try {
+    await deleteIdea(req.params.id)
+    res.status(200).json()
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 // Idea
 export const createIdea = async function(name) {
   return await Idea.create({ name: name })
@@ -132,4 +133,35 @@ export const findOrCreateIdea = async function(name) {
   }
 
   return await createIdea(name)
+}
+
+export const getNotesForIdea = async function(ideaId, slim = false) {
+  if (slim) {
+    return Note.find({ ideas: ideaId })
+      .lean()
+      .exec()
+  } else {
+    return Note.find({ ideas: ideaId })
+      .populate('author')
+      .populate('ideas')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
+      .lean()
+      .exec()
+  }
+}
+
+export const deleteIdea = async function(ideaId) {
+  let notes = await getNotesForIdea(ideaId, true)
+  let deletionPromises = []
+  notes.map(note => {
+    deletionPromises.push(removeIdeaFromNote(note._id, ideaId))
+  })
+
+  await Promise.all(deletionPromises)
+  await Idea.findOneAndDelete({ _id: ideaId })
 }

@@ -7,6 +7,7 @@ router.route('/autocomplete').post(controllers.getAutoComplete)
 router
   .route('/autocomplete/with-notes')
   .put(controllers.getIdeasByStringWithNotes)
+router.route('/:id/delete').post(controllers.reqDeleteIdea)
 router.route('/:id/notes').get(controllers.getNotesFromIdea)
 
 router.route('/:id').get(controllers.reqGetIdeaInfo)

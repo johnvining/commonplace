@@ -1,6 +1,7 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getNotesForIdea, getIdeaInfo } from './Database'
+import { getNotesForIdea, getIdeaInfo, deleteIdea } from './Database'
+import { navigate } from '@reach/router'
 
 class Idea extends React.Component {
   state = {
@@ -50,11 +51,30 @@ class Idea extends React.Component {
     return null
   }
 
+  async deleteIdea() {
+    if (
+      !confirm(`Do you want to permanently delete '${this.state.ideaName}'?`)
+    ) {
+      return
+    }
+
+    await deleteIdea(this.state.id)
+    navigate('/')
+  }
+
   render() {
     return (
       <div>
         <div align="right">
           <span className="title">{this.state.ideaName}</span>
+          <div>
+            <button
+              className="top-level button"
+              onClick={this.deleteIdea.bind(this)}
+            >
+              Delete idea
+            </button>
+          </div>
         </div>
 
         <NoteList

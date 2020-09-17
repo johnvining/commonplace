@@ -169,3 +169,7 @@ export async function deleteWork(workId) {
 export async function deleteAuthor(authorId) {
   return axios.post(url_api + 'auth/' + authorId + '/delete')
 }
+
+export async function deleteIdea(ideaId) {
+  return axios.post(url_api + 'idea/' + ideaId + '/delete')
+}
