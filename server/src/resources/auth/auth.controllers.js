@@ -1,6 +1,7 @@
 import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
+import { removeAuthorFromNote } from '../note/note.controllers.js'
 
 export const getAuthorDetails = async (req, res) => {
   try {
@@ -19,18 +20,7 @@ export const getAuthorDetails = async (req, res) => {
 
 export const getNotesFromAuthor = async (req, res) => {
   try {
-    const doc = await Note.find({ author: req.params.id })
-      .sort({ updatedAt: -1 })
-      .populate('author')
-      .populate('ideas')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
+    const doc = await getNotesForAuthor(req.params.id)
     if (!doc) {
       return res.status(400).end()
     }
@@ -80,6 +70,16 @@ export const reqGetWorksForAuthor = async (req, res) => {
   }
 }
 
+export const reqDeleteAuthor = async (req, res) => {
+  try {
+    await deleteAuthor(req.params.id)
+    res.status(200).json()
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 // Author
 export const createAuthor = async function(name) {
   return await Auth.create({ name: name })
@@ -103,4 +103,37 @@ export const findOrCreateAuthor = async function(name) {
   }
 
   return await createAuthor(name)
+}
+
+export const getNotesForAuthor = async function(authId, slim = false) {
+  if (slim) {
+    return Note.find({ author: authId })
+      .sort({ updatedAt: -1 })
+      .lean()
+      .exec()
+  } else {
+    return Note.find({ author: authId })
+      .sort({ updatedAt: -1 })
+      .populate('author')
+      .populate('ideas')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
+      .lean()
+      .exec()
+  }
+}
+
+export const deleteAuthor = async function(id) {
+  let notes = await getNotesForAuthor(id, true)
+  let deletionPromises = []
+  notes.map(note => {
+    deletionPromises.push(removeAuthorFromNote(note._id))
+  })
+
+  await Promise.all(deletionPromises)
+  await Auth.findOneAndDelete({ _id: id })
 }

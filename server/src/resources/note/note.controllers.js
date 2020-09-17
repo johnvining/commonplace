@@ -226,4 +226,8 @@ export const removeWorkFromNote = async noteId => {
   return await Note.findOneAndUpdate({ _id: noteId }, { work: null })
 }
 
+export const removeAuthorFromNote = async noteId => {
+  return await Note.findOneAndUpdate({ _id: noteId }, { author: null })
+}
+
 export default crudControllers(Note)

@@ -165,3 +165,7 @@ export async function getImagesForNote(noteId, imageN) {
 export async function deleteWork(workId) {
   return axios.post(url_api + 'work/' + workId + '/delete')
 }
+
+export async function deleteAuthor(authorId) {
+  return axios.post(url_api + 'auth/' + authorId + '/delete')
+}

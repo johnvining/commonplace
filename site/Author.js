@@ -1,11 +1,13 @@
 import React from 'react'
 import NoteList from './NoteList'
 import {
+  deleteAuthor,
   getAuthorInfo,
   getNotesForAuthor,
-  getWorksForAuthor,
-  getNotesForWork
+  getNotesForWork,
+  getWorksForAuthor
 } from './Database'
+import { navigate } from '@reach/router'
 
 class Author extends React.Component {
   state = {
@@ -82,6 +84,17 @@ class Author extends React.Component {
     return null
   }
 
+  async deleteAuthor() {
+    if (
+      !confirm(`Do you want to permanently delete '${this.state.authorName}'?`)
+    ) {
+      return
+    }
+
+    await deleteAuthor(this.state.id)
+    navigate('/')
+  }
+
   render() {
     return (
       <div>
@@ -89,6 +102,14 @@ class Author extends React.Component {
           <span className="title">{this.state.authorName}</span>
           <br />
           {this.state.bornYear} - {this.state.diedYear}
+          <div>
+            <button
+              className="top-level button"
+              onClick={this.deleteAuthor.bind(this)}
+            >
+              Delete author
+            </button>
+          </div>
         </div>
         {this.state.works?.map((work, workindex) => (
           <div key={'work-listing-' + workindex}>
