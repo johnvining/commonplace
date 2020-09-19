@@ -20,7 +20,8 @@ class NoteList extends React.Component {
   }
 
   async componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
+    this.keyDownListener = this.handleKeyDown.bind(this)
+    document.addEventListener('keydown', this.keyDownListener, false)
 
     const response = await this.props.getListOfNotes(
       this.props.index,
@@ -36,6 +37,10 @@ class NoteList extends React.Component {
         }
       }
     )
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.keyDownListener, false)
   }
 
   async incPage() {
@@ -97,14 +102,6 @@ class NoteList extends React.Component {
       notes[index] = note
       this.setState({ notes: notes })
     })
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener(
-      'keydown',
-      this.handleKeyDown.bind(this),
-      false
-    )
   }
 
   handleKeyDown(event) {

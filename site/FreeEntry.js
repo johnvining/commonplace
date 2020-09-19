@@ -6,18 +6,15 @@ class FreeEntry extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
+    this.keyDownListener = this.handleKeyDown.bind(this)
+    document.addEventListener('keydown', this.keyDownListener, false)
     this.setState({
       currentTypedText: this.props.defaultValue
     })
   }
 
   componentWillUnmount() {
-    document.removeEventListener(
-      'keydown',
-      this.handleKeyDown.bind(this),
-      false
-    )
+    document.removeEventListener('keydown', this.keyDownListener, false)
   }
 
   handleKeyDown(event) {

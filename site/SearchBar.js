@@ -23,15 +23,12 @@ class SearchBar extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
+    this.keyDownListener = this.handleKeyDown.bind(this)
+    document.addEventListener('keydown', this.keyDownListener, false)
   }
 
   componentWillUnmount() {
-    document.removeEventListener(
-      'keydown',
-      this.handleKeyDown.bind(this),
-      false
-    )
+    document.removeEventListener('keydown', this.keyDownListener, false)
   }
 
   handleTextChange(event) {
