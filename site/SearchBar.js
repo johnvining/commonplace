@@ -36,7 +36,7 @@ class SearchBar extends React.Component {
 
   handleTextChange(event) {
     this.setState({ typedText: event.target.value }, () => {
-      if (!this.state.modifierSelected) {
+      if (!this.state.modifier) {
         let text = this.state.typedText
         switch (text) {
           case this.modifiers.auth:
@@ -46,7 +46,6 @@ class SearchBar extends React.Component {
           case this.modifiers.note:
             this.setState({
               modifier: text,
-              modifierSelected: true,
               typedText: ''
             })
             break
@@ -59,14 +58,14 @@ class SearchBar extends React.Component {
     if (
       // Delete to go back
       event.keyCode == 8 &&
-      this.state.modifierSelected &&
-      this.state.typedText == ''
+      this.state.modifier &&
+      this.state.typedText == '' &&
+      !this.shouldShowAutocomplete()
     ) {
       let previousModifier = this.state.modifier
       this.setState({
         typedText: previousModifier + '',
-        modifier: '',
-        modifierSelected: false
+        modifier: ''
       })
       // TODO: Set focus back on the input
     } else if (
@@ -79,14 +78,14 @@ class SearchBar extends React.Component {
         navigate('/note/' + response.data._id)
       })
     } else if (
-      !this.state.modifierSelected &&
+      !this.state.modifier &&
       this.state.typedText == this.modifiers.home &&
       event.keyCode == 13
     ) {
       this.props.beforeNavigate()
       navigate('/')
     } else if (
-      !this.state.modifierSelected &&
+      !this.state.modifier &&
       this.state.typedText == this.modifiers.slim &&
       event.keyCode == 13
     ) {
@@ -140,17 +139,29 @@ class SearchBar extends React.Component {
 
   handleCreate() {}
 
-  render() {
-    const { modifier, typedText } = this.state
+  handleEscape() {
+    this.setState({
+      modifier: '',
+      typedText: this.state.modifier
+    })
+  }
 
-    let showAutocomplete = false
-    switch (modifier) {
+  shouldShowAutocomplete() {
+    switch (this.state.modifier) {
       case this.modifiers.auth:
       case this.modifiers.idea:
       case this.modifiers.work:
-        showAutocomplete = true
+        return true
         break
     }
+
+    return false
+  }
+
+  render() {
+    const { modifier, typedText } = this.state
+
+    let showAutocomplete = this.shouldShowAutocomplete()
 
     return (
       <div className="search-bar container">
@@ -166,6 +177,7 @@ class SearchBar extends React.Component {
             onSelect={this.handleUpdate.bind(this)}
             getSuggestions={this.getSuggestions.bind(this)}
             handleNewSelect={this.handleCreate.bind(this)}
+            escape={this.handleEscape.bind(this)}
           />
         ) : (
           <input

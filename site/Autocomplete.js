@@ -16,7 +16,8 @@ class Autocomplete extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyDown.bind(this), false)
+    this.keyDownListener = this.handleKeyDown.bind(this)
+    document.addEventListener('keydown', this.keyDownListener, false)
     this.setState({
       currentTypedText: this.props.defaultValue,
       hideResults: true
@@ -24,15 +25,14 @@ class Autocomplete extends React.Component {
   }
 
   componentWillUnmount() {
-    document.removeEventListener(
-      'keydown',
-      this.handleKeyDown.bind(this),
-      false
-    )
+    document.removeEventListener('keydown', this.keyDownListener, false)
   }
 
   handleKeyDown(event) {
     if (event.keyCode == 27) {
+      this.props.escape()
+      this.setState({ currentTypedText: '' })
+    } else if (event.keyCode == 8 && !this.state.currentTypedText) {
       this.props.escape()
     }
   }
