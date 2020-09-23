@@ -1,7 +1,9 @@
 'use strict'
 
 import fs from 'fs'
+import https from 'https'
 import parse from 'csv-parse'
+import config from '../config'
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
@@ -69,9 +71,49 @@ function parseNote(csvLine) {
   obj.text = csvLine[2]
   obj.workName = csvLine[3]
   obj.url = csvLine[4]
-  obj.ideas = csvLine[5].split(',')
+  obj.ideas = csvLine[5]?.split(',')
+  obj.externalImageUrls = csvLine[6]?.split(',')
   // TODO: Year
   return obj
+}
+
+export async function getImageFromURL(url, dest) {
+  var file = fs.createWriteStream(dest)
+
+  // TODO: Error handling
+  let htPromise = new Promise((resolve, reject) => {
+    https.get(url, function(response) {
+      response.pipe(file)
+      file.on('finish', function() {
+        file.close()
+        resolve()
+      })
+    })
+  })
+
+  await htPromise
+}
+
+async function createDirIfNeeded(path, cb) {
+  let mask = 484 // https://chmodcommand.com/chmod-744/
+  fs.mkdir(path, mask, function(err) {
+    if (err) {
+      if (err.code == 'EEXIST') cb(null)
+      else cb(err)
+    } else cb(null)
+  })
+}
+
+export async function downloadImageForNote(noteId, imageN, imageUrl, cb) {
+  const fileName = imageUrl?.split('/').pop()
+  // TODO: Check this matches
+  // TODO: Switch on http/s
+  var dest = noteId + '/' + imageN + '-' + fileName
+  await createDirIfNeeded(config.imageStorePath + '/' + noteId, val => {
+    if (val) console.error(val)
+  })
+  await getImageFromURL(imageUrl, config.imageStorePath + '/' + dest)
+  return dest
 }
 
 async function importNote(importObject) {
@@ -89,20 +131,35 @@ async function importNote(importObject) {
 
   let dataPromise = Promise.all([authorPromise, workPromise])
   let ideaPromise = Promise.all(ideaPromises)
-  await Promise.all([dataPromise, ideaPromise])
-    .then(async function(response) {
-      let newNote = {
-        author: response[0][0]?._id,
-        work: response[0][1]?._id,
-        ideas: response[1].filter(x => x),
-        text: importObject.text,
-        title: importObject.title,
-        url: importObject.url
-      }
+  let response = await Promise.all([dataPromise, ideaPromise])
 
-      await NoteControllers.createNoteObj(newNote)
-    })
-    .catch(err => console.error(err))
+  let newNote = {
+    author: response[0][0]?._id,
+    work: response[0][1]?._id,
+    ideas: response[1].filter(x => x),
+    text: importObject.text,
+    title: importObject.title,
+    url: importObject.url
+  }
+
+  let createdNote = await NoteControllers.createNoteObj(newNote)
+
+  // Add Images
+  let imagePromises = []
+  for (let i = 0; i < importObject.externalImageUrls.length; i++) {
+    imagePromises.push(
+      downloadImageForNote(
+        createdNote._id,
+        i + 1,
+        importObject.externalImageUrls[i]
+      )
+    )
+  }
+
+  let imagePromiseResp = await Promise.all(imagePromises)
+  await NoteControllers.updateNote(createdNote._id, {
+    images: imagePromiseResp
+  })
 }
 
 function parseWork(csvLine) {
