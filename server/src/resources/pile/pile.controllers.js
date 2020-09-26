@@ -30,7 +30,7 @@ export const reqGetNotesForPile = async (req, res) => {
 
 export const reqGetWorksForPile = async (req, res) => {
   try {
-    const doc = await Work.find({ piles: req.params.id })
+    const doc = await Work.find({ piles: req.params.id }).populate('author')
     if (!doc) {
       return res.status(400).end()
     }

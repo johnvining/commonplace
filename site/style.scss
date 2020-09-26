@@ -785,3 +785,30 @@ a.grid-link {
   max-width: 97%;
   margin: auto;
 }
+
+.title {
+  font-size: 28px;
+}
+
+.work-list {
+  & a {
+    text-decoration: none;
+  }
+
+  .work {
+    font-size: 18px;
+    padding: 4px;
+    margin: 4px;
+
+    &:hover {
+      background-color: $note_background_in_focus;
+      border-radius: 4px;
+    }
+  }
+
+  .date {
+    font-size: 14px;
+    padding: 4px;
+    margin: 4px;
+  }
+}

@@ -583,3 +583,20 @@ div .image-row {
 .large-image {
   max-width: 97%;
   margin: auto; }
+
+.title {
+  font-size: 28px; }
+
+.work-list a {
+  text-decoration: none; }
+.work-list .work {
+  font-size: 18px;
+  padding: 4px;
+  margin: 4px; }
+  .work-list .work:hover {
+    background-color: #efefef;
+    border-radius: 4px; }
+.work-list .date {
+  font-size: 14px;
+  padding: 4px;
+  margin: 4px; }

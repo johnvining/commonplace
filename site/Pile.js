@@ -1,6 +1,12 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getNotesForPile, getPileInfo, deleteIdea } from './Database'
+import WorkList from './WorkList'
+import {
+  getNotesForPile,
+  getPileInfo,
+  deleteIdea,
+  getWorksForPile
+} from './Database'
 import { navigate } from '@reach/router'
 
 class Pile extends React.Component {
@@ -21,7 +27,6 @@ class Pile extends React.Component {
   fetchPileInfo(pileID) {
     getPileInfo(pileID)
       .then(response => {
-        console.log(response)
         this.setState({
           pileName: response.data.data[0].name
         })
@@ -29,19 +34,6 @@ class Pile extends React.Component {
       .catch(error => {
         console.error(error)
       })
-  }
-
-  async getListOfNotes() {
-    let notesResponse
-    await getNotesForPile(this.state.id)
-      .then(response => {
-        notesResponse = response
-      })
-      .catch(error => {
-        console.error(error)
-      })
-
-    return notesResponse
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -63,6 +55,32 @@ class Pile extends React.Component {
     navigate('/')
   }
 
+  async getListOfNotes() {
+    let notesResponse
+    await getNotesForPile(this.state.id)
+      .then(response => {
+        notesResponse = response
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+    return notesResponse
+  }
+
+  async getListOfWorks() {
+    let worksResponse
+    await getWorksForPile(this.state.id)
+      .then(response => {
+        worksResponse = response
+      })
+      .catch(error => {
+        console.error(error)
+      })
+
+    return worksResponse
+  }
+
   render() {
     return (
       <div>
@@ -77,9 +95,11 @@ class Pile extends React.Component {
             </button>
           </div>
         </div>
-
+        <WorkList
+        key={'workList' + this.props.id}
+         getListOfWorks={this.getListOfWorks.bind(this)}></WorkList>
         <NoteList
-          key={'idea' + this.props.id}
+          key={'noteList' + this.props.id}
           viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
