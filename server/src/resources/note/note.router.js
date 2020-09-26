@@ -31,7 +31,7 @@ router.route('/:id/idea/:ideaId').delete(reqRemoveIdeaFromNote)
 
 router.route('/:id/pile').put(reqAddPile)
 router.route('/:id/pile/create').put(reqAddNewPile)
-router.route('/:id/pile/:pileid').delete(reqRemoveIdeaFromNote)
+// TODO: router.route('/:id/pile/:pileid').delete(reqRemoveIdeaFromNote)
 
 router.route('/:id/work').put(reqAddWork)
 router.route('/:id/work/create').put(reqAddNewWork)

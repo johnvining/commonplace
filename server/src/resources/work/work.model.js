@@ -10,7 +10,8 @@ const workSchema = new mongoose.Schema(
       ref: 'author'
     },
     url: String,
-    year: Number
+    year: Number,
+    piles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'pile' }]
   },
   { timestamps: true }
 )

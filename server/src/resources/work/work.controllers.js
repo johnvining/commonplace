@@ -1,5 +1,6 @@
 import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
+import Pile from '../pile/pile.model.js'
 import { createAuthor } from '../auth/auth.controllers.js'
 import { removeWorkFromNote } from '../note/note.controllers.js'
 import { crudControllers } from '../../utils/crud.js'
@@ -95,6 +96,27 @@ export const reqDeleteWork = async (req, res) => {
   }
 }
 
+export const reqAddPile = async (req, res) => {
+  try {
+    const docs = await addPileToID(req.params.id, req.body.id)
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqAddNewPile = async (req, res) => {
+  try {
+    const newPile = await Pile.create({ name: req.body.name })
+    const docs = await addPileToID(req.params.id, newPile._id)
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 // Direct database
 export const createWork = async function(name) {
   return await Work.create({ name: name })
@@ -161,6 +183,17 @@ export const deleteWork = async function(id) {
 
   await Promise.all(deletionPromises)
   await Work.findOneAndDelete({ _id: id })
+}
+
+export const addPileToID = async (workId, pileID) => {
+  return await Work.findOneAndUpdate(
+    { _id: workId },
+    { $addToSet: { piles: pileID } },
+    { new: true }
+  )
+    .populate('piles')
+    .lean()
+    .exec()
 }
 
 export default crudControllers(Work)

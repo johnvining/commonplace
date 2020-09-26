@@ -65,10 +65,7 @@ export const reqAddPile = async (req, res) => {
 
 export const reqAddNewPile = async (req, res) => {
   try {
-    console.log('ok')
-    // TODO: Udpate create
     const newPile = await Pile.create({ name: req.body.name })
-    console.log(newPile)
     const docs = await addPileToID(req.params.id, newPile._id)
     res.status(200).json({ data: docs })
   } catch (e) {
