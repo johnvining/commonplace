@@ -1,5 +1,6 @@
 import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
+import { crudControllers } from '../../utils/crud.js'
 import { removeIdeaFromNote } from '../note/note.controllers'
 
 export const getNotesFromIdea = async (req, res) => {
@@ -15,17 +16,8 @@ export const getNotesFromIdea = async (req, res) => {
   }
 }
 
-export const getAutoComplete = async (req, res) => {
-  try {
-    const doc = await findIdeasByString(req.body.string)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+export const findIdeasByString = async function(str) {
+  return await Idea.find({ name: new RegExp(str, 'i') }).exec()
 }
 
 export const getIdeasByStringWithNotes = async (req, res) => {
@@ -42,6 +34,7 @@ export const getIdeasByStringWithNotes = async (req, res) => {
         Note.find({ ideas: doc[i]._id })
           .populate('author')
           .populate('ideas')
+          .populate('piles')
           .populate({
             path: 'work',
             populate: {
@@ -111,10 +104,6 @@ export const createIdea = async function(name) {
   return await Idea.create({ name: name })
 }
 
-export const findIdeasByString = async function(str) {
-  return await Idea.find({ name: new RegExp(str, 'i') }).exec()
-}
-
 export const getIdeaInfo = async function(ideaId) {
   return await Idea.findOne({ _id: ideaId }).exec()
 }
@@ -144,6 +133,7 @@ export const getNotesForIdea = async function(ideaId, slim = false) {
     return Note.find({ ideas: ideaId })
       .populate('author')
       .populate('ideas')
+      .populate('piles')
       .populate({
         path: 'work',
         populate: {
@@ -165,3 +155,5 @@ export const deleteIdea = async function(ideaId) {
   await Promise.all(deletionPromises)
   await Idea.findOneAndDelete({ _id: ideaId })
 }
+
+export default crudControllers(Idea)

@@ -2,6 +2,7 @@ import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { removeAuthorFromNote } from '../note/note.controllers.js'
+import { crudControllers } from '../../utils/crud.js'
 
 export const getAuthorDetails = async (req, res) => {
   try {
@@ -116,6 +117,7 @@ export const getNotesForAuthor = async function(authId, slim = false) {
       .sort({ updatedAt: -1 })
       .populate('author')
       .populate('ideas')
+      .populate('piles')
       .populate({
         path: 'work',
         populate: {
@@ -137,3 +139,5 @@ export const deleteAuthor = async function(id) {
   await Promise.all(deletionPromises)
   await Auth.findOneAndDelete({ _id: id })
 }
+
+export default crudControllers(Auth)

@@ -6,9 +6,14 @@ export async function deleteNote(id) {
   return axios.delete(url_api + `note/${id}`)
 }
 
-export async function createTopicAndAssign(ideaName, noteId) {
-  const data = { newTopic: ideaName }
+export async function createIdeaAndAddToNote(ideaName, noteId) {
+  const data = { name: ideaName }
   return axios.put(url_api + `note/${noteId}/idea/create`, data)
+}
+
+export async function createPileAndAddToNote(pileName, noteId) {
+  const data = { name: pileName }
+  return axios.put(url_api + `note/${noteId}/pile/create`, data)
 }
 
 export async function getNoteInfo(noteId) {
@@ -55,6 +60,10 @@ export async function getNotesForIdea(ideaId) {
 
 export async function getIdeaInfo(ideaId) {
   return axios.get(url_api + `idea/${ideaId}`)
+}
+
+export async function getPileInfo(pileId) {
+  return axios.get(url_api + `pile/${pileId}`)
 }
 
 export async function getNotesForWork(workId) {
@@ -111,8 +120,13 @@ export async function getAuthorInfo(authorId) {
 }
 
 export async function addIdeaToNote(ideaId, noteId) {
-  const data = { newTopic: ideaId }
+  const data = { id: ideaId }
   return axios.put(url_api + `note/${noteId}/idea`, data)
+}
+
+export async function addPileToNote(pileId, noteId) {
+  const data = { id: pileId }
+  return axios.put(url_api + `note/${noteId}/pile`, data)
 }
 
 export async function addAuthorToNote(authorId, noteId) {

@@ -1,17 +1,21 @@
 import { Router } from 'express'
-import * as controllers from './work.controllers'
+import controllers, {
+  reqGetNotesForWork,
+  reqGetWorkInfo,
+  reqUpdateWork,
+  reqCreateAndAddAuth,
+  reqDeleteWork,
+  reqCreateWork
+} from './work.controllers'
 
 const router = Router()
 
-router.route('/autocomplete').post(controllers.getAutoComplete)
-router.route('/:id/notes').get(controllers.reqGetNotesForWork)
-router.route('/:id').get(controllers.reqGetWorkInfo)
-router.route('/:id').put(controllers.reqUpdateWork)
-router.route('/:id/auth/create').put(controllers.reqCreateAndAddAuth)
-router.route('/:id/delete').post(controllers.reqDeleteWork)
-router.route('/').post(controllers.reqCreateWork)
-
-//   .put(controllers.updateOne)
-//   .delete(controllers.removeOne)
+router.route('/autocomplete').post(controllers.autocompleteOnName)
+router.route('/:id/notes').get(reqGetNotesForWork)
+router.route('/:id').get(reqGetWorkInfo)
+router.route('/:id').put(reqUpdateWork)
+router.route('/:id/auth/create').put(reqCreateAndAddAuth)
+router.route('/:id/delete').post(reqDeleteWork)
+router.route('/').post(reqCreateWork)
 
 export default router

@@ -8,6 +8,7 @@ import noteRouter from './resources/note/note.router'
 import authRouter from './resources/auth/auth.router'
 import ideaRouter from './resources/idea/idea.router'
 import workRouter from './resources/work/work.router'
+import pileRouter from './resources/pile/pile.router'
 import fileUpload from 'express-fileupload'
 
 export const app = express()
@@ -29,6 +30,7 @@ app.use('/api/note', noteRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/idea', ideaRouter)
 app.use('/api/work', workRouter)
+app.use('/api/pile', pileRouter)
 
 export const start = async () => {
   try {

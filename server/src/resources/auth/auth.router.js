@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import {
+import controllers, {
   getAuthorDetails,
   getAutoComplete,
   getNotesFromAuthor,
@@ -12,6 +12,7 @@ const router = Router()
 
 router.route('/').post(reqCreateAuthor)
 router.route('/autocomplete').post(getAutoComplete)
+router.route('/autocomplete').post(controllers.autocompleteOnName)
 router.route('/:id/delete').post(reqDeleteAuthor)
 router.route('/:id/notes').get(getNotesFromAuthor)
 router.route('/:id/works').get(reqGetWorksForAuthor)

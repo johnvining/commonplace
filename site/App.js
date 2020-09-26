@@ -5,6 +5,7 @@ import Author from './Author'
 import Find from './Find'
 import Idea from './Idea'
 import NoteView from './NoteView'
+import Pile from './Pile'
 import RecentList from './RecentList'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
@@ -74,6 +75,7 @@ class App extends React.Component {
           <Find path="/find/:search" viewMode={this.state.viewMode} />
           <Idea path="/idea/:id" viewMode={this.state.viewMode} />
           <NoteView path="/note/:id" />
+          <Pile path="/pile/:id" viewMode={this.state.viewMode} />
           <RecentList path="/" viewMode={this.state.viewMode} />
           <Work path="/work/:id" viewMode={this.state.viewMode} />
         </Router>

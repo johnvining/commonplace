@@ -309,7 +309,7 @@ div.main {
     border: none;
     font-size: 18px;
     margin: 0px;
-    padding: 8px;
+    padding: 2px;
   }
 
   &.label {
@@ -344,6 +344,90 @@ div.main {
 
     &.edit:hover {
       background-color: $removal;
+    }
+  }
+
+  &.ul {
+    display: block;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  &.li {
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .option {
+    background-color: $option_blue;
+    border-radius: 2px;
+    border-radius: 4px;
+    border-style: none;
+    border-width: 0px;
+    color: black;
+    cursor: pointer;
+    font-size: 15px;
+    margin: 2px;
+    padding: 4px;
+    text-decoration: none;
+    font-family: $main_font;
+
+    &::after {
+      content: '? ';
+    }
+
+    &.new::before {
+      background-image: url($image_add_background);
+      background-size: 17px 17px;
+      display: inline-block;
+      width: 17px;
+      height: 15px;
+      content: '';
+    }
+  }
+}
+
+.pile {
+  &.container {
+    font-size: 15px;
+    background-color: transparent;
+    width: 60%;
+    border: none;
+    font-size: 18px;
+    margin: 0px;
+    padding: 2px;
+  }
+
+  &.label {
+    background-color: transparent;
+    border-radius: 4px;
+    border-radius: 4px;
+    border-style: solid;
+    border-color: white;
+    color: black;
+    font-size: 18px;
+    margin: 2px;
+    padding: 4px;
+    text-decoration: none;
+    font-family: $main_font;
+
+    &::before {
+      background-image: url($image_stack_background);
+      background-size: 15px 15px;
+      display: inline-block;
+      width: 16px;
+      height: 14px;
+      content: '';
+    }
+
+    &:focus {
+      @include note-edit-focus;
+    }
+
+    &:hover {
+      background-color: $selection_yellow;
+      cursor: pointer;
     }
   }
 

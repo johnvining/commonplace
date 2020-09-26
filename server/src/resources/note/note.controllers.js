@@ -1,23 +1,12 @@
 import Note from './note.model.js'
+import Pile from '../pile/pile.model.js'
 import { crudControllers } from '../../utils/crud.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 import config from '../../config'
 
-export const createNote = async function(title, author) {
-  return await Note.create({ title: title, author: author })
-}
-
-export const createNoteObj = async function(obj) {
-  return await Note.create(obj)
-}
-
-export const addAuthor = async function(id, author) {
-  return await Note.findOneAndUpdate({ _id: id }, { author: author })
-}
-
 // TODO: Standardize note-fetching so all note lists have the same fields populated #36
-export const getRecentNotes = async (req, res) => {
+export const reqGetRecentNotes = async (req, res) => {
   const pageSize = 30
   try {
     const docs = await Note.find({})
@@ -26,6 +15,7 @@ export const getRecentNotes = async (req, res) => {
       .limit(pageSize)
       .populate('author')
       .populate('ideas')
+      .populate('piles')
       .populate({
         path: 'work',
         populate: {
@@ -42,9 +32,9 @@ export const getRecentNotes = async (req, res) => {
   }
 }
 
-export const addTopic = async (req, res) => {
+export const reqAddIdea = async (req, res) => {
   try {
-    const docs = await addTopicToID(req.params.id, req.body.newTopic)
+    const docs = await addIdeaToID(req.params.id, req.body.id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -52,10 +42,34 @@ export const addTopic = async (req, res) => {
   }
 }
 
-export const addNewTopic = async (req, res) => {
+export const reqAddNewIdea = async (req, res) => {
   try {
-    const newTopic = await IdeaControllers.createIdea(req.body.newTopic)
-    const docs = await addTopicToID(req.params.id, newTopic._id)
+    const newIdea = await IdeaControllers.createIdea(req.body.name)
+    const docs = await addIdeaToID(req.params.id, newIdea._id)
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqAddPile = async (req, res) => {
+  try {
+    const docs = await addPileToID(req.params.id, req.body.id)
+    res.status(200).json({ data: docs })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqAddNewPile = async (req, res) => {
+  try {
+    console.log('ok')
+    // TODO: Udpate create
+    const newPile = await Pile.create({ name: req.body.name })
+    console.log(newPile)
+    const docs = await addPileToID(req.params.id, newPile._id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -76,7 +90,7 @@ export const reqUpdateNote = async (req, res) => {
   }
 }
 
-export const addWork = async (req, res) => {
+export const reqAddWork = async (req, res) => {
   try {
     const docs = await addWorkToID(req.params.id, req.body.newWork)
     res.status(200).json({ data: docs })
@@ -86,7 +100,7 @@ export const addWork = async (req, res) => {
   }
 }
 
-export const addNewWork = async (req, res) => {
+export const reqAddNewWork = async (req, res) => {
   try {
     const newWork = await WorkControllers.createWork(req.body.newWork)
     const docs = await addWorkToID(req.params.id, newWork._id)
@@ -166,38 +180,17 @@ export const reqRemoveIdeaFromNote = async (req, res) => {
   }
 }
 
-export const removeIdeaFromNote = async (noteId, ideaId) => {
-  return await Note.findOneAndUpdate(
-    { _id: noteId },
-    { $pull: { ideas: ideaId } },
-    { new: true }
-  )
-    .populate('ideas')
-    .lean()
-    .exec()
-}
-
 export const findNotesByString = async searchString => {
   return Note.find({ $text: { $search: '"' + searchString + '"' } })
     .populate('author')
     .populate('ideas')
+    .populate('piles')
     .populate({
       path: 'work',
       populate: {
         path: 'author'
       }
     })
-    .lean()
-    .exec()
-}
-
-export const addTopicToID = async (noteId, topicID) => {
-  return await Note.findOneAndUpdate(
-    { _id: noteId },
-    { $addToSet: { ideas: topicID } },
-    { new: true }
-  )
-    .populate('ideas')
     .lean()
     .exec()
 }
@@ -212,6 +205,7 @@ export const updateNote = async (noteId, updateObj) => {
   return await Note.findOneAndUpdate({ _id: noteId }, updateObj, { new: true })
     .populate('author')
     .populate('ideas')
+    .populate('piles')
     .populate({
       path: 'work',
       populate: {
@@ -222,12 +216,57 @@ export const updateNote = async (noteId, updateObj) => {
     .exec()
 }
 
+export const addIdeaToID = async (noteId, ideaID) => {
+  return await Note.findOneAndUpdate(
+    { _id: noteId },
+    { $addToSet: { ideas: ideaID } },
+    { new: true }
+  )
+    .populate('ideas')
+    .lean()
+    .exec()
+}
+
+export const addPileToID = async (noteId, pileID) => {
+  return await Note.findOneAndUpdate(
+    { _id: noteId },
+    { $addToSet: { piles: pileID } },
+    { new: true }
+  )
+    .populate('piles')
+    .lean()
+    .exec()
+}
+
+export const removeIdeaFromNote = async (noteId, ideaId) => {
+  return await Note.findOneAndUpdate(
+    { _id: noteId },
+    { $pull: { ideas: ideaId } },
+    { new: true }
+  )
+    .populate('ideas')
+    .lean()
+    .exec()
+}
+
 export const removeWorkFromNote = async noteId => {
   return await Note.findOneAndUpdate({ _id: noteId }, { work: null })
 }
 
 export const removeAuthorFromNote = async noteId => {
   return await Note.findOneAndUpdate({ _id: noteId }, { author: null })
+}
+
+export const addAuthor = async function(id, author) {
+  return await Note.findOneAndUpdate({ _id: id }, { author: author })
+}
+
+export const createNote = async function(title, author) {
+  return await Note.create({ title: title, author: author })
+}
+
+export const createNoteObj = async function(obj) {
+  return await Note.create(obj)
 }
 
 export default crudControllers(Note)

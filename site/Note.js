@@ -8,6 +8,7 @@ import cross_circle from './icons/cross_circle.svg'
 import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
 import link from './icons/link.svg'
+import stack from './icons/stack.svg'
 import tags from './icons/tags.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
@@ -118,7 +119,7 @@ class Note extends React.Component {
     }
   }
 
-  handleNewTopic = ideaId => {
+  handleNewIdea = ideaId => {
     db.addIdeaToNote(ideaId, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
@@ -129,8 +130,8 @@ class Note extends React.Component {
   }
 
   // TODO: Clear entry after assignment
-  handleCreateTopicAndAssign = ideaName => {
-    db.createTopicAndAssign(ideaName, this.props.id)
+  handleCreateIdeaAndAddToNote = ideaName => {
+    db.createIdeaAndAddToNote(ideaName, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
@@ -292,6 +293,21 @@ class Note extends React.Component {
                 )}
               </div>
             )}
+            <div className={'container pile'}>
+              <div>
+                {note.piles?.map(pile => (
+                  <Link to={'/pile/' + pile._id} key={'pile-link' + pile._id}>
+                    <button
+                      className="pile label"
+                      key={'pile-button' + pile._id}
+                      tabIndex="-1"
+                    >
+                      {pile.name}
+                    </button>
+                  </Link>
+                ))}
+              </div>
+            </div>
             <div className="image-row">
               {this.props.note?.images?.map((image, index) => (
                 <div
@@ -481,8 +497,8 @@ class Note extends React.Component {
                     escape={() => {
                       this.setState({ addIdea: false })
                     }}
-                    onSelect={this.handleNewTopic}
-                    handleNewSelect={this.handleCreateTopicAndAssign}
+                    onSelect={this.handleNewIdea}
+                    handleNewSelect={this.handleCreateIdeaAndAddToNote}
                     getSuggestions={db.getIdeaSuggestions}
                   />
                 ) : (

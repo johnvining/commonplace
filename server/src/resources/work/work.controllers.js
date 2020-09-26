@@ -2,6 +2,7 @@ import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
 import { createAuthor } from '../auth/auth.controllers.js'
 import { removeWorkFromNote } from '../note/note.controllers.js'
+import { crudControllers } from '../../utils/crud.js'
 
 // Request response
 export const reqGetNotesForWork = async (req, res) => {
@@ -139,6 +140,7 @@ export const getNotesFromWork = async function(workID, slim = false) {
     return Note.find({ work: workID })
       .populate('author')
       .populate('ideas')
+      .populate('piles')
       .populate({
         path: 'work',
         populate: {
@@ -160,3 +162,5 @@ export const deleteWork = async function(id) {
   await Promise.all(deletionPromises)
   await Work.findOneAndDelete({ _id: id })
 }
+
+export default crudControllers(Work)

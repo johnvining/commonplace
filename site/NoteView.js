@@ -8,7 +8,7 @@ class NoteView extends React.Component {
     id: ''
   }
 
-  async getListOfOneNote() {
+  async getListOfOneNote(index, page) {
     let notesResponse
     await getNoteInfo(this.props.id)
       .then(response => {
