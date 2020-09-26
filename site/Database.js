@@ -187,3 +187,11 @@ export async function deleteAuthor(authorId) {
 export async function deleteIdea(ideaId) {
   return axios.post(url_api + 'idea/' + ideaId + '/delete')
 }
+
+export async function getNotesForPile(pileId) {
+  return axios.get(url_api + `pile/${pileId}/notes`)
+}
+
+export async function getWorksForPile(pileId) {
+  return axios.get(url_api + `pile/${pileId}/works`)
+}

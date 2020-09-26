@@ -1,6 +1,6 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getNotesForIdea, getPileInfo, deleteIdea } from './Database'
+import { getNotesForPile, getPileInfo, deleteIdea } from './Database'
 import { navigate } from '@reach/router'
 
 class Pile extends React.Component {
@@ -21,8 +21,9 @@ class Pile extends React.Component {
   fetchPileInfo(pileID) {
     getPileInfo(pileID)
       .then(response => {
+        console.log(response)
         this.setState({
-          pileName: response.data.data.name
+          pileName: response.data.data[0].name
         })
       })
       .catch(error => {
@@ -32,7 +33,7 @@ class Pile extends React.Component {
 
   async getListOfNotes() {
     let notesResponse
-    await getNotesForIdea(this.state.id)
+    await getNotesForPile(this.state.id)
       .then(response => {
         notesResponse = response
       })
@@ -77,11 +78,11 @@ class Pile extends React.Component {
           </div>
         </div>
 
-        {/* <NoteList
+        <NoteList
           key={'idea' + this.props.id}
           viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
-        /> */}
+        />
       </div>
     )
   }
