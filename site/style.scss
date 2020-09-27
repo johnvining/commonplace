@@ -812,3 +812,42 @@ a.grid-link {
     margin: 4px;
   }
 }
+
+.slim-inner-container {
+  margin: 4px;
+
+  .pile,
+  .idea {
+    border-radius: 4px;
+    border-radius: 4px;
+    border-style: none;
+    color: black;
+    font-size: 13px;
+    margin: 4px;
+    padding: 2px;
+    text-decoration: none;
+    font-family: $main_font;
+  }
+
+  .pile {
+    background-color: white;
+  }
+
+  .pile::before {
+    background-image: url($image_stack_background);
+    background-size: 13px 15px;
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    content: '';
+  }
+
+  .idea::before {
+    background-image: url($image_tags_background);
+    background-size: 13px 13px;
+    display: inline-block;
+    width: 14px;
+    height: 13px;
+    content: '';
+  }
+}

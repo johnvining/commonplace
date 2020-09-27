@@ -600,3 +600,33 @@ div .image-row {
   font-size: 14px;
   padding: 4px;
   margin: 4px; }
+
+.slim-inner-container {
+  margin: 4px; }
+  .slim-inner-container .pile,
+  .slim-inner-container .idea {
+    border-radius: 4px;
+    border-radius: 4px;
+    border-style: none;
+    color: black;
+    font-size: 13px;
+    margin: 4px;
+    padding: 2px;
+    text-decoration: none;
+    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .slim-inner-container .pile {
+    background-color: white; }
+  .slim-inner-container .pile::before {
+    background-image: url("/icons/stack.svg");
+    background-size: 13px 15px;
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    content: ''; }
+  .slim-inner-container .idea::before {
+    background-image: url("/icons/tags.svg");
+    background-size: 13px 13px;
+    display: inline-block;
+    width: 14px;
+    height: 13px;
+    content: ''; }

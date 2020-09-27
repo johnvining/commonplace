@@ -355,21 +355,16 @@ class NoteList extends React.Component {
                     />
                   ) : this.props.viewMode == constants.view_modes.SLIM ? (
                     <NoteSlim
-                      author={note.author?.name}
-                      index={index}
-                      selected={this.state.selected.includes(index)}
                       deleted={this.state.deleted.includes(index)}
-                      authorId={note.author?._id}
                       id={note._id}
+                      index={index}
                       inFocus={this.state.inFocus}
                       key={note._id}
-                      tabIndex={index + 1}
-                      text={note.text}
-                      title={note.title}
-                      work={note.work?.name}
-                      workId={note.work?._id}
                       markChecked={this.markChecked.bind(this)}
                       markShiftChecked={this.markShiftChecked.bind(this)}
+                      note={note}
+                      selected={this.state.selected.includes(index)}
+                      tabIndex={index + 1}
                     />
                   ) : (
                     <Note

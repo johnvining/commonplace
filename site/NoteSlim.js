@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from '@reach/router'
 import circle from './icons/circle.svg'
 import check_circle from './icons/check_circle.svg'
+import NoteAuthorSpan from './NoteAuthorSpan'
 
 class NoteSlim extends React.Component {
   state = {}
@@ -45,26 +46,35 @@ class NoteSlim extends React.Component {
         <div className="note-slim text">
           <Link to={'/note/' + this.props.id} className="note-slim">
             <div tabIndex={this.props.tabIndex} className="note-slim">
-              <b>
-                {this.props.title?.length ? (
-                  this.props.title
-                ) : (
-                  <em>No title</em>
-                )}
-              </b>
-              <br />
-              {this.props.text?.length ? this.props.text : <span>&#8212;</span>}
-              <br />
-              <div align="right">
-                {this.props.author?.length ? (
-                  this.props.author
-                ) : (
-                  <em>No author</em>
-                )}
-                {this.props.work?.length ? (
-                  <em>,&nbsp;&nbsp;{this.props.work}</em>
+              <div className="slim-inner-container">
+                <NoteAuthorSpan note={this.props.note} />
+                <>: </>
+                <b>
+                  {this.props.note.title?.length ? (
+                    this.props.note.title
+                  ) : (
+                    <em>no title</em>
+                  )}
+                </b>
+              </div>
+              <div className="slim-inner-container">
+                {this.props.note.text?.length ? (
+                  <>{this.props.note.text}</>
+                ) : null}
+                {this.props.note.work?.name.length ? (
+                  <em>&nbsp;&nbsp;{this.props.note.work.name}</em>
                 ) : null}
               </div>
+
+              <div className="slim-inner-container">
+                {this.props.note.piles?.map(pile => (
+                  <span className="pile">{pile.name}</span>
+                ))}
+                {this.props.note.ideas?.map(idea => (
+                  <span className="idea">{idea.name}</span>
+                ))}
+              </div>
+              <div></div>
             </div>
           </Link>
         </div>
