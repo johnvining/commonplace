@@ -52,6 +52,16 @@ export async function getWorkSuggestions(search, withCounts = false) {
   }
 }
 
+export async function getPileSuggestions(search, withCounts = false) {
+  const data = { string: search }
+  if (!withCounts) {
+    return axios.post(url_api + `pile/autocomplete`, data)
+  } else {
+    return null
+    // axios.post(url_api + `pile/autocomplete/with-counts`, data)
+  }
+}
+
 export async function createWork(workName) {
   const data = { name: workName }
   return axios.post(url_api + `work`, data)

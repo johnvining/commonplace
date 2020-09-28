@@ -18,6 +18,7 @@ class SearchBar extends React.Component {
     home: 'home',
     idea: 'idea',
     note: 'note',
+    pile: 'pile',
     work: 'work',
     slim: 'slim'
   }
@@ -41,6 +42,7 @@ class SearchBar extends React.Component {
           case this.modifiers.idea:
           case this.modifiers.find:
           case this.modifiers.note:
+          case this.modifiers.pile:
             this.setState({
               modifier: text,
               typedText: ''
@@ -116,6 +118,10 @@ class SearchBar extends React.Component {
         this.props.beforeNavigate()
         navigate('/work/' + id)
         return
+      case this.modifiers.pile:
+        this.props.beforeNavigate()
+        navigate('/pile/' + id)
+        return
     }
 
     return
@@ -129,6 +135,8 @@ class SearchBar extends React.Component {
         return db.getIdeaSuggestions(val)
       case this.modifiers.work:
         return db.getWorkSuggestions(val)
+      case this.modifiers.pile:
+        return db.getPileSuggestions(val)
     }
 
     return null
@@ -148,6 +156,7 @@ class SearchBar extends React.Component {
       case this.modifiers.auth:
       case this.modifiers.idea:
       case this.modifiers.work:
+      case this.modifiers.pile:
         return true
         break
     }
