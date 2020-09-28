@@ -47,23 +47,18 @@ class Find extends React.Component {
         <div align="right">
           <span className="title">{search}</span>
         </div>
-        Works:
-        <WorkList
-          key={'workList' + this.state.search}
-          getListOfWorks={this.getListOfWorks.bind(this)}
-        />
-        Ideas:
-        <IdeaList
-          key={'ideaList' + this.state.search}
-          getListOfIdeas={this.getListOfIdeas.bind(this)}
-        />
-        <br />
-        Authors:
         <AuthorList
           key={'authorList' + this.state.search}
           getListOfAuthors={this.getListOfAuthors.bind(this)}
         />
-        <br />
+        <WorkList
+          key={'workList' + this.state.search}
+          getListOfWorks={this.getListOfWorks.bind(this)}
+        />
+        <IdeaList
+          key={'ideaList' + this.state.search}
+          getListOfIdeas={this.getListOfIdeas.bind(this)}
+        />
         Notes:
         <NoteList
           key={'search-list-' + this.props.search}

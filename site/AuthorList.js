@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from '@reach/router'
+import author_img from './icons/author.svg'
 
 class AuthorList extends React.Component {
   state = {}
@@ -22,7 +23,11 @@ class AuthorList extends React.Component {
                   to={`/auth/${author._id}`}
                   key={'author-list-' + author._id}
                 >
-                  <div className="author">{author.name}</div>
+                  <div className="result-box">
+                    <img src={author_img} />
+
+                    {author.name}
+                  </div>
                 </Link>
               )
             })}

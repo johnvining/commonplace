@@ -775,3 +775,19 @@ a.grid-link {
     content: '';
   }
 }
+
+.result-box {
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  font-size: 18px;
+  display: flex;
+
+  &:hover {
+    background-color: $note_background_edit;
+  }
+}
+
+a {
+  text-decoration: none;
+}

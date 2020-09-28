@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from '@reach/router'
+import work_img from './icons/work.svg'
 
 class WorkList extends React.Component {
   state = {}
@@ -14,14 +15,15 @@ class WorkList extends React.Component {
   render() {
     return (
       <div className="work-list">
-        {this.state.works === undefined ? null : (
-          <div>
-            {this.state.works.map((work, index) => {
+        {this.state.works === undefined
+          ? null
+          : this.state.works.map((work, index) => {
               return (
                 <Link to={`/work/${work._id}`} key={'work-list-' + work._id}>
-                  <div className="work">
+                  <div className="result-box">
+                    <img src={work_img} />
                     {work.author?.name ? (
-                      <span>{work.author?.name}, </span>
+                      <span>{work.author?.name},&nbsp;</span>
                     ) : null}
                     <em>{work.name}</em>
                     {work.year ? (
@@ -31,8 +33,6 @@ class WorkList extends React.Component {
                 </Link>
               )
             })}
-          </div>
-        )}
       </div>
     )
   }

@@ -566,3 +566,15 @@ div .image-row {
     width: 14px;
     height: 13px;
     content: ''; }
+
+.result-box {
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  font-size: 18px;
+  display: flex; }
+  .result-box:hover {
+    background-color: lightblue; }
+
+a {
+  text-decoration: none; }

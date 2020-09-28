@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from '@reach/router'
+import idea_img from './icons/idea.svg'
 
 class IdeaList extends React.Component {
   state = {}
@@ -19,7 +20,10 @@ class IdeaList extends React.Component {
             {this.state.ideas.map((idea, index) => {
               return (
                 <Link to={`/idea/${idea._id}`} key={'idea-list-' + idea._id}>
-                  <div className="idea">{idea.name}</div>
+                  <div className="result-box">
+                    <img src={idea_img} />
+                    {idea.name}
+                  </div>
                 </Link>
               )
             })}
