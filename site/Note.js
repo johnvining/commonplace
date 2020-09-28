@@ -215,16 +215,13 @@ class Note extends React.Component {
     const note = this.props.note
 
     // Four possible states for a note:
-    var mode = { name: 'Normal', class: 'normal ' }
+    var mode = { name: 'Normal', class: 'note-full ' }
     if (edit) {
       mode.name = 'Editing'
-      mode.class = 'edit '
+      mode.class = 'note-full edit-note '
     } else if (addIdea) {
       mode.name = 'Editing Ideas'
-      mode.class = 'edit-idea '
-    } else if (inFocus) {
-      mode.name = 'In Focus'
-      mode.class = 'in-focus '
+      mode.class = 'note-full edit-idea '
     }
 
     if (deleted) {
@@ -233,7 +230,7 @@ class Note extends React.Component {
 
     return (
       <div
-        className={mode.class + 'note outer'}
+        className={mode.class + 'outer'}
         key={this.props.id}
         id={this.props.id}
         tabIndex={this.props.tabIndex}
@@ -255,60 +252,49 @@ class Note extends React.Component {
         ) : null}
 
         <div className={this.state.largeImage >= 0 ? 'half' : null}>
-          <div className={mode.class + 'bar'}>
-            {edit ? (
-              <div>
+          <div>
+            {/* Title and Year */}
+            <div className="note-full left-right-bar">
+              {edit ? (
                 <input
-                  className={'note title'}
-                  name="title"
+                  className="note-full title"
                   autoFocus
                   defaultValue={this.state.pendingTitle}
                   onChange={this.handleTitleChange}
                 ></input>
+              ) : (
+                <div className="note-full title">{this.state.pendingTitle}</div>
+              )}
+              {edit ? (
                 <input
-                  className={'note year'}
-                  name="year"
-                  autoFocus
+                  className="note-full year"
                   defaultValue={this.state.pendingYear}
                   onChange={this.handleYearChange}
                 ></input>
-              </div>
-            ) : !this.state.pendingTitle?.length ? (
-              <div className={'note title'}>
-                <em>Untitled Note</em>
-              </div>
-            ) : (
-              <div>
-                <div className={mode.class + 'title'}>
-                  {this.state.pendingTitle}
+              ) : this.state.pendingYear ? (
+                <div className="note-full year">{this.state.pendingYear}</div>
+              ) : (
+                <div className="note-full year imputed">
+                  {this.props.note.work?.year}
                 </div>
-                {this.state.pendingYear ? (
-                  <div className={mode.class + 'year'}>
-                    {this.state.pendingYear}
-                  </div>
-                ) : (
-                  <div className={mode.class + 'year imputed'}>
-                    {this.props.note.work?.year}
-                  </div>
-                )}
-              </div>
-            )}
-            <div className={'container pile'}>
-              <div>
-                {note.piles?.map(pile => (
-                  <Link to={'/pile/' + pile._id} key={'pile-link' + pile._id}>
-                    <button
-                      className="pile label"
-                      key={'pile-button' + pile._id}
-                      tabIndex="-1"
-                    >
-                      {pile.name}
-                    </button>
-                  </Link>
-                ))}
-              </div>
+              )}
             </div>
-            <div className="image-row">
+            {/* Piles */}
+            <div className="note-full pile container">
+              {note.piles?.map(pile => (
+                <Link to={'/pile/' + pile._id} key={'pile-link' + pile._id}>
+                  <button
+                    className="note-full pile label"
+                    key={'pile-button' + pile._id}
+                    tabIndex="-1"
+                  >
+                    {pile.name}
+                  </button>
+                </Link>
+              ))}
+            </div>
+            {/* Images */}
+            <div className="note-full image-row">
               {this.props.note?.images?.map((image, index) => (
                 <div
                   className={
@@ -333,110 +319,109 @@ class Note extends React.Component {
                 </div>
               ))}
             </div>
-            {edit ? (
-              <>
+            {/* Text area */}
+            <div name="text">
+              {edit ? (
                 <textarea
-                  className={'note text'}
+                  className={'note-full note-text'}
                   onChange={this.handleTextChange}
                   value={this.state.pendingText}
                 ></textarea>
-                <input
-                  className={'note citation'}
-                  name="citation"
-                  defaultValue={this.state.pendingCitation}
-                  onChange={this.handleCitationChange}
-                ></input>
-              </>
-            ) : (
-              <div className={'note text'}>{this.state.pendingText}</div>
-            )}
-          </div>
-          <div>
-            {edit ? (
-              <input
-                className={'note url'}
-                name="url"
-                defaultValue={this.state.pendingUrl}
-                onChange={this.handleUrlChange}
-              ></input>
-            ) : (
-              <span className={'note url'}>
-                <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
-              </span>
-            )}
-          </div>
-          <div>
-            {edit ? (
-              <Autocomplete
-                inputName={this.props.id + 'author'}
-                dontAutofocus={true}
-                className={'note author'}
-                defaultValue={this.state.pendingAuthorName}
-                escape={() => {
-                  this.setState({ edit: false })
-                }}
-                onSelect={this.handleUpdateAuthor}
-                getSuggestions={db.getAuthorSuggestions}
-                handleNewSelect={this.handleCreateAuthorAndAssign}
-              />
-            ) : (
-              <div>
-                {this.state.pendingAuthorName ? (
+              ) : (
+                <div className={'note-full note-text'}>
+                  {this.state.pendingText}
+                </div>
+              )}
+            </div>
+            {/* Author */}
+            <div name="author">
+              {edit ? (
+                <Autocomplete
+                  className={'note-full author'}
+                  defaultValue={this.state.pendingAuthorName}
+                  dontAutofocus={true}
+                  inputName={this.props.id + 'author'}
+                  escape={() => {
+                    this.setState({ edit: false })
+                  }}
+                  onSelect={this.handleUpdateAuthor}
+                  getSuggestions={db.getAuthorSuggestions}
+                  handleNewSelect={this.handleCreateAuthorAndAssign}
+                />
+              ) : (
+                <div>
+                  {this.state.pendingAuthorName ? (
+                    <Link
+                      to={'/auth/' + this.state.pendingAuthorId}
+                      className={'note-full author label'}
+                    >
+                      {this.state.pendingAuthorName}
+                    </Link>
+                  ) : (
+                    <Link
+                      to={'/auth/' + this.props.note?.work?.author?._id}
+                      className={'note-full author label imputed'}
+                    >
+                      {this.props.note?.work?.author?.name}
+                    </Link>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* Work */}
+            <div>
+              {edit ? (
+                <Autocomplete
+                  inputName={this.props.id + 'work'}
+                  dontAutofocus={true}
+                  className={'note-full work edit'}
+                  defaultValue={this.state.pendingWorkName}
+                  escape={() => {
+                    this.setState({ edit: false })
+                  }}
+                  onSelect={this.handleUpdateWork.bind(this)}
+                  getSuggestions={db.getWorkSuggestions}
+                  handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
+                />
+              ) : (
+                <div>
                   <Link
-                    to={'/auth/' + this.state.pendingAuthorId}
-                    className={'note author label'}
+                    to={'/work/' + this.state.pendingWorkId}
+                    className={'note work label'}
                   >
-                    {this.state.pendingAuthorName}
+                    {this.state.pendingWorkName}
                   </Link>
-                ) : (
-                  <Link
-                    to={'/auth/' + this.props.note?.work?.author?._id}
-                    className={'note author label imputed'}
-                  >
-                    {this.props.note?.work?.author?.name}
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
-          <div>
-            {edit ? (
-              <Autocomplete
-                inputName={this.props.id + 'work'}
-                dontAutofocus={true}
-                className={'note work'}
-                defaultValue={this.state.pendingWorkName}
-                escape={() => {
-                  this.setState({ edit: false })
-                }}
-                onSelect={this.handleUpdateWork.bind(this)}
-                getSuggestions={db.getWorkSuggestions}
-                handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
-              />
-            ) : (
-              <div>
-                <Link
-                  to={'/work/' + this.state.pendingWorkId}
-                  className={'note work label'}
-                >
-                  {this.state.pendingWorkName}
-                  {this.state.pendingCitation ? (
-                    <>, {this.state.pendingCitation}</>
+                  {this.state.pendingWorkId == note.work?._id ? (
+                    note.work?.url?.length ? (
+                      <a href={note.work?.url}>
+                        <img src={link} />
+                      </a>
+                    ) : null
                   ) : null}
-                </Link>
-                {this.state.pendingWorkId == note.work?._id ? (
-                  note.work?.url?.length ? (
-                    <a href={note.work?.url}>
-                      <img src={link} />
-                    </a>
-                  ) : null
-                ) : null}
+                </div>
+              )}
+            </div>
+            {/* URL and Citation */}
+            <div className={'left-right-bar'}>
+              {edit ? (
+                <input
+                  className={'note-full url'}
+                  name="url"
+                  defaultValue={this.state.pendingUrl}
+                  onChange={this.handleUrlChange}
+                ></input>
+              ) : (
+                <span className={'note-full url'}>
+                  <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
+                </span>
+              )}
+              <div className={'note-full citation'}>
+                {this.state.pendingCitation}
               </div>
-            )}
-          </div>
-          <div className={'note item-bottom'}>
-            <div className={'container idea'}>
-              <div>
+            </div>
+            {/* Ideas and Action bar */}
+            <div className={'left-right-bar'}>
+              <div className={'idea-container'}>
                 {note.ideas?.map(idea =>
                   this.state.addIdea ? (
                     <button
@@ -462,79 +447,80 @@ class Note extends React.Component {
                   )
                 )}
               </div>
-            </div>
-
-            {edit ? (
-              <div className={'container action-bar'}>
-                <div>
-                  <button
-                    className={'action-button'}
-                    onClick={this.handleAccept.bind(this)}
-                  >
-                    <img src={check_circle}></img>
-                  </button>
-
-                  <button
-                    className={'action-button'}
-                    onClick={this.handleCancel.bind(this)}
-                  >
-                    <img src={cross_circle}></img>
-                  </button>
-                </div>
-                <div className={'container action-bar'}>
-                  <ImageUploader
-                    onImageUpload={this.onImageUpload.bind(this)}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className={'container action-bar'}>
-                {this.state.addIdea ? (
-                  <Autocomplete
-                    inputName={this.props.id + 'idea'}
-                    className={'idea'}
-                    clearOnSelect={true}
-                    escape={() => {
-                      this.setState({ addIdea: false })
-                    }}
-                    onSelect={this.handleNewIdea}
-                    handleNewSelect={this.handleCreateIdeaAndAddToNote}
-                    getSuggestions={db.getIdeaSuggestions}
-                  />
-                ) : (
-                  // Neither editing whole note nor ideas
-                  <span>
-                    <button
-                      className={'action-button'}
-                      onClick={this.addIdea.bind(this)}
-                      tabIndex="-1"
-                    >
-                      <img src={tags}></img>
-                    </button>
-                    <Link to={'/note/' + this.props.id}>
-                      <button className={'action-button'} tabIndex="-1">
-                        <img src={document_image}></img>
+              <div className={'action-bar'}>
+                {edit ? (
+                  <>
+                    <div>
+                      <button
+                        className={'action-button'}
+                        onClick={this.handleAccept.bind(this)}
+                      >
+                        <img src={check_circle}></img>
                       </button>
-                    </Link>
 
-                    <button
-                      className={'action-button'}
-                      onClick={this.handleEdit.bind(this)}
-                      tabIndex="-1"
-                    >
-                      <img src={write}></img>
-                    </button>
-                    <button
-                      onClick={this.handleDelete.bind(this)}
-                      className={'action-button'}
-                      tabIndex="-1"
-                    >
-                      <img src={trash}></img>
-                    </button>
-                  </span>
+                      <button
+                        className={'action-button'}
+                        onClick={this.handleCancel.bind(this)}
+                      >
+                        <img src={cross_circle}></img>
+                      </button>
+                    </div>
+                    <div className={'container action-bar'}>
+                      <ImageUploader
+                        onImageUpload={this.onImageUpload.bind(this)}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {this.state.addIdea ? (
+                      <Autocomplete
+                        inputName={this.props.id + 'idea'}
+                        className={'idea'}
+                        clearOnSelect={true}
+                        escape={() => {
+                          this.setState({ addIdea: false })
+                        }}
+                        onSelect={this.handleNewIdea}
+                        handleNewSelect={this.handleCreateIdeaAndAddToNote}
+                        getSuggestions={db.getIdeaSuggestions}
+                      />
+                    ) : (
+                      // Neither editing whole note nor ideas
+                      <span>
+                        <button
+                          className={'action-button'}
+                          onClick={this.addIdea.bind(this)}
+                          tabIndex="-1"
+                        >
+                          <img src={tags}></img>
+                        </button>
+                        <Link to={'/note/' + this.props.id}>
+                          <button className={'action-button'} tabIndex="-1">
+                            <img src={document_image}></img>
+                          </button>
+                        </Link>
+
+                        <button
+                          className={'action-button'}
+                          onClick={this.handleEdit.bind(this)}
+                          tabIndex="-1"
+                        >
+                          <img src={write}></img>
+                        </button>
+                        <button
+                          onClick={this.handleDelete.bind(this)}
+                          className={'action-button'}
+                          tabIndex="-1"
+                        >
+                          <img src={trash}></img>
+                        </button>
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

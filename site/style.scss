@@ -91,71 +91,120 @@ div.main {
   }
 }
 
-.note {
+.note-full {
   &.outer {
-    // TODO: Fix problem with children
+    background-color: $note_background;
+
     border-radius: 4px;
-    border-style: solid;
-    border-width: 8px;
-    display: block;
-    margin: 4px auto;
-    max-width: 1200px;
-    padding: 10px;
+    margin: 4px;
+    padding: 4px;
 
-    &.normal,
+    &.edit-note,
     &.edit-idea {
-      background-color: $note_background;
-      border-color: $note_border;
-    }
-
-    &.edit {
-      border-color: $note_border_edit;
       background-color: $note_background_edit;
-    }
-
-    &.in-focus {
-      border-color: $note_border_in_focus;
-      background-color: $note_background_in_focus;
-    }
-
-    &:focus {
-      border-color: $note_border_focused;
-      outline: none;
     }
   }
 
-  .item-bottom {
-    align-items: top;
+  .left-right-bar {
     display: flex;
     justify-content: space-between;
     margin: 0px;
     padding: 0px;
-    min-height: 36px;
+  }
+
+  .idea-container,
+  .action-bar,
+  .title,
+  .year,
+  .citation,
+  .url {
+    font-size: 18px;
+    margin: 4px;
+    padding: 4px;
   }
 
   .title,
   .year,
-  .citation {
-    background-color: transparent;
+  .citation,
+  .url {
+    display: inline-block;
     font-family: $main_font;
-    font-size: 18px;
-    margin: auto;
-    padding: 8px;
-    width: 90%;
+    background-color: transparent;
     border-style: none;
     display: inline-block;
+  }
 
-    &:focus {
-      @include note-edit-focus;
+  .url {
+    font-family: $monospace;
+  }
+
+  .title,
+  .url {
+    width: 85%;
+  }
+
+  .year,
+  .citation {
+    width: 8%;
+    text-align: right;
+  }
+
+  .note-text,
+  .author,
+  .work {
+    margin: 4px;
+    padding: 4px;
+
+    &.imputed,
+    &.work {
+      font-style: italic;
     }
 
-    &.imputed {
-      color: $de-emphasized-text-color;
-      font-style: oblique;
+    &.label {
+      text-decoration: none;
     }
   }
 
-  .text {
+  .note-text,
+  .url {
+    font-size: 14px;
+  }
+
+  .pile {
+    &.container {
+      font-size: 15px;
+      background-color: transparent;
+      padding: 2px;
+    }
+
+    &.label {
+      border-radius: 4px;
+      border-style: solid;
+      border-color: white;
+      color: black;
+      font-size: 18px;
+      margin: 2px;
+      padding: 4px;
+      text-decoration: none;
+      font-family: $main_font;
+
+      &::before {
+        background-image: url($image_stack_background);
+        background-size: 15px 15px;
+        display: inline-block;
+        width: 16px;
+        height: 14px;
+        content: '';
+      }
+
+      &:hover {
+        background-color: $selection_yellow;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .note-text {
     background-color: transparent;
     border: none;
     box-sizing: border-box;
@@ -168,10 +217,6 @@ div.main {
     resize: none;
     width: 100%;
     white-space: pre-wrap;
-
-    &:focus {
-      @include note-edit-focus;
-    }
   }
 
   .author,
@@ -183,11 +228,17 @@ div.main {
       border: none;
       font-family: $main_font;
       font-size: 18px;
-      padding: 8px 0px 8px 8px;
+      padding: 4px 4px 4px 8px;
+      margin: 0px;
 
       &:focus {
         @include note-edit-focus;
       }
+    }
+
+    &.autocomplete {
+      margin: 0px;
+      padding: 0px;
     }
 
     &.ul {
@@ -202,12 +253,13 @@ div.main {
       padding: 0px;
     }
 
-    .option {
+    &.option {
       background: transparent;
+
       border: none;
       color: #393939;
       display: inline;
-      margin: 4px;
+      margin: 0px;
       padding: 4px;
       font-size: 18px;
       font-family: $main_font;
@@ -215,56 +267,8 @@ div.main {
       &::after {
         content: '? ';
       }
-
-      // TODO: Add plus sign for new items
-    }
-
-    &.imputed {
-      color: $de-emphasized-text-color;
-      font-style: oblique;
     }
   }
-
-  .year,
-  .citation {
-    width: 6%;
-    text-align: right;
-  }
-
-  a.author,
-  a.work {
-    text-decoration: none;
-  }
-
-  .work {
-    font-style: italic;
-  }
-
-  &.url {
-    font-family: $monospace;
-    border-style: none;
-    padding: 4px;
-    margin: 4px;
-    background-color: transparent;
-
-    a {
-      text-decoration: none;
-    }
-
-    &:focus {
-      @include note-edit-focus;
-    }
-  }
-}
-
-.noteEdit-author-label-option-new::before,
-.noteEdit-work-label-option-new::before {
-  background-image: url($image_add_background);
-  background-size: 16px 16px;
-  display: inline-block;
-  width: 15px;
-  height: 13px;
-  content: '';
 }
 
 .action-bar {
@@ -359,88 +363,8 @@ div.main {
     padding: 0px;
   }
 
-  .option {
-    background-color: $option_blue;
-    border-radius: 2px;
-    border-radius: 4px;
-    border-style: none;
-    border-width: 0px;
-    color: black;
-    cursor: pointer;
-    font-size: 15px;
-    margin: 2px;
-    padding: 4px;
-    text-decoration: none;
-    font-family: $main_font;
-
-    &::after {
-      content: '? ';
-    }
-
-    &.new::before {
-      background-image: url($image_add_background);
-      background-size: 17px 17px;
-      display: inline-block;
-      width: 17px;
-      height: 15px;
-      content: '';
-    }
-  }
-}
-
-.pile {
-  &.container {
-    font-size: 15px;
-    background-color: transparent;
-    width: 60%;
-    border: none;
-    font-size: 18px;
-    margin: 0px;
-    padding: 2px;
-  }
-
-  &.label {
-    background-color: transparent;
-    border-radius: 4px;
-    border-radius: 4px;
-    border-style: solid;
-    border-color: white;
-    color: black;
-    font-size: 18px;
-    margin: 2px;
-    padding: 4px;
-    text-decoration: none;
-    font-family: $main_font;
-
-    &::before {
-      background-image: url($image_stack_background);
-      background-size: 15px 15px;
-      display: inline-block;
-      width: 16px;
-      height: 14px;
-      content: '';
-    }
-
-    &:focus {
-      @include note-edit-focus;
-    }
-
-    &:hover {
-      background-color: $selection_yellow;
-      cursor: pointer;
-    }
-  }
-
-  &.ul {
-    display: block;
-    margin: 0px;
-    padding: 0px;
-  }
-
-  &.li {
-    display: inline;
-    margin: 0px;
-    padding: 0px;
+  &.autocomplete {
+    text-align: right;
   }
 
   .option {
@@ -758,7 +682,7 @@ a.grid-link {
     display: flex;
 
     &.selected {
-      background-color: $note_border_in_focus;
+      background-color: white;
     }
 
     &:hover {
@@ -801,7 +725,7 @@ a.grid-link {
     margin: 4px;
 
     &:hover {
-      background-color: $note_background_in_focus;
+      background-color: white;
       border-radius: 4px;
     }
   }

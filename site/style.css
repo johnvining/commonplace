@@ -60,56 +60,88 @@ div .top-bar {
     background: lightblue;
     cursor: pointer; }
 
-.note.outer {
+.note-full.outer {
+  background-color: #efefef;
   border-radius: 4px;
-  border-style: solid;
-  border-width: 8px;
-  display: block;
-  margin: 4px auto;
-  max-width: 1200px;
-  padding: 10px; }
-  .note.outer.normal, .note.outer.edit-idea {
-    background-color: #efefef;
-    border-color: white; }
-  .note.outer.edit {
-    border-color: lightblue;
-    background-color: #efefef; }
-  .note.outer.in-focus {
-    border-color: lightgrey;
-    background-color: #efefef; }
-  .note.outer:focus {
-    border-color: darkgrey;
-    outline: none; }
-.note .item-bottom {
-  align-items: top;
+  margin: 4px;
+  padding: 4px; }
+  .note-full.outer.edit-note, .note-full.outer.edit-idea {
+    background-color: lightblue; }
+.note-full .left-right-bar {
   display: flex;
   justify-content: space-between;
   margin: 0px;
-  padding: 0px;
-  min-height: 36px; }
-.note .title,
-.note .year,
-.note .citation {
-  background-color: transparent;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  padding: 0px; }
+.note-full .idea-container,
+.note-full .action-bar,
+.note-full .title,
+.note-full .year,
+.note-full .citation,
+.note-full .url {
   font-size: 18px;
-  margin: auto;
-  padding: 8px;
-  width: 90%;
+  margin: 4px;
+  padding: 4px; }
+.note-full .title,
+.note-full .year,
+.note-full .citation,
+.note-full .url {
+  display: inline-block;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  background-color: transparent;
   border-style: none;
   display: inline-block; }
-  .note .title:focus,
-  .note .year:focus,
-  .note .citation:focus {
-    outline: none;
-    background-color: white;
-    border-radius: 4px; }
-  .note .title.imputed,
-  .note .year.imputed,
-  .note .citation.imputed {
-    color: #404040;
-    font-style: oblique; }
-.note .text {
+.note-full .url {
+  font-family: "Courier New", Courier, monospace; }
+.note-full .title,
+.note-full .url {
+  width: 85%; }
+.note-full .year,
+.note-full .citation {
+  width: 8%;
+  text-align: right; }
+.note-full .note-text,
+.note-full .author,
+.note-full .work {
+  margin: 4px;
+  padding: 4px; }
+  .note-full .note-text.imputed, .note-full .note-text.work,
+  .note-full .author.imputed,
+  .note-full .author.work,
+  .note-full .work.imputed,
+  .note-full .work.work {
+    font-style: italic; }
+  .note-full .note-text.label,
+  .note-full .author.label,
+  .note-full .work.label {
+    text-decoration: none; }
+.note-full .note-text,
+.note-full .url {
+  font-size: 14px; }
+.note-full .pile.container {
+  font-size: 15px;
+  background-color: transparent;
+  padding: 2px; }
+.note-full .pile.label {
+  border-radius: 4px;
+  border-style: solid;
+  border-color: white;
+  color: black;
+  font-size: 18px;
+  margin: 2px;
+  padding: 4px;
+  text-decoration: none;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .note-full .pile.label::before {
+    background-image: url("/icons/stack.svg");
+    background-size: 15px 15px;
+    display: inline-block;
+    width: 16px;
+    height: 14px;
+    content: ''; }
+  .note-full .pile.label:hover {
+    background-color: lightgoldenrodyellow;
+    cursor: pointer; }
+.note-full .note-text {
   background-color: transparent;
   border: none;
   box-sizing: border-box;
@@ -122,81 +154,48 @@ div .top-bar {
   resize: none;
   width: 100%;
   white-space: pre-wrap; }
-  .note .text:focus {
-    outline: none;
-    background-color: white;
-    border-radius: 4px; }
-.note .author.label,
-.note .work.label {
+.note-full .author.label,
+.note-full .work.label {
   background-color: transparent;
   display: inline-block;
   width: 50%;
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
-  padding: 8px 0px 8px 8px; }
-  .note .author.label:focus,
-  .note .work.label:focus {
+  padding: 4px 4px 4px 8px;
+  margin: 0px; }
+  .note-full .author.label:focus,
+  .note-full .work.label:focus {
     outline: none;
     background-color: white;
     border-radius: 4px; }
-.note .author.ul,
-.note .work.ul {
+.note-full .author.autocomplete,
+.note-full .work.autocomplete {
+  margin: 0px;
+  padding: 0px; }
+.note-full .author.ul,
+.note-full .work.ul {
   display: inline;
   margin: 0px;
   padding: 0px; }
-.note .author.li,
-.note .work.li {
+.note-full .author.li,
+.note-full .work.li {
   display: inline;
   margin: 0px;
   padding: 0px; }
-.note .author .option,
-.note .work .option {
+.note-full .author.option,
+.note-full .work.option {
   background: transparent;
   border: none;
   color: #393939;
   display: inline;
-  margin: 4px;
+  margin: 0px;
   padding: 4px;
   font-size: 18px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .note .author .option::after,
-  .note .work .option::after {
+  .note-full .author.option::after,
+  .note-full .work.option::after {
     content: '? '; }
-.note .author.imputed,
-.note .work.imputed {
-  color: #404040;
-  font-style: oblique; }
-.note .year,
-.note .citation {
-  width: 6%;
-  text-align: right; }
-.note a.author,
-.note a.work {
-  text-decoration: none; }
-.note .work {
-  font-style: italic; }
-.note.url {
-  font-family: "Courier New", Courier, monospace;
-  border-style: none;
-  padding: 4px;
-  margin: 4px;
-  background-color: transparent; }
-  .note.url a {
-    text-decoration: none; }
-  .note.url:focus {
-    outline: none;
-    background-color: white;
-    border-radius: 4px; }
-
-.noteEdit-author-label-option-new::before,
-.noteEdit-work-label-option-new::before {
-  background-image: url("/icons/plus.svg");
-  background-size: 16px 16px;
-  display: inline-block;
-  width: 15px;
-  height: 13px;
-  content: ''; }
 
 .action-bar.container {
   font-size: 15px;
@@ -266,6 +265,8 @@ div .top-bar {
   display: inline;
   margin: 0px;
   padding: 0px; }
+.idea.autocomplete {
+  text-align: right; }
 .idea .option {
   background-color: #efffff;
   border-radius: 2px;
@@ -282,71 +283,6 @@ div .top-bar {
   .idea .option::after {
     content: '? '; }
   .idea .option.new::before {
-    background-image: url("/icons/plus.svg");
-    background-size: 17px 17px;
-    display: inline-block;
-    width: 17px;
-    height: 15px;
-    content: ''; }
-
-.pile.container {
-  font-size: 15px;
-  background-color: transparent;
-  width: 60%;
-  border: none;
-  font-size: 18px;
-  margin: 0px;
-  padding: 2px; }
-.pile.label {
-  background-color: transparent;
-  border-radius: 4px;
-  border-radius: 4px;
-  border-style: solid;
-  border-color: white;
-  color: black;
-  font-size: 18px;
-  margin: 2px;
-  padding: 4px;
-  text-decoration: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .pile.label::before {
-    background-image: url("/icons/stack.svg");
-    background-size: 15px 15px;
-    display: inline-block;
-    width: 16px;
-    height: 14px;
-    content: ''; }
-  .pile.label:focus {
-    outline: none;
-    background-color: white;
-    border-radius: 4px; }
-  .pile.label:hover {
-    background-color: lightgoldenrodyellow;
-    cursor: pointer; }
-.pile.ul {
-  display: block;
-  margin: 0px;
-  padding: 0px; }
-.pile.li {
-  display: inline;
-  margin: 0px;
-  padding: 0px; }
-.pile .option {
-  background-color: #efffff;
-  border-radius: 2px;
-  border-radius: 4px;
-  border-style: none;
-  border-width: 0px;
-  color: black;
-  cursor: pointer;
-  font-size: 15px;
-  margin: 2px;
-  padding: 4px;
-  text-decoration: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .pile .option::after {
-    content: '? '; }
-  .pile .option.new::before {
     background-image: url("/icons/plus.svg");
     background-size: 17px 17px;
     display: inline-block;
@@ -565,7 +501,7 @@ div .image-row {
   vertical-align: center;
   display: flex; }
   .image-row.image-frame.selected {
-    background-color: lightgrey; }
+    background-color: white; }
   .image-row.image-frame:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
@@ -594,7 +530,7 @@ div .image-row {
   padding: 4px;
   margin: 4px; }
   .work-list .work:hover {
-    background-color: #efefef;
+    background-color: white;
     border-radius: 4px; }
 .work-list .date {
   font-size: 14px;
