@@ -41,6 +41,54 @@ export const reqGetWorksForPile = async (req, res) => {
   }
 }
 
+export const reqGetAutoCompleteWithCounts = async (req, res) => {
+  return reqGetAutoComplete(req, res, true)
+}
+
+export const reqGetAutoComplete = async (req, res, withCounts = false) => {
+  try {
+    const doc = await filePilesByString(req.body.string, withCounts)
+    if (!doc) {
+      return res.status(400).end()
+    }
+    res.status(200).json({ data: doc })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+// TODO: Duplicative of whats in work.controllers.js
+export const filePilesByString = async function(string, withCounts) {
+  let piles = await Pile.find({ name: new RegExp(string, 'i') })
+    .lean()
+    .exec()
+  if (!withCounts) {
+    return piles
+  } else {
+    let notePromises = [],
+      workPromises = []
+    piles.map(pile => {
+      notePromises.push(Note.find({ piles: pile._id }).countDocuments())
+      workPromises.push(Work.find({ piles: pile._id }).countDocuments())
+    })
+
+    let noteFiler = Promise.all(notePromises).then(result => {
+      result.map((val, idx) => {
+        piles[idx] = { ...piles[idx], note_count: val }
+      })
+    })
+    let workFiler = Promise.all(workPromises).then(result => {
+      result.map((val, idx) => {
+        piles[idx] = { ...piles[idx], work_count: val }
+      })
+    })
+
+    await Promise.all([noteFiler, workFiler])
+    return piles
+  }
+}
+
 export const findOrCreatePile = async name => {
   return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
 }

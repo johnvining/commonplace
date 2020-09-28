@@ -4,11 +4,13 @@ import {
   searchNotes,
   getIdeaSuggestions,
   getWorkSuggestions,
-  getAuthorSuggestions
+  getAuthorSuggestions,
+  getPileSuggestions
 } from './Database'
 import WorkList from './WorkList'
 import IdeaList from './IdeaList'
 import AuthorList from './AuthorList'
+import PileList from './PileList'
 import * as constants from './constants'
 
 class Find extends React.Component {
@@ -30,6 +32,10 @@ class Find extends React.Component {
     return await getAuthorSuggestions(this.state.search, true)
   }
 
+  async getListOfPiles() {
+    return await getPileSuggestions(this.state.search, false)
+  }
+
   static getDerivedStateFromProps(nextProps, prevState) {
     if (nextProps.search !== prevState.search) {
       return { search: nextProps.search }
@@ -47,6 +53,10 @@ class Find extends React.Component {
         <div align="right">
           <span className="title">{search}</span>
         </div>
+        <PileList
+          key={'pileList' + this.state.search}
+          getListOfPiles={this.getListOfPiles.bind(this)}
+        />
         <AuthorList
           key={'authorList' + this.state.search}
           getListOfAuthors={this.getListOfAuthors.bind(this)}
@@ -59,7 +69,6 @@ class Find extends React.Component {
           key={'ideaList' + this.state.search}
           getListOfIdeas={this.getListOfIdeas.bind(this)}
         />
-
         <NoteList
           key={'search-list-' + this.props.search}
           notes={notes}

@@ -99,7 +99,7 @@ class Pile extends React.Component {
         <WorkList
           key={'workList' + this.props.id}
           getListOfWorks={this.getListOfWorks.bind(this)}
-        ></WorkList>
+        />
         <NoteList
           key={'noteList' + this.props.id}
           viewMode={constants.view_modes.RESULT}

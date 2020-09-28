@@ -57,8 +57,7 @@ export async function getPileSuggestions(search, withCounts = false) {
   if (!withCounts) {
     return axios.post(url_api + `pile/autocomplete`, data)
   } else {
-    return null
-    // axios.post(url_api + `pile/autocomplete/with-counts`, data)
+    return axios.post(url_api + `pile/autocomplete/with-counts`, data)
   }
 }
 

@@ -1,12 +1,15 @@
 import { Router } from 'express'
 import controllers, {
   reqGetNotesForPile,
-  reqGetWorksForPile
+  reqGetWorksForPile,
+  reqGetAutoCompleteWithCounts,
+  reqGetAutoComplete
 } from './pile.controllers'
 
 const router = Router()
 
-router.route('/autocomplete').post(controllers.autocompleteOnName)
+router.route('/autocomplete/with-counts').post(reqGetAutoCompleteWithCounts)
+router.route('/autocomplete').post(reqGetAutoComplete)
 router.route('/').post(controllers.createOne)
 
 router.route('/:id/notes').get(reqGetNotesForPile)

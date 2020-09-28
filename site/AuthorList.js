@@ -31,20 +31,23 @@ class AuthorList extends React.Component {
 
                       {author.name}
                     </div>
-                    <div className="result-box content">
-                      {author.note_count ? (
-                        <>
-                          <img src={note_img} />
-                          {author.note_count}
-                        </>
-                      ) : null}
-                      {author.work_count ? (
-                        <>
-                          <img src={work_img} />
-                          {author.work_count}
-                        </>
-                      ) : null}
-                    </div>
+
+                    {author.note_count || author.note_count ? (
+                      <div className="result-box content">
+                        {author.note_count ? (
+                          <>
+                            <img src={note_img} />
+                            {author.note_count}
+                          </>
+                        ) : null}
+                        {author.work_count ? (
+                          <>
+                            <img src={work_img} />
+                            {author.work_count}
+                          </>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </div>
                 </Link>
               )
