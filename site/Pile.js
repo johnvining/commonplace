@@ -8,6 +8,7 @@ import {
   getWorksForPile
 } from './Database'
 import { navigate } from '@reach/router'
+import * as constants from './constants'
 
 class Pile extends React.Component {
   state = {
@@ -101,7 +102,7 @@ class Pile extends React.Component {
         ></WorkList>
         <NoteList
           key={'noteList' + this.props.id}
-          viewMode={this.props.viewMode}
+          viewMode={constants.view_modes.RESULT}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
       </div>

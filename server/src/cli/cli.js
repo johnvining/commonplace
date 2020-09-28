@@ -258,7 +258,9 @@ async function load() {
 
 function printLoadHelp(recordType) {
   if (recordType == 1)
-    console.log(' format -> Author,Title,Text,Work,URL,"idea1,idea2"')
+    console.log(
+      ' format -> Author,Title,Text,Work,URL,"idea1,idea2",image URL,"pile1,pile2"'
+    )
   else if (recordType == 2) console.log(' format -> Title,Author,Year,URL')
 }
 
@@ -285,7 +287,7 @@ async function idea(input) {
 
   if (context.type == 'note') {
     // TODO: Add the idea to the note
-    await NoteControllers.addTopicToID(context.item._id, idea._id)
+    await NoteControllers.addIdeaToID(context.item._id, idea._id)
   } else {
     setContext(usertext.context.idea, idea)
   }

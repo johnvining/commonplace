@@ -8,6 +8,7 @@ import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
+import * as PileControllers from '../resources/pile/pile.controllers.js'
 
 export async function importNoteCSV(filePath, recordType) {
   console.log('Importing notes from file ' + filePath)
@@ -73,6 +74,7 @@ function parseNote(csvLine) {
   obj.url = csvLine[4]
   obj.ideas = csvLine[5]?.split(',')
   obj.externalImageUrls = csvLine[6]?.split(',')
+  obj.piles = csvLine[7]?.split(',')
   // TODO: Year
   return obj
 }
@@ -124,19 +126,26 @@ async function importNote(importObject) {
   let workPromise = WorkControllers.findOrCreateWork(importObject.workName)
 
   var ideaPromises = []
-  for (let i = 0; i < importObject.ideas.length; i++) {
-    let ideaPromise = IdeaControllers.findOrCreateIdea(importObject.ideas[i])
-    ideaPromises.push(ideaPromise)
-  }
+  importObject.ideas.map(idea => {
+    ideaPromises.push(IdeaControllers.findOrCreateIdea(idea))
+  })
+
+  var pilePromises = []
+  importObject.piles.map(pile => {
+    console.log(pile)
+    pilePromises.push(PileControllers.findOrCreatePile(pile))
+  })
 
   let dataPromise = Promise.all([authorPromise, workPromise])
   let ideaPromise = Promise.all(ideaPromises)
-  let response = await Promise.all([dataPromise, ideaPromise])
+  let pilePromise = Promise.all(pilePromises)
+  let response = await Promise.all([dataPromise, ideaPromise, pilePromise])
 
   let newNote = {
     author: response[0][0]?._id,
     work: response[0][1]?._id,
     ideas: response[1].filter(x => x),
+    piles: response[2].filter(x => x),
     text: importObject.text,
     title: importObject.title,
     url: importObject.url

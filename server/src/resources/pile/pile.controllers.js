@@ -41,4 +41,8 @@ export const reqGetWorksForPile = async (req, res) => {
   }
 }
 
+export const findOrCreatePile = async name => {
+  return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
+}
+
 export default crudControllers(Pile)
