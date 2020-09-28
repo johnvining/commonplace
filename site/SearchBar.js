@@ -179,7 +179,7 @@ class SearchBar extends React.Component {
           <Autocomplete
             inputName="searchBar"
             className="search-bar"
-            defaultValue={typedText}
+            defaultValue={typedText || ''}
             onSelect={this.handleUpdate.bind(this)}
             getSuggestions={this.getSuggestions.bind(this)}
             handleNewSelect={this.handleCreate.bind(this)}

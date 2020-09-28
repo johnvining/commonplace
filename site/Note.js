@@ -334,7 +334,7 @@ class Note extends React.Component {
               {edit ? (
                 <Autocomplete
                   className={'note-full author'}
-                  defaultValue={this.state.pendingAuthorName}
+                  defaultValue={this.state.pendingAuthorName || ''}
                   dontAutofocus={true}
                   inputName={this.props.id + 'author'}
                   escape={() => {
@@ -371,7 +371,7 @@ class Note extends React.Component {
                   inputName={this.props.id + 'work'}
                   dontAutofocus={true}
                   className={'note-full work edit'}
-                  defaultValue={this.state.pendingWorkName}
+                  defaultValue={this.state.pendingWorkName || ''}
                   escape={() => {
                     this.setState({ edit: false })
                   }}
