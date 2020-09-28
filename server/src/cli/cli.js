@@ -65,9 +65,6 @@ connect()
         case usertext.command.note:
           await note(args)
           break
-        case usertext.command.text:
-          await text()
-          break
         case usertext.command.help:
           help(args)
           break
@@ -116,65 +113,10 @@ function writeContext() {
   return context_string
 }
 
-async function doList() {
-  let recent_notes = await NoteControllers.getTenMostRecentNotes()
 }
 
-// TODO: process.env + text editor
-async function text() {
-  if (context.type != usertext.note || context.item == null) {
-    console.log(usertext.no_note_selected)
-    return
-  }
-
-  if (context.item.text == '') {
-    console.log(usertext.no_text)
-  } else {
-    console.log('--')
-    console.log(context.item.text)
-    console.log('--')
-  }
-
-  let edit = prompt(usertext.prompt_edit + ' ')
-  if (edit != usertext.yes) {
-    return
-  }
-
-  // TODO Get the text editor stuff working
-  fs.writeFile('newfile.txt', 'LETS GO' + context.item.text, function(err) {
-    if (err) throw err
-    console.log('File is created successfully.')
-  })
-
-  var openInEditor = require('open-in-editor')
-  var editor = openInEditor.configure(
-    {
-      // options
-    },
-    function(err) {
-      console.error('Something went wrong: ' + err)
-    }
-  )
-
-  editor.open('newfile.txt').then(
-    function() {
-      console.log('Success!')
-    },
-    function(err) {
-      console.error('Something went wrong: ' + err)
-    }
-  )
-
-  let ready = prompt(usertext.prompt_done + ' ')
-
-  let val = fs.readFile('/etc/hosts', 'utf8', function(err, data) {
-    if (err) {
-      return console.log(err)
-    }
-    console.log(data)
-  })
-
-  console.log(val)
+async function doList() {
+  let recent_notes = await NoteControllers.getTenMostRecentNotes()
 }
 
 async function note(args) {
@@ -261,7 +203,8 @@ function printLoadHelp(recordType) {
     console.log(
       ' format -> Author,Title,Text,Work,URL,"idea1,idea2",image URL,"pile1,pile2"'
     )
-  else if (recordType == 2) console.log(' format -> Title,Author,Year,URL')
+  else if (recordType == 2)
+    console.log(' format -> Title,Author,Year,URL,"pile1,pile2"')
 }
 
 function getFilePath() {

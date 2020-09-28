@@ -177,6 +177,7 @@ function parseWork(csvLine) {
   obj.authorName = csvLine[1]
   obj.year = csvLine[2]
   obj.url = csvLine[3]
+  obj.piles = csvLine[4]?.split(',')
   // TODO: obj.ideas = csvLine[4].split(',')
   return obj
 }
@@ -184,7 +185,10 @@ function parseWork(csvLine) {
 async function importWork(importObject) {
   if (!importObject.title) return
 
-  let work = await WorkControllers.findOrCreateWork(importObject.title)
+  let pilePromises = []
+  importObject.piles.map(pile => {
+    pilePromises.push(PileControllers.findOrCreatePile(pile))
+  })
 
   // TODO: Support different update behaviors: Overwrite,Clear,FillIn
   let updateObject = {}
@@ -198,5 +202,11 @@ async function importWork(importObject) {
     updateObject.url = importObject.url
   }
 
+  updateObject.piles = []
+  await Promise.all(pilePromises).then(response => {
+    response.map(pile => updateObject.piles.push(pile))
+  })
+
+  let work = await WorkControllers.findOrCreateWork(importObject.title)
   await WorkControllers.updateWorkInfo(work._id, updateObject)
 }
