@@ -67,11 +67,15 @@ class NoteSlim extends React.Component {
               </div>
 
               <div className="slim-inner-container">
-                {this.props.note.piles?.map(pile => (
-                  <span className="pile">{pile.name}</span>
+                {this.props.note.piles?.map((pile, idx) => (
+                  <span className="pile" key={'pile-' + this.props.id + idx}>
+                    {pile.name}
+                  </span>
                 ))}
-                {this.props.note.ideas?.map(idea => (
-                  <span className="idea">{idea.name}</span>
+                {this.props.note.ideas?.map((idea, idx) => (
+                  <span className="idea" key={'idea-' + this.props.id + idx}>
+                    {idea.name}
+                  </span>
                 ))}
               </div>
               <div></div>
