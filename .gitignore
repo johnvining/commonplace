@@ -9,3 +9,4 @@
 /site/.sass-cache/
 /site/dist/
 /site/node_modules/
+server/src/config/prod-mine.js
