@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from '@reach/router'
 import NoteList from './NoteList'
 import {
   getWorkInfo,
@@ -34,6 +35,7 @@ class Work extends React.Component {
       .then(response => {
         this.setState({
           work: response.data.data.name,
+          piles: response.data.data.piles,
           authorName: response.data.data.author?.name,
           url: response.data.data.url,
           year: response.data.data.year
@@ -118,6 +120,14 @@ class Work extends React.Component {
     return (
       <div>
         <div className="top-right">
+          {/* Piles */}
+          <div className="pile container">
+            {this.state.piles?.map(pile => (
+              <Link to={'/pile/' + pile._id} key={'/pile/' + pile._id}>
+                <span className="pile label">{pile.name}</span>
+              </Link>
+            ))}
+          </div>
           <div>
             <span className="title">{this.state.work}</span>
           </div>

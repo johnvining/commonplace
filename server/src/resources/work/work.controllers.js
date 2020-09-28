@@ -151,6 +151,7 @@ export const createWork = async function(name) {
 export const getWorkInfo = async function(workId) {
   const results = await Work.findOne({ _id: workId })
     .populate('author')
+    .populate('piles')
     .lean()
     .exec()
   return results

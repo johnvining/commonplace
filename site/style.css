@@ -117,30 +117,6 @@ div .top-bar {
 .note-full .note-text,
 .note-full .url {
   font-size: 14px; }
-.note-full .pile.container {
-  font-size: 15px;
-  background-color: transparent;
-  padding: 2px; }
-.note-full .pile.label {
-  border-radius: 4px;
-  border-style: solid;
-  border-color: white;
-  color: black;
-  font-size: 18px;
-  margin: 2px;
-  padding: 4px;
-  text-decoration: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .note-full .pile.label::before {
-    background-image: url("/icons/stack.svg");
-    background-size: 15px 15px;
-    display: inline-block;
-    width: 16px;
-    height: 14px;
-    content: ''; }
-  .note-full .pile.label:hover {
-    background-color: lightgoldenrodyellow;
-    cursor: pointer; }
 .note-full .note-text {
   background-color: transparent;
   border: none;
@@ -289,6 +265,31 @@ div .top-bar {
     width: 17px;
     height: 15px;
     content: ''; }
+
+.pile.container {
+  font-size: 15px;
+  background-color: transparent;
+  padding: 2px; }
+.pile.label {
+  border-radius: 4px;
+  border-style: solid;
+  border-color: white;
+  color: black;
+  font-size: 18px;
+  margin: 2px;
+  padding: 4px;
+  text-decoration: none;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .pile.label::before {
+    background-image: url("/icons/stack.svg");
+    background-size: 15px 15px;
+    display: inline-block;
+    width: 16px;
+    height: 14px;
+    content: ''; }
+  .pile.label:hover {
+    background-color: lightgoldenrodyellow;
+    cursor: pointer; }
 
 .top-right {
   text-align: right; }
