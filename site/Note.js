@@ -211,16 +211,12 @@ class Note extends React.Component {
 
   render() {
     const { edit, id, addIdea, deleted } = this.state
-    const inFocus = this.props.id == this.props.inFocus
     const note = this.props.note
 
-    // Four possible states for a note:
-    var mode = { name: 'Normal', class: 'note-full ' }
+    var mode = { class: 'note-full ' }
     if (edit) {
-      mode.name = 'Editing'
       mode.class = 'note-full edit-note '
     } else if (addIdea) {
-      mode.name = 'Editing Ideas'
       mode.class = 'note-full edit-idea '
     }
 

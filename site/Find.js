@@ -7,6 +7,7 @@ import {
   getAuthorSuggestions
 } from './Database'
 import { Link } from '@reach/router'
+import WorkList from './WorkList'
 
 class Find extends React.Component {
   state = { search: '' }
@@ -23,15 +24,13 @@ class Find extends React.Component {
 
   fetchData(search) {
     const ideasFromTextSearch = getIdeaSuggestions(search, true)
-    const worksFromTextSearch = getWorkSuggestions(search)
     const authsFromTextSearch = getAuthorSuggestions(search)
 
-    Promise.all([ideasFromTextSearch, worksFromTextSearch, authsFromTextSearch])
+    Promise.all([ideasFromTextSearch, authsFromTextSearch])
       .then(response => {
         this.setState({
           ideas: response[0].data.data,
-          works: response[1].data.data,
-          authors: response[2].data.data
+          authors: response[1].data.data
         })
       })
       .catch(error => {
@@ -41,6 +40,10 @@ class Find extends React.Component {
 
   async getListOfNotes() {
     return await searchNotes(this.state.search)
+  }
+
+  async getListOfWorks() {
+    return await getWorkSuggestions(this.state.search)
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -61,14 +64,10 @@ class Find extends React.Component {
           <span className="title">{search}</span>
         </div>
         Works:
-        <ul className="search-ul">
-          {works?.map(work => (
-            <Link to={'/work/' + work._id} key={'work-' + work._id}>
-              <li className="search-li">{work.name}</li>
-            </Link>
-          ))}
-        </ul>
-        <br />
+        <WorkList
+          key={'workList' + this.props.id}
+          getListOfWorks={this.getListOfWorks.bind(this)}
+        ></WorkList>
         Ideas:
         <ul className="search-ul">
           {ideas?.map(idea => (

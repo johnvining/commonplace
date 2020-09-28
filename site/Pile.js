@@ -96,8 +96,9 @@ class Pile extends React.Component {
           </div>
         </div>
         <WorkList
-        key={'workList' + this.props.id}
-         getListOfWorks={this.getListOfWorks.bind(this)}></WorkList>
+          key={'workList' + this.props.id}
+          getListOfWorks={this.getListOfWorks.bind(this)}
+        ></WorkList>
         <NoteList
           key={'noteList' + this.props.id}
           viewMode={this.props.viewMode}

@@ -7,12 +7,13 @@ import controllers, {
   reqDeleteWork,
   reqCreateWork,
   reqAddPile,
-  reqAddNewPile
+  reqAddNewPile,
+  reqAutocompleteOnName
 } from './work.controllers'
 
 const router = Router()
 
-router.route('/autocomplete').post(controllers.autocompleteOnName)
+router.route('/autocomplete').post(reqAutocompleteOnName)
 router.route('/:id/notes').get(reqGetNotesForWork)
 router.route('/:id/auth/create').put(reqCreateAndAddAuth)
 router.route('/:id/delete').post(reqDeleteWork)
