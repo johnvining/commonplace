@@ -6,10 +6,10 @@ import {
   getWorkSuggestions,
   getAuthorSuggestions
 } from './Database'
-import { Link } from '@reach/router'
 import WorkList from './WorkList'
 import IdeaList from './IdeaList'
 import AuthorList from './AuthorList'
+import * as constants from './constants'
 
 class Find extends React.Component {
   state = { search: '' }
@@ -59,11 +59,11 @@ class Find extends React.Component {
           key={'ideaList' + this.state.search}
           getListOfIdeas={this.getListOfIdeas.bind(this)}
         />
-        Notes:
+
         <NoteList
           key={'search-list-' + this.props.search}
           notes={notes}
-          viewMode={this.props.viewMode}
+          viewMode={constants.view_modes.RESULT}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
       </div>

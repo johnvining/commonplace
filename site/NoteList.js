@@ -2,6 +2,7 @@ import React from 'react'
 import Note from './Note'
 import NoteSlim from './NoteSlim'
 import NoteGrid from './NoteGrid'
+import NoteResult from './NoteResult'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import * as constants from './constants'
@@ -236,10 +237,12 @@ class NoteList extends React.Component {
   }
 
   render() {
+    let showMultiselect =
+      this.props.viewMode == constants.view_modes.FULL ||
+      this.props.viewMode == constants.view_modes.RESULT
     return (
       <div className="multi-select">
-        {this.props.viewMode == constants.view_modes.FULL ? null : this.state
-            .selected.length ? (
+        {showMultiselect ? null : this.state.selected.length ? (
           <div>
             {this.state.addSomething ? (
               <Autocomplete
@@ -366,6 +369,8 @@ class NoteList extends React.Component {
                       selected={this.state.selected.includes(index)}
                       tabIndex={index + 1}
                     />
+                  ) : this.props.viewMode == constants.view_modes.RESULT ? (
+                    <NoteResult note={note} id={note._id} key={note._id} />
                   ) : (
                     <Note
                       note={note}

@@ -23,9 +23,9 @@ class WorkList extends React.Component {
                   <div className="result-box">
                     <img src={work_img} />
                     {work.author?.name ? (
-                      <span>{work.author?.name},&nbsp;</span>
+                      <>{work.author?.name} ,&nbsp;</>
                     ) : null}
-                    <em>{work.name}</em>
+                    {work.name}
                     {work.year ? (
                       <span className="date">{work.year}</span>
                     ) : null}
