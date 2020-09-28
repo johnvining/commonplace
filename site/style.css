@@ -571,8 +571,22 @@ div .image-row {
   padding: 8px;
   margin: 8px;
   border-radius: 4px;
-  font-size: 18px;
-  display: flex; }
+  font-size: 18px; }
+  .result-box.header {
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    align-items: flex-start; }
+  .result-box .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; }
+  .result-box.content {
+    display: block;
+    padding: 0px;
+    margin: 8px 10px 0px 16px;
+    display: flex;
+    align-items: flex-start; }
   .result-box:hover {
     background-color: lightblue; }
 

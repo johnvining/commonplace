@@ -16,11 +16,7 @@ export const getNotesFromIdea = async (req, res) => {
   }
 }
 
-export const findIdeasByString = async function(str) {
-  return await Idea.find({ name: new RegExp(str, 'i') }).exec()
-}
-
-export const getIdeasByStringWithNotes = async (req, res) => {
+export const reqGetIdeasByStringWithCounts = async (req, res) => {
   try {
     var doc = await findIdeasByString(req.body.string)
     if (!doc) {
@@ -60,6 +56,45 @@ export const getIdeasByStringWithNotes = async (req, res) => {
   } catch (e) {
     console.error(e)
     res.status(400).end()
+  }
+}
+
+export const getAutoCompleteWithCounts = async (req, res) => {
+  return await reqGetAutoComplete(req, res, true)
+}
+
+export const reqGetAutoComplete = async (req, res, withCounts = false) => {
+  try {
+    const doc = await findIdeasByString(req.body.string, withCounts)
+    if (!doc) {
+      return res.status(400).end()
+    }
+    res.status(200).json({ data: doc })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const findIdeasByString = async function(string, withCounts = false) {
+  let ideas = await Idea.find({ name: new RegExp(string, 'i') })
+    .lean()
+    .exec()
+  if (!withCounts) {
+    return ideas
+  } else {
+    let notePromises = []
+    ideas.map(idea => {
+      notePromises.push(Note.find({ ideas: idea._id }).countDocuments())
+    })
+
+    await Promise.all(notePromises).then(result => {
+      result.map((val, idx) => {
+        ideas[idx] = { ...ideas[idx], note_count: val }
+      })
+    })
+
+    return ideas
   }
 }
 

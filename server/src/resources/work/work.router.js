@@ -8,11 +8,13 @@ import controllers, {
   reqCreateWork,
   reqAddPile,
   reqAddNewPile,
-  reqAutocompleteOnName
+  reqAutocompleteOnName,
+  reqGetAutoCompleteWithCounts
 } from './work.controllers'
 
 const router = Router()
 
+router.route('/autocomplete/with-counts').post(reqGetAutoCompleteWithCounts)
 router.route('/autocomplete').post(reqAutocompleteOnName)
 router.route('/:id/notes').get(reqGetNotesForWork)
 router.route('/:id/auth/create').put(reqCreateAndAddAuth)

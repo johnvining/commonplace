@@ -11,8 +11,12 @@ class NoteResult extends React.Component {
         key={'note-list-' + this.props.note._id}
       >
         <div className="result-box">
-          <img src={note_img}></img>
-          <NoteAuthorSpan note={this.props.note} />: {this.props.note.title}
+          <div className="result-box header">
+            <img src={note_img}></img>
+            <span className="truncate">
+              <NoteAuthorSpan note={this.props.note} />: {this.props.note.title}
+            </span>
+          </div>
         </div>
       </Link>
     )

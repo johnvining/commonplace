@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from '@reach/router'
 import author_img from './icons/author.svg'
+import note_img from './icons/write.svg'
+import work_img from './icons/work.svg'
 
 class AuthorList extends React.Component {
   state = {}
@@ -24,9 +26,25 @@ class AuthorList extends React.Component {
                   key={'author-list-' + author._id}
                 >
                   <div className="result-box">
-                    <img src={author_img} />
+                    <div className="result-box header">
+                      <img src={author_img} />
 
-                    {author.name}
+                      {author.name}
+                    </div>
+                    <div className="result-box content">
+                      {author.note_count ? (
+                        <>
+                          <img src={note_img} />
+                          {author.note_count}
+                        </>
+                      ) : null}
+                      {author.work_count ? (
+                        <>
+                          <img src={work_img} />
+                          {author.work_count}
+                        </>
+                      ) : null}
+                    </div>
                   </div>
                 </Link>
               )

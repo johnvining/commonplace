@@ -3,6 +3,7 @@ import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { removeAuthorFromNote } from '../note/note.controllers.js'
 import { crudControllers } from '../../utils/crud.js'
+import { response } from 'express'
 
 export const getAuthorDetails = async (req, res) => {
   try {
@@ -32,9 +33,13 @@ export const getNotesFromAuthor = async (req, res) => {
   }
 }
 
-export const getAutoComplete = async (req, res) => {
+export const getAutoCompleteWithCounts = async (req, res) => {
+  return getAutoComplete(req, res, true)
+}
+
+export const getAutoComplete = async (req, res, withCounts = false) => {
   try {
-    const doc = await findAuthorsByString(req.body.string)
+    const doc = await findAuthorsByString(req.body.string, withCounts)
     if (!doc) {
       return res.status(400).end()
     }
@@ -44,7 +49,37 @@ export const getAutoComplete = async (req, res) => {
     res.status(400).end()
   }
 }
-// TODO: DRY
+
+export const findAuthorsByString = async function(str, withCounts) {
+  let authors = await Auth.find({ name: new RegExp(str, 'i') })
+    .lean()
+    .exec()
+  if (!withCounts) {
+    return authors
+  } else {
+    let notePromises = [],
+      workPromises = []
+    authors.map(author => {
+      notePromises.push(Note.find({ author: author._id }).countDocuments())
+      workPromises.push(Work.find({ author: author._id }).countDocuments())
+    })
+
+    let noteFiler = Promise.all(notePromises).then(result => {
+      result.map((val, idx) => {
+        authors[idx] = { ...authors[idx], note_count: val }
+      })
+    })
+    let workFiler = Promise.all(workPromises).then(result => {
+      result.map((val, idx) => {
+        authors[idx] = { ...authors[idx], work_count: val }
+      })
+    })
+
+    await Promise.all([noteFiler, workFiler])
+    return authors
+  }
+}
+
 export const reqCreateAuthor = async (req, res) => {
   try {
     const doc = await createAuthor(req.body.name)
@@ -81,13 +116,8 @@ export const reqDeleteAuthor = async (req, res) => {
   }
 }
 
-// Author
 export const createAuthor = async function(name) {
   return await Auth.create({ name: name })
-}
-
-export const findAuthorsByString = async function(str) {
-  return await Auth.find({ name: new RegExp(str, 'i') }).exec() // TODO when to use exec
 }
 
 export const findAuthorByString = async function(str) {

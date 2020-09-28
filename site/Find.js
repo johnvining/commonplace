@@ -19,7 +19,7 @@ class Find extends React.Component {
   }
 
   async getListOfWorks() {
-    return await getWorkSuggestions(this.state.search)
+    return await getWorkSuggestions(this.state.search, true)
   }
 
   async getListOfIdeas() {
@@ -27,7 +27,7 @@ class Find extends React.Component {
   }
 
   async getListOfAuthors() {
-    return await getAuthorSuggestions(this.state.search)
+    return await getAuthorSuggestions(this.state.search, true)
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {

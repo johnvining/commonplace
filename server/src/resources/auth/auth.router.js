@@ -1,18 +1,19 @@
 import { Router } from 'express'
-import controllers, {
+import {
   getAuthorDetails,
   getAutoComplete,
   getNotesFromAuthor,
   reqCreateAuthor,
   reqDeleteAuthor,
-  reqGetWorksForAuthor
+  reqGetWorksForAuthor,
+  getAutoCompleteWithCounts
 } from './auth.controllers'
 
 const router = Router()
 
 router.route('/').post(reqCreateAuthor)
+router.route('/autocomplete/with-counts').post(getAutoCompleteWithCounts)
 router.route('/autocomplete').post(getAutoComplete)
-router.route('/autocomplete').post(controllers.autocompleteOnName)
 router.route('/:id/delete').post(reqDeleteAuthor)
 router.route('/:id/notes').get(getNotesFromAuthor)
 router.route('/:id/works').get(reqGetWorksForAuthor)

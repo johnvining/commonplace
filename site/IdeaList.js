@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from '@reach/router'
 import idea_img from './icons/idea.svg'
+import note_img from './icons/write.svg'
 
 class IdeaList extends React.Component {
   state = {}
@@ -21,8 +22,16 @@ class IdeaList extends React.Component {
               return (
                 <Link to={`/idea/${idea._id}`} key={'idea-list-' + idea._id}>
                   <div className="result-box">
-                    <img src={idea_img} />
-                    {idea.name}
+                    <div className="result-box header">
+                      <img src={idea_img} />
+                      {idea.name}
+                    </div>
+                    {idea.note_count ? (
+                      <div className="result-box content">
+                        <img src={note_img} />
+                        {idea.note_count}
+                      </div>
+                    ) : null}
                   </div>
                 </Link>
               )

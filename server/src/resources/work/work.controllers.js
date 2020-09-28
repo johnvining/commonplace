@@ -19,19 +19,6 @@ export const reqGetNotesForWork = async (req, res) => {
   }
 }
 
-export const getAutoComplete = async (req, res) => {
-  try {
-    const doc = await findWorksByString(req.body.string)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-}
-
 export const reqGetWorkInfo = async (req, res) => {
   try {
     const doc = await getWorkInfo(req.params.id)
@@ -117,11 +104,13 @@ export const reqAddNewPile = async (req, res) => {
   }
 }
 
-export const reqAutocompleteOnName = async (req, res) => {
+export const reqGetAutoCompleteWithCounts = async (req, res) => {
+  return await reqAutocompleteOnName(req, res, true)
+}
+
+export const reqAutocompleteOnName = async (req, res, withCounts = false) => {
   try {
-    const doc = await Work.find({ name: new RegExp(req.body.string, 'i') })
-      .populate('author')
-      .exec()
+    const doc = await findWorksByString(req.body.string, withCounts)
     if (!doc) {
       return res.status(400).end()
     }
@@ -132,13 +121,31 @@ export const reqAutocompleteOnName = async (req, res) => {
   }
 }
 
-// Direct database
-export const createWork = async function(name) {
-  return await Work.create({ name: name })
+export const findWorksByString = async function(string, withCounts = false) {
+  let works = await Work.find({ name: new RegExp(string, 'i') })
+    .populate('author')
+    .lean()
+    .exec()
+  if (!withCounts) {
+    return works
+  } else {
+    let notePromises = []
+    works.map(work => {
+      notePromises.push(Note.find({ work: work._id }).countDocuments())
+    })
+
+    await Promise.all(notePromises).then(result => {
+      result.map((val, idx) => {
+        works[idx] = { ...works[idx], note_count: val }
+      })
+    })
+
+    return works
+  }
 }
 
-export const findWorksByString = async function(str) {
-  return await Work.find({ name: new RegExp(str, 'i') }).exec()
+export const createWork = async function(name) {
+  return await Work.create({ name: name })
 }
 
 export const getWorkInfo = async function(workId) {

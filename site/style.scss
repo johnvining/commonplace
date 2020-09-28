@@ -781,7 +781,27 @@ a.grid-link {
   margin: 8px;
   border-radius: 4px;
   font-size: 18px;
-  display: flex;
+
+  &.header {
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.content {
+    display: block;
+    padding: 0px;
+    margin: 8px 10px 0px 16px;
+    display: flex;
+    align-items: flex-start;
+  }
 
   &:hover {
     background-color: $note_background_edit;

@@ -24,24 +24,32 @@ export async function updateNoteInfo(noteId, params) {
   return axios.put(url_api + `note/${noteId}`, params)
 }
 
-export async function getIdeaSuggestions(search, withNotes) {
+export async function getIdeaSuggestions(search, withCounts = false) {
   const data = { string: search }
 
-  if (!withNotes) {
+  if (!withCounts) {
     return axios.post(url_api + `idea/autocomplete`, data)
   } else {
-    return axios.put(url_api + `idea/autocomplete/with-notes`, data)
+    return axios.post(url_api + `idea/autocomplete/with-counts`, data)
   }
 }
 
-export async function getAuthorSuggestions(search) {
+export async function getAuthorSuggestions(search, withCounts = false) {
   const data = { string: search }
-  return axios.post(url_api + `auth/autocomplete`, data)
+  if (!withCounts) {
+    return axios.post(url_api + `auth/autocomplete`, data)
+  } else {
+    return axios.post(url_api + `auth/autocomplete/with-counts`, data)
+  }
 }
 
-export async function getWorkSuggestions(search) {
+export async function getWorkSuggestions(search, withCounts = false) {
   const data = { string: search }
-  return axios.post(url_api + `work/autocomplete`, data)
+  if (!withCounts) {
+    return axios.post(url_api + `work/autocomplete`, data)
+  } else {
+    return axios.post(url_api + `work/autocomplete/with-counts`, data)
+  }
 }
 
 export async function createWork(workName) {

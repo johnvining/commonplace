@@ -1,17 +1,18 @@
 import { Router } from 'express'
-// import * as controllers from './idea.controllers'
-import controllers, {
-  getIdeasByStringWithNotes,
+import {
   reqDeleteIdea,
   getNotesFromIdea,
   reqGetIdeaInfo,
-  reqCreateIdea
+  reqCreateIdea,
+  getAutoCompleteWithCounts,
+  reqGetAutoComplete
 } from './idea.controllers'
 
 const router = Router()
 
-router.route('/autocomplete').post(controllers.autocompleteOnName)
-router.route('/autocomplete/with-notes').put(getIdeasByStringWithNotes)
+router.route('/autocomplete/with-counts').post(getAutoCompleteWithCounts)
+router.route('/autocomplete').post(reqGetAutoComplete)
+
 router.route('/:id/delete').post(reqDeleteIdea)
 router.route('/:id/notes').get(getNotesFromIdea)
 
