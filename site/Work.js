@@ -13,8 +13,6 @@ import {
   createPileAndAddToWork
 } from './Database'
 import Autocomplete from './Autocomplete'
-import FreeEntry from './FreeEntry'
-import link from './icons/link.svg'
 import { guessYearFromURL } from './utils'
 import { navigate } from '@reach/router'
 
@@ -46,6 +44,7 @@ class Work extends React.Component {
           pendingWorkTitle: response.data.data.name,
           piles: response.data.data.piles,
           pendingAuthorName: response.data.data.author?.name,
+          pendingAuthorId: response.data.data.author?._id,
           pendingUrl: response.data.data.url,
           pendingYear: response.data.data.year
         })
@@ -103,12 +102,13 @@ class Work extends React.Component {
   }
 
   async handleAcceptUpdates() {
-    const updateObject = {
+    var updateObject = {
       author: this.state.pendingAuthorId,
       year: this.state.pendingYear,
       url: this.state.pendingUrl,
       name: this.state.pendingWorkTitle
     }
+
     updateWorkInfo(this.props.id, updateObject)
     this.setState({ edit: false })
   }
@@ -123,6 +123,10 @@ class Work extends React.Component {
     createPileAndAddToWork(pileName, this.props.id).then(() => {
       this.fetchWorkInfo(this.props.id)
     })
+  }
+
+  async handleClearAuthor() {
+    this.setState({ pendingAuthorId: null, pendingAuthorName: '' })
   }
 
   render() {
@@ -167,7 +171,7 @@ class Work extends React.Component {
           <div className="work-page  form-container">
             {this.state.edit ? (
               <>
-                <label for="title" className="work-page form-label">
+                <label htmlFor="title" className="work-page form-label">
                   Title
                 </label>
                 <input
@@ -187,7 +191,7 @@ class Work extends React.Component {
           <div className="work-page  form-container">
             {this.state.edit ? (
               <>
-                <label for="work-author" className="work-page form-label">
+                <label htmlFor="work-author" className="work-page form-label">
                   Author
                 </label>
                 <Autocomplete
@@ -201,6 +205,7 @@ class Work extends React.Component {
                   onSelect={this.handleUpdateAuthor.bind(this)}
                   getSuggestions={getAuthorSuggestions}
                   handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
+                  onClearText={this.handleClearAuthor.bind(this)}
                 />
               </>
             ) : (
@@ -213,7 +218,7 @@ class Work extends React.Component {
           <div className="work-page  form-container">
             {this.state.edit ? (
               <>
-                <label for="url" className="work-page form-label">
+                <label htmlFor="url" className="work-page form-label">
                   URL
                 </label>
                 <input
@@ -233,7 +238,7 @@ class Work extends React.Component {
           <div className="work-page  form-container">
             {this.state.edit ? (
               <>
-                <label for="year" className="work-page form-label">
+                <label htmlFor="year" className="work-page form-label">
                   Year
                 </label>
                 <input

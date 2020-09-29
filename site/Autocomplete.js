@@ -40,7 +40,10 @@ class Autocomplete extends React.Component {
   handleTypingChange = val => {
     this.setState({ hideResults: false })
     this.setState({ currentTypedText: val.target.value }, () => {
-      if (this.state.currentTypedText.length < 3) {
+      if (!this.state.currentTypedText) {
+        if (this.props.onClearText) this.props.onClearText()
+        return
+      } else if (this.state.currentTypedText.length < 3) {
         this.state.responses = []
         return
       }
