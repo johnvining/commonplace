@@ -221,7 +221,6 @@ div.main {
 
     &.option {
       background: transparent;
-
       border: none;
       color: #393939;
       display: inline;
@@ -810,4 +809,77 @@ a.grid-link {
 
 a {
   text-decoration: none;
+}
+
+.work-page {
+  &.title {
+    font-size: 22px;
+    font-style: italic;
+    width: 100%;
+    font-family: $main_font;
+    border-style: none;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  &.author {
+    font-size: 20px;
+    font-family: $main_font;
+    border-style: none;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  &.author-select {
+    &.label {
+      background-color: transparent;
+      display: inline-block;
+      width: 30%;
+      border: none;
+      font-family: $main_font;
+      font-size: 20px;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    &.ul {
+      display: inline;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    &.li {
+      display: inline;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    &.option {
+      background: transparent;
+      border: none;
+      color: #393939;
+      display: inline;
+      margin: 0px;
+      padding: 4px;
+      font-size: 18px;
+      font-family: $main_font;
+
+      &::after {
+        content: '? ';
+      }
+    }
+  }
+
+  &.year,
+  &.url {
+    font-size: 18px;
+    font-family: $main_font;
+    border-style: none;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  &.form-container {
+    padding: 4px;
+  }
 }

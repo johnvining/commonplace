@@ -24,6 +24,10 @@ export async function updateNoteInfo(noteId, params) {
   return axios.put(url_api + `note/${noteId}`, params)
 }
 
+export async function updateWorkInfo(workId, params) {
+  return axios.put(url_api + `work/${workId}`, params)
+}
+
 export async function getIdeaSuggestions(search, withCounts = false) {
   const data = { string: search }
 
