@@ -209,6 +209,18 @@ class Note extends React.Component {
     })
   }
 
+  async handleNewPile(pile) {
+    db.addPileToNote(pile, this.props.id).then(() => {
+      this.props.refetchMe(this.props.index)
+    })
+  }
+
+  async handleCreatePileAndAssign(pileName) {
+    db.createPileAndAddToNote(pileName, this.props.id).then(() => {
+      this.props.refetchMe(this.props.index)
+    })
+  }
+
   render() {
     const { edit, id, addIdea, deleted } = this.state
     const note = this.props.note
@@ -288,6 +300,30 @@ class Note extends React.Component {
                   </button>
                 </Link>
               ))}
+              {this.state.editPiles ? (
+                <Autocomplete
+                  inputName="work-pile"
+                  className={'work-page pile-select'}
+                  clearOnSelect={true}
+                  defaultValue=""
+                  dontAutofocus={false}
+                  escape={() => {
+                    this.setState({ edit: false })
+                  }}
+                  onSelect={this.handleNewPile.bind(this)}
+                  getSuggestions={db.getPileSuggestions}
+                  handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+                />
+              ) : !this.state.edit ? (
+                <button
+                  className="pile-select button"
+                  onClick={() => {
+                    this.setState({ editPiles: true })
+                  }}
+                >
+                  +
+                </button>
+              ) : null}
             </div>
             {/* Images */}
             <div className="note-full image-row">
