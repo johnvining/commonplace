@@ -179,13 +179,7 @@ export const reqRemoveIdeaFromNote = async (req, res) => {
 
 export const reqRemovePileFromNote = async (req, res) => {
   try {
-    const doc = await Note.findOneAndUpdate(
-      { _id: req.params.id },
-      { $pull: { piles: req.params.pileId } },
-      { new: true }
-    )
-      .lean()
-      .exec()
+    const doc = removePileFromNote(req.params.id, req.params.pileId)
     if (!doc) {
       return res.status(400).end()
     }
@@ -287,6 +281,16 @@ export const removeWorkFromNote = async noteId => {
 
 export const removeAuthorFromNote = async noteId => {
   return await Note.findOneAndUpdate({ _id: noteId }, { author: null })
+}
+
+export const removePileFromNote = async (noteId, pileId) => {
+  return await Note.findOneAndUpdate(
+    { _id: noteId },
+    { $pull: { piles: pileId } },
+    { new: true }
+  )
+    .lean()
+    .exec()
 }
 
 export const addAuthor = async function(id, author) {

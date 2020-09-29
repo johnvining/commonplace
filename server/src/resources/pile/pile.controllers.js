@@ -1,23 +1,13 @@
 import Pile from './pile.model.js'
 import Note from '../note/note.model.js'
 import Work from '../work/work.model.js'
+import { removePileFromNote } from '../note/note.controllers.js'
 import { crudControllers } from '../../utils/crud.js'
+import { removePileFromWork } from '../work/work.controllers.js'
 
 export const reqGetNotesForPile = async (req, res) => {
   try {
-    const doc = await Note.find({ piles: req.params.id })
-      .sort({ updatedAt: -1 })
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
+    const doc = await getNotesForPile(req.params.id)
     if (!doc) {
       return res.status(400).end()
     }
@@ -30,7 +20,7 @@ export const reqGetNotesForPile = async (req, res) => {
 
 export const reqGetWorksForPile = async (req, res) => {
   try {
-    const doc = await Work.find({ piles: req.params.id }).populate('author')
+    const doc = await getWorksForPile(req.params.id)
     if (!doc) {
       return res.status(400).end()
     }
@@ -102,8 +92,64 @@ export const reqCreatePile = async (req, res) => {
   }
 }
 
+export const reqDeletePile = async (req, res) => {
+  try {
+    await deletePile(req.params.id)
+    res.status(200).json()
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const deletePile = async function(pileId) {
+  // TODO: Parallel
+  let notes = await getNotesForPile(pileId, true)
+  let works = await getWorksForPile(pileId)
+  let deletionPromises = []
+  notes.map(note => {
+    deletionPromises.push(removePileFromNote(note._id, pileId))
+  })
+
+  works.map(work => {
+    deletionPromises.push(removePileFromWork(work._id, pileId))
+  })
+
+  await Promise.all(deletionPromises)
+  await Pile.findOneAndDelete({ _id: pileId })
+}
+
 export const findOrCreatePile = async name => {
   return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
+}
+
+export const getNotesForPile = async function(pileId, slim = false) {
+  if (slim) {
+    return Note.find({ piles: pileId })
+      .lean()
+      .exec()
+  } else {
+    return Note.find({ piles: pileId })
+      .sort({ updatedAt: -1 })
+      .populate('author')
+      .populate('ideas')
+      .populate('piles')
+      .populate({
+        path: 'work',
+        populate: {
+          path: 'author'
+        }
+      })
+      .lean()
+      .exec()
+  }
+}
+
+export const getWorksForPile = async function(pileId) {
+  return Work.find({ piles: pileId })
+    .populate('author')
+    .lean()
+    .exec()
 }
 
 export default crudControllers(Pile)

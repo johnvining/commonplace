@@ -123,13 +123,7 @@ export const reqAutocompleteOnName = async (req, res, withCounts = false) => {
 
 export const reqRemovePileFromWork = async (req, res) => {
   try {
-    const doc = await Work.findOneAndUpdate(
-      { _id: req.params.id },
-      { $pull: { piles: req.params.pileId } },
-      { new: true }
-    )
-      .lean()
-      .exec()
+    const doc = await removePileFromWork(req.params.id, req.params.pileId)
     if (!doc) {
       return res.status(400).end()
     }
@@ -234,6 +228,16 @@ export const addPileToID = async (workId, pileID) => {
     { new: true }
   )
     .populate('piles')
+    .lean()
+    .exec()
+}
+
+export const removePileFromWork = async (workId, pileId) => {
+  return Work.findOneAndUpdate(
+    { _id: workId },
+    { $pull: { piles: pileId } },
+    { new: true }
+  )
     .lean()
     .exec()
 }

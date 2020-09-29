@@ -4,8 +4,8 @@ import WorkList from './WorkList'
 import {
   getNotesForPile,
   getPileInfo,
-  deleteIdea,
-  getWorksForPile
+  getWorksForPile,
+  deletePile
 } from './Database'
 import { navigate } from '@reach/router'
 import * as constants from './constants'
@@ -45,14 +45,14 @@ class Pile extends React.Component {
     return null
   }
 
-  async deleteIdea() {
+  async handleDeletePile() {
     if (
       !confirm(`Do you want to permanently delete '${this.state.pileName}'?`)
     ) {
       return
     }
 
-    await deleteIdea(this.state.id)
+    await deletePile(this.state.id)
     navigate('/')
   }
 
@@ -90,7 +90,7 @@ class Pile extends React.Component {
           <div>
             <button
               className="top-level button"
-              onClick={this.deleteIdea.bind(this)}
+              onClick={this.handleDeletePile.bind(this)}
             >
               Delete pile
             </button>

@@ -1,5 +1,6 @@
 import React from 'react'
 import Autocomplete from './Autocomplete'
+import { navigate } from '@reach/router'
 
 class PileListForItem extends React.Component {
   render() {

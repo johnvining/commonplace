@@ -232,6 +232,10 @@ export async function deleteIdea(ideaId) {
   return axios.post(url_api + 'idea/' + ideaId + '/delete')
 }
 
+export async function deletePile(pileId) {
+  return axios.delete(url_api + 'pile/' + pileId)
+}
+
 export async function getNotesForPile(pileId) {
   return axios.get(url_api + `pile/${pileId}/notes`)
 }

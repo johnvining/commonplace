@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import controllers, {
-  reqGetNotesForPile,
-  reqGetWorksForPile,
-  reqGetAutoCompleteWithCounts,
+  reqCreatePile,
+  reqDeletePile,
   reqGetAutoComplete,
-  reqCreatePile
+  reqGetAutoCompleteWithCounts,
+  reqGetNotesForPile,
+  reqGetWorksForPile
 } from './pile.controllers'
 
 const router = Router()
@@ -19,6 +20,6 @@ router.route('/:id/works').get(reqGetWorksForPile)
 router
   .route('/:id')
   .get(controllers.getOne)
-  .delete(controllers.removeOne)
+  .delete(reqDeletePile)
 
 export default router
