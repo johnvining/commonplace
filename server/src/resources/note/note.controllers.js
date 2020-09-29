@@ -249,7 +249,15 @@ export const addPileToID = async (noteId, pileID) => {
     { $addToSet: { piles: pileID } },
     { new: true }
   )
+    .populate('author')
+    .populate('ideas')
     .populate('piles')
+    .populate({
+      path: 'work',
+      populate: {
+        path: 'author'
+      }
+    })
     .lean()
     .exec()
 }
@@ -260,7 +268,15 @@ export const removeIdeaFromNote = async (noteId, ideaId) => {
     { $pull: { ideas: ideaId } },
     { new: true }
   )
+    .populate('author')
     .populate('ideas')
+    .populate('piles')
+    .populate({
+      path: 'work',
+      populate: {
+        path: 'author'
+      }
+    })
     .lean()
     .exec()
 }

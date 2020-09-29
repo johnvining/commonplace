@@ -89,6 +89,19 @@ export const filePilesByString = async function(string, withCounts) {
   }
 }
 
+export const reqCreatePile = async (req, res) => {
+  try {
+    const doc = await findOrCreatePile(req.body.name)
+    if (!doc) {
+      return res.status(400).end()
+    }
+    res.status(200).json({ data: doc })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
 export const findOrCreatePile = async name => {
   return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
 }

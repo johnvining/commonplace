@@ -8,6 +8,7 @@ import Autocomplete from './Autocomplete'
 import * as constants from './constants'
 import left from './icons/left.svg'
 import right from './icons/right.svg'
+import { assign } from 'lodash'
 
 class NoteList extends React.Component {
   state = {
@@ -188,6 +189,9 @@ class NoteList extends React.Component {
       case 'work':
         assignFunction = db.addWorkToNote
         break
+      case 'pile':
+        assignFunction = db.addPileToNote
+        break
       default:
         return
     }
@@ -197,7 +201,7 @@ class NoteList extends React.Component {
       let noteId = this.state.notes[this.state.selected[i]]._id
       assignFunction(idToAdd, noteId).then(response => {
         let notes = this.state.notes
-        const note = response.data
+        const note = response.data.data
         notes[this.state.selected[i]] = note
         this.setState({ notes: notes })
       })
@@ -216,6 +220,9 @@ class NoteList extends React.Component {
       case 'work':
         createFunction = db.createWork
         break
+      case 'pile':
+        createFunction = db.createPile
+        break
       default:
         return
     }
@@ -233,6 +240,8 @@ class NoteList extends React.Component {
         return db.getIdeaSuggestions(string)
       case 'work':
         return db.getWorkSuggestions(string)
+      case 'pile':
+        return db.getPileSuggestions(string)
     }
   }
 
@@ -287,6 +296,14 @@ class NoteList extends React.Component {
                   className="multi-select button"
                 >
                   Author
+                </button>
+                <button
+                  onClick={() => {
+                    this.setState({ addSomething: true, toAdd: 'pile' })
+                  }}
+                  className="multi-select button"
+                >
+                  Pile
                 </button>
                 <button
                   onClick={() => {

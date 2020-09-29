@@ -104,7 +104,7 @@ class Autocomplete extends React.Component {
           id={this.props.inputName}
           autoFocus={this.props.dontAutofocus ? false : true}
           className={this.style.searchBox}
-          value={this.state.currentTypedText}
+          value={this.state.currentTypedText || ''}
           onChange={this.handleTypingChange.bind(this)}
         ></input>
         {this.state.hideResults ? (
