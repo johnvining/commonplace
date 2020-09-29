@@ -12,7 +12,8 @@ import controllers, {
   reqGetRecentNotes,
   reqRemoveIdeaFromNote,
   reqUpdateNote,
-  reqRemovePileFromNote
+  reqRemovePileFromNote,
+  reqRemoveImageFromNote
 } from './note.controllers'
 
 const router = Router()
@@ -40,7 +41,7 @@ router.route('/:id/work/create').put(reqAddNewWork)
 
 router.route('/:id/image').put(reqAddImageToNote)
 router.route('/:id/images/:image').get(reqGetImageForNote)
-// TODO: router.route('/:id/image/:imageN').delete()
+router.route('/:id/image/').delete(reqRemoveImageFromNote)
 
 router
   .route('/:id')

@@ -562,6 +562,8 @@ div .image-row {
   .image-row.image-frame:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
+  .image-row.image-frame.remove:hover {
+    background-color: lightcoral; }
 .image-row img {
   max-height: 170px;
   max-width: 120px;

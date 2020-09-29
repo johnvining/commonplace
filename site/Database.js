@@ -220,6 +220,7 @@ export async function getImagesForNote(noteId, imageN) {
   })
 }
 
+// TODO: Update to use delete action rather than post -- see deleteImage
 export async function deleteWork(workId) {
   return axios.post(url_api + 'work/' + workId + '/delete')
 }
@@ -234,6 +235,11 @@ export async function deleteIdea(ideaId) {
 
 export async function deletePile(pileId) {
   return axios.delete(url_api + 'pile/' + pileId)
+}
+
+export async function deleteImage(noteId, imagePath) {
+  const data = { filename: imagePath }
+  return axios.delete(url_api + `note/${noteId}/image/`, { data: data })
 }
 
 export async function getNotesForPile(pileId) {

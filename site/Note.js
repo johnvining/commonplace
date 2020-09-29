@@ -199,14 +199,24 @@ class Note extends React.Component {
   async onImageUpload(image) {
     await db.addImageToNote(this.props.id, image)
 
-    // TODO: Don't fetch all the images if we don't need to
+    // TODO: Don't fetch all the images if we don't need to, e.g. views that won't show them
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
   handleFocusImage(click) {
-    this.setState({
-      largeImage: click.target.id
-    })
+    if (this.state.edit) {
+      db.deleteImage(
+        this.props.id,
+        this.props.note.images[click.target.id]
+      ).then(() => {
+        // TODO: Update refetchMe to handle a response from the database if we've already gotten it
+        this.props.refetchMe(this.props.index)
+      })
+    } else {
+      this.setState({
+        largeImage: click.target.id
+      })
+    }
   }
 
   async handleNewPile(pile) {
@@ -314,7 +324,9 @@ class Note extends React.Component {
               {this.props.note?.images?.map((image, index) => (
                 <div
                   className={
-                    this.state.largeImage == index
+                    this.state.edit
+                      ? 'image-row image-frame remove'
+                      : this.state.largeImage == index
                       ? 'image-row image-frame selected'
                       : 'image-row image-frame'
                   }

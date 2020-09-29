@@ -4,6 +4,7 @@ import { crudControllers } from '../../utils/crud.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 import config from '../../config'
+import fs from 'fs'
 
 // TODO: Standardize note-fetching so all note lists have the same fields populated #36
 export const reqGetRecentNotes = async (req, res) => {
@@ -148,6 +149,31 @@ export const reqAddImageToNote = async (req, res) => {
         }
       })
     }
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqRemoveImageFromNote = async function(req, res) {
+  try {
+    var filename = req.body.filename
+    const noteId = req.params.id
+    const note = await Note.findById(noteId)
+
+    if (!note.images.includes(filename)) {
+      res.status(400).end()
+      return
+    }
+
+    const doc = await Note.findOneAndUpdate(
+      { _id: noteId },
+      { $pull: { images: filename } },
+      { new: true }
+    )
+    fs.unlink(config.imageStorePath + '/' + filename, () => {
+      res.status(200).json({ data: doc })
+    })
   } catch (e) {
     console.error(e)
     res.status(400).end()

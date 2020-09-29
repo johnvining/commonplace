@@ -766,6 +766,10 @@ a.grid-link {
       background-color: $selection_yellow;
       cursor: pointer;
     }
+
+    &.remove:hover {
+      background-color: $removal;
+    }
   }
 
   img {
