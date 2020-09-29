@@ -378,6 +378,20 @@ div.main {
     text-decoration: none;
     font-family: $main_font;
 
+    // TODO: Combine with others in _var
+    &.remove::after {
+      background-image: url($image_remove_background);
+      background-size: 15px 15px;
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      content: '';
+    }
+
+    &.remove:hover {
+      background-color: $removal;
+    }
+
     &::before {
       background-image: url($image_stack_background);
       background-size: 15px 15px;

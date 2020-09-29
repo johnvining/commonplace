@@ -9,7 +9,8 @@ import controllers, {
   reqAddPile,
   reqAddNewPile,
   reqAutocompleteOnName,
-  reqGetAutoCompleteWithCounts
+  reqGetAutoCompleteWithCounts,
+  reqRemovePileFromWork
 } from './work.controllers'
 
 const router = Router()
@@ -22,6 +23,7 @@ router.route('/:id/delete').post(reqDeleteWork)
 
 router.route('/:id/pile').put(reqAddPile)
 router.route('/:id/pile/create').put(reqAddNewPile)
+router.route('/:id/pile/:pileId').delete(reqRemovePileFromWork)
 
 router.route('/:id').get(reqGetWorkInfo)
 router.route('/:id').put(reqUpdateWork)

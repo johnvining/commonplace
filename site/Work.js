@@ -10,7 +10,8 @@ import {
   deleteWork,
   updateWorkInfo,
   addPileToWork,
-  createPileAndAddToWork
+  createPileAndAddToWork,
+  removePileFromWork
 } from './Database'
 import Autocomplete from './Autocomplete'
 import { guessYearFromURL } from './utils'
@@ -129,6 +130,14 @@ class Work extends React.Component {
     this.setState({ pendingAuthorId: null, pendingAuthorName: '' })
   }
 
+  async handlePileClick(pileId) {
+    if (this.state.edit) {
+      removePileFromWork(this.state.id, pileId).then(() => {
+        this.fetchWorkInfo(this.props.id)
+      })
+    }
+  }
+
   render() {
     var { pendingWorkTitle, pendingUrl, pendingYear } = this.state
 
@@ -138,9 +147,19 @@ class Work extends React.Component {
           {/* Piles */}
           <div className="work-page form-container">
             {this.state.piles?.map(pile => (
-              <Link to={'/pile/' + pile._id} key={'/pile/' + pile._id}>
-                <button className="pile label">{pile.name}</button>
-              </Link>
+              <button
+                key={'/pile/' + pile._id}
+                className={this.state.edit ? 'pile label remove' : 'pile label'}
+                onClick={() => {
+                  if (this.state.edit) {
+                    this.handlePileClick(pile._id)
+                  } else {
+                    navigate('/pile/' + pile._id)
+                  }
+                }}
+              >
+                {pile.name}
+              </button>
             ))}
             {this.state.editPiles ? (
               <Autocomplete
@@ -156,7 +175,7 @@ class Work extends React.Component {
                 getSuggestions={getPileSuggestions}
                 handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
               />
-            ) : (
+            ) : !this.state.edit ? (
               <button
                 className="pile-select button"
                 onClick={() => {
@@ -165,7 +184,7 @@ class Work extends React.Component {
               >
                 +
               </button>
-            )}
+            ) : null}
           </div>
           {/* Title */}
           <div className="work-page  form-container">
