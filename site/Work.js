@@ -14,6 +14,7 @@ import {
   removePileFromWork
 } from './Database'
 import Autocomplete from './Autocomplete'
+import PileListForItem from './PileListForItem'
 import { guessYearFromURL } from './utils'
 import { navigate } from '@reach/router'
 
@@ -130,12 +131,10 @@ class Work extends React.Component {
     this.setState({ pendingAuthorId: null, pendingAuthorName: '' })
   }
 
-  async handlePileClick(pileId) {
-    if (this.state.edit) {
-      removePileFromWork(this.state.id, pileId).then(() => {
-        this.fetchWorkInfo(this.props.id)
-      })
-    }
+  async handlePileRemove(pileId) {
+    removePileFromWork(this.state.id, pileId).then(() => {
+      this.fetchWorkInfo(this.props.id)
+    })
   }
 
   render() {
@@ -146,45 +145,19 @@ class Work extends React.Component {
         <div>
           {/* Piles */}
           <div className="work-page form-container">
-            {this.state.piles?.map(pile => (
-              <button
-                key={'/pile/' + pile._id}
-                className={this.state.edit ? 'pile label remove' : 'pile label'}
-                onClick={() => {
-                  if (this.state.edit) {
-                    this.handlePileClick(pile._id)
-                  } else {
-                    navigate('/pile/' + pile._id)
-                  }
-                }}
-              >
-                {pile.name}
-              </button>
-            ))}
-            {this.state.editPiles ? (
-              <Autocomplete
-                inputName="work-pile"
-                className={'work-page pile-select'}
-                clearOnSelect={true}
-                defaultValue=""
-                dontAutofocus={false}
-                escape={() => {
-                  this.setState({ edit: false })
-                }}
-                onSelect={this.handleNewPile.bind(this)}
-                getSuggestions={getPileSuggestions}
-                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-              />
-            ) : !this.state.edit ? (
-              <button
-                className="pile-select button"
-                onClick={() => {
-                  this.setState({ editPiles: true })
-                }}
-              >
-                +
-              </button>
-            ) : null}
+            <PileListForItem
+              remove={this.state.edit}
+              edit={this.state.editPiles}
+              piles={this.state.piles}
+              onSelect={this.handleNewPile.bind(this)}
+              getSuggestions={getPileSuggestions}
+              handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+              mainClassName="work-page"
+              onStartEdit={() => {
+                this.setState({ editPiles: true })
+              }}
+              onPileRemove={this.handlePileRemove.bind(this)}
+            />
           </div>
           {/* Title */}
           <div className="work-page  form-container">

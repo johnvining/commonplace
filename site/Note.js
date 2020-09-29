@@ -8,10 +8,10 @@ import cross_circle from './icons/cross_circle.svg'
 import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
 import link from './icons/link.svg'
-import stack from './icons/stack.svg'
 import tags from './icons/tags.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
+import PileListForItem from './PileListForItem'
 
 class Note extends React.Component {
   state = {
@@ -221,6 +221,12 @@ class Note extends React.Component {
     })
   }
 
+  async handlePileRemove(pileId) {
+    db.removePileFromNote(this.props.id, pileId).then(() => {
+      this.props.refetchMe(this.props.index)
+    })
+  }
+
   render() {
     const { edit, id, addIdea, deleted } = this.state
     const note = this.props.note
@@ -289,41 +295,19 @@ class Note extends React.Component {
             </div>
             {/* Piles */}
             <div className="note-full pile container">
-              {note.piles?.map(pile => (
-                <Link to={'/pile/' + pile._id} key={'pile-link' + pile._id}>
-                  <button
-                    className="note-full pile label"
-                    key={'pile-button' + pile._id}
-                    tabIndex="-1"
-                  >
-                    {pile.name}
-                  </button>
-                </Link>
-              ))}
-              {this.state.editPiles ? (
-                <Autocomplete
-                  inputName="work-pile"
-                  className={'work-page pile-select'}
-                  clearOnSelect={true}
-                  defaultValue=""
-                  dontAutofocus={false}
-                  escape={() => {
-                    this.setState({ edit: false })
-                  }}
-                  onSelect={this.handleNewPile.bind(this)}
-                  getSuggestions={db.getPileSuggestions}
-                  handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-                />
-              ) : !this.state.edit ? (
-                <button
-                  className="pile-select button"
-                  onClick={() => {
-                    this.setState({ editPiles: true })
-                  }}
-                >
-                  +
-                </button>
-              ) : null}
+              <PileListForItem
+                remove={this.state.edit}
+                edit={this.state.editPiles}
+                piles={note.piles}
+                onSelect={this.handleNewPile.bind(this)}
+                getSuggestions={db.getPileSuggestions}
+                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+                mainClassName="note"
+                onStartEdit={() => {
+                  this.setState({ editPiles: true })
+                }}
+                onPileRemove={this.handlePileRemove.bind(this)}
+              />
             </div>
             {/* Images */}
             <div className="note-full image-row">

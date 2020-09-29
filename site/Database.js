@@ -199,6 +199,10 @@ export async function removePileFromWork(workId, pileId) {
   return axios.delete(url_api + 'work/' + workId + '/pile/' + pileId)
 }
 
+export async function removePileFromNote(noteId, pileId) {
+  return axios.delete(url_api + 'note/' + noteId + '/pile/' + pileId)
+}
+
 export async function addImageToNote(noteId, image) {
   const data = new FormData()
   data.append('image', image)
