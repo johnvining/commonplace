@@ -150,6 +150,16 @@ export async function addPileToNote(pileId, noteId) {
   return axios.put(url_api + `note/${noteId}/pile`, data)
 }
 
+export async function addPileToWork(pileId, workId) {
+  const data = { id: pileId }
+  return axios.put(url_api + `work/${workId}/pile`, data)
+}
+
+export async function createPileAndAddToWork(pileName, workId) {
+  const data = { name: pileName }
+  return axios.put(url_api + `work/${workId}/pile/create`, data)
+}
+
 export async function addAuthorToNote(authorId, noteId) {
   const updateObject = { author: authorId }
   return updateNoteInfo(noteId, updateObject)

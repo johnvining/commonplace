@@ -4,13 +4,13 @@ import NoteList from './NoteList'
 import {
   getWorkInfo,
   getNotesForWork,
-  addAuthorToWork,
   createAuthorAndAddToWork,
-  addUrlToWork,
-  addYearToWork,
   getAuthorSuggestions,
+  getPileSuggestions,
   deleteWork,
-  updateWorkInfo
+  updateWorkInfo,
+  addPileToWork,
+  createPileAndAddToWork
 } from './Database'
 import Autocomplete from './Autocomplete'
 import FreeEntry from './FreeEntry'
@@ -22,6 +22,7 @@ class Work extends React.Component {
   state = {
     id: '',
     edit: false,
+    editPiles: false,
     pendingWorkTitle: '',
     pendingUrl: '',
     pendingYear: '',
@@ -112,6 +113,18 @@ class Work extends React.Component {
     this.setState({ edit: false })
   }
 
+  async handleNewPile(pile) {
+    addPileToWork(pile, this.props.id).then(() => {
+      this.fetchWorkInfo(this.props.id)
+    })
+  }
+
+  async handleCreatePileAndAssign(pileName) {
+    createPileAndAddToWork(pileName, this.props.id).then(() => {
+      this.fetchWorkInfo(this.props.id)
+    })
+  }
+
   render() {
     var { pendingWorkTitle, pendingUrl, pendingYear } = this.state
 
@@ -122,20 +135,50 @@ class Work extends React.Component {
           <div className="work-page form-container">
             {this.state.piles?.map(pile => (
               <Link to={'/pile/' + pile._id} key={'/pile/' + pile._id}>
-                <span className="pile label">{pile.name}</span>
+                <button className="pile label">{pile.name}</button>
               </Link>
             ))}
+            {this.state.editPiles ? (
+              <Autocomplete
+                inputName="work-pile"
+                className={'work-page pile-select'}
+                clearOnSelect={true}
+                defaultValue=""
+                dontAutofocus={false}
+                escape={() => {
+                  this.setState({ edit: false })
+                }}
+                onSelect={this.handleNewPile.bind(this)}
+                getSuggestions={getPileSuggestions}
+                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+              />
+            ) : (
+              <button
+                className="pile-select button"
+                onClick={() => {
+                  this.setState({ editPiles: true })
+                }}
+              >
+                +
+              </button>
+            )}
           </div>
           {/* Title */}
           <div className="work-page  form-container">
             {this.state.edit ? (
-              <input
-                className="work-page title"
-                defaultValue={pendingWorkTitle}
-                onChange={e => {
-                  this.setState({ pendingWorkTitle: e.target.value })
-                }}
-              />
+              <>
+                <label for="title" className="work-page form-label">
+                  Title
+                </label>
+                <input
+                  className="work-page title input"
+                  id="title"
+                  defaultValue={pendingWorkTitle}
+                  onChange={e => {
+                    this.setState({ pendingWorkTitle: e.target.value })
+                  }}
+                />
+              </>
             ) : (
               <span className="work-page title">{pendingWorkTitle}</span>
             )}
@@ -143,18 +186,23 @@ class Work extends React.Component {
           {/* Author */}
           <div className="work-page  form-container">
             {this.state.edit ? (
-              <Autocomplete
-                inputName="work-author"
-                className={'work-page author-select'}
-                dontAutofocus={true}
-                defaultValue={this.state.pendingAuthorName || ''}
-                escape={() => {
-                  this.setState({ edit: false })
-                }}
-                onSelect={this.handleUpdateAuthor.bind(this)}
-                getSuggestions={getAuthorSuggestions}
-                handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
-              />
+              <>
+                <label for="work-author" className="work-page form-label">
+                  Author
+                </label>
+                <Autocomplete
+                  inputName="work-author"
+                  className={'work-page author-select'}
+                  dontAutofocus={true}
+                  defaultValue={this.state.pendingAuthorName || ''}
+                  escape={() => {
+                    this.setState({ edit: false })
+                  }}
+                  onSelect={this.handleUpdateAuthor.bind(this)}
+                  getSuggestions={getAuthorSuggestions}
+                  handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
+                />
+              </>
             ) : (
               <div className={'work-page author'}>
                 {this.state.pendingAuthorName}
@@ -164,13 +212,19 @@ class Work extends React.Component {
           {/* URL */}
           <div className="work-page  form-container">
             {this.state.edit ? (
-              <input
-                defaultValue={pendingUrl}
-                className="work-page url"
-                onChange={e => {
-                  this.setState({ pendingUrl: e.target.value })
-                }}
-              />
+              <>
+                <label for="url" className="work-page form-label">
+                  URL
+                </label>
+                <input
+                  defaultValue={pendingUrl}
+                  id="url"
+                  className="work-page url input"
+                  onChange={e => {
+                    this.setState({ pendingUrl: e.target.value })
+                  }}
+                />
+              </>
             ) : (
               <span className="work-page url">{pendingUrl}</span>
             )}
@@ -178,13 +232,18 @@ class Work extends React.Component {
           {/* Year */}
           <div className="work-page  form-container">
             {this.state.edit ? (
-              <input
-                defaultValue={pendingYear}
-                className="work-page year"
-                onChange={e => {
-                  this.setState({ pendingYear: e.target.value })
-                }}
-              />
+              <>
+                <label for="year" className="work-page form-label">
+                  Year
+                </label>
+                <input
+                  defaultValue={pendingYear}
+                  className="work-page year input"
+                  onChange={e => {
+                    this.setState({ pendingYear: e.target.value })
+                  }}
+                />
+              </>
             ) : (
               <span className="work-page year">{pendingYear}</span>
             )}
@@ -203,7 +262,7 @@ class Work extends React.Component {
                 <button
                   className="top-level button"
                   onClick={() => {
-                    this.setState({ edit: true })
+                    this.setState({ edit: true, editPiles: false })
                   }}
                 >
                   Edit
