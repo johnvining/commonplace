@@ -78,10 +78,13 @@ function parseNote(csvLine) {
   obj.piles = csvLine[7]?.split(',')
   obj.year = csvLine[8]
   obj.page = csvLine[9]
+  obj.take = csvLine[10]
   return obj
 }
 
 export async function getImageFromURL(url, dest) {
+  if (!url) return
+
   var file = fs.createWriteStream(dest)
 
   // TODO: Error handling
@@ -164,7 +167,8 @@ async function importNote(importObject) {
     title: importObject.title,
     url: importObject.url,
     year: importObject.year,
-    page: importObject.page
+    page: importObject.page,
+    take: importObject.take
   }
 
   if (!isNaN(newNote.year) && newNote.url) {

@@ -17,13 +17,14 @@ const noteSchema = new mongoose.Schema(
     url: String,
     images: [{ type: String }],
     page: String,
-    piles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'pile' }]
+    piles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'pile' }],
+    take: String
   },
   { timestamps: true }
 )
 // TODO: Title not working
 // TODO: How to refresh index?
-noteSchema.index({ title: 'text', text: 'text' })
+noteSchema.index({ title: 'text', text: 'text', take: 'text' })
 
 // TODO: Add indices
 export default mongoose.model('note', noteSchema)

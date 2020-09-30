@@ -201,7 +201,7 @@ async function load() {
 function printLoadHelp(recordType) {
   if (recordType == 1)
     console.log(
-      ' format -> Author,Title,Text,Work,URL,"idea1,idea2",image URL,"pile1,pile2"'
+      ' format -> Author,Title,Text,Work,URL,"idea1,idea2",image URL,"pile1,pile2",year,page,take'
     )
   else if (recordType == 2)
     console.log(' format -> Title,Author,Year,URL,"pile1,pile2"')
