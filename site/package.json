@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "parcel index.html",
-    "sass": "sass --watch style.scss"
+    "sass": "sass --watch style.scss",
+    "start": "parcel index.html --no-hmr"
   },
   "dependencies": {
     "@reach/router": "^1.3.4",
