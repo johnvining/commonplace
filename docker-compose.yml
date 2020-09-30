@@ -22,7 +22,7 @@ services:
     networks:
       - app-network
   mongo:
-    image: mongo
+    image: andresvidal/rpi3-mongodb3
     volumes:
         # TODO
       - data-volume:/data/db
