@@ -177,18 +177,19 @@ async function importNote(importObject) {
 
   let createdNote = await NoteControllers.createNoteObj(newNote)
 
-  // Add Images
-  let imagePromises = []
-  for (let i = 0; i < importObject.externalImageUrls.length; i++) {
-    imagePromises.push(
-      downloadImageForNote(
-        createdNote._id,
-        i + 1,
-        importObject.externalImageUrls[i],
-        true
-      )
-    )
+  if (
+    importObject.externalImageUrls.length == 1 &&
+    importObject.externalImageUrls[0] == ''
+  ) {
+    return
   }
+
+  let imagePromises = []
+  importObject.externalImageUrls.map((url, idx) => {
+    imagePromises.push(
+      downloadImageForNote(createdNote._id, idx + 1, url, true)
+    )
+  })
 
   let imagePromiseResp = await Promise.all(imagePromises)
   await NoteControllers.updateNote(createdNote._id, {
