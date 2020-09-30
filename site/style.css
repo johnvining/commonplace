@@ -76,14 +76,14 @@ div .top-bar {
 .note-full .action-bar,
 .note-full .title,
 .note-full .year,
-.note-full .citation,
+.note-full .page,
 .note-full .url {
   font-size: 18px;
   margin: 4px;
   padding: 4px; }
 .note-full .title,
 .note-full .year,
-.note-full .citation,
+.note-full .page,
 .note-full .url {
   display: inline-block;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -96,7 +96,7 @@ div .top-bar {
 .note-full .url {
   width: 85%; }
 .note-full .year,
-.note-full .citation {
+.note-full .page {
   width: 8%;
   text-align: right; }
 .note-full .note-text,

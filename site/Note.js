@@ -18,7 +18,7 @@ class Note extends React.Component {
     largeImage: -1,
     pendingAuthorId: null,
     pendingAuthorName: '',
-    pendingCitation: '',
+    pendingPage: '',
     pendingText: '',
     pendingTitle: '',
     pendingUrl: '',
@@ -35,7 +35,7 @@ class Note extends React.Component {
       inFocus: this.props.inFocus,
       pendingAuthorId: this.props.note.author?._id,
       pendingAuthorName: this.props.note.author?.name,
-      pendingCitation: this.props.note.citation,
+      pendingPage: this.props.note.page,
       pendingText: this.props.note.text,
       pendingTitle: this.props.note.title,
       pendingUrl: this.props.note.url,
@@ -98,8 +98,8 @@ class Note extends React.Component {
     this.setState({ pendingTitle: val.target.value })
   }
 
-  handleCitationChange = val => {
-    this.setState({ pendingCitation: val.target.value })
+  handlePageChange = val => {
+    this.setState({ pendingPage: val.target.value })
   }
 
   handleYearChange = val => {
@@ -170,7 +170,7 @@ class Note extends React.Component {
   async handleAccept() {
     const updateObject = {
       author: this.state.pendingAuthorId,
-      citation: this.state.pendingCitation,
+      page: this.state.pendingPage,
       text: this.state.pendingText,
       title: this.state.pendingTitle,
       url: this.state.pendingUrl,
@@ -429,7 +429,7 @@ class Note extends React.Component {
                 </div>
               )}
             </div>
-            {/* URL and Citation */}
+            {/* URL and Page */}
             <div className={'left-right-bar'}>
               {edit ? (
                 <input
@@ -443,9 +443,7 @@ class Note extends React.Component {
                   <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
                 </span>
               )}
-              <div className={'note-full citation'}>
-                {this.state.pendingCitation}
-              </div>
+              <div className={'note-full page'}>{this.state.pendingPage}</div>
             </div>
             {/* Ideas and Action bar */}
             <div className={'left-right-bar'}>

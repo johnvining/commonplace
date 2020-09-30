@@ -116,7 +116,7 @@ div.main {
   .action-bar,
   .title,
   .year,
-  .citation,
+  .page,
   .url {
     font-size: 18px;
     margin: 4px;
@@ -125,7 +125,7 @@ div.main {
 
   .title,
   .year,
-  .citation,
+  .page,
   .url {
     display: inline-block;
     font-family: $main_font;
@@ -144,7 +144,7 @@ div.main {
   }
 
   .year,
-  .citation {
+  .page {
     width: 8%;
     text-align: right;
   }
