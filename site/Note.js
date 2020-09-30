@@ -19,6 +19,7 @@ class Note extends React.Component {
     pendingAuthorId: null,
     pendingAuthorName: '',
     pendingPage: '',
+    pendingTake: '',
     pendingText: '',
     pendingTitle: '',
     pendingUrl: '',
@@ -36,6 +37,7 @@ class Note extends React.Component {
       pendingAuthorId: this.props.note.author?._id,
       pendingAuthorName: this.props.note.author?.name,
       pendingPage: this.props.note.page,
+      pendingTake: this.props.note.take,
       pendingText: this.props.note.text,
       pendingTitle: this.props.note.title,
       pendingUrl: this.props.note.url,
@@ -110,6 +112,10 @@ class Note extends React.Component {
     this.setState({ pendingText: val.target.value })
   }
 
+  handleTakeChange = val => {
+    this.setState({ pendingTake: val.target.value })
+  }
+
   handleUrlChange = val => {
     let year = guessYearFromURL(val.target.value)
     if (!this.state.pendingYear && year) {
@@ -171,6 +177,7 @@ class Note extends React.Component {
     const updateObject = {
       author: this.state.pendingAuthorId,
       page: this.state.pendingPage,
+      take: this.state.pendingTake,
       text: this.state.pendingText,
       title: this.state.pendingTitle,
       url: this.state.pendingUrl,
@@ -190,6 +197,7 @@ class Note extends React.Component {
         console.error(error)
       })
   }
+
   removeIdea(ideaId) {
     // TODO: Support passing the new version of a note back to parent instead of refetch
     db.removeIdeaFromNote(this.props.id, ideaId)
@@ -361,6 +369,21 @@ class Note extends React.Component {
                 </div>
               )}
             </div>
+            {/* Take */}
+            <div name="take">
+              {edit ? (
+                <textarea
+                  className={'note-full note-text'}
+                  onChange={this.handleTakeChange}
+                  value={this.state.pendingTake}
+                ></textarea>
+              ) : (
+                <div className={'note-full note-text'}>
+                  {this.state.pendingTake}
+                </div>
+              )}
+            </div>
+
             {/* Author */}
             <div name="author">
               {edit ? (
