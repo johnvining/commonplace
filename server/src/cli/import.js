@@ -4,6 +4,7 @@ import fs from 'fs'
 import https from 'https'
 import parse from 'csv-parse'
 import config from '../config'
+import * as utils from '../utils' //TODO: Fix duplicate code
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
@@ -75,7 +76,8 @@ function parseNote(csvLine) {
   obj.ideas = csvLine[5]?.split(',')
   obj.externalImageUrls = csvLine[6]?.split(',')
   obj.piles = csvLine[7]?.split(',')
-  // TODO: Year
+  obj.year = csvLine[8]
+  obj.page = csvLine[9]
   return obj
 }
 
@@ -106,7 +108,20 @@ async function createDirIfNeeded(path, cb) {
   })
 }
 
-export async function downloadImageForNote(noteId, imageN, imageUrl, cb) {
+export async function downloadImageForNote(
+  noteId,
+  imageN,
+  imageUrl,
+  useAirtableFormat = false
+) {
+  // airtable format: "filename.jpg (url/to/file.jpg)"
+  if (useAirtableFormat) {
+    imageUrl = imageUrl.substring(
+      imageUrl.indexOf('(') + 1,
+      imageUrl.lastIndexOf(')')
+    )
+  }
+
   const fileName = imageUrl?.split('/').pop()
   // TODO: Check this matches
   // TODO: Switch on http/s
@@ -132,7 +147,6 @@ async function importNote(importObject) {
 
   var pilePromises = []
   importObject.piles.map(pile => {
-    console.log(pile)
     pilePromises.push(PileControllers.findOrCreatePile(pile))
   })
 
@@ -148,7 +162,13 @@ async function importNote(importObject) {
     piles: response[2].filter(x => x),
     text: importObject.text,
     title: importObject.title,
-    url: importObject.url
+    url: importObject.url,
+    year: importObject.year,
+    page: importObject.page
+  }
+
+  if (!isNaN(newNote.year) && newNote.url) {
+    newNote.year = utils.guessYearFromURL(newNote.url)
   }
 
   let createdNote = await NoteControllers.createNoteObj(newNote)
@@ -160,7 +180,8 @@ async function importNote(importObject) {
       downloadImageForNote(
         createdNote._id,
         i + 1,
-        importObject.externalImageUrls[i]
+        importObject.externalImageUrls[i],
+        true
       )
     )
   }
@@ -178,7 +199,6 @@ function parseWork(csvLine) {
   obj.year = csvLine[2]
   obj.url = csvLine[3]
   obj.piles = csvLine[4]?.split(',')
-  // TODO: obj.ideas = csvLine[4].split(',')
   return obj
 }
 
@@ -195,9 +215,13 @@ async function importWork(importObject) {
   updateObject.author = await AuthControllers.findOrCreateAuthor(
     importObject.authorName
   )
+
   if (importObject.year && !isNaN(updateObject.year)) {
-    updateObject.year = importObject.year // TODO: Support URL guessing
+    updateObject.year = importObject.year
+  } else if (!isNaN(importObject.year) && importObject.url) {
+    updateObject.year = utils.guessYearFromURL(importObject.url)
   }
+
   if (importObject.url) {
     updateObject.url = importObject.url
   }
