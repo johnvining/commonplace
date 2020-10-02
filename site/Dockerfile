@@ -1,14 +1,8 @@
-# Dockerfile for React client
-# https://medium.com/mozilla-club-bbsr/dockerizing-a-mern-stack-web-application-ebf78babf136
 # Build react client
 FROM node:10.16-alpine
-
-# Working directory
-# TODO:
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
-
 ###  Installing dependencies
 # --no-cache: download package index on-the-fly, no need to cleanup afterwards
 # --virtual: bundle packages, remove whole bundle at once, when done
@@ -20,10 +14,17 @@ RUN apk --no-cache --virtual build-dependencies add \
     && npm install \
     && apk del build-dependencies
 
-# copy local files to app folder
 COPY . .
 
-EXPOSE 1234
+# create dist files 
+RUN npm run build
 
-# TODO
-CMD ["npm","start"] 
+# nginx
+FROM nginx:stable-alpine
+COPY --from=0 /app/dist /usr/share/nginx/html
+
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

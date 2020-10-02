@@ -4,11 +4,12 @@
   "scripts": {
     "dev": "parcel index.html",
     "sass": "sass --watch style.scss",
-    "start": "parcel index.html --no-hmr"
+    "build": "parcel build index.html --no-minify"
   },
   "dependencies": {
     "@reach/router": "^1.3.4",
     "axios": "^0.19.2",
+    "babel-preset-es2015": "^6.24.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
@@ -23,6 +24,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
+    "terser": "^5.3.3",
     "validator": "^10.9.0"
   },
   "devDependencies": {

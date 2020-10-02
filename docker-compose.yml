@@ -38,14 +38,13 @@ services:
     image: myapp-client 
     container_name: commonplace-site
     # TODO
-    command: npm start
     volumes:
       - ./client/:/usr/app
       - /usr/app/node_modules
     depends_on:
       - server
     ports:
-      - "1234:1234"
+      - "8080:80"
     networks:
       - app-network
 
