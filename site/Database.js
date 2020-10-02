@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-export const url_api = 'http://localhost:3000/api/'
+// TODO: Move to config file
+export const url_api = process.env.SERVER_API
 
 export async function deleteNote(id) {
   return axios.delete(url_api + `note/${id}`)
