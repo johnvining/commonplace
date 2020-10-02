@@ -5,18 +5,17 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    image: myapp-server
+    image: commonplace-server-image
     container_name: commonplace-server
-    # command: /usr/src/app/node_modules/.bin/nodemon server.js
     volumes:
         # TODO
       - ./server/:/usr/src/app
+      - image-store:/usr/src/app/image-store
       - /usr/src/app/node_modules
     ports:
       - "3000:3000"
     depends_on:
       - mongo
-    # env_file: ./server/.env
     environment:
       - NODE_ENV=development
     networks:
@@ -24,8 +23,7 @@ services:
   mongo:
     image: mongo
     volumes:
-        # TODO
-      - data-volume:/data/db
+      - mongo-data:/data/db
     ports:
       - "27017:27017"
     networks:
@@ -34,8 +32,7 @@ services:
     build:
       context: ./site
       dockerfile: Dockerfile
-    # TODO
-    image: myapp-client 
+    image: commonplace-site-image 
     container_name: commonplace-site
     # TODO
     volumes:
@@ -53,7 +50,8 @@ networks:
         driver: bridge
 
 volumes:
-    data-volume:
+    image-store:
+    mongo-data:
     node_modules:
     web-root:
       driver: local

@@ -1,7 +1,4 @@
 export const config = {
-  secrets: {
-    jwt: ''
-  },
-  dbUrl: 'mongodb:',
-  imageStorePath: '/...'
+  dbUrl: 'mongodb://mongo:27017/commonplace',
+  imageStorePath: '/usr/src/app/image-store'
 }

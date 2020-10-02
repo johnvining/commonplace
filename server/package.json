@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "babel src --out-dir dist",
-    "dev": "nodemon --exec npm run restart",
+    "dev": "NODE_ENV=development nodemon --exec npm run restart",
     "cli": "node dist/cli/cli.js",
     "import": "node dist/cli/import.js",
     "restart": "rimraf dist && npm run build && npm run start",
