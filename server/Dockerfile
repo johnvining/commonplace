@@ -2,7 +2,7 @@
 # https://medium.com/mozilla-club-bbsr/dockerizing-a-mern-stack-web-application-ebf78babf136
 
 
-FROM node:10.16-alpine
+FROM node:14-alpine
 
 # Create App Directory
 RUN mkdir -p /usr/src/app
