@@ -276,9 +276,7 @@ class Note extends React.Component {
           >
             <img
               className="large-image"
-              src={URL.createObjectURL(
-                this.props.note.imageBlobs[this.state.largeImage]
-              )}
+              src={this.props.note.imageUrls[this.state.largeImage]}
             />
           </div>
         ) : null}
@@ -354,12 +352,10 @@ class Note extends React.Component {
                   onClick={this.handleFocusImage.bind(this)}
                   id={index}
                 >
-                  {this.props.note?.imageBlobs ? (
+                  {this.props.note?.imageUrls ? (
                     <img
                       key={this.props.id + index + 'img'}
-                      src={URL.createObjectURL(
-                        this.props.note.imageBlobs[index]
-                      )}
+                      src={this.props.note.imageUrls[index]}
                       className="image-row"
                       id={index}
                     />

@@ -72,7 +72,7 @@ class NoteList extends React.Component {
     let notes = this.state.notes
     const response = await db.getNoteInfo(notes[index]._id)
     let note = response.data.data[0]
-    note.imageBlobs = this.state.notes[index].imageBlobs
+    note.imageUrls = this.state.notes[index].imageUrls
     notes[index] = note
     this.setState({ notes: notes })
   }
@@ -97,9 +97,9 @@ class NoteList extends React.Component {
       let imagesArray = []
       let note = notes[index]
       responses.map(response => {
-        imagesArray.push(response.data)
+        imagesArray.push(URL.createObjectURL(response.data))
       })
-      note.imageBlobs = imagesArray
+      note.imageUrls = imagesArray
       notes[index] = note
       this.setState({ notes: notes })
     })
