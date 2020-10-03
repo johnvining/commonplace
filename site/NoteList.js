@@ -8,7 +8,6 @@ import Autocomplete from './Autocomplete'
 import * as constants from './constants'
 import left from './icons/left.svg'
 import right from './icons/right.svg'
-import { assign } from 'lodash'
 
 class NoteList extends React.Component {
   state = {
@@ -201,7 +200,7 @@ class NoteList extends React.Component {
       let noteId = this.state.notes[this.state.selected[i]]._id
       assignFunction(idToAdd, noteId).then(response => {
         let notes = this.state.notes
-        const note = response.data.data
+        const note = response.data
         notes[this.state.selected[i]] = note
         this.setState({ notes: notes })
       })
