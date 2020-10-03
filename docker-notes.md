@@ -2,7 +2,7 @@
 
 #### mongo database
 Extract the mongo database docker volume into a tarball:
-`docker run --rm --volumes-from commonplace_mongo_1 -v $(pwd):/backup ubuntu tar cvf /backup/backup-mongo.tar /data/db`
+`docker run --rm --volumes-from commonplace-db -v $(pwd):/backup ubuntu tar cvf /backup/backup-mongo.tar /data/db`
 
 Alternatively, you can use `mongodump` and `mongorestore`:
  * `mongodump --uri="mongodb://<IP addr>:<port>"`
