@@ -30,10 +30,10 @@ class Autocomplete extends React.Component {
 
   handleKeyDown(event) {
     if (event.keyCode == 27) {
-      this.props.escape()
+      if (this.props.escape) this.props.escape()
       this.setState({ currentTypedText: '' })
     } else if (event.keyCode == 8 && !this.state.currentTypedText) {
-      this.props.escape()
+      if (this.props.escape) this.props.escape()
     }
   }
 

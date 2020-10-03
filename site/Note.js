@@ -392,9 +392,6 @@ class Note extends React.Component {
                   defaultValue={this.state.pendingAuthorName || ''}
                   dontAutofocus={true}
                   inputName={this.props.id + 'author'}
-                  escape={() => {
-                    this.setState({ edit: false })
-                  }}
                   onSelect={this.handleUpdateAuthor}
                   getSuggestions={db.getAuthorSuggestions}
                   handleNewSelect={this.handleCreateAuthorAndAssign}
@@ -427,9 +424,6 @@ class Note extends React.Component {
                   dontAutofocus={true}
                   className={'note-full work edit'}
                   defaultValue={this.state.pendingWorkName || ''}
-                  escape={() => {
-                    this.setState({ edit: false })
-                  }}
                   onSelect={this.handleUpdateWork.bind(this)}
                   getSuggestions={db.getWorkSuggestions}
                   handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
