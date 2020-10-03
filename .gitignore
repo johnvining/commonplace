@@ -12,3 +12,4 @@ site/.env.production
 site/.env.development
 server/src/config/prodconfig.js
 server/src/config/devconfig.js
+Notes.md
