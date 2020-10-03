@@ -288,21 +288,33 @@ class Note extends React.Component {
             {/* Title and Year */}
             <div className="note-full left-right-bar">
               {edit ? (
-                <input
-                  className="note-full title"
-                  autoFocus
-                  defaultValue={this.state.pendingTitle}
-                  onChange={this.handleTitleChange}
-                ></input>
+                <>
+                  <label htmlFor="title" className="note-full form-label">
+                    Title
+                  </label>
+                  <input
+                    id="title"
+                    className="note-full title"
+                    autoFocus
+                    defaultValue={this.state.pendingTitle}
+                    onChange={this.handleTitleChange}
+                  ></input>
+                </>
               ) : (
                 <div className="note-full title">{this.state.pendingTitle}</div>
               )}
               {edit ? (
-                <input
-                  className="note-full year"
-                  defaultValue={this.state.pendingYear}
-                  onChange={this.handleYearChange}
-                ></input>
+                <>
+                  <label htmlFor="year" className="note-full form-label">
+                    Year
+                  </label>
+                  <input
+                    id="year"
+                    className="note-full year"
+                    defaultValue={this.state.pendingYear}
+                    onChange={this.handleYearChange}
+                  ></input>
+                </>
               ) : this.state.pendingYear ? (
                 <div className="note-full year">{this.state.pendingYear}</div>
               ) : (
@@ -358,11 +370,17 @@ class Note extends React.Component {
             {/* Text area */}
             <div name="text">
               {edit ? (
-                <textarea
-                  className={'note-full note-text'}
-                  onChange={this.handleTextChange}
-                  value={this.state.pendingText}
-                ></textarea>
+                <>
+                  <label htmlFor="text" className="note-full form-label">
+                    Text
+                  </label>
+                  <textarea
+                    id="text"
+                    className={'note-full note-text'}
+                    onChange={this.handleTextChange}
+                    value={this.state.pendingText}
+                  ></textarea>
+                </>
               ) : (
                 <div className={'note-full note-text'}>
                   {this.state.pendingText}
@@ -372,11 +390,17 @@ class Note extends React.Component {
             {/* Take */}
             <div name="take">
               {edit ? (
-                <textarea
-                  className={'note-full note-text'}
-                  onChange={this.handleTakeChange}
-                  value={this.state.pendingTake}
-                ></textarea>
+                <>
+                  <label htmlFor="take" className="note-full form-label">
+                    Take
+                  </label>
+                  <textarea
+                    id="take"
+                    className={'note-full note-text'}
+                    onChange={this.handleTakeChange}
+                    value={this.state.pendingTake}
+                  ></textarea>
+                </>
               ) : (
                 <div className={'note-full note-text'}>
                   {this.state.pendingTake}
@@ -387,15 +411,20 @@ class Note extends React.Component {
             {/* Author */}
             <div name="author">
               {edit ? (
-                <Autocomplete
-                  className={'note-full author'}
-                  defaultValue={this.state.pendingAuthorName || ''}
-                  dontAutofocus={true}
-                  inputName={this.props.id + 'author'}
-                  onSelect={this.handleUpdateAuthor}
-                  getSuggestions={db.getAuthorSuggestions}
-                  handleNewSelect={this.handleCreateAuthorAndAssign}
-                />
+                <>
+                  <label htmlFor="author" className="note-full form-label">
+                    Author
+                  </label>
+                  <Autocomplete
+                    className={'note-full author'}
+                    defaultValue={this.state.pendingAuthorName || ''}
+                    dontAutofocus={true}
+                    inputName={this.props.id + 'author'}
+                    onSelect={this.handleUpdateAuthor}
+                    getSuggestions={db.getAuthorSuggestions}
+                    handleNewSelect={this.handleCreateAuthorAndAssign}
+                  />
+                </>
               ) : (
                 <div>
                   {this.state.pendingAuthorName ? (
@@ -419,15 +448,20 @@ class Note extends React.Component {
             {/* Work */}
             <div>
               {edit ? (
-                <Autocomplete
-                  inputName={this.props.id + 'work'}
-                  dontAutofocus={true}
-                  className={'note-full work edit'}
-                  defaultValue={this.state.pendingWorkName || ''}
-                  onSelect={this.handleUpdateWork.bind(this)}
-                  getSuggestions={db.getWorkSuggestions}
-                  handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
-                />
+                <>
+                  <label htmlFor="work" className="note-full form-label">
+                    Work
+                  </label>
+                  <Autocomplete
+                    inputName={this.props.id + 'work'}
+                    dontAutofocus={true}
+                    className={'note-full work edit'}
+                    defaultValue={this.state.pendingWorkName || ''}
+                    onSelect={this.handleUpdateWork.bind(this)}
+                    getSuggestions={db.getWorkSuggestions}
+                    handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
+                  />
+                </>
               ) : (
                 <div>
                   <Link
@@ -449,18 +483,41 @@ class Note extends React.Component {
             {/* URL and Page */}
             <div className={'left-right-bar'}>
               {edit ? (
-                <input
-                  className={'note-full url'}
-                  name="url"
-                  defaultValue={this.state.pendingUrl}
-                  onChange={this.handleUrlChange}
-                ></input>
+                <>
+                  <label htmlFor="url" className="note-full form-label">
+                    URL
+                  </label>
+                  <input
+                    id="url"
+                    className={'note-full url'}
+                    name="url"
+                    defaultValue={this.state.pendingUrl}
+                    onChange={this.handleUrlChange}
+                  ></input>
+                </>
               ) : (
                 <span className={'note-full url'}>
                   <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
                 </span>
               )}
-              <div className={'note-full page'}>{this.state.pendingPage}</div>
+              {edit ? (
+                <>
+                  <label htmlFor="page" className="note-full form-label">
+                    Page
+                  </label>
+                  <input
+                    id="page"
+                    className={'note-full page'}
+                    name="url"
+                    defaultValue={this.state.pendingPage}
+                    onChange={this.handlePageChange}
+                  ></input>
+                </>
+              ) : (
+                <span className={'note-full page'}>
+                  <a href={this.state.pendingPage}>{this.state.pendingPage}</a>
+                </span>
+              )}
             </div>
             {/* Ideas and Action bar */}
             <div className={'left-right-bar'}>

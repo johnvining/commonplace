@@ -991,11 +991,11 @@ a {
   &.form-container {
     padding: 4px;
   }
+}
 
-  &.form-label {
-    font-size: 12px;
-    text-transform: uppercase;
-    font-family: $sans_font;
-    display: block;
-  }
+.form-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-family: $sans_font;
+  display: block;
 }

@@ -725,7 +725,8 @@ a {
   border-width: 1px; }
 .work-page.form-container {
   padding: 4px; }
-.work-page.form-label {
+
+.form-label {
   font-size: 12px;
   text-transform: uppercase;
   font-family: "Avenir", "Candara", "Arial", sans-serif;
