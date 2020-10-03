@@ -221,9 +221,9 @@ async function importWork(importObject) {
     importObject.authorName
   )
 
-  if (importObject.year && !isNaN(updateObject.year)) {
+  if (importObject.year) {
     updateObject.year = importObject.year
-  } else if (!isNaN(importObject.year) && importObject.url) {
+  } else if (importObject.url) {
     updateObject.year = utils.guessYearFromURL(importObject.url)
   }
 
