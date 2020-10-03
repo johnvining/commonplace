@@ -212,7 +212,7 @@ async function importWork(importObject) {
 
   let pilePromises = []
   importObject.piles.map(pile => {
-    pilePromises.push(PileControllers.findOrCreatePile(pile))
+    if (pile) pilePromises.push(PileControllers.findOrCreatePile(pile))
   })
 
   // TODO: Support different update behaviors: Overwrite,Clear,FillIn
