@@ -86,28 +86,46 @@ export async function getImageFromURL(url, dest) {
   if (!url) return
 
   var file = fs.createWriteStream(dest)
-
-  // TODO: Error handling
   let htPromise = new Promise((resolve, reject) => {
-    https.get(url, function(response) {
-      response.pipe(file)
-      file.on('finish', function() {
-        file.close()
-        resolve()
+    try {
+      https.get(url, function(response) {
+        response.pipe(file)
+        file.on('finish', function() {
+          file.close()
+          resolve()
+        })
+
+        file.on('error', function(err) {
+          resolve()
+          console.error(err)
+        })
       })
-    })
+    } catch (e) {
+      resolve()
+      console.error(e)
+    }
   })
 
-  await htPromise
+  try {
+    await htPromise
+  } catch (e) {
+    console.error(e)
+  }
+
+  return dest
 }
 
-async function createDirIfNeeded(path, cb) {
+async function createDirIfNeeded(path) {
   let mask = 484 // https://chmodcommand.com/chmod-744/
-  fs.mkdir(path, mask, function(err) {
-    if (err) {
-      if (err.code == 'EEXIST') cb(null)
-      else cb(err)
-    } else cb(null)
+  return mkDirPromise(path, mask)
+}
+
+function mkDirPromise(path, mask) {
+  return new Promise(function(resolve, reject) {
+    fs.mkdir(path, mask, function(err) {
+      if (err && err.code !== 'EEXIST') return reject(err)
+      resolve(path)
+    })
   })
 }
 
@@ -126,12 +144,9 @@ export async function downloadImageForNote(
   }
 
   const fileName = imageUrl?.split('/').pop()
-  // TODO: Check this matches
   // TODO: Switch on http/s
   var dest = noteId + '/' + imageN + '-' + fileName
-  await createDirIfNeeded(config.imageStorePath + '/' + noteId, val => {
-    if (val) console.error(val)
-  })
+  await createDirIfNeeded(config.imageStorePath + '/' + noteId)
   await getImageFromURL(imageUrl, config.imageStorePath + '/' + dest)
   return dest
 }
