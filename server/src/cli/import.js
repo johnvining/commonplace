@@ -173,6 +173,8 @@ async function importNote(importObject) {
 
   if (!isNaN(newNote.year) && newNote.url) {
     newNote.year = utils.guessYearFromURL(newNote.url)
+  } else if (isNaN(newNote.year)) {
+    newNote.year = null
   }
 
   let createdNote = await NoteControllers.createNoteObj(newNote)
