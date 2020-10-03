@@ -8,7 +8,6 @@ services:
     image: commonplace-server-image
     container_name: commonplace-server
     volumes:
-        # TODO
       - ./server/:/usr/src/app
       - image-store:/usr/src/app/image-store
       - /usr/src/app/node_modules
@@ -17,11 +16,12 @@ services:
     depends_on:
       - mongo
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
     networks:
       - app-network
   mongo:
     image: mongo
+    container_name: commonplace-db
     volumes:
       - mongo-data:/data/db
     ports:

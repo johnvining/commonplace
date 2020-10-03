@@ -16,10 +16,17 @@ let envConfig = {}
 switch (env) {
   case 'dev':
   case 'development':
-    envConfig = require('./dev-mine').config
+    console.log('...using development config')
+    envConfig = require('./devconfig').config
+    break
+  case 'prod':
+  case 'production':
+    console.log('...using *production* config')
+    envConfig = require('./prodconfig').config
     break
   default:
-    envConfig = require('./dev-mine').config
+    console.log('...using development config')
+    envConfig = require('./devconfig').config
 }
 
 export default merge(baseConfig, envConfig)
