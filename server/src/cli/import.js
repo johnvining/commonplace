@@ -222,7 +222,9 @@ async function importWork(importObject) {
   )
 
   if (importObject.year) {
-    updateObject.year = importObject.year
+    if (!isNaN(importObject.year)) {
+      updateObject.year = importObject.year
+    }
   } else if (importObject.url) {
     updateObject.year = utils.guessYearFromURL(importObject.url)
   }
