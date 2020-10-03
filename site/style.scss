@@ -93,15 +93,23 @@ div.main {
 
 .note-full {
   &.outer {
-    background-color: $note_background;
-
+    background-color: white;
+    border-color: $note_background;
+    border-style: solid;
+    border-width: 2px;
     border-radius: 4px;
     margin: 4px;
     padding: 4px;
 
+    &:focus {
+      border-color: black;
+      outline: none;
+    }
+
     &.edit-note,
     &.edit-idea {
-      background-color: $note_background_edit;
+      background-color: white;
+      border-color: $note_background_edit;
     }
   }
 
@@ -118,9 +126,18 @@ div.main {
   .year,
   .page,
   .url {
-    font-size: 18px;
     margin: 4px;
     padding: 4px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .year,
+  .page,
+  .url {
+    font-size: 14px;
   }
 
   .title,
@@ -132,6 +149,12 @@ div.main {
     background-color: transparent;
     border-style: none;
     display: inline-block;
+
+    &:focus {
+      background-color: $note_background_edit;
+      outline: none;
+      border-radius: 2px;
+    }
   }
 
   .url {
@@ -147,9 +170,15 @@ div.main {
   .page {
     width: 8%;
     text-align: right;
+
+    &.input {
+      width: 80%;
+      text-align: left;
+    }
   }
 
   .note-text,
+  .note-take,
   .author,
   .work {
     margin: 4px;
@@ -166,23 +195,39 @@ div.main {
   }
 
   .note-text,
+  .note-take,
   .url {
     font-size: 14px;
   }
 
-  .note-text {
+  .note-text,
+  .note-take {
     background-color: transparent;
     border: none;
     box-sizing: border-box;
     display: block;
     font-family: $main_font;
     font-size: 14px;
-    height: 18em;
+    // height: 12em;
     margin: auto;
     padding: 8px;
     resize: none;
     width: 100%;
     white-space: pre-wrap;
+
+    &:focus {
+      background-color: $note_background_edit;
+      outline: none;
+      border-radius: 2px;
+    }
+  }
+
+  .note-text.edit {
+    height: 14em;
+  }
+
+  .note-take.edit {
+    height: 6em;
   }
 
   .author,
@@ -198,7 +243,9 @@ div.main {
       margin: 0px;
 
       &:focus {
-        @include note-edit-focus;
+        background-color: $note_background_edit;
+        outline: none;
+        border-radius: 2px;
       }
     }
 
@@ -233,6 +280,14 @@ div.main {
         content: '? ';
       }
     }
+  }
+
+  &.form-label {
+    font-size: 12px;
+    padding: 8px;
+    text-transform: uppercase;
+    font-family: $sans_font;
+    display: block;
   }
 }
 
@@ -282,7 +337,7 @@ div.main {
   }
 
   &.label {
-    background-color: white;
+    background-color: $option_blue;
     border-radius: 4px;
     border-radius: 4px;
     border-style: none;
@@ -436,6 +491,7 @@ div.main {
     &:hover {
       cursor: pointer;
       background-color: $selection_yellow;
+      outline: none;
     }
   }
 
@@ -991,11 +1047,19 @@ a {
   &.form-container {
     padding: 4px;
   }
+
+  &.form-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-family: $sans_font;
+    display: block;
+  }
 }
 
-.form-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  font-family: $sans_font;
-  display: block;
+.width-80 {
+  width: 80%;
+}
+
+.width-20 {
+  width: 20%;
 }

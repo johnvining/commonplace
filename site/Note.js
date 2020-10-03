@@ -288,33 +288,33 @@ class Note extends React.Component {
             {/* Title and Year */}
             <div className="note-full left-right-bar">
               {edit ? (
-                <>
+                <div className="width-80">
                   <label htmlFor="title" className="note-full form-label">
                     Title
                   </label>
                   <input
                     id="title"
-                    className="note-full title"
+                    className="note-full title input"
                     autoFocus
                     defaultValue={this.state.pendingTitle}
                     onChange={this.handleTitleChange}
                   ></input>
-                </>
+                </div>
               ) : (
                 <div className="note-full title">{this.state.pendingTitle}</div>
               )}
               {edit ? (
-                <>
+                <div className="width-20">
                   <label htmlFor="year" className="note-full form-label">
                     Year
                   </label>
                   <input
                     id="year"
-                    className="note-full year"
+                    className="note-full year input"
                     defaultValue={this.state.pendingYear}
                     onChange={this.handleYearChange}
                   ></input>
-                </>
+                </div>
               ) : this.state.pendingYear ? (
                 <div className="note-full year">{this.state.pendingYear}</div>
               ) : (
@@ -376,7 +376,7 @@ class Note extends React.Component {
                   </label>
                   <textarea
                     id="text"
-                    className={'note-full note-text'}
+                    className={'note-full note-text edit'}
                     onChange={this.handleTextChange}
                     value={this.state.pendingText}
                   ></textarea>
@@ -396,16 +396,16 @@ class Note extends React.Component {
                   </label>
                   <textarea
                     id="take"
-                    className={'note-full note-text'}
+                    className={'note-full note-take edit'}
                     onChange={this.handleTakeChange}
                     value={this.state.pendingTake}
                   ></textarea>
                 </>
-              ) : (
-                <div className={'note-full note-text'}>
+              ) : this.state.pendingTake ? (
+                <div className="note-full note-take">
                   {this.state.pendingTake}
                 </div>
-              )}
+              ) : null}
             </div>
 
             {/* Author */}
@@ -434,14 +434,14 @@ class Note extends React.Component {
                     >
                       {this.state.pendingAuthorName}
                     </Link>
-                  ) : (
+                  ) : this.props.note?.work?.author ? (
                     <Link
                       to={'/auth/' + this.props.note?.work?.author?._id}
                       className={'note-full author label imputed'}
                     >
                       {this.props.note?.work?.author?.name}
                     </Link>
-                  )}
+                  ) : null}
                 </div>
               )}
             </div>
@@ -462,7 +462,7 @@ class Note extends React.Component {
                     handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
                   />
                 </>
-              ) : (
+              ) : this.state.pendingWorkId ? (
                 <div>
                   <Link
                     to={'/work/' + this.state.pendingWorkId}
@@ -478,41 +478,41 @@ class Note extends React.Component {
                     ) : null
                   ) : null}
                 </div>
-              )}
+              ) : null}
             </div>
             {/* URL and Page */}
             <div className={'left-right-bar'}>
               {edit ? (
-                <>
+                <div className="width-80">
                   <label htmlFor="url" className="note-full form-label">
                     URL
                   </label>
                   <input
                     id="url"
-                    className={'note-full url'}
+                    className={'note-full url input'}
                     name="url"
                     defaultValue={this.state.pendingUrl}
                     onChange={this.handleUrlChange}
                   ></input>
-                </>
+                </div>
               ) : (
                 <span className={'note-full url'}>
                   <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
                 </span>
               )}
               {edit ? (
-                <>
+                <div className="width-20">
                   <label htmlFor="page" className="note-full form-label">
                     Page
                   </label>
                   <input
                     id="page"
-                    className={'note-full page'}
+                    className={'note-full page input'}
                     name="url"
                     defaultValue={this.state.pendingPage}
                     onChange={this.handlePageChange}
                   ></input>
-                </>
+                </div>
               ) : (
                 <span className={'note-full page'}>
                   <a href={this.state.pendingPage}>{this.state.pendingPage}</a>
