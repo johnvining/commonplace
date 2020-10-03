@@ -120,6 +120,7 @@ export const deletePile = async function(pileId) {
 }
 
 export const findOrCreatePile = async name => {
+  if (!name) return
   return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
 }
 

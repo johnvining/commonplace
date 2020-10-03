@@ -113,8 +113,6 @@ function writeContext() {
   return context_string
 }
 
-}
-
 async function doList() {
   let recent_notes = await NoteControllers.getTenMostRecentNotes()
 }

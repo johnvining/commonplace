@@ -4,9 +4,12 @@
 /server/image-store/
 /server/input.csv
 /server/node_modules/
-/server/src/config/dev-mine.js
 /site/.cache/
 /site/.sass-cache/
 /site/dist/
 /site/node_modules/
-server/src/config/prod-mine.js
+site/.env.production
+site/.env.development
+server/src/config/prodconfig.js
+server/src/config/devconfig.js
+Notes.md

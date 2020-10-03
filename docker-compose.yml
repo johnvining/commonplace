@@ -1,0 +1,57 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: commonplace-server-image
+    container_name: commonplace-server
+    volumes:
+      - ./server/:/usr/src/app
+      - image-store:/usr/src/app/image-store
+      - /usr/src/app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+  mongo:
+    image: mongo
+    container_name: commonplace-db
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+  site:
+    build:
+      context: ./site
+      dockerfile: Dockerfile
+    image: commonplace-site-image 
+    container_name: commonplace-site
+    # TODO
+    volumes:
+      - ./client/:/usr/app
+      - /usr/app/node_modules
+    depends_on:
+      - server
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    image-store:
+    mongo-data:
+    node_modules:
+    web-root:
+      driver: local
