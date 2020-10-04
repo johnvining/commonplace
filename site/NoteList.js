@@ -356,7 +356,11 @@ class NoteList extends React.Component {
                 <div key={'note-view-' + note._id}>
                   {this.props.viewMode == constants.view_modes.GRID ? (
                     <NoteGrid
-                      author={note.author?.name}
+                      author={
+                        note.author?.name
+                          ? note.author?.name
+                          : note.work?.author?.name
+                      }
                       index={index}
                       selected={this.state.selected.includes(index)}
                       deleted={this.state.deleted.includes(index)}
