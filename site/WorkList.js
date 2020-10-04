@@ -1,7 +1,5 @@
 import React from 'react'
-import { Link } from '@reach/router'
-import work_img from './icons/work.svg'
-import note_img from './icons/write.svg'
+import ResultWork from './ResultWork'
 
 class WorkList extends React.Component {
   state = {}
@@ -18,32 +16,9 @@ class WorkList extends React.Component {
       <div className="work-list">
         {this.state.works === undefined
           ? null
-          : this.state.works.map((work, index) => {
-              return (
-                <Link to={`/work/${work._id}`} key={'work-list-' + work._id}>
-                  <div className="result-box">
-                    <div className="result-box header">
-                      <img src={work_img} />
-                      <div>
-                        {work.author?.name ? (
-                          <>{work.author?.name},&nbsp;</>
-                        ) : null}
-                        <em>{work.name}</em>
-                        {work.year ? (
-                          <span className="date">{work.year}</span>
-                        ) : null}
-                      </div>
-                    </div>
-                    {work.note_count ? (
-                      <div className="result-box content">
-                        <img src={note_img} />
-                        {work.note_count}
-                      </div>
-                    ) : null}
-                  </div>
-                </Link>
-              )
-            })}
+          : this.state.works.map(work => (
+              <ResultWork work={work} key={'work-list-' + work._id} />
+            ))}
       </div>
     )
   }

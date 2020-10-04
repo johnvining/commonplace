@@ -8,6 +8,8 @@ import {
   getWorksForAuthor
 } from './Database'
 import { navigate, Link } from '@reach/router'
+import * as constants from './constants'
+import ResultWork from './ResultWork'
 
 class Author extends React.Component {
   state = {
@@ -113,23 +115,20 @@ class Author extends React.Component {
         </div>
         {this.state.works?.map((work, workindex) => (
           <div key={'work-listing-' + workindex}>
-            <section className="section-header">
-              <Link to={'/work/' + work._id}>{work.name}</Link> - {work?.year}
-            </section>
-            <div>
+            <ResultWork work={work} key={'work-' + work._id} />
+            <div className="result-box parent">
               <NoteList
                 key={'notes-for-work' + work._id}
                 index={workindex}
-                viewMode={this.props.viewMode}
+                viewMode={constants.view_modes.RESULT}
                 getListOfNotes={this.getListOfNotes.bind(this)}
               />
             </div>
           </div>
         ))}
-        <section className="section-header">Not attached to work</section>
         <NoteList
           key={'auth' + this.props.id}
-          viewMode={this.props.viewMode}
+          viewMode={constants.view_modes.RESULT}
           useGroupings={true}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />

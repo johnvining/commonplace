@@ -692,6 +692,14 @@ div .image-row {
     align-items: flex-start; }
   .result-box:hover {
     background-color: lightblue; }
+  .result-box.parent {
+    display: block;
+    padding: 0px;
+    margin: 8px 10px 0px 16px;
+    display: flex;
+    align-items: flex-start; }
+    .result-box.parent:hover {
+      background-color: transparent; }
 
 a {
   text-decoration: none; }

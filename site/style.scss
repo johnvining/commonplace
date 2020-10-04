@@ -943,6 +943,18 @@ a.grid-link {
   &:hover {
     background-color: $note_background_edit;
   }
+
+  &.parent {
+    display: block;
+    padding: 0px;
+    margin: 8px 10px 0px 16px;
+    display: flex;
+    align-items: flex-start;
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
 }
 
 a {
