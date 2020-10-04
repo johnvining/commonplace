@@ -7,7 +7,7 @@ import {
   getNotesForWork,
   getWorksForAuthor
 } from './Database'
-import { navigate } from '@reach/router'
+import { navigate, Link } from '@reach/router'
 
 class Author extends React.Component {
   state = {
@@ -114,7 +114,7 @@ class Author extends React.Component {
         {this.state.works?.map((work, workindex) => (
           <div key={'work-listing-' + workindex}>
             <section className="section-header">
-              {work.name} - {work?.year}
+              <Link to={'/work/' + work.id}>{work.name}</Link> - {work?.year}
             </section>
             <div>
               <NoteList

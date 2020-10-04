@@ -199,7 +199,9 @@ class Work extends React.Component {
               </>
             ) : (
               <div className={'work-page author'}>
-                {this.state.pendingAuthorName}
+                <Link to={'/auth/' + this.state.pendingAuthorId}>
+                  {this.state.pendingAuthorName}
+                </Link>
               </div>
             )}
           </div>
