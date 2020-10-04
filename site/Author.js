@@ -114,7 +114,7 @@ class Author extends React.Component {
         {this.state.works?.map((work, workindex) => (
           <div key={'work-listing-' + workindex}>
             <section className="section-header">
-              <Link to={'/work/' + work.id}>{work.name}</Link> - {work?.year}
+              <Link to={'/work/' + work._id}>{work.name}</Link> - {work?.year}
             </section>
             <div>
               <NoteList
