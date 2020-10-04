@@ -212,13 +212,19 @@ class Note extends React.Component {
   }
 
   handleFocusImage(click) {
-    if (this.state.edit) {
+    if (
+      this.state.edit &&
+      confirm('Are you sure you want to delete this image?')
+    ) {
+      if (click.target.id == this.state.largeImage) {
+        this.setState({ largeImage: -1 })
+      }
       db.deleteImage(
         this.props.id,
         this.props.note.images[click.target.id]
       ).then(() => {
         // TODO: Update refetchMe to handle a response from the database if we've already gotten it
-        this.props.refetchMe(this.props.index)
+        this.props.getImagesForNoteAtIndex(this.props.index, true)
       })
     } else {
       this.setState({
