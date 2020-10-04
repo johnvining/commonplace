@@ -191,9 +191,6 @@ class Work extends React.Component {
                   className={'work-page author-select'}
                   dontAutofocus={true}
                   defaultValue={this.state.pendingAuthorName || ''}
-                  escape={() => {
-                    this.setState({ edit: false })
-                  }}
                   onSelect={this.handleUpdateAuthor.bind(this)}
                   getSuggestions={getAuthorSuggestions}
                   handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
