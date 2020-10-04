@@ -279,6 +279,15 @@ div.main {
       &::after {
         content: '? ';
       }
+
+      &.new::before {
+        background-image: url($image_add_background);
+        background-size: 17px 17px;
+        display: inline-block;
+        width: 17px;
+        height: 15px;
+        content: '';
+      }
     }
   }
 
@@ -525,6 +534,15 @@ div.main {
 
     &::after {
       content: '? ';
+    }
+
+    &.new::before {
+      background-image: url($image_add_background);
+      background-size: 17px 17px;
+      display: inline-block;
+      width: 17px;
+      height: 15px;
+      content: '';
     }
   }
 }
@@ -955,6 +973,12 @@ a.grid-link {
       background-color: transparent;
     }
   }
+
+  .date {
+    font-size: 14px;
+    padding: 4px;
+    margin: 4px;
+  }
 }
 
 a {
@@ -1030,6 +1054,15 @@ a {
 
       &::after {
         content: '? ';
+      }
+
+      &.new::before {
+        background-image: url($image_add_background);
+        background-size: 17px 17px;
+        display: inline-block;
+        width: 17px;
+        height: 15px;
+        content: '';
       }
     }
   }
