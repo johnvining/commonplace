@@ -116,13 +116,13 @@ class NoteList extends React.Component {
         case 84: // Ctrl T
           this.setNoteMode(
             document.activeElement.id,
-            constants.note_modes.EDIT_IDEA
+            constants.note_modes.EDIT_IDEAS
           )
           break
         case 80: // Ctrl P
           this.setNoteMode(
             document.activeElement.id,
-            constants.note_modes.EDIT_PILE
+            constants.note_modes.EDIT_PILES
           )
       }
     } else {
@@ -153,7 +153,7 @@ class NoteList extends React.Component {
   }
 
   onStartPileEdit(noteId) {
-    this.setNoteMode(noteId, constants.note_modes.EDIT_PILE)
+    this.setNoteMode(noteId, constants.note_modes.EDIT_PILES)
   }
 
   markChecked(noteIndex) {

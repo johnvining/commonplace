@@ -261,11 +261,11 @@ class Note extends React.Component {
         class_name = 'note-full edit-note '
         edit = true
         break
-      case constants.note_modes.EDIT_IDEA:
+      case constants.note_modes.EDIT_IDEAS:
         class_name = 'note-full edit-note '
         edit_ideas = true
         break
-      case constants.note_modes.EDIT_PILE:
+      case constants.note_modes.EDIT_PILES:
         class_name = 'note-full edit-note '
         edit_piles = true
         break
@@ -603,7 +603,7 @@ class Note extends React.Component {
                           onClick={() => {
                             this.props.setNoteMode(
                               this.props.id,
-                              constants.note_modes.EDIT_IDEA
+                              constants.note_modes.EDIT_IDEAS
                             )
                           }}
                           tabIndex="-1"
