@@ -6,7 +6,7 @@ export const view_modes = {
 }
 
 export const note_modes = {
-  NOSELECTION: 'No selection',
+  NO_SELECTION: 'No selection',
   NOT_SELECTED: 'Not selected',
   SELECTED: 'Selected',
   EDIT: 'Editing',

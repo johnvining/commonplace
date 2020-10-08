@@ -12,7 +12,7 @@ import right from './icons/right.svg'
 class NoteList extends React.Component {
   state = {
     inFocus: null,
-    focusType: constants.note_modes.NOSELECTION,
+    focusType: constants.note_modes.NO_SELECTION,
     selectedNote: '',
     notes: [],
     selected: [],
@@ -128,7 +128,7 @@ class NoteList extends React.Component {
     } else {
       switch (event.keyCode) {
         case 13: // Enter
-          if (this.state.focusType == constants.note_modes.NOSELECTION) {
+          if (this.state.focusType == constants.note_modes.NO_SELECTION) {
             this.setNoteMode(
               document.activeElement.id,
               constants.note_modes.SELECTED
@@ -138,7 +138,7 @@ class NoteList extends React.Component {
           break
         case 27: // Escape
           let divToFocus = document.getElementById(this.state.selectedNote)
-          this.setNoteMode('', constants.note_modes.NOSELECTION)
+          this.setNoteMode('', constants.note_modes.NO_SELECTION)
           divToFocus.focus()
           break
       }
@@ -435,7 +435,7 @@ class NoteList extends React.Component {
                       )}
                       mode={
                         !this.state.selectedNote
-                          ? constants.note_modes.NOSELECTION
+                          ? constants.note_modes.NO_SELECTION
                           : this.state.selectedNote == note._id
                           ? this.state.focusType
                           : constants.note_modes.NOT_SELECTED

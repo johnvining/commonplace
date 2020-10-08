@@ -247,7 +247,7 @@ class Note extends React.Component {
 
     var class_name = 'note-full '
     switch (this.props.mode) {
-      case constants.note_modes.NOSELECTION:
+      case constants.note_modes.NO_SELECTION:
         no_selection = true
         break
       case constants.note_modes.NOT_SELECTED:
