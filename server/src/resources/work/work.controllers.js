@@ -85,7 +85,7 @@ export const reqDeleteWork = async (req, res) => {
 
 export const reqAddPile = async (req, res) => {
   try {
-    const docs = await addPileToID(req.params.id, req.body.id)
+    const docs = await addPileToId(req.params.id, req.body.id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -96,7 +96,7 @@ export const reqAddPile = async (req, res) => {
 export const reqAddNewPile = async (req, res) => {
   try {
     const newPile = await Pile.create({ name: req.body.name })
-    const docs = await addPileToID(req.params.id, newPile._id)
+    const docs = await addPileToId(req.params.id, newPile._id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -170,8 +170,8 @@ export const getWorkInfo = async function(workId) {
   return results
 }
 
-export const updateWorkInfo = async function(workID, updateObject) {
-  return await Work.findOneAndUpdate({ _id: workID }, updateObject)
+export const updateWorkInfo = async function(workId, updateObject) {
+  return await Work.findOneAndUpdate({ _id: workId`` }, updateObject)
 }
 
 export const findWorkByString = async function(name) {
@@ -189,13 +189,13 @@ export const findOrCreateWork = async function(name) {
   return await createWork(name)
 }
 
-export const getNotesFromWork = async function(workID, slim = false) {
+export const getNotesFromWork = async function(workId, slim = false) {
   if (slim) {
-    return Note.find({ work: workID })
+    return Note.find({ work: workId })
       .lean()
       .exec()
   } else {
-    return Note.find({ work: workID })
+    return Note.find({ work: workId })
       .populate('author')
       .populate('ideas')
       .populate('piles')
@@ -221,10 +221,10 @@ export const deleteWork = async function(id) {
   await Work.findOneAndDelete({ _id: id })
 }
 
-export const addPileToID = async (workId, pileID) => {
+export const addPileToId = async (workId, pileId) => {
   return await Work.findOneAndUpdate(
     { _id: workId },
-    { $addToSet: { piles: pileID } },
+    { $addToSet: { piles: pileId } },
     { new: true }
   )
     .populate('piles')

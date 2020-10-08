@@ -25,8 +25,8 @@ class Pile extends React.Component {
     }
   }
 
-  fetchPileInfo(pileID) {
-    getPileInfo(pileID)
+  fetchPileInfo(pileId) {
+    getPileInfo(pileId)
       .then(response => {
         this.setState({
           pileName: response.data.data[0].name

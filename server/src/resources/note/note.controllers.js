@@ -35,7 +35,7 @@ export const reqGetRecentNotes = async (req, res) => {
 
 export const reqAddIdea = async (req, res) => {
   try {
-    const docs = await addIdeaToID(req.params.id, req.body.id)
+    const docs = await addIdeaToId(req.params.id, req.body.id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -46,7 +46,7 @@ export const reqAddIdea = async (req, res) => {
 export const reqAddNewIdea = async (req, res) => {
   try {
     const newIdea = await IdeaControllers.createIdea(req.body.name)
-    const docs = await addIdeaToID(req.params.id, newIdea._id)
+    const docs = await addIdeaToId(req.params.id, newIdea._id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -56,7 +56,7 @@ export const reqAddNewIdea = async (req, res) => {
 
 export const reqAddPile = async (req, res) => {
   try {
-    const docs = await addPileToID(req.params.id, req.body.id)
+    const docs = await addPileToId(req.params.id, req.body.id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -67,7 +67,7 @@ export const reqAddPile = async (req, res) => {
 export const reqAddNewPile = async (req, res) => {
   try {
     const newPile = await Pile.create({ name: req.body.name })
-    const docs = await addPileToID(req.params.id, newPile._id)
+    const docs = await addPileToId(req.params.id, newPile._id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -90,7 +90,7 @@ export const reqUpdateNote = async (req, res) => {
 
 export const reqAddWork = async (req, res) => {
   try {
-    const docs = await addWorkToID(req.params.id, req.body.newWork)
+    const docs = await addWorkToId(req.params.id, req.body.newWork)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -101,7 +101,7 @@ export const reqAddWork = async (req, res) => {
 export const reqAddNewWork = async (req, res) => {
   try {
     const newWork = await WorkControllers.createWork(req.body.newWork)
-    const docs = await addWorkToID(req.params.id, newWork._id)
+    const docs = await addWorkToId(req.params.id, newWork._id)
     res.status(200).json({ data: docs })
   } catch (e) {
     console.error(e)
@@ -231,8 +231,8 @@ export const findNotesByString = async searchString => {
     .exec()
 }
 
-export const addWorkToID = async (noteId, workID) => {
-  return await Note.findOneAndUpdate({ _id: noteId }, { work: workID })
+export const addWorkToId = async (noteId, workId) => {
+  return await Note.findOneAndUpdate({ _id: noteId }, { work: workId })
     .lean()
     .exec()
 }
@@ -252,10 +252,10 @@ export const updateNote = async (noteId, updateObj) => {
     .exec()
 }
 
-export const addIdeaToID = async (noteId, ideaID) => {
+export const addIdeaToId = async (noteId, ideaId) => {
   return await Note.findOneAndUpdate(
     { _id: noteId },
-    { $addToSet: { ideas: ideaID } },
+    { $addToSet: { ideas: ideaId } },
     { new: true }
   )
     .populate('ideas')
@@ -263,10 +263,10 @@ export const addIdeaToID = async (noteId, ideaID) => {
     .exec()
 }
 
-export const addPileToID = async (noteId, pileID) => {
+export const addPileToId = async (noteId, pileId) => {
   return await Note.findOneAndUpdate(
     { _id: noteId },
-    { $addToSet: { piles: pileID } },
+    { $addToSet: { piles: pileId } },
     { new: true }
   )
     .populate('author')
