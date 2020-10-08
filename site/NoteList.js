@@ -282,7 +282,6 @@ class NoteList extends React.Component {
       this.props.viewMode == constants.view_modes.RESULT
     return (
       <div className="multi-select">
-        infocus: {this.state.selectedNote} - focustype: {this.state.focusType}
         {showMultiselect ? null : this.state.selected.length ? (
           <div>
             {this.state.addSomething ? (

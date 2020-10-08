@@ -278,7 +278,6 @@ class Note extends React.Component {
         id={this.props.id}
         tabIndex={no_selection ? this.props.tabIndex : '-1'}
       >
-        Mode: {this.props.mode} -- {this.props.noteCanFocus} -- {class_name}
         {this.state.largeImage >= 0 ? (
           <div
             className="half"
