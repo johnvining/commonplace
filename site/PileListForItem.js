@@ -33,14 +33,16 @@ class PileListForItem extends React.Component {
             inputName="work-pile"
             onSelect={this.props.onSelect.bind(this)}
           />
-        ) : !this.props.remove ? (
+        ) : (
           <button
             className="pile-select button"
-            onClick={this.props.onStartEdit}
+            onClick={this.props.onStartPileEdit}
+            disabled={!this.props.allowAdd}
+            tabIndex={this.props.allowTabbing ? '' : '-1'}
           >
             +
           </button>
-        ) : null}
+        )}
       </>
     )
   }

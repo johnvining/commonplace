@@ -102,14 +102,22 @@ div.main {
     padding: 4px;
 
     &:focus {
-      border-color: black;
+      border-color: gray;
       outline: none;
+    }
+
+    &.selected {
+      border-color: black;
     }
 
     &.edit-note,
     &.edit-idea {
       background-color: white;
       border-color: $note_background_edit;
+    }
+
+    &.not-selected {
+      background-color: #f2f2f2;
     }
   }
 

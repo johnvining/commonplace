@@ -12,6 +12,8 @@ import right from './icons/right.svg'
 class NoteList extends React.Component {
   state = {
     inFocus: null,
+    focusType: constants.note_modes.NOSELECTION,
+    selectedNote: '',
     notes: [],
     selected: [],
     deleted: [],
@@ -106,22 +108,52 @@ class NoteList extends React.Component {
   }
 
   handleKeyDown(event) {
-    if (event.keyCode == 13) {
-      // TODO: This is clumsy -- need to avoid inner elements like Input's or anything that happens while note is being edited
-      if (document.activeElement.className == 'normal note outer') {
-        this.setIsFocused(document.activeElement.id)
+    if (event.ctrlKey) {
+      switch (event.keyCode) {
+        case 69: // Ctrl E'
+          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT)
+          break
+        case 84: // Ctrl T
+          this.setNoteMode(
+            document.activeElement.id,
+            constants.note_modes.EDIT_IDEA
+          )
+          break
+        case 80: // Ctrl P
+          this.setNoteMode(
+            document.activeElement.id,
+            constants.note_modes.EDIT_PILE
+          )
+      }
+    } else {
+      switch (event.keyCode) {
+        case 13: // Enter
+          if (this.state.focusType == constants.note_modes.NOSELECTION) {
+            this.setNoteMode(
+              document.activeElement.id,
+              constants.note_modes.SELECTED
+            )
+          }
+
+          break
+        case 27: // Escape
+          let divToFocus = document.getElementById(this.state.selectedNote)
+          this.setNoteMode('', constants.note_modes.NOSELECTION)
+          divToFocus.focus()
+          break
       }
     }
   }
 
-  setIsFocused(id) {
+  setNoteMode(noteId, mode) {
     this.setState({
-      inFocus: id
+      selectedNote: noteId,
+      focusType: mode
     })
   }
 
-  becomeInFocus(id) {
-    this.setState({ inFocus: id })
+  onStartPileEdit(noteId) {
+    this.setNoteMode(noteId, constants.note_modes.EDIT_PILE)
   }
 
   markChecked(noteIndex) {
@@ -250,6 +282,7 @@ class NoteList extends React.Component {
       this.props.viewMode == constants.view_modes.RESULT
     return (
       <div className="multi-select">
+        infocus: {this.state.selectedNote} - focustype: {this.state.focusType}
         {showMultiselect ? null : this.state.selected.length ? (
           <div>
             {this.state.addSomething ? (
@@ -348,7 +381,6 @@ class NoteList extends React.Component {
             </div>
           </div>
         )}
-
         {this.state.notes === undefined ? null : (
           <div>
             {this.state.notes.map((note, index) => {
@@ -398,12 +430,19 @@ class NoteList extends React.Component {
                       key={note._id}
                       tabIndex={index + 1}
                       index={index}
-                      inFocus={this.state.inFocus}
-                      becomeInFocus={this.becomeInFocus.bind(this)}
                       refetchMe={this.refetchNoteAtIndex.bind(this)}
                       getImagesForNoteAtIndex={this.getImagesForNoteAtIndex.bind(
                         this
                       )}
+                      mode={
+                        !this.state.selectedNote
+                          ? constants.note_modes.NOSELECTION
+                          : this.state.selectedNote == note._id
+                          ? this.state.focusType
+                          : constants.note_modes.NOT_SELECTED
+                      }
+                      setNoteMode={this.setNoteMode.bind(this)}
+                      onStartPileEdit={this.onStartPileEdit.bind(this)}
                     />
                   )}
                 </div>

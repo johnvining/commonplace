@@ -41,6 +41,7 @@ class Autocomplete extends React.Component {
     this.setState({ hideResults: false })
     this.setState({ currentTypedText: val.target.value }, () => {
       if (!this.state.currentTypedText) {
+        t
         if (this.props.onClearText) this.props.onClearText()
         return
       } else if (this.state.currentTypedText.length < 3) {

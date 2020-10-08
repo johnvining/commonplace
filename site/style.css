@@ -69,11 +69,15 @@ div .top-bar {
   margin: 4px;
   padding: 4px; }
   .note-full.outer:focus {
-    border-color: black;
+    border-color: gray;
     outline: none; }
+  .note-full.outer.selected {
+    border-color: black; }
   .note-full.outer.edit-note, .note-full.outer.edit-idea {
     background-color: white;
     border-color: lightblue; }
+  .note-full.outer.not-selected {
+    background-color: #f2f2f2; }
 .note-full .left-right-bar {
   display: flex;
   justify-content: space-between;

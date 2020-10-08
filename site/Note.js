@@ -12,6 +12,7 @@ import tags from './icons/tags.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 import PileListForItem from './PileListForItem'
+import * as constants from './constants'
 
 class Note extends React.Component {
   state = {
@@ -33,7 +34,6 @@ class Note extends React.Component {
     document.addEventListener('keydown', this.keyDownListener, false)
 
     this.setState({
-      inFocus: this.props.inFocus,
       pendingAuthorId: this.props.note.author?._id,
       pendingAuthorName: this.props.note.author?.name,
       pendingPage: this.props.note.page,
@@ -52,18 +52,14 @@ class Note extends React.Component {
   }
 
   handleKeyDown(event) {
-    // TODO: Update to pass in the status rather than the ID from parent
-    if (this.props.inFocus != this.props.id) {
-      return
-    }
-    if (this.state.edit && event.ctrlKey && event.keyCode == 65) {
+    if (
+      this.props.mode == constants.note_modes.EDIT &&
+      event.ctrlKey &&
+      event.keyCode == 65
+    ) {
       this.handleAccept()
-    } else if (!this.state.edit && event.ctrlKey && event.keyCode == 69) {
-      this.handleEdit()
     } else if (this.state.edit && event.keyCode == 27) {
-      this.handleCancel()
-    } else if (!this.state.edit && event.ctrlKey && event.keyCode == 84) {
-      this.addIdea()
+      this.props.setNoteMode('', '')
     }
   }
 
@@ -77,23 +73,6 @@ class Note extends React.Component {
           console.error(error)
         })
     }
-  }
-
-  handleCancel() {
-    this.setState({ edit: false })
-  }
-
-  handleEdit() {
-    this.setState({ edit: true })
-    this.props.becomeInFocus(this.props.id)
-  }
-
-  addIdea() {
-    this.setState({ addIdea: true, focus: this })
-  }
-
-  endIdea() {
-    this.setState({ addIdea: false })
   }
 
   handleTitleChange = val => {
@@ -189,7 +168,8 @@ class Note extends React.Component {
       updateObject.year = this.state.pendingYear
     }
 
-    this.setState({ edit: false, keep: true })
+    this.setState({ keep: true })
+    this.props.setNoteMode(constants.note_modes.SELECT)
     await db
       .updateNoteInfo(this.props.id, updateObject)
       .then(this.props.refetchMe(this.props.index))
@@ -213,7 +193,7 @@ class Note extends React.Component {
 
   handleFocusImage(click) {
     if (
-      this.state.edit &&
+      this.state.mode == constants.note_modes.EDIT &&
       confirm('Are you sure you want to delete this image?')
     ) {
       if (click.target.id == this.state.largeImage) {
@@ -252,27 +232,53 @@ class Note extends React.Component {
   }
 
   render() {
-    const { edit, id, addIdea, deleted } = this.state
-    const note = this.props.note
-
-    var mode = { class: 'note-full ' }
-    if (edit) {
-      mode.class = 'note-full edit-note '
-    } else if (addIdea) {
-      mode.class = 'note-full edit-idea '
-    }
+    const { deleted } = this.state
+    const { note } = this.props
 
     if (deleted) {
       return <div> </div>
     }
 
+    var edit = false,
+      edit_ideas = false,
+      edit_piles = false,
+      selected = false,
+      no_selection = false
+
+    var class_name = 'note-full '
+    switch (this.props.mode) {
+      case constants.note_modes.NOSELECTION:
+        no_selection = true
+        break
+      case constants.note_modes.NOT_SELECTED:
+        class_name = 'note-full not-selected '
+        break
+      case constants.note_modes.SELECTED:
+        selected = true
+        class_name = 'note-full selected '
+        break
+      case constants.note_modes.EDIT:
+        class_name = 'note-full edit-note '
+        edit = true
+        break
+      case constants.note_modes.EDIT_IDEA:
+        class_name = 'note-full edit-note '
+        edit_ideas = true
+        break
+      case constants.note_modes.EDIT_PILE:
+        class_name = 'note-full edit-note '
+        edit_piles = true
+        break
+    }
+
     return (
       <div
-        className={mode.class + 'outer'}
+        className={class_name + 'outer'}
         key={this.props.id}
         id={this.props.id}
-        tabIndex={this.props.tabIndex}
+        tabIndex={no_selection ? this.props.tabIndex : '-1'}
       >
+        Mode: {this.props.mode} -- {this.props.noteCanFocus} -- {class_name}
         {this.state.largeImage >= 0 ? (
           <div
             className="half"
@@ -286,7 +292,6 @@ class Note extends React.Component {
             />
           </div>
         ) : null}
-
         <div className={this.state.largeImage >= 0 ? 'half' : null}>
           <div>
             {/* Title and Year */}
@@ -331,16 +336,18 @@ class Note extends React.Component {
             <div className="note-full pile container">
               <PileListForItem
                 remove={this.state.edit}
-                edit={this.state.editPiles}
+                allowTabbing={selected || edit_piles}
+                allowAdd={selected || edit_piles || this.props.mode == ''}
+                edit={edit_piles}
                 piles={note.piles}
                 onSelect={this.handleNewPile.bind(this)}
                 getSuggestions={db.getPileSuggestions}
                 handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
                 mainClassName="note"
-                onStartEdit={() => {
-                  this.setState({ editPiles: true })
-                }}
                 onPileRemove={this.handlePileRemove.bind(this)}
+                onStartPileEdit={() => {
+                  this.props.onStartPileEdit(note._id)
+                }}
               />
             </div>
             {/* Images */}
@@ -525,7 +532,7 @@ class Note extends React.Component {
             <div className={'left-right-bar'}>
               <div className={'idea-container'}>
                 {note.ideas?.map(idea =>
-                  this.state.addIdea ? (
+                  edit_ideas ? (
                     <button
                       className="idea label edit"
                       key={'idea-button' + idea._id}
@@ -562,7 +569,9 @@ class Note extends React.Component {
 
                       <button
                         className={'action-button'}
-                        onClick={this.handleCancel.bind(this)}
+                        onClick={() => {
+                          this.props.setNoteMode(this.props.id, '')
+                        }}
                       >
                         <img src={cross_circle}></img>
                       </button>
@@ -575,7 +584,7 @@ class Note extends React.Component {
                   </>
                 ) : (
                   <>
-                    {this.state.addIdea ? (
+                    {edit_ideas ? (
                       <Autocomplete
                         inputName={this.props.id + 'idea'}
                         className={'idea'}
@@ -592,7 +601,12 @@ class Note extends React.Component {
                       <span>
                         <button
                           className={'action-button'}
-                          onClick={this.addIdea.bind(this)}
+                          onClick={() => {
+                            this.props.setNoteMode(
+                              this.props.id,
+                              constants.note_modes.EDIT_IDEA
+                            )
+                          }}
                           tabIndex="-1"
                         >
                           <img src={tags}></img>
@@ -605,7 +619,12 @@ class Note extends React.Component {
 
                         <button
                           className={'action-button'}
-                          onClick={this.handleEdit.bind(this)}
+                          onClick={() => {
+                            this.props.setNoteMode(
+                              this.props.id,
+                              constants.note_modes.EDIT
+                            )
+                          }}
                           tabIndex="-1"
                         >
                           <img src={write}></img>
