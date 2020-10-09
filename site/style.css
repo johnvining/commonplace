@@ -263,9 +263,11 @@ div .top-bar {
   padding: 2px; }
 .idea.label {
   background-color: #efffff;
+  border-style: solid;
   border-radius: 4px;
   border-radius: 4px;
-  border-style: none;
+  border-style: solid;
+  border-color: white;
   color: black;
   font-size: 15px;
   margin: 2px;
@@ -273,9 +275,7 @@ div .top-bar {
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
   .idea.label:focus {
-    outline: none;
-    background-color: white;
-    border-radius: 4px; }
+    border-color: black; }
   .idea.label:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
@@ -286,8 +286,6 @@ div .top-bar {
     width: 14px;
     height: 14px;
     content: ''; }
-  .idea.label.edit:hover {
-    background-color: lightcoral; }
 .idea.ul {
   display: block;
   margin: 0px;

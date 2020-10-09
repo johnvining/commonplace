@@ -355,9 +355,12 @@ div.main {
 
   &.label {
     background-color: $option_blue;
+    border-style: solid;
+
     border-radius: 4px;
     border-radius: 4px;
-    border-style: none;
+    border-style: solid;
+    border-color: white;
     color: black;
     font-size: 15px;
     margin: 2px;
@@ -366,7 +369,7 @@ div.main {
     font-family: $main_font;
 
     &:focus {
-      @include note-edit-focus;
+      border-color: black;
     }
 
     &:hover {
@@ -381,10 +384,6 @@ div.main {
       width: 14px;
       height: 14px;
       content: '';
-    }
-
-    &.edit:hover {
-      background-color: $removal;
     }
   }
 
