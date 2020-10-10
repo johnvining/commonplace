@@ -6,120 +6,73 @@ import * as WorkControllers from '../work/work.controllers.js'
 import config from '../../config'
 import fs from 'fs'
 
+export const reqFindNotesByString = async (req, res) => {
+  return await findNotesByString(req.body.searchString)
+}
+
 // TODO: Standardize note-fetching so all note lists have the same fields populated #36
 export const reqGetRecentNotes = async (req, res) => {
   const pageSize = 30
-  try {
-    const docs = await Note.find({})
-      .sort({ updatedAt: -1 })
-      .skip((req.params.skip - 1) * pageSize)
-      .limit(pageSize)
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
-
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  return await Note.find({})
+    .sort({ updatedAt: -1 })
+    .skip((req.params.skip - 1) * pageSize)
+    .limit(pageSize)
+    .populate('author')
+    .populate('ideas')
+    .populate('piles')
+    .populate({
+      path: 'work',
+      populate: {
+        path: 'author'
+      }
+    })
+    .lean()
+    .exec()
 }
 
 export const reqAddIdea = async (req, res) => {
-  try {
-    const docs = await addIdeaToId(req.params.id, req.body.id)
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  return await addIdeaToId(req.params.id, req.body.id)
 }
 
 export const reqAddNewIdea = async (req, res) => {
-  try {
-    const newIdea = await IdeaControllers.createIdea(req.body.name)
-    const docs = await addIdeaToId(req.params.id, newIdea._id)
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  const newIdea = await IdeaControllers.createIdea(req.body.name)
+  return await addIdeaToId(req.params.id, newIdea._id)
+}
+
+export const reqRemoveIdeaFromNote = async (req, res) => {
+  return await removeIdeaFromNote(req.params.id, req.params.ideaId)
 }
 
 export const reqAddPile = async (req, res) => {
-  try {
-    const docs = await addPileToId(req.params.id, req.body.id)
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  return await addPileToId(req.params.id, req.body.id)
 }
 
 export const reqAddNewPile = async (req, res) => {
-  try {
-    const newPile = await Pile.create({ name: req.body.name })
-    const docs = await addPileToId(req.params.id, newPile._id)
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  const newPile = await Pile.create({ name: req.body.name })
+  return await addPileToId(req.params.id, newPile._id)
 }
 
-export const reqUpdateNote = async (req, res) => {
-  try {
-    const docs = await updateNote(req.params.id, req.body)
-    res
-      .status(200)
-      .json(docs)
-      .end()
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+export const reqRemovePileFromNote = async (req, res) => {
+  const doc = removePileFromNote(req.params.id, req.params.pileId)
+  if (!doc) {
+    return res.status(400).end() // TODO: Test with wrapper
   }
 }
 
 export const reqAddWork = async (req, res) => {
-  try {
-    const docs = await addWorkToId(req.params.id, req.body.newWork)
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  return await addWorkToId(req.params.id, req.body.newWork)
 }
 
 export const reqAddNewWork = async (req, res) => {
-  try {
-    const newWork = await WorkControllers.createWork(req.body.newWork)
-    const docs = await addWorkToId(req.params.id, newWork._id)
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  const newWork = await WorkControllers.createWork(req.body.newWork)
+  return await addWorkToId(req.params.id, newWork._id)
 }
 
-export const reqFindNotesByString = async (req, res) => {
-  try {
-    const docs = await findNotesByString(req.body.searchString)
-
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+export const reqUpdateNote = async (req, res) => {
+  return await updateNote(req.params.id, req.body)
 }
 
+// TODO: Create specific file for nome.image.controllers
 export const reqAddImageToNote = async (req, res) => {
   try {
     if (!req.files) {
@@ -186,30 +139,6 @@ export const reqGetImageForNote = async function(req, res) {
     res.sendFile(
       config.imageStorePath + '/' + note.images[req.params.image - 1]
     )
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-}
-
-export const reqRemoveIdeaFromNote = async (req, res) => {
-  try {
-    const docs = await removeIdeaFromNote(req.params.id, req.params.ideaId)
-
-    res.status(200).json({ data: docs })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-}
-
-export const reqRemovePileFromNote = async (req, res) => {
-  try {
-    const doc = removePileFromNote(req.params.id, req.params.pileId)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
   } catch (e) {
     console.error(e)
     res.status(400).end()
