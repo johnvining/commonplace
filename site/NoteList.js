@@ -146,6 +146,10 @@ class NoteList extends React.Component {
   }
 
   setNoteMode(noteId, mode) {
+    if (mode == constants.note_modes.SELECT) {
+      let divToFocus = document.getElementById(this.state.selectedNote)
+      divToFocus.focus()
+    }
     this.setState({
       selectedNote: noteId,
       focusType: mode
