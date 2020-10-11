@@ -193,7 +193,7 @@ class Note extends React.Component {
 
   handleFocusImage(click) {
     if (
-      this.state.mode == constants.note_modes.EDIT &&
+      this.props.mode == constants.note_modes.EDIT &&
       confirm('Are you sure you want to delete this image?')
     ) {
       if (click.target.id == this.state.largeImage) {
