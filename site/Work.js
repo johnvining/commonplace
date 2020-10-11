@@ -153,9 +153,11 @@ class Work extends React.Component {
               getSuggestions={getPileSuggestions}
               handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
               mainClassName="work-page"
-              onStartEdit={() => {
+              onStartPileEdit={() => {
                 this.setState({ editPiles: true })
               }}
+              allowAdd={true}
+              allowTabbing={true}
               onPileRemove={this.handlePileRemove.bind(this)}
             />
           </div>
