@@ -12,6 +12,7 @@ import ViewSelector from './ViewSelector'
 import Work from './Work'
 import plus from './icons/plus.svg'
 import { createNewNoteFromTitle } from './Database'
+import search from './icons/search.svg'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }
@@ -67,6 +68,17 @@ class App extends React.Component {
               </Link>
             </div>
             <div className="top-action-bar">
+              <div className="tool-bar div">
+                <button
+                  className="button left-right"
+                  onClick={async () => {
+                    this.setState({ barOpen: true })
+                  }}
+                >
+                  {' '}
+                  <img src={search} />{' '}
+                </button>
+              </div>
               <div className="tool-bar div">
                 <button
                   className="button left-right"
