@@ -11,7 +11,8 @@ import {
   updateWorkInfo,
   addPileToWork,
   createPileAndAddToWork,
-  removePileFromWork
+  removePileFromWork,
+  createNewNoteForWork
 } from './Database'
 import Autocomplete from './Autocomplete'
 import PileListForItem from './PileListForItem'
@@ -135,6 +136,12 @@ class Work extends React.Component {
     removePileFromWork(this.state.id, pileId).then(() => {
       this.fetchWorkInfo(this.props.id)
     })
+  }
+
+  async createNoteForWork() {
+    const response = await createNewNoteForWork(this.props.id)
+    console.log(response)
+    navigate('/note/' + response.data._id)
   }
 
   render() {
@@ -270,6 +277,12 @@ class Work extends React.Component {
                   onClick={this.deleteWork.bind(this)}
                 >
                   Delete
+                </button>
+                <button
+                  className="top-level button"
+                  onClick={this.createNoteForWork.bind(this)}
+                >
+                  + Note
                 </button>
               </>
             )}
