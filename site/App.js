@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { Router, Link } from '@reach/router'
+import { Router, Link, navigate } from '@reach/router'
 import Author from './Author'
 import Find from './Find'
 import Idea from './Idea'
@@ -10,6 +10,8 @@ import RecentList from './RecentList'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
+import plus from './icons/plus.svg'
+import { createNewNoteFromTitle } from './Database'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }
@@ -65,10 +67,24 @@ class App extends React.Component {
               </Link>
             </div>
             <div className="top-action-bar">
-              <ViewSelector
-                viewMode={this.state.viewMode}
-                setView={this.setView.bind(this)}
-              />
+              <div className="tool-bar div">
+                <button
+                  className="button left-right"
+                  onClick={async () => {
+                    const response = await createNewNoteFromTitle('')
+                    navigate('/note/' + response.data._id + '/edit')
+                  }}
+                >
+                  {' '}
+                  <img src={plus} />{' '}
+                </button>
+              </div>
+              <div className="tool-bar div">
+                <ViewSelector
+                  viewMode={this.state.viewMode}
+                  setView={this.setView.bind(this)}
+                />
+              </div>
             </div>
           </div>
         )}

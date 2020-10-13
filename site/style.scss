@@ -32,11 +32,9 @@ div.main {
   }
 
   .top-action-bar {
-    display: inline-block;
-    text-align: right;
+    display: inline-flex;
+    justify-content: flex-end;
     width: 50%;
-    height: 45px;
-    align-items: center;
   }
 
   .tool-bar {
@@ -62,12 +60,20 @@ div.main {
       outline: none;
     }
 
+    &.div {
+      padding: 10px;
+    }
+
     .left {
       border-radius: 5px 0px 0px 5px;
     }
 
     .right {
       border-radius: 0px 5px 5px 0px;
+    }
+
+    .left-right {
+      border-radius: 5px 5px 5px 5px;
     }
   }
 }
