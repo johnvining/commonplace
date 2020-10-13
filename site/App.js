@@ -79,6 +79,7 @@ class App extends React.Component {
           <Find path="/find/:search" viewMode={this.state.viewMode} />
           <Idea path="/idea/:id" viewMode={this.state.viewMode} />
           <NoteView path="/note/:id" />
+          <NoteView path="/note/:id/edit" edit={true} />
           <Pile path="/pile/:id" viewMode={this.state.viewMode} />
           <RecentList path="/" viewMode={this.state.viewMode} />
           <Work path="/work/:id" viewMode={this.state.viewMode} />

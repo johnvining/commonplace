@@ -40,6 +40,10 @@ class NoteList extends React.Component {
         }
       }
     )
+
+    if (this.props.editFirst && this.state.notes[0]) {
+      this.setNoteMode(this.state.notes[0]._id, constants.note_modes.EDIT)
+    }
   }
 
   componentWillUnmount() {
