@@ -3,17 +3,12 @@ import Note from '../note/note.model.js'
 import { crudControllers } from '../../utils/crud.js'
 import { removeIdeaFromNote } from '../note/note.controllers'
 
-export const getNotesFromIdea = async (req, res) => {
-  try {
-    const doc = await getNotesForIdea(req.params.id)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+export const reqGetNotesForIdea = async (req, res) => {
+  const doc = await getNotesForIdea(req.params.id)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqGetIdeasByStringWithCounts = async (req, res) => {
@@ -59,21 +54,16 @@ export const reqGetIdeasByStringWithCounts = async (req, res) => {
   }
 }
 
-export const getAutoCompleteWithCounts = async (req, res) => {
+export const reqGetAutoCompleteWithCounts = async (req, res) => {
   return await reqGetAutoComplete(req, res, true)
 }
 
 export const reqGetAutoComplete = async (req, res, withCounts = false) => {
-  try {
-    const doc = await findIdeasByString(req.body.string, withCounts)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await findIdeasByString(req.body.string, withCounts)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const findIdeasByString = async function(string, withCounts = false) {
@@ -99,39 +89,23 @@ export const findIdeasByString = async function(string, withCounts = false) {
 }
 
 export const reqGetIdeaInfo = async (req, res) => {
-  try {
-    const doc = await getIdeaInfo(req.params.id)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await getIdeaInfo(req.params.id)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqCreateIdea = async (req, res) => {
-  try {
-    const doc = await createIdea(req.body.name)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await createIdea(req.body.name)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqDeleteIdea = async (req, res) => {
-  try {
-    await deleteIdea(req.params.id)
-    res.status(200).json()
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  await deleteIdea(req.params.id)
 }
 
 // Idea
