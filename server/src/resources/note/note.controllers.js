@@ -57,6 +57,7 @@ export const reqRemovePileFromNote = async (req, res) => {
   if (!doc) {
     return res.status(400).end() // TODO: Test with wrapper
   }
+  return doc
 }
 
 export const reqAddWork = async (req, res) => {
