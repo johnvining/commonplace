@@ -6,29 +6,19 @@ import { crudControllers } from '../../utils/crud.js'
 import { removePileFromWork } from '../work/work.controllers.js'
 
 export const reqGetNotesForPile = async (req, res) => {
-  try {
-    const doc = await getNotesForPile(req.params.id)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await getNotesForPile(req.params.id)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqGetWorksForPile = async (req, res) => {
-  try {
-    const doc = await getWorksForPile(req.params.id)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await getWorksForPile(req.params.id)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqGetAutoCompleteWithCounts = async (req, res) => {
@@ -36,16 +26,23 @@ export const reqGetAutoCompleteWithCounts = async (req, res) => {
 }
 
 export const reqGetAutoComplete = async (req, res, withCounts = false) => {
-  try {
-    const doc = await filePilesByString(req.body.string, withCounts)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await filePilesByString(req.body.string, withCounts)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
+}
+
+export const reqCreatePile = async (req, res) => {
+  const doc = await findOrCreatePile(req.body.name)
+  if (!doc) {
+    return res.status(400).end()
+  }
+  return doc
+}
+
+export const reqDeletePile = async (req, res) => {
+  await deletePile(req.params.id)
 }
 
 // TODO: Duplicative of whats in work.controllers.js
@@ -76,29 +73,6 @@ export const filePilesByString = async function(string, withCounts) {
 
     await Promise.all([noteFiler, workFiler])
     return piles
-  }
-}
-
-export const reqCreatePile = async (req, res) => {
-  try {
-    const doc = await findOrCreatePile(req.body.name)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-}
-
-export const reqDeletePile = async (req, res) => {
-  try {
-    await deletePile(req.params.id)
-    res.status(200).json()
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
   }
 }
 

@@ -7,15 +7,18 @@ import controllers, {
   reqGetNotesForPile,
   reqGetWorksForPile
 } from './pile.controllers'
+import { asyncWrapper } from '../../utils/requests.js'
 
 const router = Router()
 
-router.route('/autocomplete/with-counts').post(reqGetAutoCompleteWithCounts)
-router.route('/autocomplete').post(reqGetAutoComplete)
-router.route('/').post(reqCreatePile)
+router
+  .route('/autocomplete/with-counts')
+  .post(asyncWrapper(reqGetAutoCompleteWithCounts, 200))
+router.route('/autocomplete').post(asyncWrapper(reqGetAutoComplete, 200))
+router.route('/').post(asyncWrapper(reqCreatePile, 200))
 
-router.route('/:id/notes').get(reqGetNotesForPile)
-router.route('/:id/works').get(reqGetWorksForPile)
+router.route('/:id/notes').get(asyncWrapper(reqGetNotesForPile, 200))
+router.route('/:id/works').get(asyncWrapper(reqGetWorksForPile, 200))
 
 router
   .route('/:id')
