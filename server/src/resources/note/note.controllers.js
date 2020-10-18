@@ -18,7 +18,7 @@ export const reqGetNoteDetails = async (req, res) => {
 }
 
 export const reqDeleteNote = async (req, res) => {
-  // TODO: Delete images when deleting note
+  // TODO: Delete images when deleting note, #101
   const id = req.params.id
   await Note.deleteOne({ _id: id })
   res.status(200).end()

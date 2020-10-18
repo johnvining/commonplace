@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import {
+import defaultControllers, {
   getAutoComplete,
   getAutoCompleteWithCounts,
   reqCreateAuthor,
@@ -20,6 +20,6 @@ router.route('/autocomplete').post(asyncWrapper(getAutoComplete, 200))
 router.route('/:id/delete').post(asyncWrapper(reqDeleteAuthor, 204))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForAuthor, 200))
 router.route('/:id/works').get(asyncWrapper(reqGetWorksForAuthor, 200))
-router.route('/:id').get(asyncWrapper(reqGetAuthorDetails, 200))
+router.route('/:id').get(asyncWrapper(defaultControllers.getOne, 200))
 
 export default router

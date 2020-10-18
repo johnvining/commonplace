@@ -4,16 +4,6 @@ import Work from '../work/work.model.js'
 import { findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 
-export const reqGetAuthorDetails = async (req, res) => {
-  const doc = await Auth.findOne({ _id: req.params.id })
-    .lean()
-    .exec()
-  if (!doc) {
-    return res.status(400).end()
-  }
-  return doc
-}
-
 export const reqGetNotesForAuthor = async (req, res) => {
   const doc = await getNotesForAuthor(req.params.id)
   if (!doc) {

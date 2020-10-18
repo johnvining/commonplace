@@ -29,7 +29,7 @@ class Pile extends React.Component {
     getPileInfo(pileId)
       .then(response => {
         this.setState({
-          pileName: response.data.data[0].name
+          pileName: response.data.data.name
         })
       })
       .catch(error => {

@@ -1,6 +1,6 @@
 export const getOne = model => async (req, res) => {
   const doc = await model
-    .find({ _id: req.params.id })
+    .findOne({ _id: req.params.id })
     .lean()
     .exec()
 
