@@ -14,6 +14,7 @@ export const getMany = model => async (req, res) => {
   }
 }
 
+// TODO: Refactor out when using Note
 export const getOne = model => async (req, res) => {
   try {
     const doc = await model

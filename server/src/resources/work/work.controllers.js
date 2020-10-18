@@ -2,7 +2,7 @@ import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
 import Pile from '../pile/pile.model.js'
 import { createAuthor } from '../auth/auth.controllers.js'
-import { removeWorkFromNote } from '../note/note.controllers.js'
+import { findNotesAndPopulate } from '../note/note.controllers.js'
 import { crudControllers } from '../../utils/crud.js'
 
 // Request response
@@ -139,31 +139,14 @@ export const findOrCreateWork = async function(name) {
 }
 
 export const getNotesFromWork = async function(workId, slim = false) {
-  if (slim) {
-    return Note.find({ work: workId })
-      .lean()
-      .exec()
-  } else {
-    return Note.find({ work: workId })
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
-  }
+  return findNotesAndPopulate({ work: workId }, {}, slim)
 }
 
 export const deleteWork = async function(id) {
   let notes = await getNotesFromWork(id, true)
   let deletionPromises = []
   notes.map(note => {
-    deletionPromises.push(removeWorkFromNote(note._id))
+    deletionPromises.push(updateNote(note._id), { work: null })
   })
 
   await Promise.all(deletionPromises)

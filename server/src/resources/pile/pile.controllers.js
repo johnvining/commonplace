@@ -1,7 +1,7 @@
 import Pile from './pile.model.js'
 import Note from '../note/note.model.js'
 import Work from '../work/work.model.js'
-import { removePileFromNote } from '../note/note.controllers.js'
+import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
 import { crudControllers } from '../../utils/crud.js'
 import { removePileFromWork } from '../work/work.controllers.js'
 
@@ -82,7 +82,7 @@ export const deletePile = async function(pileId) {
   let works = await getWorksForPile(pileId)
   let deletionPromises = []
   notes.map(note => {
-    deletionPromises.push(removePileFromNote(note._id, pileId))
+    deletionPromises.push(updateNote(note._id, { $pull: { piles: pileId } }))
   })
 
   works.map(work => {
@@ -99,25 +99,7 @@ export const findOrCreatePile = async name => {
 }
 
 export const getNotesForPile = async function(pileId, slim = false) {
-  if (slim) {
-    return Note.find({ piles: pileId })
-      .lean()
-      .exec()
-  } else {
-    return Note.find({ piles: pileId })
-      .sort({ updatedAt: -1 })
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
-  }
+  return findNotesAndPopulate({ piles: pileId }, { updatedAt: -1 }, slim)
 }
 
 export const getWorksForPile = async function(pileId) {

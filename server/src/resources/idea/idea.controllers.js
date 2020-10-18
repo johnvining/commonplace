@@ -1,7 +1,10 @@
 import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
 import { crudControllers } from '../../utils/crud.js'
-import { removeIdeaFromNote } from '../note/note.controllers'
+import {
+  removeIdeaFromNote,
+  findNotesAndPopulate
+} from '../note/note.controllers'
 
 export const reqGetNotesForIdea = async (req, res) => {
   const doc = await getNotesForIdea(req.params.id)
@@ -18,23 +21,10 @@ export const reqGetIdeasByStringWithCounts = async (req, res) => {
       return res.status(400).end()
     }
 
-    // TODO: Refactor note from idea search out
+    // TODO: Can we use slim here?
     var notePromises = []
     for (let i = 0; i < doc.length; i++) {
-      notePromises.push(
-        Note.find({ ideas: doc[i]._id })
-          .populate('author')
-          .populate('ideas')
-          .populate('piles')
-          .populate({
-            path: 'work',
-            populate: {
-              path: 'author'
-            }
-          })
-          .lean()
-          .exec()
-      )
+      notePromises.push(findNotesAndPopulate({ ideas: doc[i]._id }))
     }
 
     const notes = await Promise.all(notePromises)
@@ -134,24 +124,7 @@ export const findOrCreateIdea = async function(name) {
 }
 
 export const getNotesForIdea = async function(ideaId, slim = false) {
-  if (slim) {
-    return Note.find({ ideas: ideaId })
-      .lean()
-      .exec()
-  } else {
-    return Note.find({ ideas: ideaId })
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
-  }
+  return findNotesAndPopulate({ ideas: ideaId }, {}, slim)
 }
 
 export const deleteIdea = async function(ideaId) {

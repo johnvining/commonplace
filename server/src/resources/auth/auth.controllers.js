@@ -1,7 +1,7 @@
 import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
-import { removeAuthorFromNote } from '../note/note.controllers.js'
+import { findNotesAndPopulate } from '../note/note.controllers.js'
 import { crudControllers } from '../../utils/crud.js'
 
 export const reqGetAuthorDetails = async (req, res) => {
@@ -105,33 +105,14 @@ export const findOrCreateAuthor = async function(name) {
 }
 
 export const getNotesForAuthor = async function(authId, slim = false) {
-  if (slim) {
-    return Note.find({ author: authId })
-      .sort({ updatedAt: -1 })
-      .lean()
-      .exec()
-  } else {
-    return Note.find({ author: authId })
-      .sort({ updatedAt: -1 })
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
-  }
+  return findNotesAndPopulate({ author: authId }, { updatedAt: -1 }, slim)
 }
 
 export const deleteAuthor = async function(id) {
   let notes = await getNotesForAuthor(id, true)
   let deletionPromises = []
   notes.map(note => {
-    deletionPromises.push(removeAuthorFromNote(note._id))
+    deletionPromises.push(updateNote(note._id, { author: null }))
   })
 
   await Promise.all(deletionPromises)

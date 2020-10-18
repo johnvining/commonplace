@@ -125,7 +125,7 @@ async function note(args) {
     let note = await NoteControllers.createNote(args)
     setContext(usertext.context.note, note)
     let author = await auth(args)
-    await NoteControllers.addAuthor(note.id, author)
+    await NoteControllers.updateNote(note.id, { author: author })
   }
 }
 
