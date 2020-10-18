@@ -1,6 +1,6 @@
 import Note from './note.model.js'
 import Pile from '../pile/pile.model.js'
-import { crudControllers } from '../../utils/crud.js'
+import { defaultControllers } from '../../utils/default.controllers.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 import config from '../../config'
@@ -15,6 +15,13 @@ export const reqFindNotesByString = async (req, res) => {
 
 export const reqGetNoteDetails = async (req, res) => {
   return await findNotesAndPopulate({ _id: req.params.id })
+}
+
+export const reqDeleteNote = async (req, res) => {
+  // TODO: Delete images when deleting note
+  const id = req.params.id
+  await Note.deleteOne({ _id: id })
+  res.status(200).end()
 }
 
 export const reqGetRecentNotes = async (req, res) => {
@@ -203,4 +210,4 @@ export const findNotesAndPopulate = async function(
   }
 }
 
-export default crudControllers(Note)
+export default defaultControllers(Note)

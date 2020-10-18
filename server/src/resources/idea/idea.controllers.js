@@ -1,6 +1,6 @@
 import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
-import { crudControllers } from '../../utils/crud.js'
+import { defaultControllers } from '../../utils/default.controllers.js'
 import {
   removeIdeaFromNote,
   findNotesAndPopulate
@@ -138,4 +138,4 @@ export const deleteIdea = async function(ideaId) {
   await Idea.findOneAndDelete({ _id: ideaId })
 }
 
-export default crudControllers(Idea)
+export default defaultControllers(Idea)

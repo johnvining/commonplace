@@ -2,7 +2,7 @@ import Pile from './pile.model.js'
 import Note from '../note/note.model.js'
 import Work from '../work/work.model.js'
 import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
-import { crudControllers } from '../../utils/crud.js'
+import { defaultControllers } from '../../utils/default.controllers.js'
 import { removePileFromWork } from '../work/work.controllers.js'
 
 export const reqGetNotesForPile = async (req, res) => {
@@ -109,4 +109,4 @@ export const getWorksForPile = async function(pileId) {
     .exec()
 }
 
-export default crudControllers(Pile)
+export default defaultControllers(Pile)

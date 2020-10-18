@@ -22,7 +22,7 @@ router.route('/:id/works').get(asyncWrapper(reqGetWorksForPile, 200))
 
 router
   .route('/:id')
-  .get(controllers.getOne)
+  .get(asyncWrapper(controllers.getOne, 200))
   .delete(asyncWrapper(reqDeletePile, 204))
 
 export default router

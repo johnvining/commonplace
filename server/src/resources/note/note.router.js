@@ -7,14 +7,15 @@ import controllers, {
   reqAddNewWork,
   reqAddPile,
   reqAddWork,
+  reqDeleteNote,
   reqFindNotesByString,
   reqGetImageForNote,
+  reqGetNoteDetails,
   reqGetRecentNotes,
   reqRemoveIdeaFromNote,
-  reqUpdateNote,
-  reqRemovePileFromNote,
   reqRemoveImageFromNote,
-  reqGetNoteDetails
+  reqRemovePileFromNote,
+  reqUpdateNote
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
@@ -22,7 +23,7 @@ const router = Router()
 
 router.route('/find').put(asyncWrapper(reqFindNotesByString, 200))
 
-router.route('/').post(controllers.createOne)
+router.route('/').post(asyncWrapper(controllers.createOne, 201))
 
 router.route('/all/:skip').get(asyncWrapper(reqGetRecentNotes, 200))
 
@@ -50,6 +51,6 @@ router
   .route('/:id')
   .get(asyncWrapper(reqGetNoteDetails, 200))
   .put(asyncWrapper(reqUpdateNote, 200))
-  .delete(controllers.removeOne)
+  .delete(asyncWrapper(reqDeleteNote, 204))
 
 export default router

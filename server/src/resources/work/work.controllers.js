@@ -3,7 +3,7 @@ import Note from '../note/note.model.js'
 import Pile from '../pile/pile.model.js'
 import { createAuthor } from '../auth/auth.controllers.js'
 import { findNotesAndPopulate } from '../note/note.controllers.js'
-import { crudControllers } from '../../utils/crud.js'
+import { defaultControllers } from '../../utils/default.controllers.js'
 
 // Request response
 export const reqGetNotesForWork = async (req, res) => {
@@ -174,4 +174,4 @@ export const removePileFromWork = async (workId, pileId) => {
     .exec()
 }
 
-export default crudControllers(Work)
+export default defaultControllers(Work)

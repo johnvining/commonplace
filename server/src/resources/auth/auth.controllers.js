@@ -2,7 +2,7 @@ import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { findNotesAndPopulate } from '../note/note.controllers.js'
-import { crudControllers } from '../../utils/crud.js'
+import { defaultControllers } from '../../utils/default.controllers.js'
 
 export const reqGetAuthorDetails = async (req, res) => {
   const doc = await Auth.findOne({ _id: req.params.id })
@@ -119,4 +119,4 @@ export const deleteAuthor = async function(id) {
   await Auth.findOneAndDelete({ _id: id })
 }
 
-export default crudControllers(Auth)
+export default defaultControllers(Auth)
