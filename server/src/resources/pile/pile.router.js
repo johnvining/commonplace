@@ -15,7 +15,7 @@ router
   .route('/autocomplete/with-counts')
   .post(asyncWrapper(reqGetAutoCompleteWithCounts, 200))
 router.route('/autocomplete').post(asyncWrapper(reqGetAutoComplete, 200))
-router.route('/').post(asyncWrapper(reqCreatePile, 200))
+router.route('/').post(asyncWrapper(reqCreatePile, 201))
 
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForPile, 200))
 router.route('/:id/works').get(asyncWrapper(reqGetWorksForPile, 200))
@@ -23,6 +23,6 @@ router.route('/:id/works').get(asyncWrapper(reqGetWorksForPile, 200))
 router
   .route('/:id')
   .get(controllers.getOne)
-  .delete(asyncWrapper(reqDeletePile, 200))
+  .delete(asyncWrapper(reqDeletePile, 204))
 
 export default router
