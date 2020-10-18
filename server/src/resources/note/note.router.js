@@ -13,7 +13,8 @@ import controllers, {
   reqRemoveIdeaFromNote,
   reqUpdateNote,
   reqRemovePileFromNote,
-  reqRemoveImageFromNote
+  reqRemoveImageFromNote,
+  reqGetNoteDetails
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
@@ -47,7 +48,7 @@ router.route('/:id/image/').delete(reqRemoveImageFromNote)
 
 router
   .route('/:id')
-  .get(controllers.getOne)
+  .get(asyncWrapper(reqGetNoteDetails, 200))
   .put(asyncWrapper(reqUpdateNote, 200))
   .delete(controllers.removeOne)
 

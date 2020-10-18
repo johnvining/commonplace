@@ -13,7 +13,10 @@ export const reqFindNotesByString = async (req, res) => {
   )
 }
 
-// TODO: Standardize note-fetching so all note lists have the same fields populated #36
+export const reqGetNoteDetails = async (req, res) => {
+  return await findNotesAndPopulate({ _id: req.params.id })
+}
+
 export const reqGetRecentNotes = async (req, res) => {
   const pageSize = 30
   return findNotesAndPopulate(
