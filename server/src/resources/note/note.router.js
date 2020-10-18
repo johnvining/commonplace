@@ -21,10 +21,7 @@ const router = Router()
 
 router.route('/find').put(asyncWrapper(reqFindNotesByString, 200))
 
-router
-  .route('/')
-  .get(controllers.getMany)
-  .post(controllers.createOne)
+router.route('/').post(controllers.createOne)
 
 router.route('/all/:skip').get(asyncWrapper(reqGetRecentNotes, 200))
 
