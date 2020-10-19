@@ -16,10 +16,6 @@ export const reqGetNotesForAuthor = async (req, res) => {
   return doc
 }
 
-export const getNotesForAuthor = async function(authId, slim = false) {
-  return
-}
-
 export const getAutoCompleteWithCounts = async (req, res) => {
   return getAutoComplete(req, res, true)
 }
