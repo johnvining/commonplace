@@ -5,11 +5,19 @@ import { findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 
 export const reqGetNotesForAuthor = async (req, res) => {
-  const doc = await getNotesForAuthor(req.params.id)
+  const doc = await findNotesAndPopulate(
+    { author: authId },
+    { updatedAt: -1 },
+    slim
+  )
   if (!doc) {
     return res.status(400).end()
   }
   return doc
+}
+
+export const getNotesForAuthor = async function(authId, slim = false) {
+  return
 }
 
 export const getAutoCompleteWithCounts = async (req, res) => {
@@ -92,10 +100,6 @@ export const findOrCreateAuthor = async function(name) {
   }
 
   return await createAuthor(name)
-}
-
-export const getNotesForAuthor = async function(authId, slim = false) {
-  return findNotesAndPopulate({ author: authId }, { updatedAt: -1 }, slim)
 }
 
 export const deleteAuthor = async function(id) {
