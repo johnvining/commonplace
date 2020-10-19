@@ -8,8 +8,7 @@ import { removePileFromWork } from '../work/work.controllers.js'
 export const reqGetNotesForPile = async (req, res) => {
   const doc = await findNotesAndPopulate(
     { piles: req.params.id },
-    { updatedAt: -1 },
-    slim
+    { updatedAt: -1 }
   )
   if (!doc) {
     return res.status(400).end()
@@ -82,7 +81,11 @@ export const filePilesByString = async function(string, withCounts) {
 
 export const deletePile = async function(pileId) {
   // TODO: Parallel
-  let notes = await getNotesForPile(pileId, true)
+  let notes = await findNotesAndPopulate(
+    { piles: pileId },
+    { updatedAt: -1 },
+    true
+  )
   let works = await getWorksForPile(pileId)
   let deletionPromises = []
   notes.map(note => {

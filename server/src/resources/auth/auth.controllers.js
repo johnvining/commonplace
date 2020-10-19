@@ -7,8 +7,7 @@ import { defaultControllers } from '../../utils/default.controllers.js'
 export const reqGetNotesForAuthor = async (req, res) => {
   const doc = await findNotesAndPopulate(
     { author: req.params.id },
-    { updatedAt: -1 },
-    slim
+    { updatedAt: -1 }
   )
   if (!doc) {
     return res.status(400).end()
@@ -99,7 +98,11 @@ export const findOrCreateAuthor = async function(name) {
 }
 
 export const deleteAuthor = async function(id) {
-  let notes = await getNotesForAuthor(id, true)
+  let notes = await findNotesAndPopulate(
+    { author: id },
+    { updatedAt: -1 },
+    true
+  )
   let deletionPromises = []
   notes.map(note => {
     deletionPromises.push(updateNote(note._id, { author: null }))

@@ -7,7 +7,7 @@ import { defaultControllers } from '../../utils/default.controllers.js'
 
 // Request response
 export const reqGetNotesForWork = async (req, res) => {
-  const doc = await getNotesFromWork(req.params.id)
+  const doc = await findNotesAndPopulate({ work: req.params.id }, {})
   if (!doc) {
     return res.status(400).end()
   }
@@ -120,7 +120,7 @@ export const getWorkInfo = async function(workId) {
 }
 
 export const updateWorkInfo = async function(workId, updateObject) {
-  return await Work.findOneAndUpdate({ _id: workId`` }, updateObject)
+  return await Work.findOneAndUpdate({ _id: workId }, updateObject)
 }
 
 export const findWorkByString = async function(name) {
@@ -138,12 +138,8 @@ export const findOrCreateWork = async function(name) {
   return await createWork(name)
 }
 
-export const getNotesFromWork = async function(workId, slim = false) {
-  return findNotesAndPopulate({ work: workId }, {}, slim)
-}
-
 export const deleteWork = async function(id) {
-  let notes = await getNotesFromWork(id, true)
+  let notes = await findNotesAndPopulate({ work: id }, {}, true)
   let deletionPromises = []
   notes.map(note => {
     deletionPromises.push(updateNote(note._id), { work: null })

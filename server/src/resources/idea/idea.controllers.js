@@ -7,7 +7,7 @@ import {
 } from '../note/note.controllers'
 
 export const reqGetNotesForIdea = async (req, res) => {
-  const doc = await findNotesAndPopulate({ ideas: req.params.id }, {}, slim)
+  const doc = await findNotesAndPopulate({ ideas: req.params.id })
   if (!doc) {
     return res.status(400).end()
   }
@@ -112,7 +112,7 @@ export const findOrCreateIdea = async function(name) {
 }
 
 export const deleteIdea = async function(ideaId) {
-  let notes = await getNotesForIdea(ideaId, true)
+  let notes = await findNotesAndPopulate({ ideas: ideaId }, {}, true)
   let deletionPromises = []
   notes.map(note => {
     deletionPromises.push(removeIdeaFromNote(note._id, ideaId))
