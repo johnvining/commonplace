@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import {
+import defaultControllers, {
   reqGetNotesForIdea,
   reqCreateIdea,
   reqDeleteIdea,
@@ -19,7 +19,7 @@ router.route('/autocomplete').post(asyncWrapper(reqGetAutoComplete, 200))
 router.route('/:id/delete').post(asyncWrapper(reqDeleteIdea, 204))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForIdea, 200))
 
-router.route('/:id').get(asyncWrapper(reqGetIdeaInfo, 200))
+router.route('/:id').get(asyncWrapper(defaultControllers.getOne, 200))
 
 router.route('/').post(asyncWrapper(reqCreateIdea, 201))
 

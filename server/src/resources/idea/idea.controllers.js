@@ -7,7 +7,7 @@ import {
 } from '../note/note.controllers'
 
 export const reqGetNotesForIdea = async (req, res) => {
-  const doc = await getNotesForIdea(req.params.id)
+  const doc = await findNotesAndPopulate({ ideas: req.params.id }, {}, slim)
   if (!doc) {
     return res.status(400).end()
   }
@@ -78,14 +78,6 @@ export const findIdeasByString = async function(string, withCounts = false) {
   }
 }
 
-export const reqGetIdeaInfo = async (req, res) => {
-  const doc = await getIdeaInfo(req.params.id)
-  if (!doc) {
-    return res.status(400).end()
-  }
-  return doc
-}
-
 export const reqCreateIdea = async (req, res) => {
   const doc = await createIdea(req.body.name)
   if (!doc) {
@@ -103,10 +95,6 @@ export const createIdea = async function(name) {
   return await Idea.create({ name: name })
 }
 
-export const getIdeaInfo = async function(ideaId) {
-  return await Idea.findOne({ _id: ideaId }).exec()
-}
-
 export const findIdeaByString = async function(string) {
   return await Idea.findOne({ name: string })
 }
@@ -121,10 +109,6 @@ export const findOrCreateIdea = async function(name) {
   }
 
   return await createIdea(name)
-}
-
-export const getNotesForIdea = async function(ideaId, slim = false) {
-  return findNotesAndPopulate({ ideas: ideaId }, {}, slim)
 }
 
 export const deleteIdea = async function(ideaId) {
