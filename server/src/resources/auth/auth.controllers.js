@@ -6,7 +6,7 @@ import { defaultControllers } from '../../utils/default.controllers.js'
 
 export const reqGetNotesForAuthor = async (req, res) => {
   const doc = await findNotesAndPopulate(
-    { author: authId },
+    { author: req.params.id },
     { updatedAt: -1 },
     slim
   )

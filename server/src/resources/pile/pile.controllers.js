@@ -6,7 +6,11 @@ import { defaultControllers } from '../../utils/default.controllers.js'
 import { removePileFromWork } from '../work/work.controllers.js'
 
 export const reqGetNotesForPile = async (req, res) => {
-  const doc = await getNotesForPile(req.params.id)
+  const doc = await findNotesAndPopulate(
+    { piles: req.params.id },
+    { updatedAt: -1 },
+    slim
+  )
   if (!doc) {
     return res.status(400).end()
   }
@@ -96,10 +100,6 @@ export const deletePile = async function(pileId) {
 export const findOrCreatePile = async name => {
   if (!name) return
   return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
-}
-
-export const getNotesForPile = async function(pileId, slim = false) {
-  return findNotesAndPopulate({ piles: pileId }, { updatedAt: -1 }, slim)
 }
 
 export const getWorksForPile = async function(pileId) {
