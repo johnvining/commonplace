@@ -10,7 +10,7 @@ export const types = {
 
 export const url_api = process.env.SERVER_API
 
-// Supported types: idea, auth, work pile
+// Supported types: idea, auth, work, pile
 export async function getSuggestions(type, search, withCounts = false) {
   const data = { string: search }
 
@@ -21,15 +21,20 @@ export async function getSuggestions(type, search, withCounts = false) {
   }
 }
 
-// Supported types: idea, auth, work pile
+// Supported types: idea, auth, work, pile, note
 export async function getInfo(type, Id) {
   return axios.get(url_api + type + `/${Id}`)
 }
 
-// Supported types: TODO
+// Supported types: idea, auth, work, pile,
 export async function createRecord(type, name) {
   const data = { name: name }
   return axios.post(url_api + type, data)
+}
+
+// Supported types: note, work
+export async function updateRecord(type, id, params) {
+  return axios.put(url_api + type + `/${id}`, params)
 }
 
 export async function deleteNote(id) {
@@ -44,14 +49,6 @@ export async function createIdeaAndAddToNote(ideaName, noteId) {
 export async function createPileAndAddToNote(pileName, noteId) {
   const data = { name: pileName }
   return axios.put(url_api + `note/${noteId}/pile/create`, data)
-}
-
-export async function updateNoteInfo(noteId, params) {
-  return axios.put(url_api + `note/${noteId}`, params)
-}
-
-export async function updateWorkInfo(workId, params) {
-  return axios.put(url_api + `work/${workId}`, params)
 }
 
 export async function getNotesForIdea(ideaId) {

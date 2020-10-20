@@ -171,7 +171,7 @@ class Note extends React.Component {
     this.setState({ keep: true })
     this.props.setNoteMode(constants.note_modes.SELECT)
     await db
-      .updateNoteInfo(this.props.id, updateObject)
+      .updateRecord(db.types.note, this.props.id, updateObject)
       .then(this.props.refetchMe(this.props.index))
       .catch(error => {
         console.error(error)

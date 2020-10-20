@@ -8,7 +8,7 @@ import {
   createAuthorAndAddToWork,
   getSuggestions,
   deleteWork,
-  updateWorkInfo,
+  updateRecord,
   addPileToWork,
   createPileAndAddToWork,
   removePileFromWork
@@ -111,7 +111,7 @@ class Work extends React.Component {
       name: this.state.pendingWorkTitle
     }
 
-    updateWorkInfo(this.props.id, updateObject)
+    updateRecord(types.work, this.props.id, updateObject)
     this.setState({ edit: false })
   }
 
