@@ -202,7 +202,7 @@ class NoteList extends React.Component {
 
     for (let i = 0; i < this.state.selected.length; i++) {
       let noteId = this.state.notes[this.state.selected[i]]._id
-      db.deleteNote(noteId)
+      db.deleteRecord(db.types.note, noteId)
     }
 
     this.setState({ deleted: this.state.selected, selected: [] })

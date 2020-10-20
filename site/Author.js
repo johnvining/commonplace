@@ -1,7 +1,7 @@
 import React from 'react'
 import NoteList from './NoteList'
 import {
-  deleteAuthor,
+  deleteRecord,
   getInfo,
   types,
   getNotesForAuthor,
@@ -94,7 +94,7 @@ class Author extends React.Component {
       return
     }
 
-    await deleteAuthor(this.state.id)
+    await deleteRecord(types.auth, this.state.id)
     navigate('/')
   }
 

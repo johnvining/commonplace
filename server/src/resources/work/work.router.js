@@ -22,7 +22,7 @@ router
 router.route('/autocomplete').post(asyncWrapper(reqAutocompleteOnName, 200))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForWork, 200))
 router.route('/:id/auth/create').put(asyncWrapper(reqCreateAndAddAuth, 201))
-router.route('/:id/delete').post(asyncWrapper(reqDeleteWork, 204))
+router.route('/:id/delete').delete(asyncWrapper(reqDeleteWork, 204))
 
 router.route('/:id/pile').put(asyncWrapper(reqAddPile, 200))
 router.route('/:id/pile/create').put(asyncWrapper(reqAddNewPile, 201))

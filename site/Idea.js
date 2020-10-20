@@ -1,6 +1,6 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getNotesForIdea, getInfo, deleteIdea, types } from './Database'
+import { getNotesForIdea, getInfo, deleteRecord, types } from './Database'
 import { navigate } from '@reach/router'
 
 class Idea extends React.Component {
@@ -58,7 +58,7 @@ class Idea extends React.Component {
       return
     }
 
-    await deleteIdea(this.state.id)
+    await deleteRecord(types.idea, this.state.id)
     navigate('/')
   }
 

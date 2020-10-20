@@ -37,8 +37,9 @@ export async function updateRecord(type, id, params) {
   return axios.put(url_api + type + `/${id}`, params)
 }
 
-export async function deleteNote(id) {
-  return axios.delete(url_api + `note/${id}`)
+// Supported types: note, work, auth, idea, pile
+export async function deleteRecord(type, id) {
+  return axios.delete(url_api + type + `/${id}`)
 }
 
 export async function createIdeaAndAddToNote(ideaName, noteId) {
@@ -164,32 +165,15 @@ export async function addImageToNote(noteId, image) {
   return axios.put(url_api + 'note/' + noteId + '/image', data)
 }
 
+export async function deleteImage(noteId, imagePath) {
+  const data = { filename: imagePath }
+  return axios.delete(url_api + `note/${noteId}/image/`, { data: data })
+}
+
 export async function getImagesForNote(noteId, imageN) {
   return axios.get(url_api + 'note/' + noteId + '/images/' + imageN, {
     responseType: 'blob'
   })
-}
-
-// TODO: Update to use delete action rather than post -- see deleteImage
-export async function deleteWork(workId) {
-  return axios.post(url_api + 'work/' + workId + '/delete')
-}
-
-export async function deleteAuthor(authorId) {
-  return axios.post(url_api + 'auth/' + authorId + '/delete')
-}
-
-export async function deleteIdea(ideaId) {
-  return axios.post(url_api + 'idea/' + ideaId + '/delete')
-}
-
-export async function deletePile(pileId) {
-  return axios.delete(url_api + 'pile/' + pileId)
-}
-
-export async function deleteImage(noteId, imagePath) {
-  const data = { filename: imagePath }
-  return axios.delete(url_api + `note/${noteId}/image/`, { data: data })
 }
 
 export async function getNotesForPile(pileId) {

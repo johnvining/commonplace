@@ -7,7 +7,7 @@ import {
   getNotesForWork,
   createAuthorAndAddToWork,
   getSuggestions,
-  deleteWork,
+  deleteRecord,
   updateRecord,
   addPileToWork,
   createPileAndAddToWork,
@@ -99,7 +99,7 @@ class Work extends React.Component {
       return
     }
 
-    await deleteWork(this.state.id)
+    await deleteRecord(types.work, this.state.id)
     navigate('/')
   }
 

@@ -65,7 +65,7 @@ class Note extends React.Component {
 
   handleDelete() {
     if (confirm('Are you sure you want to delete this note?')) {
-      db.deleteNote(this.props.id)
+      db.deleteRecord(db.types.note, this.props.id)
         .then(() => {
           this.setState({ deleted: true })
         })

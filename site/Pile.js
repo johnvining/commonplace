@@ -6,7 +6,7 @@ import {
   getInfo,
   types,
   getWorksForPile,
-  deletePile
+  deleteRecord
 } from './Database'
 import { navigate } from '@reach/router'
 import * as constants from './constants'
@@ -53,7 +53,7 @@ class Pile extends React.Component {
       return
     }
 
-    await deletePile(this.state.id)
+    await deleteRecord(types.pile, this.state.id)
     navigate('/')
   }
 
