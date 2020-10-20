@@ -21,10 +21,12 @@ export async function getSuggestions(type, search, withCounts = false) {
   }
 }
 
+// Supported types: idea, auth, work pile
 export async function getInfo(type, Id) {
   return axios.get(url_api + type + `/${Id}`)
 }
 
+// Supported types: TODO
 export async function createRecord(type, name) {
   const data = { name: name }
   return axios.post(url_api + type, data)
@@ -99,10 +101,6 @@ export async function getNotesForAuthor(authorId) {
 
 export async function getWorksForAuthor(authorId) {
   return axios.get(url_api + `auth/${authorId}/works`)
-}
-
-export async function getAuthorInfo(authorId) {
-  return axios.get(url_api + `auth/${authorId}`)
 }
 
 export async function addIdeaToNote(ideaId, noteId) {

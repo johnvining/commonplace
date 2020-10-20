@@ -2,7 +2,8 @@ import React from 'react'
 import NoteList from './NoteList'
 import {
   deleteAuthor,
-  getAuthorInfo,
+  getInfo,
+  types,
   getNotesForAuthor,
   getNotesForWork,
   getWorksForAuthor
@@ -29,7 +30,7 @@ class Author extends React.Component {
   }
 
   fetchAuthorInfo(authorId) {
-    getAuthorInfo(authorId)
+    getInfo(types.auth, authorId)
       .then(response => {
         this.setState({
           authorName: response.data.data.name,
