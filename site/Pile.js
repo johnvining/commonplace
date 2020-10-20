@@ -3,7 +3,8 @@ import NoteList from './NoteList'
 import WorkList from './WorkList'
 import {
   getNotesForPile,
-  getPileInfo,
+  getInfo,
+  types,
   getWorksForPile,
   deletePile
 } from './Database'
@@ -26,7 +27,7 @@ class Pile extends React.Component {
   }
 
   fetchPileInfo(pileId) {
-    getPileInfo(pileId)
+    getInfo(types.pile, pileId)
       .then(response => {
         this.setState({
           pileName: response.data.data.name

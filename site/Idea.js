@@ -1,6 +1,6 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getNotesForIdea, getIdeaInfo, deleteIdea } from './Database'
+import { getNotesForIdea, getInfo, deleteIdea, types } from './Database'
 import { navigate } from '@reach/router'
 
 class Idea extends React.Component {
@@ -19,7 +19,7 @@ class Idea extends React.Component {
   }
 
   fetchIdeaInfo(ideaId) {
-    getIdeaInfo(ideaId)
+    getInfo(types.idea, ideaId)
       .then(response => {
         this.setState({
           ideaName: response.data.data.name

@@ -3,7 +3,7 @@ import { Link } from '@reach/router'
 import NoteList from './NoteList'
 import {
   types,
-  getWorkInfo,
+  getInfo,
   getNotesForWork,
   createAuthorAndAddToWork,
   getSuggestions,
@@ -17,7 +17,6 @@ import Autocomplete from './Autocomplete'
 import PileListForItem from './PileListForItem'
 import { guessYearFromURL } from './utils'
 import { navigate } from '@reach/router'
-import { types } from './dist/App.d36a57b6'
 
 class Work extends React.Component {
   state = {
@@ -41,7 +40,7 @@ class Work extends React.Component {
   }
 
   fetchWorkInfo(workId) {
-    getWorkInfo(workId)
+    getInfo(types.work, workId)
       .then(response => {
         this.setState({
           pendingWorkTitle: response.data.data.name,

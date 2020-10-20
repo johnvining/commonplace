@@ -21,6 +21,10 @@ export async function getSuggestions(type, search, withCounts = false) {
   }
 }
 
+export async function getInfo(type, Id) {
+  return axios.get(url_api + type + `/${Id}`)
+}
+
 export async function deleteNote(id) {
   return axios.delete(url_api + `note/${id}`)
 }
@@ -33,10 +37,6 @@ export async function createIdeaAndAddToNote(ideaName, noteId) {
 export async function createPileAndAddToNote(pileName, noteId) {
   const data = { name: pileName }
   return axios.put(url_api + `note/${noteId}/pile/create`, data)
-}
-
-export async function getNoteInfo(noteId) {
-  return axios.get(url_api + `note/${noteId}`)
 }
 
 export async function updateNoteInfo(noteId, params) {
@@ -61,20 +61,8 @@ export async function getNotesForIdea(ideaId) {
   return axios.get(url_api + `idea/${ideaId}/notes`)
 }
 
-export async function getIdeaInfo(ideaId) {
-  return axios.get(url_api + `idea/${ideaId}`)
-}
-
-export async function getPileInfo(pileId) {
-  return axios.get(url_api + `pile/${pileId}`)
-}
-
 export async function getNotesForWork(workId) {
   return axios.get(url_api + `work/${workId}/notes`)
-}
-
-export async function getWorkInfo(workId) {
-  return axios.get(url_api + `work/${workId}`)
 }
 
 export async function addAuthorToWork(workId, authorId) {

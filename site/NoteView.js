@@ -1,6 +1,6 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getNoteInfo } from './Database'
+import { getInfo, types } from './Database'
 import * as constants from './constants'
 
 class NoteView extends React.Component {
@@ -10,7 +10,7 @@ class NoteView extends React.Component {
 
   async getListOfOneNote(index, page) {
     let notesResponse
-    await getNoteInfo(this.props.id)
+    await getInfo(types.note, this.props.id)
       .then(response => {
         notesResponse = response
       })
