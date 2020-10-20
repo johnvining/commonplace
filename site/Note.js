@@ -131,7 +131,7 @@ class Note extends React.Component {
   }
 
   handleCreateAuthorAndAssign = authorName => {
-    db.createAuthor(authorName).then(response => {
+    db.createRecord(types.auth, authorName).then(response => {
       this.setState({
         pendingAuthorId: response.data.data._id,
         pendingAuthorName: authorName
@@ -144,7 +144,7 @@ class Note extends React.Component {
   }
 
   handleCreateWorkAndAssign = workName => {
-    db.createWork(workName).then(response => {
+    db.createRecord(db.types.work, workName).then(response => {
       this.setState({
         pendingWorkId: response.data.data._id,
         pendingWorkName: workName

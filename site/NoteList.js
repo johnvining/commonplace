@@ -240,26 +240,26 @@ class NoteList extends React.Component {
   }
 
   async handleCreateAndAdd(name) {
-    var createFunction
+    var type
     switch (this.state.toAdd) {
       case 'author':
-        createFunction = db.createAuthor
+        type = db.types.auth
         break
       case 'idea':
-        createFunction = db.createIdea
+        type = db.types.idea
         break
       case 'work':
-        createFunction = db.createWork
+        type = db.types.work
         break
       case 'pile':
-        createFunction = db.createPile
+        type = db.types.pile
         break
       default:
         return
     }
 
     // TODO: Create single API call
-    let newIdToAssign = await createFunction(name)
+    let newIdToAssign = await db.createRecord(type, name)
     this.handleAddNew(newIdToAssign.data.data._id)
   }
 

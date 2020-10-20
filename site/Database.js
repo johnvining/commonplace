@@ -25,6 +25,11 @@ export async function getInfo(type, Id) {
   return axios.get(url_api + type + `/${Id}`)
 }
 
+export async function createRecord(type, name) {
+  const data = { name: name }
+  return axios.post(url_api + type, data)
+}
+
 export async function deleteNote(id) {
   return axios.delete(url_api + `note/${id}`)
 }
@@ -45,16 +50,6 @@ export async function updateNoteInfo(noteId, params) {
 
 export async function updateWorkInfo(workId, params) {
   return axios.put(url_api + `work/${workId}`, params)
-}
-
-export async function createWork(workName) {
-  const data = { name: workName }
-  return axios.post(url_api + `work`, data)
-}
-
-export async function createAuthor(authorName) {
-  const data = { name: authorName }
-  return axios.post(url_api + `auth`, data)
 }
 
 export async function getNotesForIdea(ideaId) {
@@ -150,16 +145,6 @@ export async function createWorkAndAddToNote(workName, noteId) {
   // TODO: Make single request
   const newWork = await createWork(workName)
   return addWorkToNote(newWork._id, noteId)
-}
-
-export async function createIdea(ideaName) {
-  const data = { name: ideaName }
-  return axios.post(url_api + `idea`, data)
-}
-
-export async function createPile(pileName) {
-  const data = { name: pileName }
-  return axios.post(url_api + `pile`, data)
 }
 
 export async function getRecentNotes(page) {
