@@ -42,6 +42,18 @@ export async function deleteRecord(type, id) {
   return axios.delete(url_api + type + `/${id}`)
 }
 
+export async function removeIdeaFromNote(noteId, ideaId) {
+  return axios.delete(url_api + 'note/' + noteId + '/idea/' + ideaId)
+}
+
+export async function removePileFromWork(workId, pileId) {
+  return axios.delete(url_api + 'work/' + workId + '/pile/' + pileId)
+}
+
+export async function removePileFromNote(noteId, pileId) {
+  return axios.delete(url_api + 'note/' + noteId + '/pile/' + pileId)
+}
+
 export async function createIdeaAndAddToNote(ideaName, noteId) {
   const data = { name: ideaName }
   return axios.put(url_api + `note/${noteId}/idea/create`, data)
@@ -73,32 +85,10 @@ export async function addUrlToWork(workId, newUrl, newYear) {
   return axios.put(url_api + `work/${workId}`, data)
 }
 
+// Add X to Y
 export async function addYearToWork(workId, newYear) {
   const data = { year: newYear }
   return axios.put(url_api + `work/${workId}`, data)
-}
-
-export async function createAuthorAndAddToWork(workId, authorName) {
-  const data = { author: authorName }
-  return axios.put(url_api + `work/${workId}/auth/create`, data)
-}
-
-export async function createNewNoteFromTitle(title) {
-  const data = { title: title }
-  return axios.post(url_api + 'note', data)
-}
-
-export async function searchNotes(searchString) {
-  const data = { searchString: searchString }
-  return axios.put(url_api + 'note/find', data)
-}
-
-export async function getNotesForAuthor(authorId) {
-  return axios.get(url_api + `auth/${authorId}/notes`)
-}
-
-export async function getWorksForAuthor(authorId) {
-  return axios.get(url_api + `auth/${authorId}/works`)
 }
 
 export async function addIdeaToNote(ideaId, noteId) {
@@ -116,11 +106,6 @@ export async function addPileToWork(pileId, workId) {
   return axios.put(url_api + `work/${workId}/pile`, data)
 }
 
-export async function createPileAndAddToWork(pileName, workId) {
-  const data = { name: pileName }
-  return axios.put(url_api + `work/${workId}/pile/create`, data)
-}
-
 export async function addAuthorToNote(authorId, noteId) {
   const updateObject = { author: authorId }
   return updateNoteInfo(noteId, updateObject)
@@ -129,6 +114,26 @@ export async function addAuthorToNote(authorId, noteId) {
 export async function addWorkToNote(workId, noteId) {
   const updateObject = { work: workId }
   return updateNoteInfo(noteId, updateObject)
+}
+
+async function updateNoteInfo(noteId, updateObject) {
+  return axios.put(url_api + `note/${noteId}`, updateObject)
+}
+
+// Create X and add to Y
+export async function createAuthorAndAddToWork(workId, authorName) {
+  const data = { author: authorName }
+  return axios.put(url_api + `work/${workId}/auth/create`, data)
+}
+
+export async function createNewNoteFromTitle(title) {
+  const data = { title: title }
+  return axios.post(url_api + 'note', data)
+}
+
+export async function createPileAndAddToWork(pileName, workId) {
+  const data = { name: pileName }
+  return axios.put(url_api + `work/${workId}/pile/create`, data)
 }
 
 export async function createAuthorAndAddToNote(authorName, noteId) {
@@ -143,22 +148,24 @@ export async function createWorkAndAddToNote(workName, noteId) {
   return addWorkToNote(newWork._id, noteId)
 }
 
-export async function getRecentNotes(page) {
-  return axios.get(url_api + `note/all/` + page)
+// Get X for Y
+export async function getNotesForAuthor(authorId) {
+  return axios.get(url_api + `auth/${authorId}/notes`)
 }
 
-export async function removeIdeaFromNote(noteId, ideaId) {
-  return axios.delete(url_api + 'note/' + noteId + '/idea/' + ideaId)
+export async function getWorksForAuthor(authorId) {
+  return axios.get(url_api + `auth/${authorId}/works`)
 }
 
-export async function removePileFromWork(workId, pileId) {
-  return axios.delete(url_api + 'work/' + workId + '/pile/' + pileId)
+export async function getNotesForPile(pileId) {
+  return axios.get(url_api + `pile/${pileId}/notes`)
 }
 
-export async function removePileFromNote(noteId, pileId) {
-  return axios.delete(url_api + 'note/' + noteId + '/pile/' + pileId)
+export async function getWorksForPile(pileId) {
+  return axios.get(url_api + `pile/${pileId}/works`)
 }
 
+// Image handling
 export async function addImageToNote(noteId, image) {
   const data = new FormData()
   data.append('image', image)
@@ -176,10 +183,12 @@ export async function getImagesForNote(noteId, imageN) {
   })
 }
 
-export async function getNotesForPile(pileId) {
-  return axios.get(url_api + `pile/${pileId}/notes`)
+// Generic get-notes functions
+export async function searchNotes(searchString) {
+  const data = { searchString: searchString }
+  return axios.put(url_api + 'note/find', data)
 }
 
-export async function getWorksForPile(pileId) {
-  return axios.get(url_api + `pile/${pileId}/works`)
+export async function getRecentNotes(page) {
+  return axios.get(url_api + `note/all/` + page)
 }

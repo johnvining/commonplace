@@ -131,7 +131,7 @@ class Note extends React.Component {
   }
 
   handleCreateAuthorAndAssign = authorName => {
-    db.createRecord(types.auth, authorName).then(response => {
+    db.createRecord(db.types.auth, authorName).then(response => {
       this.setState({
         pendingAuthorId: response.data.data._id,
         pendingAuthorName: authorName
