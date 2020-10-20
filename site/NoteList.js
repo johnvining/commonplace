@@ -266,13 +266,13 @@ class NoteList extends React.Component {
   getSuggestions(string) {
     switch (this.state.toAdd) {
       case 'author':
-        return db.getAuthorSuggestions(string)
+        return db.getSuggestions(db.types.auth, string)
       case 'idea':
-        return db.getIdeaSuggestions(string)
+        return db.getSuggestions(db.types.idea, string)
       case 'work':
-        return db.getWorkSuggestions(string)
+        return db.getSuggestions(db.types.work, string)
       case 'pile':
-        return db.getPileSuggestions(string)
+        return db.getSuggestions(db.types.pile, string)
     }
   }
 

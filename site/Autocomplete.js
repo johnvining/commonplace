@@ -49,7 +49,7 @@ class Autocomplete extends React.Component {
         return
       }
       this.props
-        .getSuggestions(this.state.currentTypedText)
+        .getSuggestions(this.props.apiType, this.state.currentTypedText)
         .then(response => {
           this.setState({
             responses: response.data.data

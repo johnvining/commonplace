@@ -1,12 +1,6 @@
 import React from 'react'
 import NoteList from './NoteList'
-import {
-  searchNotes,
-  getIdeaSuggestions,
-  getWorkSuggestions,
-  getAuthorSuggestions,
-  getPileSuggestions
-} from './Database'
+import { types, searchNotes, getSuggestions } from './Database'
 import WorkList from './WorkList'
 import IdeaList from './IdeaList'
 import AuthorList from './AuthorList'
@@ -21,19 +15,19 @@ class Find extends React.Component {
   }
 
   async getListOfWorks() {
-    return await getWorkSuggestions(this.state.search, true)
+    return await getSuggestions(types.work, this.state.search, true)
   }
 
   async getListOfIdeas() {
-    return await getIdeaSuggestions(this.state.search, true)
+    return await getSuggestions(types.idea, this.state.search, true)
   }
 
   async getListOfAuthors() {
-    return await getAuthorSuggestions(this.state.search, true)
+    return await getSuggestions(types.auth, this.state.search, true)
   }
 
   async getListOfPiles() {
-    return await getPileSuggestions(this.state.search, false)
+    return await getSuggestions(types.pile, this.state.search, false)
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {

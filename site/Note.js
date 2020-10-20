@@ -340,7 +340,8 @@ class Note extends React.Component {
                 edit={edit_piles}
                 piles={note.piles}
                 onSelect={this.handleNewPile.bind(this)}
-                getSuggestions={db.getPileSuggestions}
+                getSuggestions={db.getSuggestions}
+                apiType={db.types.pile}
                 handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
                 mainClassName="note"
                 onPileRemove={this.handlePileRemove.bind(this)}
@@ -429,7 +430,8 @@ class Note extends React.Component {
                     dontAutofocus={true}
                     inputName={this.props.id + 'author'}
                     onSelect={this.handleUpdateAuthor}
-                    getSuggestions={db.getAuthorSuggestions}
+                    getSuggestions={db.getSuggestions}
+                    apiType={db.types.auth}
                     handleNewSelect={this.handleCreateAuthorAndAssign}
                   />
                 </>
@@ -466,7 +468,8 @@ class Note extends React.Component {
                     className={'note-full work edit'}
                     defaultValue={this.state.pendingWorkName || ''}
                     onSelect={this.handleUpdateWork.bind(this)}
-                    getSuggestions={db.getWorkSuggestions}
+                    getSuggestions={db.getSuggestions}
+                    apiType={db.types.work}
                     handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
                   />
                 </>
@@ -593,7 +596,8 @@ class Note extends React.Component {
                         }}
                         onSelect={this.handleNewIdea}
                         handleNewSelect={this.handleCreateIdeaAndAddToNote}
-                        getSuggestions={db.getIdeaSuggestions}
+                        getSuggestions={db.getSuggestions}
+                        apiType={db.types.idea}
                       />
                     ) : (
                       // Neither editing whole note nor ideas

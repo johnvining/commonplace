@@ -1,7 +1,25 @@
 import axios from 'axios'
 
-// TODO: Move to config file
+export const types = {
+  auth: 'auth',
+  note: 'note',
+  work: 'work',
+  idea: 'idea',
+  pile: 'pile'
+}
+
 export const url_api = process.env.SERVER_API
+
+// Supported types: idea, auth, work pile
+export async function getSuggestions(type, search, withCounts = false) {
+  const data = { string: search }
+
+  if (!withCounts) {
+    return axios.post(url_api + type + `/autocomplete`, data)
+  } else {
+    return axios.post(url_api + type + `/autocomplete/with-counts`, data)
+  }
+}
 
 export async function deleteNote(id) {
   return axios.delete(url_api + `note/${id}`)
@@ -27,43 +45,6 @@ export async function updateNoteInfo(noteId, params) {
 
 export async function updateWorkInfo(workId, params) {
   return axios.put(url_api + `work/${workId}`, params)
-}
-
-export async function getIdeaSuggestions(search, withCounts = false) {
-  const data = { string: search }
-
-  if (!withCounts) {
-    return axios.post(url_api + `idea/autocomplete`, data)
-  } else {
-    return axios.post(url_api + `idea/autocomplete/with-counts`, data)
-  }
-}
-
-export async function getAuthorSuggestions(search, withCounts = false) {
-  const data = { string: search }
-  if (!withCounts) {
-    return axios.post(url_api + `auth/autocomplete`, data)
-  } else {
-    return axios.post(url_api + `auth/autocomplete/with-counts`, data)
-  }
-}
-
-export async function getWorkSuggestions(search, withCounts = false) {
-  const data = { string: search }
-  if (!withCounts) {
-    return axios.post(url_api + `work/autocomplete`, data)
-  } else {
-    return axios.post(url_api + `work/autocomplete/with-counts`, data)
-  }
-}
-
-export async function getPileSuggestions(search, withCounts = false) {
-  const data = { string: search }
-  if (!withCounts) {
-    return axios.post(url_api + `pile/autocomplete`, data)
-  } else {
-    return axios.post(url_api + `pile/autocomplete/with-counts`, data)
-  }
 }
 
 export async function createWork(workName) {

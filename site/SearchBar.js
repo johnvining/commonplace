@@ -130,13 +130,13 @@ class SearchBar extends React.Component {
   getSuggestions(val) {
     switch (this.state.modifier) {
       case this.modifiers.auth:
-        return db.getAuthorSuggestions(val)
+        return db.getSuggestions(types.auth, val)
       case this.modifiers.idea:
-        return db.getIdeaSuggestions(val)
+        return db.getSuggestions(types.idea, val)
       case this.modifiers.work:
-        return db.getWorkSuggestions(val)
+        return db.getSuggestions(types.work, val)
       case this.modifiers.pile:
-        return db.getPileSuggestions(val)
+        return db.getSuggestions(types.pile, val)
     }
 
     return null

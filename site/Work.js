@@ -2,11 +2,11 @@ import React from 'react'
 import { Link } from '@reach/router'
 import NoteList from './NoteList'
 import {
+  types,
   getWorkInfo,
   getNotesForWork,
   createAuthorAndAddToWork,
-  getAuthorSuggestions,
-  getPileSuggestions,
+  getSuggestions,
   deleteWork,
   updateWorkInfo,
   addPileToWork,
@@ -17,6 +17,7 @@ import Autocomplete from './Autocomplete'
 import PileListForItem from './PileListForItem'
 import { guessYearFromURL } from './utils'
 import { navigate } from '@reach/router'
+import { types } from './dist/App.d36a57b6'
 
 class Work extends React.Component {
   state = {
@@ -150,7 +151,8 @@ class Work extends React.Component {
               edit={this.state.editPiles}
               piles={this.state.piles}
               onSelect={this.handleNewPile.bind(this)}
-              getSuggestions={getPileSuggestions}
+              getSuggestions={getSuggestions}
+              apiType={types.pile}
               handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
               mainClassName="work-page"
               onStartEdit={() => {
@@ -192,7 +194,8 @@ class Work extends React.Component {
                   dontAutofocus={true}
                   defaultValue={this.state.pendingAuthorName || ''}
                   onSelect={this.handleUpdateAuthor.bind(this)}
-                  getSuggestions={getAuthorSuggestions}
+                  getSuggestions={getSuggestions}
+                  apiType={types.auth}
                   handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
                   onClearText={this.handleClearAuthor.bind(this)}
                 />
