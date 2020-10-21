@@ -14,8 +14,6 @@ export const url_api = process.env.SERVER_API
 export async function getSuggestions(type, search, withCounts = false) {
   const data = { string: search }
 
-  console.log(search)
-
   if (!withCounts) {
     return axios.post(url_api + type + `/autocomplete`, data)
   } else {
