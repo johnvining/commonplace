@@ -1,33 +1,33 @@
-import React from 'react'
-import NoteList from './NoteList'
-import { types, searchNotes, getSuggestions } from './Database'
-import WorkList from './WorkList'
-import IdeaList from './IdeaList'
-import AuthorList from './AuthorList'
-import PileList from './PileList'
 import * as constants from './constants'
+import * as db from './Database'
+import AuthorList from './AuthorList'
+import IdeaList from './IdeaList'
+import NoteList from './NoteList'
+import PileList from './PileList'
+import React from 'react'
+import WorkList from './WorkList'
 
 class Find extends React.Component {
   state = { search: '' }
 
   async getListOfNotes() {
-    return await searchNotes(this.state.search)
+    return await db.searchNotes(this.state.search)
   }
 
   async getListOfWorks() {
-    return await getSuggestions(types.work, this.state.search, true)
+    return await db.getSuggestions(db.types.work, this.state.search, true)
   }
 
   async getListOfIdeas() {
-    return await getSuggestions(types.idea, this.state.search, true)
+    return await db.getSuggestions(db.types.idea, this.state.search, true)
   }
 
   async getListOfAuthors() {
-    return await getSuggestions(types.auth, this.state.search, true)
+    return await db.getSuggestions(db.types.auth, this.state.search, true)
   }
 
   async getListOfPiles() {
-    return await getSuggestions(types.pile, this.state.search, false)
+    return await db.getSuggestions(db.types.pile, this.state.search, false)
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {

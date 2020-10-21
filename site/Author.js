@@ -1,8 +1,8 @@
-import React from 'react'
-import NoteList from './NoteList'
-import { deleteRecord, getInfo, types, getRecordsWithFilter } from './Database'
-import { navigate, Link } from '@reach/router'
+import { navigate } from '@reach/router'
 import * as constants from './constants'
+import * as db from './Database'
+import NoteList from './NoteList'
+import React from 'react'
 import ResultWork from './ResultWork'
 
 class Author extends React.Component {
@@ -23,7 +23,7 @@ class Author extends React.Component {
   }
 
   fetchAuthorInfo(authorId) {
-    getInfo(types.auth, authorId)
+    db.getInfo(types.auth, authorId)
       .then(response => {
         this.setState({
           authorName: response.data.data.name,
@@ -37,7 +37,7 @@ class Author extends React.Component {
   }
 
   fetchAuthorWorks(authorId) {
-    getRecordsWithFilter(types.work, types.auth, authorId)
+    db.getRecordsWithFilter(db.types.work, db.types.auth, authorId)
       .then(response => {
         this.setState({
           works: response.data.data
@@ -51,7 +51,8 @@ class Author extends React.Component {
   async getListOfNotes(index, page) {
     let notesResponse
     if (index == undefined) {
-      await getRecordsWithFilter(types.note, types.auth, this.state.id)
+      await db
+        .getRecordsWithFilter(db.types.note, db.types.auth, this.state.id)
         .then(response => {
           notesResponse = response
         })
@@ -60,7 +61,8 @@ class Author extends React.Component {
         })
     } else {
       let workId = this.state.works[index]?._id
-      await getRecordsWithFilter(types.note, types.work, workId)
+      await db
+        .getRecordsWithFilter(db.types.note, db.types.work, workId)
         .then(response => {
           notesResponse = response
         })
@@ -87,7 +89,7 @@ class Author extends React.Component {
       return
     }
 
-    await deleteRecord(types.auth, this.state.id)
+    await db.deleteRecord(types.auth, this.state.id)
     navigate('/')
   }
 
