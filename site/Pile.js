@@ -1,13 +1,7 @@
 import React from 'react'
 import NoteList from './NoteList'
 import WorkList from './WorkList'
-import {
-  getNotesForPile,
-  getInfo,
-  types,
-  getWorksForPile,
-  deleteRecord
-} from './Database'
+import { getInfo, types, getRecordsWithFilter, deleteRecord } from './Database'
 import { navigate } from '@reach/router'
 import * as constants from './constants'
 
@@ -59,7 +53,7 @@ class Pile extends React.Component {
 
   async getListOfNotes() {
     let notesResponse
-    await getNotesForPile(this.state.id)
+    await getRecordsWithFilter(types.note, types.pile, this.state.id)
       .then(response => {
         notesResponse = response
       })
@@ -72,7 +66,7 @@ class Pile extends React.Component {
 
   async getListOfWorks() {
     let worksResponse
-    await getWorksForPile(this.state.id)
+    await getRecordsWithFilter(types.work, types.pile, this.state.id)
       .then(response => {
         worksResponse = response
       })

@@ -1,13 +1,6 @@
 import React from 'react'
 import NoteList from './NoteList'
-import {
-  deleteRecord,
-  getInfo,
-  types,
-  getNotesForAuthor,
-  getNotesForWork,
-  getWorksForAuthor
-} from './Database'
+import { deleteRecord, getInfo, types, getRecordsWithFilter } from './Database'
 import { navigate, Link } from '@reach/router'
 import * as constants from './constants'
 import ResultWork from './ResultWork'
@@ -44,7 +37,7 @@ class Author extends React.Component {
   }
 
   fetchAuthorWorks(authorId) {
-    getWorksForAuthor(authorId)
+    getRecordsWithFilter(types.work, types.auth, authorId)
       .then(response => {
         this.setState({
           works: response.data.data
@@ -58,7 +51,7 @@ class Author extends React.Component {
   async getListOfNotes(index, page) {
     let notesResponse
     if (index == undefined) {
-      await getNotesForAuthor(this.state.id)
+      await getRecordsWithFilter(types.note, types.auth, this.state.id)
         .then(response => {
           notesResponse = response
         })
@@ -67,7 +60,7 @@ class Author extends React.Component {
         })
     } else {
       let workId = this.state.works[index]?._id
-      await getNotesForWork(workId)
+      await getRecordsWithFilter(types.note, types.work, workId)
         .then(response => {
           notesResponse = response
         })

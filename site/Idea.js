@@ -1,6 +1,6 @@
 import React from 'react'
 import NoteList from './NoteList'
-import { getNotesForIdea, getInfo, deleteRecord, types } from './Database'
+import { removeFromRecord, getInfo, deleteRecord, types } from './Database'
 import { navigate } from '@reach/router'
 
 class Idea extends React.Component {
@@ -32,7 +32,7 @@ class Idea extends React.Component {
 
   async getListOfNotes() {
     let notesResponse
-    await getNotesForIdea(this.state.id)
+    await removeFromRecord(types.note, types.idea, this.state.id)
       .then(response => {
         notesResponse = response
       })

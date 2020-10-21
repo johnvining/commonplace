@@ -42,13 +42,26 @@ export async function deleteRecord(type, id) {
   return axios.delete(url_api + type + `/${id}`)
 }
 
-// Supported cobminations:
+// Supported combinations:
 //   - idea from note
 //   - pile from note
 //   - pile from work
 export async function removeFromRecord(removeType, removeId, fromType, fromId) {
   return axios.delete(
     url_api + fromType + '/' + fromId + '/' + removeType + '/' + removeId
+  )
+}
+
+// Supported combinations:
+//   - notes filtered by auth
+//   - notes filtered by pile
+//   - notes filtered by idea
+//   - notes filtered by work
+//   - works filtered by auth
+//   - works filtered by pile
+export async function getRecordsWithFilter(recordType, filterType, filterId) {
+  return axios.get(
+    url_api + filterType + '/' + filterId + '/' + recordType + 's'
   )
 }
 
@@ -60,14 +73,6 @@ export async function createIdeaAndAddToNote(ideaName, noteId) {
 export async function createPileAndAddToNote(pileName, noteId) {
   const data = { name: pileName }
   return axios.put(url_api + `note/${noteId}/pile/create`, data)
-}
-
-export async function getNotesForIdea(ideaId) {
-  return axios.get(url_api + `idea/${ideaId}/notes`)
-}
-
-export async function getNotesForWork(workId) {
-  return axios.get(url_api + `work/${workId}/notes`)
 }
 
 export async function addAuthorToWork(workId, authorId) {
@@ -144,23 +149,6 @@ export async function createWorkAndAddToNote(workName, noteId) {
   // TODO: Make single request
   const newWork = await createWork(workName)
   return addWorkToNote(newWork._id, noteId)
-}
-
-// Get X for Y
-export async function getNotesForAuthor(authorId) {
-  return axios.get(url_api + `auth/${authorId}/notes`)
-}
-
-export async function getWorksForAuthor(authorId) {
-  return axios.get(url_api + `auth/${authorId}/works`)
-}
-
-export async function getNotesForPile(pileId) {
-  return axios.get(url_api + `pile/${pileId}/notes`)
-}
-
-export async function getWorksForPile(pileId) {
-  return axios.get(url_api + `pile/${pileId}/works`)
 }
 
 // Image handling

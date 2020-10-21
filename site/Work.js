@@ -4,7 +4,7 @@ import NoteList from './NoteList'
 import {
   types,
   getInfo,
-  getNotesForWork,
+  getRecordsWithFilter,
   createAuthorAndAddToWork,
   getSuggestions,
   deleteRecord,
@@ -58,7 +58,7 @@ class Work extends React.Component {
 
   async getListOfNotes() {
     let notesResponse
-    await getNotesForWork(this.state.id)
+    await getRecordsWithFilter(types.note, types.work, this.state.id)
       .then(response => {
         notesResponse = response
       })
