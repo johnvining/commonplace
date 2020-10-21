@@ -5,12 +5,11 @@ import {
   types,
   getInfo,
   getRecordsWithFilter,
-  createAuthorAndAddToWork,
+  createAndLinkToRecord,
   getSuggestions,
   deleteRecord,
   updateRecord,
   addLinkToRecord,
-  createPileAndAddToWork,
   removeFromRecord
 } from './Database'
 import Autocomplete from './Autocomplete'
@@ -83,7 +82,12 @@ class Work extends React.Component {
 
   handleCreateAuthorAndAssign(authorName) {
     this.setState({ pendingAuthorName: authorName })
-    createAuthorAndAddToWork(this.props.id, authorName).then(response => {
+    createAndLinkToRecord(
+      types.auth,
+      authorName,
+      types.work,
+      this.props.id
+    ).then(response => {
       this.setState({
         pendingAuthorId: response.data.data.id
       })
@@ -122,9 +126,11 @@ class Work extends React.Component {
   }
 
   async handleCreatePileAndAssign(pileName) {
-    createPileAndAddToWork(pileName, this.props.id).then(() => {
-      this.fetchWorkInfo(this.props.id)
-    })
+    createAndLinkToRecord(types.pile, pileName, types.work, this.props.id).then(
+      () => {
+        this.fetchWorkInfo(this.props.id)
+      }
+    )
   }
 
   async handleClearAuthor() {

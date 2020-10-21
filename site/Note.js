@@ -116,7 +116,12 @@ class Note extends React.Component {
 
   // TODO: Clear entry after assignment
   handleCreateIdeaAndAddToNote = ideaName => {
-    db.createIdeaAndAddToNote(ideaName, this.props.id)
+    db.createAndLinkToRecord(
+      db.types.idea,
+      ideaName,
+      db.types.note,
+      this.props.id
+    )
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
@@ -222,7 +227,12 @@ class Note extends React.Component {
   }
 
   async handleCreatePileAndAssign(pileName) {
-    db.createPileAndAddToNote(pileName, this.props.id).then(() => {
+    db.createAndLinkToRecord(
+      db.types.pile,
+      pileName,
+      db.types.note,
+      this.props.id
+    ).then(() => {
       this.props.refetchMe(this.props.index)
     })
   }

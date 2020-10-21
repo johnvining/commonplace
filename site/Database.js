@@ -65,47 +65,22 @@ export async function getRecordsWithFilter(recordType, filterType, filterId) {
   )
 }
 
-// Create X and add to Y
-export async function createAuthorAndAddToWork(workId, authorName) {
-  const data = { author: authorName }
-  return axios.put(url_api + `work/${workId}/auth/create`, data)
-}
-
-export async function createPileAndAddToWork(pileName, workId) {
-  const data = { name: pileName }
-  return axios.put(url_api + `work/${workId}/pile/create`, data)
-}
-
-export async function createIdeaAndAddToNote(ideaName, noteId) {
-  const data = { name: ideaName }
-  return axios.put(url_api + `note/${noteId}/idea/create`, data)
-}
-
-export async function createPileAndAddToNote(pileName, noteId) {
-  const data = { name: pileName }
-  return axios.put(url_api + `note/${noteId}/pile/create`, data)
-}
-
-export async function createAuthorAndAddToNote(authorName, noteId) {
-  // TODO: Make single request
-  const newAuthor = await createAuthor(authorName)
-  return addAuthorToNote(newAuthor._id, noteId)
-}
-
-export async function addAuthorToNote(authorId, noteId) {
-  const updateObject = { author: authorId }
-  return updateNoteInfo(noteId, updateObject)
-}
-
-export async function createWorkAndAddToNote(workName, noteId) {
-  // TODO: Make single request
-  const newWork = await createWork(workName)
-  return addWorkToNote(newWork._id, noteId)
-}
-
-export async function addWorkToNote(workId, noteId) {
-  const updateObject = { work: workId }
-  return updateNoteInfo(noteId, updateObject)
+// Supported combinations:
+//   - create auth and add to work
+//   - create pile and add to work
+//   - create idea and add to note
+//   - create pile and add to note
+export async function createAndLinkToRecord(
+  createType,
+  createName,
+  recordType,
+  recordId
+) {
+  const data = { name: createName }
+  return axios.put(
+    url_api + recordType + '/' + recordId + '/' + createType + '/create',
+    data
+  )
 }
 
 // See appendLinkToRecord and setLinkOnRecord for supported combinations
@@ -147,24 +122,6 @@ export async function setLinkOnRecord(linkType, linkId, recordType, recordId) {
     data = { work: linkId }
   }
   return axios.put(url_api + recordType + '/' + recordId, data)
-}
-
-export async function addUrlToWork(workId, newUrl, newYear) {
-  const data = { url: newUrl }
-  if (newYear) {
-    data.year = newYear
-  }
-  return axios.put(url_api + `work/${workId}`, data)
-}
-
-// Add X to Y
-export async function addYearToWork(workId, newYear) {
-  const data = { year: newYear }
-  return axios.put(url_api + `work/${workId}`, data)
-}
-
-async function updateNoteInfo(noteId, updateObject) {
-  return axios.put(url_api + `note/${noteId}`, updateObject)
 }
 
 // Image handling

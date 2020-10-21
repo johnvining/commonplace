@@ -39,7 +39,7 @@ export const reqUpdateWork = async (req, res) => {
 }
 
 export const reqCreateAndAddAuth = async (req, res) => {
-  const newAuth = await createAuthor(req.body.author)
+  const newAuth = await createAuthor(req.body.name)
   const updateObject = { author: newAuth.id }
   const doc = await updateWorkInfo(req.params.id, updateObject)
   if (!doc) {
