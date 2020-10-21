@@ -1,7 +1,7 @@
-import React from 'react'
-import NoteList from './NoteList'
-import { getNotesForIdea, getIdeaInfo, deleteIdea } from './Database'
 import { navigate } from '@reach/router'
+import * as db from './Database'
+import NoteList from './NoteList'
+import React from 'react'
 
 class Idea extends React.Component {
   state = {
@@ -19,7 +19,7 @@ class Idea extends React.Component {
   }
 
   fetchIdeaInfo(ideaId) {
-    getIdeaInfo(ideaId)
+    db.getInfo(db.types.idea, ideaId)
       .then(response => {
         this.setState({
           ideaName: response.data.data.name
@@ -31,8 +31,9 @@ class Idea extends React.Component {
   }
 
   async getListOfNotes() {
-    let notesResponse
-    await getNotesForIdea(this.state.id)
+    var notesResponse
+    await db
+      .removeFromRecord(db.types.note, db.types.idea, this.state.id)
       .then(response => {
         notesResponse = response
       })
@@ -58,7 +59,7 @@ class Idea extends React.Component {
       return
     }
 
-    await deleteIdea(this.state.id)
+    await db.deleteRecord(db.types.idea, this.state.id)
     navigate('/')
   }
 

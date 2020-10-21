@@ -35,7 +35,7 @@ class SearchBar extends React.Component {
   handleTextChange(event) {
     this.setState({ typedText: event.target.value }, () => {
       if (!this.state.modifier) {
-        let text = this.state.typedText
+        var text = this.state.typedText
         switch (text) {
           case this.modifiers.auth:
           case this.modifiers.work:
@@ -61,7 +61,7 @@ class SearchBar extends React.Component {
       this.state.typedText == '' &&
       !this.shouldShowAutocomplete()
     ) {
-      let previousModifier = this.state.modifier
+      var previousModifier = this.state.modifier
       this.setState({
         typedText: previousModifier + '',
         modifier: ''
@@ -96,7 +96,7 @@ class SearchBar extends React.Component {
       this.state.modifier == this.modifiers.find &&
       event.keyCode == 13
     ) {
-      let search = this.state.typedText
+      var search = this.state.typedText
       this.setState({ typedText: '' }, () => {
         this.props.beforeNavigate()
         navigate('/find/' + search)
@@ -130,13 +130,13 @@ class SearchBar extends React.Component {
   getSuggestions(val) {
     switch (this.state.modifier) {
       case this.modifiers.auth:
-        return db.getAuthorSuggestions(val)
+        return db.getSuggestions(types.auth, val)
       case this.modifiers.idea:
-        return db.getIdeaSuggestions(val)
+        return db.getSuggestions(types.idea, val)
       case this.modifiers.work:
-        return db.getWorkSuggestions(val)
+        return db.getSuggestions(types.work, val)
       case this.modifiers.pile:
-        return db.getPileSuggestions(val)
+        return db.getSuggestions(types.pile, val)
     }
 
     return null
@@ -167,7 +167,7 @@ class SearchBar extends React.Component {
   render() {
     const { modifier, typedText } = this.state
 
-    let showAutocomplete = this.shouldShowAutocomplete()
+    var showAutocomplete = this.shouldShowAutocomplete()
 
     return (
       <div className="search-bar container">

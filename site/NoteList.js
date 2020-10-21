@@ -12,7 +12,7 @@ import right from './icons/right.svg'
 class NoteList extends React.Component {
   state = {
     inFocus: null,
-    focusType: constants.note_modes.NOSELECTION,
+    focusType: constants.note_modes.NO_SELECTION,
     selectedNote: '',
     notes: [],
     selected: [],
@@ -35,7 +35,7 @@ class NoteList extends React.Component {
         notes: response.data.data
       },
       () => {
-        for (let i = 0; i < this.state.notes.length; i++) {
+        for (var i = 0; i < this.state.notes.length; i++) {
           this.getImagesForNoteAtIndex(i, false)
         }
       }
@@ -75,9 +75,9 @@ class NoteList extends React.Component {
   }
 
   async refetchNoteAtIndex(index) {
-    let notes = this.state.notes
-    const response = await db.getNoteInfo(notes[index]._id)
-    let note = response.data.data[0]
+    var notes = this.state.notes
+    const response = await db.getInfo(db.types.note, notes[index]._id)
+    var note = response.data.data[0]
     note.imageUrls = this.state.notes[index].imageUrls
     notes[index] = note
     this.setState({ notes: notes })
@@ -89,19 +89,19 @@ class NoteList extends React.Component {
       await this.refetchNoteAtIndex(index)
     }
 
-    let notes = this.state.notes
+    var notes = this.state.notes
     var numberImages = notes[index].images?.length
 
     if (numberImages == 0) return
 
-    let imagePromises = []
-    for (let i = 1; i <= numberImages; i++) {
+    var imagePromises = []
+    for (var i = 1; i <= numberImages; i++) {
       imagePromises.push(db.getImagesForNote(notes[index]._id, i))
     }
 
     await Promise.all(imagePromises).then(responses => {
-      let imagesArray = []
-      let note = notes[index]
+      var imagesArray = []
+      var note = notes[index]
       responses.map(response => {
         imagesArray.push(URL.createObjectURL(response.data))
       })
@@ -120,19 +120,19 @@ class NoteList extends React.Component {
         case 84: // Ctrl T
           this.setNoteMode(
             document.activeElement.id,
-            constants.note_modes.EDIT_IDEA
+            constants.note_modes.EDIT_IDEAS
           )
           break
         case 80: // Ctrl P
           this.setNoteMode(
             document.activeElement.id,
-            constants.note_modes.EDIT_PILE
+            constants.note_modes.EDIT_PILES
           )
       }
     } else {
       switch (event.keyCode) {
         case 13: // Enter
-          if (this.state.focusType == constants.note_modes.NOSELECTION) {
+          if (this.state.focusType == constants.note_modes.NO_SELECTION) {
             this.setNoteMode(
               document.activeElement.id,
               constants.note_modes.SELECTED
@@ -141,8 +141,8 @@ class NoteList extends React.Component {
 
           break
         case 27: // Escape
-          let divToFocus = document.getElementById(this.state.selectedNote)
-          this.setNoteMode('', constants.note_modes.NOSELECTION)
+          var divToFocus = document.getElementById(this.state.selectedNote)
+          this.setNoteMode('', constants.note_modes.NO_SELECTION)
           divToFocus.focus()
           break
       }
@@ -161,29 +161,29 @@ class NoteList extends React.Component {
   }
 
   onStartPileEdit(noteId) {
-    this.setNoteMode(noteId, constants.note_modes.EDIT_PILE)
+    this.setNoteMode(noteId, constants.note_modes.EDIT_PILES)
   }
 
   markChecked(noteIndex) {
     if (this.state.selected.includes(noteIndex)) {
-      let tempArray = this.state.selected
+      var tempArray = this.state.selected
       const index = tempArray.indexOf(noteIndex)
       if (index > -1) {
         tempArray.splice(index, 1)
       }
       this.setState({ selected: tempArray })
     } else {
-      let tempArray = this.state.selected
+      var tempArray = this.state.selected
       tempArray.push(noteIndex)
       this.setState({ selected: tempArray, lastSelectedIndex: noteIndex })
     }
   }
 
   markShiftChecked(id) {
-    let start = Math.min(this.state.lastSelectedIndex, id)
-    let end = Math.max(this.state.lastSelectedIndex, id)
-    let tempArray = this.state.selected
-    for (let i = start; i <= end; i++) {
+    var start = Math.min(this.state.lastSelectedIndex, id)
+    var end = Math.max(this.state.lastSelectedIndex, id)
+    var tempArray = this.state.selected
+    for (var i = start; i <= end; i++) {
       if (!this.state.selected.includes(i) && !this.state.deleted.includes(i)) {
         tempArray.push(i)
       }
@@ -192,8 +192,8 @@ class NoteList extends React.Component {
   }
 
   selectAll() {
-    let selected = []
-    for (let i = 0; i < this.state.notes.length; i++) {
+    var selected = []
+    for (var i = 0; i < this.state.notes.length; i++) {
       selected.push(i)
     }
     this.setState({ selected: selected })
@@ -208,84 +208,39 @@ class NoteList extends React.Component {
       return
     }
 
-    for (let i = 0; i < this.state.selected.length; i++) {
-      let noteId = this.state.notes[this.state.selected[i]]._id
-      db.deleteNote(noteId)
+    for (var i = 0; i < this.state.selected.length; i++) {
+      var noteId = this.state.notes[this.state.selected[i]]._id
+      db.deleteRecord(db.types.note, noteId)
     }
 
     this.setState({ deleted: this.state.selected, selected: [] })
   }
 
   handleAddNew(idToAdd) {
-    var assignFunction
-    switch (this.state.toAdd) {
-      case 'author':
-        assignFunction = db.addAuthorToNote
-        break
-      case 'idea':
-        assignFunction = db.addIdeaToNote
-        break
-      case 'work':
-        assignFunction = db.addWorkToNote
-        break
-      case 'pile':
-        assignFunction = db.addPileToNote
-        break
-      default:
-        return
-    }
+    var linkType = this.state.toAdd
 
     // TODO: Single API call for multiple changes
-    for (let i = 0; i < this.state.selected.length; i++) {
-      let noteId = this.state.notes[this.state.selected[i]]._id
-      assignFunction(idToAdd, noteId).then(response => {
-        let notes = this.state.notes
-        const note = response.data
-        notes[this.state.selected[i]] = note
-        this.setState({ notes: notes })
-      })
+    for (var i = 0; i < this.state.selected.length; i++) {
+      var noteId = this.state.notes[this.state.selected[i]]._id
+      db.addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
+        response => {
+          var notes = this.state.notes
+          const note = response.data
+          notes[this.state.selected[i]] = note
+          this.setState({ notes: notes })
+        }
+      )
     }
   }
 
   async handleCreateAndAdd(name) {
-    var createFunction
-    switch (this.state.toAdd) {
-      case 'author':
-        createFunction = db.createAuthor
-        break
-      case 'idea':
-        createFunction = db.createIdea
-        break
-      case 'work':
-        createFunction = db.createWork
-        break
-      case 'pile':
-        createFunction = db.createPile
-        break
-      default:
-        return
-    }
-
     // TODO: Create single API call
-    let newIdToAssign = await createFunction(name)
+    var newIdToAssign = await db.createRecord(this.state.toAdd, name)
     this.handleAddNew(newIdToAssign.data.data._id)
   }
 
-  getSuggestions(string) {
-    switch (this.state.toAdd) {
-      case 'author':
-        return db.getAuthorSuggestions(string)
-      case 'idea':
-        return db.getIdeaSuggestions(string)
-      case 'work':
-        return db.getWorkSuggestions(string)
-      case 'pile':
-        return db.getPileSuggestions(string)
-    }
-  }
-
   render() {
-    let showMultiselect =
+    var showMultiselect =
       this.props.viewMode == constants.view_modes.FULL ||
       this.props.viewMode == constants.view_modes.RESULT
     return (
@@ -302,7 +257,8 @@ class NoteList extends React.Component {
                 }}
                 onSelect={this.handleAddNew.bind(this)}
                 handleNewSelect={this.handleCreateAndAdd.bind(this)}
-                getSuggestions={this.getSuggestions.bind(this)}
+                getSuggestions={db.getSuggestions}
+                apiType={this.state.toAdd}
               />
             ) : (
               <div>
@@ -314,7 +270,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'idea' })
+                    this.setState({ addSomething: true, toAdd: db.types.idea })
                   }}
                   className="multi-select button"
                 >
@@ -322,7 +278,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'work' })
+                    this.setState({ addSomething: true, toAdd: db.types.work })
                   }}
                   className="multi-select button"
                 >
@@ -330,7 +286,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'author' })
+                    this.setState({ addSomething: true, toAdd: db.types.auth })
                   }}
                   className="multi-select button"
                 >
@@ -338,7 +294,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'pile' })
+                    this.setState({ addSomething: true, toAdd: db.types.pile })
                   }}
                   className="multi-select button"
                 >
@@ -443,7 +399,7 @@ class NoteList extends React.Component {
                       )}
                       mode={
                         !this.state.selectedNote
-                          ? constants.note_modes.NOSELECTION
+                          ? constants.note_modes.NO_SELECTION
                           : this.state.selectedNote == note._id
                           ? this.state.focusType
                           : constants.note_modes.NOT_SELECTED

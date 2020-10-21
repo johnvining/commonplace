@@ -65,7 +65,7 @@ class Note extends React.Component {
 
   handleDelete() {
     if (confirm('Are you sure you want to delete this note?')) {
-      db.deleteNote(this.props.id)
+      db.deleteRecord(db.types.note, this.props.id)
         .then(() => {
           this.setState({ deleted: true })
         })
@@ -96,7 +96,7 @@ class Note extends React.Component {
   }
 
   handleUrlChange = val => {
-    let year = guessYearFromURL(val.target.value)
+    var year = guessYearFromURL(val.target.value)
     if (!this.state.pendingYear && year) {
       this.setState({ pendingUrl: val.target.value, pendingYear: year })
     } else {
@@ -105,7 +105,7 @@ class Note extends React.Component {
   }
 
   handleNewIdea = ideaId => {
-    db.addIdeaToNote(ideaId, this.props.id)
+    db.addLinkToRecord(db.types.idea, ideaId, db.types.note, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
@@ -116,7 +116,12 @@ class Note extends React.Component {
 
   // TODO: Clear entry after assignment
   handleCreateIdeaAndAddToNote = ideaName => {
-    db.createIdeaAndAddToNote(ideaName, this.props.id)
+    db.createAndLinkToRecord(
+      db.types.idea,
+      ideaName,
+      db.types.note,
+      this.props.id
+    )
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
@@ -131,7 +136,7 @@ class Note extends React.Component {
   }
 
   handleCreateAuthorAndAssign = authorName => {
-    db.createAuthor(authorName).then(response => {
+    db.createRecord(db.types.auth, authorName).then(response => {
       this.setState({
         pendingAuthorId: response.data.data._id,
         pendingAuthorName: authorName
@@ -144,7 +149,7 @@ class Note extends React.Component {
   }
 
   handleCreateWorkAndAssign = workName => {
-    db.createWork(workName).then(response => {
+    db.createRecord(db.types.work, workName).then(response => {
       this.setState({
         pendingWorkId: response.data.data._id,
         pendingWorkName: workName
@@ -171,7 +176,7 @@ class Note extends React.Component {
     this.setState({ keep: true })
     this.props.setNoteMode(constants.note_modes.SELECT)
     await db
-      .updateNoteInfo(this.props.id, updateObject)
+      .updateRecord(db.types.note, this.props.id, updateObject)
       .then(this.props.refetchMe(this.props.index))
       .catch(error => {
         console.error(error)
@@ -180,7 +185,7 @@ class Note extends React.Component {
 
   removeIdea(ideaId) {
     // TODO: Support passing the new version of a note back to parent instead of refetch
-    db.removeIdeaFromNote(this.props.id, ideaId)
+    db.removeFromRecord(db.types.idea, ideaId, db.types.note, this.props.id)
     this.props.refetchMe(this.props.index)
   }
 
@@ -214,19 +219,31 @@ class Note extends React.Component {
   }
 
   async handleNewPile(pile) {
-    db.addPileToNote(pile, this.props.id).then(() => {
-      this.props.refetchMe(this.props.index)
-    })
+    db.addLinkToRecord(db.types.pile, pile, db.types.note, this.props.id).then(
+      () => {
+        this.props.refetchMe(this.props.index)
+      }
+    )
   }
 
   async handleCreatePileAndAssign(pileName) {
-    db.createPileAndAddToNote(pileName, this.props.id).then(() => {
+    db.createAndLinkToRecord(
+      db.types.pile,
+      pileName,
+      db.types.note,
+      this.props.id
+    ).then(() => {
       this.props.refetchMe(this.props.index)
     })
   }
 
   async handlePileRemove(pileId) {
-    db.removePileFromNote(this.props.id, pileId).then(() => {
+    db.removeFromRecord(
+      db.types.pile,
+      pileId,
+      db.types.note,
+      this.props.id
+    ).then(() => {
       this.props.refetchMe(this.props.index)
     })
   }
@@ -247,7 +264,7 @@ class Note extends React.Component {
 
     var class_name = 'note-full '
     switch (this.props.mode) {
-      case constants.note_modes.NOSELECTION:
+      case constants.note_modes.NO_SELECTION:
         no_selection = true
         break
       case constants.note_modes.NOT_SELECTED:
@@ -261,11 +278,11 @@ class Note extends React.Component {
         class_name = 'note-full edit-note '
         edit = true
         break
-      case constants.note_modes.EDIT_IDEA:
+      case constants.note_modes.EDIT_IDEAS:
         class_name = 'note-full edit-note '
         edit_ideas = true
         break
-      case constants.note_modes.EDIT_PILE:
+      case constants.note_modes.EDIT_PILES:
         class_name = 'note-full edit-note '
         edit_piles = true
         break
@@ -340,7 +357,8 @@ class Note extends React.Component {
                 edit={edit_piles}
                 piles={note.piles}
                 onSelect={this.handleNewPile.bind(this)}
-                getSuggestions={db.getPileSuggestions}
+                getSuggestions={db.getSuggestions}
+                apiType={db.types.pile}
                 handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
                 mainClassName="note"
                 onPileRemove={this.handlePileRemove.bind(this)}
@@ -429,7 +447,8 @@ class Note extends React.Component {
                     dontAutofocus={true}
                     inputName={this.props.id + 'author'}
                     onSelect={this.handleUpdateAuthor}
-                    getSuggestions={db.getAuthorSuggestions}
+                    getSuggestions={db.getSuggestions}
+                    apiType={db.types.auth}
                     handleNewSelect={this.handleCreateAuthorAndAssign}
                   />
                 </>
@@ -466,7 +485,8 @@ class Note extends React.Component {
                     className={'note-full work edit'}
                     defaultValue={this.state.pendingWorkName || ''}
                     onSelect={this.handleUpdateWork.bind(this)}
-                    getSuggestions={db.getWorkSuggestions}
+                    getSuggestions={db.getSuggestions}
+                    apiType={db.types.work}
                     handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
                   />
                 </>
@@ -593,7 +613,8 @@ class Note extends React.Component {
                         }}
                         onSelect={this.handleNewIdea}
                         handleNewSelect={this.handleCreateIdeaAndAddToNote}
-                        getSuggestions={db.getIdeaSuggestions}
+                        getSuggestions={db.getSuggestions}
+                        apiType={db.types.idea}
                       />
                     ) : (
                       // Neither editing whole note nor ideas
@@ -603,7 +624,7 @@ class Note extends React.Component {
                           onClick={() => {
                             this.props.setNoteMode(
                               this.props.id,
-                              constants.note_modes.EDIT_IDEA
+                              constants.note_modes.EDIT_IDEAS
                             )
                           }}
                           tabIndex="-1"

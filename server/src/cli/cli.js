@@ -125,7 +125,7 @@ async function note(args) {
     let note = await NoteControllers.createNote(args)
     setContext(usertext.context.note, note)
     let author = await auth(args)
-    await NoteControllers.addAuthor(note.id, author)
+    await NoteControllers.updateNote(note.id, { author: author })
   }
 }
 
@@ -192,7 +192,7 @@ async function load() {
 
     printLoadHelp(recordType)
     let filePath = getFilePath()
-    await importUtils.importNoteCSV(filePath, recordType)
+    await importUtils.importCSV(filePath, recordType)
   }
 }
 
@@ -268,7 +268,7 @@ function help(args) {
   if (args != '') {
     console.log(usertext.helpText[args])
   } else {
-    Object.keys(usertext.helpText).forEach((command, index) => {
+    Object.keys(usertext.helpText).forEach(command => {
       console.log(' | ' + command + ': ' + usertext.helpText[command])
     })
   }

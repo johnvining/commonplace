@@ -1,14 +1,8 @@
-import React from 'react'
-import NoteList from './NoteList'
-import {
-  deleteAuthor,
-  getAuthorInfo,
-  getNotesForAuthor,
-  getNotesForWork,
-  getWorksForAuthor
-} from './Database'
-import { navigate, Link } from '@reach/router'
+import { navigate } from '@reach/router'
 import * as constants from './constants'
+import * as db from './Database'
+import NoteList from './NoteList'
+import React from 'react'
 import ResultWork from './ResultWork'
 
 class Author extends React.Component {
@@ -29,7 +23,7 @@ class Author extends React.Component {
   }
 
   fetchAuthorInfo(authorId) {
-    getAuthorInfo(authorId)
+    db.getInfo(types.auth, authorId)
       .then(response => {
         this.setState({
           authorName: response.data.data.name,
@@ -43,7 +37,7 @@ class Author extends React.Component {
   }
 
   fetchAuthorWorks(authorId) {
-    getWorksForAuthor(authorId)
+    db.getRecordsWithFilter(db.types.work, db.types.auth, authorId)
       .then(response => {
         this.setState({
           works: response.data.data
@@ -55,9 +49,10 @@ class Author extends React.Component {
   }
 
   async getListOfNotes(index, page) {
-    let notesResponse
+    var notesResponse
     if (index == undefined) {
-      await getNotesForAuthor(this.state.id)
+      await db
+        .getRecordsWithFilter(db.types.note, db.types.auth, this.state.id)
         .then(response => {
           notesResponse = response
         })
@@ -65,8 +60,9 @@ class Author extends React.Component {
           console.error(error)
         })
     } else {
-      let workId = this.state.works[index]?._id
-      await getNotesForWork(workId)
+      var workId = this.state.works[index]?._id
+      await db
+        .getRecordsWithFilter(db.types.note, db.types.work, workId)
         .then(response => {
           notesResponse = response
         })
@@ -93,7 +89,7 @@ class Author extends React.Component {
       return
     }
 
-    await deleteAuthor(this.state.id)
+    await db.deleteRecord(types.auth, this.state.id)
     navigate('/')
   }
 

@@ -11,8 +11,7 @@ import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
 import * as PileControllers from '../resources/pile/pile.controllers.js'
 
-// TODO: Change function name -- can be notes or works
-export async function importNoteCSV(filePath, recordType) {
+export async function importCSV(filePath, recordType) {
   console.log('Importing records from file ' + filePath)
   console.log('')
 

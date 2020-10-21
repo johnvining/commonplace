@@ -1,23 +1,10 @@
-import React from 'react'
 import { Link } from '@reach/router'
-import NoteList from './NoteList'
-import {
-  getWorkInfo,
-  getNotesForWork,
-  createAuthorAndAddToWork,
-  getAuthorSuggestions,
-  getPileSuggestions,
-  deleteWork,
-  updateWorkInfo,
-  addPileToWork,
-  createPileAndAddToWork,
-  removePileFromWork,
-  createNewNoteForWork
-} from './Database'
-import Autocomplete from './Autocomplete'
-import PileListForItem from './PileListForItem'
-import { guessYearFromURL } from './utils'
 import { navigate } from '@reach/router'
+import * as db from './Database'
+import Autocomplete from './Autocomplete'
+import NoteList from './NoteList'
+import PileListForItem from './PileListForItem'
+import React from 'react'
 
 class Work extends React.Component {
   state = {
@@ -41,7 +28,7 @@ class Work extends React.Component {
   }
 
   fetchWorkInfo(workId) {
-    getWorkInfo(workId)
+    db.getInfo(db.types.work, workId)
       .then(response => {
         this.setState({
           pendingWorkTitle: response.data.data.name,
@@ -58,8 +45,9 @@ class Work extends React.Component {
   }
 
   async getListOfNotes() {
-    let notesResponse
-    await getNotesForWork(this.state.id)
+    var notesResponse
+    await db
+      .getRecordsWithFilter(db.types.note, db.types.work, this.state.id)
       .then(response => {
         notesResponse = response
       })
@@ -84,7 +72,12 @@ class Work extends React.Component {
 
   handleCreateAuthorAndAssign(authorName) {
     this.setState({ pendingAuthorName: authorName })
-    createAuthorAndAddToWork(this.props.id, authorName).then(response => {
+    db.createAndLinkToRecord(
+      db.types.auth,
+      authorName,
+      db.types.work,
+      this.props.id
+    ).then(response => {
       this.setState({
         pendingAuthorId: response.data.data.id
       })
@@ -100,7 +93,7 @@ class Work extends React.Component {
       return
     }
 
-    await deleteWork(this.state.id)
+    await db.deleteRecord(db.types.work, this.state.id)
     navigate('/')
   }
 
@@ -112,18 +105,25 @@ class Work extends React.Component {
       name: this.state.pendingWorkTitle
     }
 
-    updateWorkInfo(this.props.id, updateObject)
+    db.updateRecord(db.types.work, this.props.id, updateObject)
     this.setState({ edit: false })
   }
 
   async handleNewPile(pile) {
-    addPileToWork(pile, this.props.id).then(() => {
-      this.fetchWorkInfo(this.props.id)
-    })
+    db.addLinkToRecord(db.types.pile, pile, db.types.note, this.props.id).then(
+      () => {
+        this.fetchWorkInfo(this.props.id)
+      }
+    )
   }
 
   async handleCreatePileAndAssign(pileName) {
-    createPileAndAddToWork(pileName, this.props.id).then(() => {
+    db.createAndLinkToRecord(
+      db.types.pile,
+      pileName,
+      db.types.work,
+      this.props.id
+    ).then(() => {
       this.fetchWorkInfo(this.props.id)
     })
   }
@@ -133,7 +133,12 @@ class Work extends React.Component {
   }
 
   async handlePileRemove(pileId) {
-    removePileFromWork(this.state.id, pileId).then(() => {
+    db.removeFromRecord(
+      db.types.pile,
+      pileId,
+      db.types.work,
+      this.state.id
+    ).then(() => {
       this.fetchWorkInfo(this.props.id)
     })
   }
@@ -157,7 +162,8 @@ class Work extends React.Component {
               edit={this.state.editPiles}
               piles={this.state.piles}
               onSelect={this.handleNewPile.bind(this)}
-              getSuggestions={getPileSuggestions}
+              getSuggestions={db.getSuggestions}
+              apiType={db.types.pile}
               handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
               mainClassName="work-page"
               onStartPileEdit={() => {
@@ -201,7 +207,8 @@ class Work extends React.Component {
                   dontAutofocus={true}
                   defaultValue={this.state.pendingAuthorName || ''}
                   onSelect={this.handleUpdateAuthor.bind(this)}
-                  getSuggestions={getAuthorSuggestions}
+                  getSuggestions={db.getSuggestions}
+                  apiType={db.types.auth}
                   handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
                   onClearText={this.handleClearAuthor.bind(this)}
                 />

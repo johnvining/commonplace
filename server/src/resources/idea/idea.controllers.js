@@ -1,19 +1,17 @@
 import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
-import { crudControllers } from '../../utils/crud.js'
-import { removeIdeaFromNote } from '../note/note.controllers'
+import { defaultControllers } from '../../utils/default.controllers.js'
+import {
+  removeIdeaFromNote,
+  findNotesAndPopulate
+} from '../note/note.controllers'
 
-export const getNotesFromIdea = async (req, res) => {
-  try {
-    const doc = await getNotesForIdea(req.params.id)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+export const reqGetNotesForIdea = async (req, res) => {
+  const doc = await findNotesAndPopulate({ ideas: req.params.id })
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqGetIdeasByStringWithCounts = async (req, res) => {
@@ -23,23 +21,10 @@ export const reqGetIdeasByStringWithCounts = async (req, res) => {
       return res.status(400).end()
     }
 
-    // TODO: Refactor note from idea search out
+    // TODO: Can we use slim here?
     var notePromises = []
     for (let i = 0; i < doc.length; i++) {
-      notePromises.push(
-        Note.find({ ideas: doc[i]._id })
-          .populate('author')
-          .populate('ideas')
-          .populate('piles')
-          .populate({
-            path: 'work',
-            populate: {
-              path: 'author'
-            }
-          })
-          .lean()
-          .exec()
-      )
+      notePromises.push(findNotesAndPopulate({ ideas: doc[i]._id }))
     }
 
     const notes = await Promise.all(notePromises)
@@ -59,21 +44,16 @@ export const reqGetIdeasByStringWithCounts = async (req, res) => {
   }
 }
 
-export const getAutoCompleteWithCounts = async (req, res) => {
+export const reqGetAutoCompleteWithCounts = async (req, res) => {
   return await reqGetAutoComplete(req, res, true)
 }
 
 export const reqGetAutoComplete = async (req, res, withCounts = false) => {
-  try {
-    const doc = await findIdeasByString(req.body.string, withCounts)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await findIdeasByString(req.body.string, withCounts)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const findIdeasByString = async function(string, withCounts = false) {
@@ -98,49 +78,21 @@ export const findIdeasByString = async function(string, withCounts = false) {
   }
 }
 
-export const reqGetIdeaInfo = async (req, res) => {
-  try {
-    const doc = await getIdeaInfo(req.params.id)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-}
-
 export const reqCreateIdea = async (req, res) => {
-  try {
-    const doc = await createIdea(req.body.name)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await createIdea(req.body.name)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqDeleteIdea = async (req, res) => {
-  try {
-    await deleteIdea(req.params.id)
-    res.status(200).json()
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  await deleteIdea(req.params.id)
 }
 
 // Idea
 export const createIdea = async function(name) {
   return await Idea.create({ name: name })
-}
-
-export const getIdeaInfo = async function(ideaId) {
-  return await Idea.findOne({ _id: ideaId }).exec()
 }
 
 export const findIdeaByString = async function(string) {
@@ -159,29 +111,8 @@ export const findOrCreateIdea = async function(name) {
   return await createIdea(name)
 }
 
-export const getNotesForIdea = async function(ideaId, slim = false) {
-  if (slim) {
-    return Note.find({ ideas: ideaId })
-      .lean()
-      .exec()
-  } else {
-    return Note.find({ ideas: ideaId })
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
-  }
-}
-
 export const deleteIdea = async function(ideaId) {
-  let notes = await getNotesForIdea(ideaId, true)
+  let notes = await findNotesAndPopulate({ ideas: ideaId }, {}, true)
   let deletionPromises = []
   notes.map(note => {
     deletionPromises.push(removeIdeaFromNote(note._id, ideaId))
@@ -191,4 +122,4 @@ export const deleteIdea = async function(ideaId) {
   await Idea.findOneAndDelete({ _id: ideaId })
 }
 
-export default crudControllers(Idea)
+export default defaultControllers(Idea)

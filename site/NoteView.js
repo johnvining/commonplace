@@ -1,7 +1,7 @@
-import React from 'react'
-import NoteList from './NoteList'
-import { getNoteInfo } from './Database'
 import * as constants from './constants'
+import * as db from './Database'
+import NoteList from './NoteList'
+import React from 'react'
 
 class NoteView extends React.Component {
   state = {
@@ -9,8 +9,9 @@ class NoteView extends React.Component {
   }
 
   async getListOfOneNote(index, page) {
-    let notesResponse
-    await getNoteInfo(this.props.id)
+    var notesResponse
+    await db
+      .getInfo(db.types.note, this.props.id)
       .then(response => {
         notesResponse = response
       })

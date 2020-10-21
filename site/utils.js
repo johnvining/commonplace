@@ -1,7 +1,7 @@
 export function guessYearFromURL(url) {
   if (!url) return
 
-  let val
+  var val
   // TODO: Fix in safari
   const array = [] //[...url.matchAll(/(?<=\/)(\d){4}(?=\D)/g)]
   if (array.length == 1) {

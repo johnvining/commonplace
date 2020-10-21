@@ -1,4 +1,5 @@
 .vscode
+/server/coverage/
 /server/csvin.csv
 /server/dist/
 /server/image-store/
@@ -8,8 +9,8 @@
 /site/.sass-cache/
 /site/dist/
 /site/node_modules/
-site/.env.production
-site/.env.development
-server/src/config/prodconfig.js
-server/src/config/devconfig.js
 Notes.md
+server/src/config/devconfig.js
+server/src/config/prodconfig.js
+site/.env.development
+site/.env.production

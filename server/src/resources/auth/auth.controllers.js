@@ -1,36 +1,18 @@
 import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
-import { removeAuthorFromNote } from '../note/note.controllers.js'
-import { crudControllers } from '../../utils/crud.js'
-import { response } from 'express'
+import { findNotesAndPopulate } from '../note/note.controllers.js'
+import { defaultControllers } from '../../utils/default.controllers.js'
 
-export const getAuthorDetails = async (req, res) => {
-  try {
-    const doc = await Auth.findOne({ _id: req.params.id })
-      .lean()
-      .exec()
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+export const reqGetNotesForAuthor = async (req, res) => {
+  const doc = await findNotesAndPopulate(
+    { author: req.params.id },
+    { updatedAt: -1 }
+  )
+  if (!doc) {
+    return res.status(400).end()
   }
-}
-
-export const getNotesFromAuthor = async (req, res) => {
-  try {
-    const doc = await getNotesForAuthor(req.params.id)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  return doc
 }
 
 export const getAutoCompleteWithCounts = async (req, res) => {
@@ -38,16 +20,11 @@ export const getAutoCompleteWithCounts = async (req, res) => {
 }
 
 export const getAutoComplete = async (req, res, withCounts = false) => {
-  try {
-    const doc = await findAuthorsByString(req.body.string, withCounts)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await findAuthorsByString(req.body.string, withCounts)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const findAuthorsByString = async function(str, withCounts) {
@@ -81,39 +58,23 @@ export const findAuthorsByString = async function(str, withCounts) {
 }
 
 export const reqCreateAuthor = async (req, res) => {
-  try {
-    const doc = await createAuthor(req.body.name)
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await createAuthor(req.body.name)
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqGetWorksForAuthor = async (req, res) => {
-  try {
-    const doc = await Work.find({ author: req.params.id })
-    if (!doc) {
-      return res.status(400).end()
-    }
-    res.status(200).json({ data: doc })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
+  const doc = await Work.find({ author: req.params.id })
+  if (!doc) {
+    return res.status(400).end()
   }
+  return doc
 }
 
 export const reqDeleteAuthor = async (req, res) => {
-  try {
-    await deleteAuthor(req.params.id)
-    res.status(200).json()
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
+  await deleteAuthor(req.params.id)
 }
 
 export const createAuthor = async function(name) {
@@ -136,38 +97,19 @@ export const findOrCreateAuthor = async function(name) {
   return await createAuthor(name)
 }
 
-export const getNotesForAuthor = async function(authId, slim = false) {
-  if (slim) {
-    return Note.find({ author: authId })
-      .sort({ updatedAt: -1 })
-      .lean()
-      .exec()
-  } else {
-    return Note.find({ author: authId })
-      .sort({ updatedAt: -1 })
-      .populate('author')
-      .populate('ideas')
-      .populate('piles')
-      .populate({
-        path: 'work',
-        populate: {
-          path: 'author'
-        }
-      })
-      .lean()
-      .exec()
-  }
-}
-
 export const deleteAuthor = async function(id) {
-  let notes = await getNotesForAuthor(id, true)
+  let notes = await findNotesAndPopulate(
+    { author: id },
+    { updatedAt: -1 },
+    true
+  )
   let deletionPromises = []
   notes.map(note => {
-    deletionPromises.push(removeAuthorFromNote(note._id))
+    deletionPromises.push(updateNote(note._id, { author: null }))
   })
 
   await Promise.all(deletionPromises)
   await Auth.findOneAndDelete({ _id: id })
 }
 
-export default crudControllers(Auth)
+export default defaultControllers(Auth)

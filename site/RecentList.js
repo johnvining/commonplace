@@ -4,7 +4,7 @@ import * as db from './Database'
 
 class RecentList extends React.Component {
   async getListOfNotes(index, page) {
-    let notesResponse
+    var notesResponse
     await db
       .getRecentNotes(page)
       .then(response => {

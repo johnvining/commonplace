@@ -4,13 +4,17 @@
   "main": "index.js",
   "scripts": {
     "build": "babel src --out-dir dist",
-    "dev": "NODE_ENV=development nodemon --exec npm run restart",
     "cli": "node dist/cli/cli.js",
+    "dev": "NODE_ENV=development nodemon --exec npm run restart",
     "import": "node dist/cli/import.js",
     "restart": "rimraf dist && npm run build && npm run start",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "coverage": "jest --coverage",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@types/jest": "^26.0.14",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
@@ -53,7 +57,7 @@
     "eslint-plugin-prettier": "^2.6.2",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
-    "jest": "^26.4.2",
+    "jest": "^26.5.2",
     "mock-req-res": "^1.0.2",
     "nodemon": "^1.18.3",
     "parcel-bundler": "^1.12.4",
@@ -61,17 +65,13 @@
     "rimraf": "^2.6.2",
     "supertest": "^3.3.0"
   },
-  "jest": {
-    "verbose": true,
-    "testURL": "http://localhost/",
-    "testEnvironment": "node",
-    "setupTestFrameworkScriptFile": "<rootDir>/test-db-setup.js",
-    "testPathIgnorePatterns": [
-      "dist/"
-    ],
-    "restoreMocks": true
-  },
   "browserslist": [
     "last 2 Chrome versions"
-  ]
+  ],
+  "jest": {
+    "testEnvironment": "jest-environment-node",
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
+  }
 }

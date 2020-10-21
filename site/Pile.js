@@ -1,14 +1,9 @@
-import React from 'react'
-import NoteList from './NoteList'
-import WorkList from './WorkList'
-import {
-  getNotesForPile,
-  getPileInfo,
-  getWorksForPile,
-  deletePile
-} from './Database'
 import { navigate } from '@reach/router'
 import * as constants from './constants'
+import * as db from './Database'
+import NoteList from './NoteList'
+import React from 'react'
+import WorkList from './WorkList'
 
 class Pile extends React.Component {
   state = {
@@ -25,11 +20,11 @@ class Pile extends React.Component {
     }
   }
 
-  fetchPileInfo(pileID) {
-    getPileInfo(pileID)
+  fetchPileInfo(pileId) {
+    db.getInfo(db.types.pile, pileId)
       .then(response => {
         this.setState({
-          pileName: response.data.data[0].name
+          pileName: response.data.data.name
         })
       })
       .catch(error => {
@@ -52,13 +47,14 @@ class Pile extends React.Component {
       return
     }
 
-    await deletePile(this.state.id)
+    await db.deleteRecord(db.types.pile, this.state.id)
     navigate('/')
   }
 
   async getListOfNotes() {
-    let notesResponse
-    await getNotesForPile(this.state.id)
+    var notesResponse
+    await db
+      .getRecordsWithFilter(db.types.note, db.types.pile, this.state.id)
       .then(response => {
         notesResponse = response
       })
@@ -70,8 +66,9 @@ class Pile extends React.Component {
   }
 
   async getListOfWorks() {
-    let worksResponse
-    await getWorksForPile(this.state.id)
+    var worksResponse
+    await db
+      .getRecordsWithFilter(db.types.work, db.types.pile, this.state.id)
       .then(response => {
         worksResponse = response
       })
