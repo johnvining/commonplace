@@ -42,16 +42,14 @@ export async function deleteRecord(type, id) {
   return axios.delete(url_api + type + `/${id}`)
 }
 
-export async function removeIdeaFromNote(noteId, ideaId) {
-  return axios.delete(url_api + 'note/' + noteId + '/idea/' + ideaId)
-}
-
-export async function removePileFromWork(workId, pileId) {
-  return axios.delete(url_api + 'work/' + workId + '/pile/' + pileId)
-}
-
-export async function removePileFromNote(noteId, pileId) {
-  return axios.delete(url_api + 'note/' + noteId + '/pile/' + pileId)
+// Supported cobminations:
+//   - idea from note
+//   - pile from note
+//   - pile from work
+export async function removeFromRecord(removeType, removeId, fromType, fromId) {
+  return axios.delete(
+    url_api + fromType + '/' + fromId + '/' + removeType + '/' + removeId
+  )
 }
 
 export async function createIdeaAndAddToNote(ideaName, noteId) {

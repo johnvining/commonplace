@@ -180,7 +180,7 @@ class Note extends React.Component {
 
   removeIdea(ideaId) {
     // TODO: Support passing the new version of a note back to parent instead of refetch
-    db.removeIdeaFromNote(this.props.id, ideaId)
+    db.removeFromRecord(db.types.idea, ideaId, db.types.note, this.props.id)
     this.props.refetchMe(this.props.index)
   }
 
@@ -226,7 +226,12 @@ class Note extends React.Component {
   }
 
   async handlePileRemove(pileId) {
-    db.removePileFromNote(this.props.id, pileId).then(() => {
+    db.removeFromRecord(
+      db.types.pile,
+      pileId,
+      db.types.note,
+      this.props.id
+    ).then(() => {
       this.props.refetchMe(this.props.index)
     })
   }

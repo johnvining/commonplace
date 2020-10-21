@@ -11,7 +11,7 @@ import {
   updateRecord,
   addPileToWork,
   createPileAndAddToWork,
-  removePileFromWork
+  removeFromRecord
 } from './Database'
 import Autocomplete from './Autocomplete'
 import PileListForItem from './PileListForItem'
@@ -132,7 +132,7 @@ class Work extends React.Component {
   }
 
   async handlePileRemove(pileId) {
-    removePileFromWork(this.state.id, pileId).then(() => {
+    removeFromRecord(types.pile, pileId, types.work, this.state.id).then(() => {
       this.fetchWorkInfo(this.props.id)
     })
   }
