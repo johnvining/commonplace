@@ -31,7 +31,7 @@ class Idea extends React.Component {
   }
 
   async getListOfNotes() {
-    let notesResponse
+    var notesResponse
     await db
       .removeFromRecord(db.types.note, db.types.idea, this.state.id)
       .then(response => {

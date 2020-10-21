@@ -45,7 +45,7 @@ class Work extends React.Component {
   }
 
   async getListOfNotes() {
-    let notesResponse
+    var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.work, this.state.id)
       .then(response => {

@@ -52,7 +52,7 @@ class Pile extends React.Component {
   }
 
   async getListOfNotes() {
-    let notesResponse
+    var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.pile, this.state.id)
       .then(response => {
@@ -66,7 +66,7 @@ class Pile extends React.Component {
   }
 
   async getListOfWorks() {
-    let worksResponse
+    var worksResponse
     await db
       .getRecordsWithFilter(db.types.work, db.types.pile, this.state.id)
       .then(response => {

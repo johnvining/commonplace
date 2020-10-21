@@ -49,7 +49,7 @@ class Author extends React.Component {
   }
 
   async getListOfNotes(index, page) {
-    let notesResponse
+    var notesResponse
     if (index == undefined) {
       await db
         .getRecordsWithFilter(db.types.note, db.types.auth, this.state.id)
@@ -60,7 +60,7 @@ class Author extends React.Component {
           console.error(error)
         })
     } else {
-      let workId = this.state.works[index]?._id
+      var workId = this.state.works[index]?._id
       await db
         .getRecordsWithFilter(db.types.note, db.types.work, workId)
         .then(response => {

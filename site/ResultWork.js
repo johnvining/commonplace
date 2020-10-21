@@ -7,7 +7,7 @@ class ResultWork extends React.Component {
   state = {}
 
   render() {
-    let work = this.props.work
+    var work = this.props.work
     return (
       <Link to={`/work/${work._id}`}>
         <div className="result-box">

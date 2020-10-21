@@ -96,7 +96,7 @@ class Note extends React.Component {
   }
 
   handleUrlChange = val => {
-    let year = guessYearFromURL(val.target.value)
+    var year = guessYearFromURL(val.target.value)
     if (!this.state.pendingYear && year) {
       this.setState({ pendingUrl: val.target.value, pendingYear: year })
     } else {
