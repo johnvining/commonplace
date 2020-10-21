@@ -209,28 +209,12 @@ class NoteList extends React.Component {
   }
 
   handleAddNew(idToAdd) {
-    var linkType
-    switch (this.state.toAdd) {
-      case 'author':
-        linkType = db.types.auth
-        break
-      case 'idea':
-        linkType = db.types.idea
-        break
-      case 'work':
-        linkType = db.types.work
-        break
-      case 'pile':
-        linkType = db.types.pile
-        break
-      default:
-        return
-    }
+    var linkType = this.state.toAdd
 
     // TODO: Single API call for multiple changes
     for (var i = 0; i < this.state.selected.length; i++) {
       var noteId = this.state.notes[this.state.selected[i]]._id
-      addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
+      db.addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
         response => {
           var notes = this.state.notes
           const note = response.data
@@ -242,40 +226,9 @@ class NoteList extends React.Component {
   }
 
   async handleCreateAndAdd(name) {
-    var type
-    switch (this.state.toAdd) {
-      case 'author':
-        type = db.types.auth
-        break
-      case 'idea':
-        type = db.types.idea
-        break
-      case 'work':
-        type = db.types.work
-        break
-      case 'pile':
-        type = db.types.pile
-        break
-      default:
-        return
-    }
-
     // TODO: Create single API call
-    var newIdToAssign = await db.createRecord(type, name)
+    var newIdToAssign = await db.createRecord(this.state.toAdd, name)
     this.handleAddNew(newIdToAssign.data.data._id)
-  }
-
-  getSuggestions(string) {
-    switch (this.state.toAdd) {
-      case 'author':
-        return db.getSuggestions(db.types.auth, string)
-      case 'idea':
-        return db.getSuggestions(db.types.idea, string)
-      case 'work':
-        return db.getSuggestions(db.types.work, string)
-      case 'pile':
-        return db.getSuggestions(db.types.pile, string)
-    }
   }
 
   render() {
@@ -296,7 +249,8 @@ class NoteList extends React.Component {
                 }}
                 onSelect={this.handleAddNew.bind(this)}
                 handleNewSelect={this.handleCreateAndAdd.bind(this)}
-                getSuggestions={this.getSuggestions.bind(this)}
+                getSuggestions={db.getSuggestions}
+                apiType={this.state.toAdd}
               />
             ) : (
               <div>
@@ -308,7 +262,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'idea' })
+                    this.setState({ addSomething: true, toAdd: db.types.idea })
                   }}
                   className="multi-select button"
                 >
@@ -316,7 +270,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'work' })
+                    this.setState({ addSomething: true, toAdd: db.types.work })
                   }}
                   className="multi-select button"
                 >
@@ -324,7 +278,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'author' })
+                    this.setState({ addSomething: true, toAdd: db.types.auth })
                   }}
                   className="multi-select button"
                 >
@@ -332,7 +286,7 @@ class NoteList extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.setState({ addSomething: true, toAdd: 'pile' })
+                    this.setState({ addSomething: true, toAdd: db.types.pile })
                   }}
                   className="multi-select button"
                 >
