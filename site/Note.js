@@ -198,7 +198,7 @@ class Note extends React.Component {
 
   handleFocusImage(click) {
     if (
-      this.state.mode == constants.note_modes.EDIT &&
+      this.props.mode == constants.note_modes.EDIT &&
       confirm('Are you sure you want to delete this image?')
     ) {
       if (click.target.id == this.state.largeImage) {
@@ -353,7 +353,7 @@ class Note extends React.Component {
               <PileListForItem
                 remove={this.state.edit}
                 allowTabbing={selected || edit_piles}
-                allowAdd={selected || edit_piles || this.props.mode == ''}
+                allowAdd={selected || edit_piles || no_selection}
                 edit={edit_piles}
                 piles={note.piles}
                 onSelect={this.handleNewPile.bind(this)}

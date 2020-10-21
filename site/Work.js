@@ -143,6 +143,12 @@ class Work extends React.Component {
     })
   }
 
+  async createNoteForWork() {
+    const response = await createNewNoteForWork(this.props.id)
+    console.log(response)
+    navigate('/note/' + response.data._id + '/edit')
+  }
+
   render() {
     var { pendingWorkTitle, pendingUrl, pendingYear } = this.state
 
@@ -160,9 +166,11 @@ class Work extends React.Component {
               apiType={db.types.pile}
               handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
               mainClassName="work-page"
-              onStartEdit={() => {
+              onStartPileEdit={() => {
                 this.setState({ editPiles: true })
               }}
+              allowAdd={true}
+              allowTabbing={true}
               onPileRemove={this.handlePileRemove.bind(this)}
             />
           </div>
@@ -276,6 +284,12 @@ class Work extends React.Component {
                   onClick={this.deleteWork.bind(this)}
                 >
                   Delete
+                </button>
+                <button
+                  className="top-level button"
+                  onClick={this.createNoteForWork.bind(this)}
+                >
+                  + Note
                 </button>
               </>
             )}

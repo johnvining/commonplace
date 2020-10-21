@@ -148,6 +148,11 @@ export async function createNewNoteFromTitle(title) {
   return axios.post(url_api + 'note', data)
 }
 
+export async function createNewNoteForWork(workId) {
+  const data = { work: workId }
+  return axios.post(url_api + 'note', data)
+}
+
 export async function searchNotes(searchString) {
   const data = { searchString: searchString }
   return axios.put(url_api + 'note/find', data)

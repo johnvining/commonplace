@@ -7,7 +7,7 @@ import grid from './icons/grid.svg'
 class SearchBar extends React.Component {
   render() {
     return (
-      <div className="tool-bar">
+      <>
         <button
           className={
             this.props.viewMode == constants.view_modes.FULL
@@ -44,7 +44,7 @@ class SearchBar extends React.Component {
         >
           <img src={grid} />
         </button>
-      </div>
+      </>
     )
   }
 }

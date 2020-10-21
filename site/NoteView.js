@@ -27,6 +27,7 @@ class NoteView extends React.Component {
       <NoteList
         key={'note' + this.props.id}
         viewMode={constants.view_modes.FULL}
+        editFirst={this.props.edit}
         getListOfNotes={this.getListOfOneNote.bind(this)}
       />
     )

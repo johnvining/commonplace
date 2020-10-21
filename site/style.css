@@ -21,11 +21,9 @@ div .top-bar {
   font-size: 50px;
   width: 50%; }
 .top-bar .top-action-bar {
-  display: inline-block;
-  text-align: right;
-  width: 50%;
-  height: 45px;
-  align-items: center; }
+  display: inline-flex;
+  justify-content: flex-end;
+  width: 50%; }
 .top-bar .tool-bar button {
   border-style: none;
   padding: 4px;
@@ -41,10 +39,14 @@ div .top-bar {
   background: lightblue; }
 .top-bar .tool-bar .button-selected:focus {
   outline: none; }
+.top-bar .tool-bar.div {
+  padding: 10px; }
 .top-bar .tool-bar .left {
   border-radius: 5px 0px 0px 5px; }
 .top-bar .tool-bar .right {
   border-radius: 0px 5px 5px 0px; }
+.top-bar .tool-bar .left-right {
+  border-radius: 5px 5px 5px 5px; }
 
 .top-level.button {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -263,9 +265,11 @@ div .top-bar {
   padding: 2px; }
 .idea.label {
   background-color: #efffff;
+  border-style: solid;
   border-radius: 4px;
   border-radius: 4px;
-  border-style: none;
+  border-style: solid;
+  border-color: white;
   color: black;
   font-size: 15px;
   margin: 2px;
@@ -273,9 +277,7 @@ div .top-bar {
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
   .idea.label:focus {
-    outline: none;
-    background-color: white;
-    border-radius: 4px; }
+    border-color: black; }
   .idea.label:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
@@ -286,8 +288,6 @@ div .top-bar {
     width: 14px;
     height: 14px;
     content: ''; }
-  .idea.label.edit:hover {
-    background-color: lightcoral; }
 .idea.ul {
   display: block;
   margin: 0px;
