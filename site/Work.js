@@ -9,7 +9,7 @@ import {
   getSuggestions,
   deleteRecord,
   updateRecord,
-  addPileToWork,
+  addLinkToRecord,
   createPileAndAddToWork,
   removeFromRecord
 } from './Database'
@@ -116,7 +116,7 @@ class Work extends React.Component {
   }
 
   async handleNewPile(pile) {
-    addPileToWork(pile, this.props.id).then(() => {
+    addLinkToRecord(types.pile, pile, types.note, this.props.id).then(() => {
       this.fetchWorkInfo(this.props.id)
     })
   }

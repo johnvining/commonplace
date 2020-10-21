@@ -209,19 +209,19 @@ class NoteList extends React.Component {
   }
 
   handleAddNew(idToAdd) {
-    var assignFunction
+    var linkType
     switch (this.state.toAdd) {
       case 'author':
-        assignFunction = db.addAuthorToNote
+        linkType = db.types.auth
         break
       case 'idea':
-        assignFunction = db.addIdeaToNote
+        linkType = db.types.idea
         break
       case 'work':
-        assignFunction = db.addWorkToNote
+        linkType = db.types.work
         break
       case 'pile':
-        assignFunction = db.addPileToNote
+        linkType = db.types.pile
         break
       default:
         return
@@ -230,12 +230,14 @@ class NoteList extends React.Component {
     // TODO: Single API call for multiple changes
     for (let i = 0; i < this.state.selected.length; i++) {
       let noteId = this.state.notes[this.state.selected[i]]._id
-      assignFunction(idToAdd, noteId).then(response => {
-        let notes = this.state.notes
-        const note = response.data
-        notes[this.state.selected[i]] = note
-        this.setState({ notes: notes })
-      })
+      addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
+        response => {
+          let notes = this.state.notes
+          const note = response.data
+          notes[this.state.selected[i]] = note
+          this.setState({ notes: notes })
+        }
+      )
     }
   }
 

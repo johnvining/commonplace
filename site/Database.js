@@ -65,6 +65,17 @@ export async function getRecordsWithFilter(recordType, filterType, filterId) {
   )
 }
 
+// Create X and add to Y
+export async function createAuthorAndAddToWork(workId, authorName) {
+  const data = { author: authorName }
+  return axios.put(url_api + `work/${workId}/auth/create`, data)
+}
+
+export async function createPileAndAddToWork(pileName, workId) {
+  const data = { name: pileName }
+  return axios.put(url_api + `work/${workId}/pile/create`, data)
+}
+
 export async function createIdeaAndAddToNote(ideaName, noteId) {
   const data = { name: ideaName }
   return axios.put(url_api + `note/${noteId}/idea/create`, data)
@@ -75,9 +86,67 @@ export async function createPileAndAddToNote(pileName, noteId) {
   return axios.put(url_api + `note/${noteId}/pile/create`, data)
 }
 
-export async function addAuthorToWork(workId, authorId) {
-  const data = { author: authorId }
-  return axios.put(url_api + `work/${workId}`, data)
+export async function createAuthorAndAddToNote(authorName, noteId) {
+  // TODO: Make single request
+  const newAuthor = await createAuthor(authorName)
+  return addAuthorToNote(newAuthor._id, noteId)
+}
+
+export async function addAuthorToNote(authorId, noteId) {
+  const updateObject = { author: authorId }
+  return updateNoteInfo(noteId, updateObject)
+}
+
+export async function createWorkAndAddToNote(workName, noteId) {
+  // TODO: Make single request
+  const newWork = await createWork(workName)
+  return addWorkToNote(newWork._id, noteId)
+}
+
+export async function addWorkToNote(workId, noteId) {
+  const updateObject = { work: workId }
+  return updateNoteInfo(noteId, updateObject)
+}
+
+// See appendLinkToRecord and setLinkOnRecord for supported combinations
+export async function addLinkToRecord(linkType, linkId, recordType, recordId) {
+  if (linkType == types.idea || linkType == types.pile) {
+    return appendLinkToRecord(linkType, linkId, recordType, recordId)
+  } else if (linkType == types.work || linkType == types.auth) {
+    return setLinkOnRecord(linkType, linkId, recordType, recordId)
+  }
+  return null
+}
+
+// Supported combinations:
+//   - add idea to note
+//   - add pile to note
+//   - add pile to work
+export async function appendLinkToRecord(
+  appendType,
+  appendId,
+  recordType,
+  recordId
+) {
+  const data = { id: appendId }
+  return axios.put(
+    url_api + recordType + '/' + recordId + '/' + appendType,
+    data
+  )
+}
+
+// Supported combinations:
+//   - set work on note
+//   - set auth on note
+//   - set auth on work
+export async function setLinkOnRecord(linkType, linkId, recordType, recordId) {
+  var data = {}
+  if (linkType == types.auth) {
+    data = { author: linkId }
+  } else if (linkType == types.work) {
+    data = { work: linkId }
+  }
+  return axios.put(url_api + recordType + '/' + recordId, data)
 }
 
 export async function addUrlToWork(workId, newUrl, newYear) {
@@ -94,61 +163,8 @@ export async function addYearToWork(workId, newYear) {
   return axios.put(url_api + `work/${workId}`, data)
 }
 
-export async function addIdeaToNote(ideaId, noteId) {
-  const data = { id: ideaId }
-  return axios.put(url_api + `note/${noteId}/idea`, data)
-}
-
-export async function addPileToNote(pileId, noteId) {
-  const data = { id: pileId }
-  return axios.put(url_api + `note/${noteId}/pile`, data)
-}
-
-export async function addPileToWork(pileId, workId) {
-  const data = { id: pileId }
-  return axios.put(url_api + `work/${workId}/pile`, data)
-}
-
-export async function addAuthorToNote(authorId, noteId) {
-  const updateObject = { author: authorId }
-  return updateNoteInfo(noteId, updateObject)
-}
-
-export async function addWorkToNote(workId, noteId) {
-  const updateObject = { work: workId }
-  return updateNoteInfo(noteId, updateObject)
-}
-
 async function updateNoteInfo(noteId, updateObject) {
   return axios.put(url_api + `note/${noteId}`, updateObject)
-}
-
-// Create X and add to Y
-export async function createAuthorAndAddToWork(workId, authorName) {
-  const data = { author: authorName }
-  return axios.put(url_api + `work/${workId}/auth/create`, data)
-}
-
-export async function createNewNoteFromTitle(title) {
-  const data = { title: title }
-  return axios.post(url_api + 'note', data)
-}
-
-export async function createPileAndAddToWork(pileName, workId) {
-  const data = { name: pileName }
-  return axios.put(url_api + `work/${workId}/pile/create`, data)
-}
-
-export async function createAuthorAndAddToNote(authorName, noteId) {
-  // TODO: Make single request
-  const newAuthor = await createAuthor(authorName)
-  return addAuthorToNote(newAuthor._id, noteId)
-}
-
-export async function createWorkAndAddToNote(workName, noteId) {
-  // TODO: Make single request
-  const newWork = await createWork(workName)
-  return addWorkToNote(newWork._id, noteId)
 }
 
 // Image handling
@@ -169,7 +185,12 @@ export async function getImagesForNote(noteId, imageN) {
   })
 }
 
-// Generic get-notes functions
+// Generic Note Functions
+export async function createNewNoteFromTitle(title) {
+  const data = { title: title }
+  return axios.post(url_api + 'note', data)
+}
+
 export async function searchNotes(searchString) {
   const data = { searchString: searchString }
   return axios.put(url_api + 'note/find', data)

@@ -105,7 +105,7 @@ class Note extends React.Component {
   }
 
   handleNewIdea = ideaId => {
-    db.addIdeaToNote(ideaId, this.props.id)
+    db.addLinkToRecord(db.types.idea, ideaId, db.types.note, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
@@ -214,9 +214,11 @@ class Note extends React.Component {
   }
 
   async handleNewPile(pile) {
-    db.addPileToNote(pile, this.props.id).then(() => {
-      this.props.refetchMe(this.props.index)
-    })
+    db.addLinkToRecord(db.types.pile, pile, db.types.note, this.props.id).then(
+      () => {
+        this.props.refetchMe(this.props.index)
+      }
+    )
   }
 
   async handleCreatePileAndAssign(pileName) {
