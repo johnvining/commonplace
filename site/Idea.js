@@ -64,6 +64,7 @@ class Idea extends React.Component {
   }
 
   render() {
+    this.props.setPageTitle(this.state.ideaName)
     return (
       <div>
         <div align="right">

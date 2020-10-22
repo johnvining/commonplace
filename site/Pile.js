@@ -80,6 +80,7 @@ class Pile extends React.Component {
   }
 
   render() {
+    this.props.setPageTitle(this.state.pileName)
     return (
       <div>
         <div align="right">

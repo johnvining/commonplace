@@ -1,4 +1,4 @@
-import React from 'react'
+import { createNewNoteFromTitle } from './Database'
 import { render } from 'react-dom'
 import { Router, Link, navigate } from '@reach/router'
 import Author from './Author'
@@ -6,13 +6,13 @@ import Find from './Find'
 import Idea from './Idea'
 import NoteView from './NoteView'
 import Pile from './Pile'
+import plus from './icons/plus.svg'
+import React from 'react'
 import RecentList from './RecentList'
+import search from './icons/search.svg'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
-import plus from './icons/plus.svg'
-import { createNewNoteFromTitle } from './Database'
-import search from './icons/search.svg'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }
@@ -44,6 +44,10 @@ class App extends React.Component {
   setView(view) {
     this.setState({ viewMode: view })
     localStorage.viewMode = view
+  }
+
+  setPageTitle(title) {
+    document.title = title
   }
 
   render() {
@@ -103,14 +107,45 @@ class App extends React.Component {
 
         <br />
         <Router>
-          <Author path="/auth/:id" viewMode={this.state.viewMode} />
-          <Find path="/find/:search" viewMode={this.state.viewMode} />
-          <Idea path="/idea/:id" viewMode={this.state.viewMode} />
-          <NoteView path="/note/:id" />
-          <NoteView path="/note/:id/edit" edit={true} />
-          <Pile path="/pile/:id" viewMode={this.state.viewMode} />
-          <RecentList path="/" viewMode={this.state.viewMode} />
-          <Work path="/work/:id" viewMode={this.state.viewMode} />
+          <Author
+            path="/auth/:id"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <Find
+            path="/find/:search"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <Idea
+            path="/idea/:id"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <NoteView
+            path="/note/:id"
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <NoteView
+            path="/note/:id/edit"
+            edit={true}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <Pile
+            path="/pile/:id"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <RecentList
+            path="/"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <Work
+            path="/work/:id"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
         </Router>
       </div>
     )

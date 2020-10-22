@@ -150,7 +150,7 @@ class Work extends React.Component {
 
   render() {
     var { pendingWorkTitle, pendingUrl, pendingYear } = this.state
-
+    this.props.setPageTitle(pendingWorkTitle)
     return (
       <div>
         <div>

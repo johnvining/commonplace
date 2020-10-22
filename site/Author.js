@@ -30,6 +30,7 @@ class Author extends React.Component {
           bornYear: response.data.data.bornYear,
           diedYear: response.data.data.diedYear
         })
+        this.props.setPageTitle(response.data.data.name)
       })
       .catch(error => {
         console.error(error)

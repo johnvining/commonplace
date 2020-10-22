@@ -18,6 +18,7 @@ class RecentList extends React.Component {
   }
 
   render() {
+    this.props.setPageTitle('Recent notes')
     return (
       <div>
         <NoteList

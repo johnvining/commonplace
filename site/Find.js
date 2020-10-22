@@ -42,6 +42,8 @@ class Find extends React.Component {
     const { notes, ideas, works, authors } = this.state
     const { search } = this.props
 
+    this.props.setPageTitle('Find: ' + search)
+
     return (
       <div>
         <div align="right">
