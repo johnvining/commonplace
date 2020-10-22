@@ -33,7 +33,7 @@ class Idea extends React.Component {
   async getListOfNotes() {
     var notesResponse
     await db
-      .removeFromRecord(db.types.note, db.types.idea, this.state.id)
+      .getRecordsWithFilter(db.types.note, db.types.idea, this.state.id)
       .then(response => {
         notesResponse = response
       })
