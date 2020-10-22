@@ -23,7 +23,7 @@ class Author extends React.Component {
   }
 
   fetchAuthorInfo(authorId) {
-    db.getInfo(types.auth, authorId)
+    db.getInfo(db.types.auth, authorId)
       .then(response => {
         this.setState({
           authorName: response.data.data.name,
@@ -89,7 +89,7 @@ class Author extends React.Component {
       return
     }
 
-    await db.deleteRecord(types.auth, this.state.id)
+    await db.deleteRecord(db.types.auth, this.state.id)
     navigate('/')
   }
 
