@@ -2,7 +2,6 @@ import React from 'react'
 import { navigate } from '@reach/router'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
-import { realpathSync } from 'fs'
 
 class SearchBar extends React.Component {
   state = {
@@ -130,13 +129,13 @@ class SearchBar extends React.Component {
   getSuggestions(val) {
     switch (this.state.modifier) {
       case this.modifiers.auth:
-        return db.getSuggestions(types.auth, val)
+        return db.getSuggestions(db.types.auth, val)
       case this.modifiers.idea:
-        return db.getSuggestions(types.idea, val)
+        return db.getSuggestions(db.types.idea, val)
       case this.modifiers.work:
-        return db.getSuggestions(types.work, val)
+        return db.getSuggestions(db.types.work, val)
       case this.modifiers.pile:
-        return db.getSuggestions(types.pile, val)
+        return db.getSuggestions(db.types.pile, val)
     }
 
     return null
