@@ -225,14 +225,14 @@ class NoteList extends React.Component {
     var linkType = this.state.toAdd
 
     // TODO: Single API call for multiple changes
-    for (var i = 0; i < this.state.selected.length; i++) {
+    for (let i = 0; i < this.state.selected.length; i++) {
       var noteId = this.state.notes[this.state.selected[i]]._id
       db.addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
         response => {
-          var notes = this.state.notes
-          const note = response.data
-          notes[this.state.selected[i]] = note
-          this.setState({ notes: notes })
+          var tempNotes = this.state.notes
+          const note = response.data.data
+          tempNotes[this.state.selected[i]] = note
+          this.setState({ notes: tempNotes })
         }
       )
     }
