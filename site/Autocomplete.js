@@ -51,7 +51,6 @@ class Autocomplete extends React.Component {
       this.props
         .getSuggestions(this.props.apiType, this.state.currentTypedText)
         .then(response => {
-          // TODO: Loop over response items to see if match
           for (var i = 0; i < response.data.data.length; i++) {
             var hasExact = false
             if (this.state.currentTypedText == response.data.data[i].name) {
@@ -60,7 +59,9 @@ class Autocomplete extends React.Component {
             }
           }
           this.setState({
-            responses: response.data.data,
+            responses: response.data.data.filter(
+              item => !this.props.excludeIds.includes(item._id)
+            ),
             responseIncludesExactMatch: hasExact
           })
         })
@@ -108,7 +109,6 @@ class Autocomplete extends React.Component {
 
   render() {
     const { responses } = this.state
-    console.log(responses)
     return (
       <div className={this.props.className + ' autocomplete'}>
         <input

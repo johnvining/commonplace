@@ -32,6 +32,7 @@ class PileListForItem extends React.Component {
             handleNewSelect={this.props.handleNewSelect.bind(this)}
             inputName="work-pile"
             onSelect={this.props.onSelect.bind(this)}
+            excludeIds={this.props.piles.map(pile => pile._id)}
           />
         ) : (
           <button

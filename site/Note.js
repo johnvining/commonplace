@@ -618,6 +618,7 @@ class Note extends React.Component {
                         handleNewSelect={this.handleCreateIdeaAndAddToNote}
                         getSuggestions={db.getSuggestions}
                         apiType={db.types.idea}
+                        excludeIds={note.ideas.map(idea => idea._id)}
                       />
                     ) : (
                       // Neither editing whole note nor ideas
