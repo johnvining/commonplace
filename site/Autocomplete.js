@@ -4,7 +4,8 @@ class Autocomplete extends React.Component {
   state = {
     loading: true,
     currentTypedText: '',
-    hideResults: false
+    hideResults: false,
+    responseIncludesExactMatch: false
   }
   className = this.props.className
   style = {
@@ -50,8 +51,17 @@ class Autocomplete extends React.Component {
       this.props
         .getSuggestions(this.props.apiType, this.state.currentTypedText)
         .then(response => {
+          // TODO: Loop over response items to see if match
+          for (var i = 0; i < response.data.data.length; i++) {
+            var hasExact = false
+            if (this.state.currentTypedText == response.data.data[i].name) {
+              hasExact = true
+              break
+            }
+          }
           this.setState({
-            responses: response.data.data
+            responses: response.data.data,
+            responseIncludesExactMatch: hasExact
           })
         })
         .catch(error => {
@@ -98,6 +108,7 @@ class Autocomplete extends React.Component {
 
   render() {
     const { responses } = this.state
+    console.log(responses)
     return (
       <div className={this.props.className + ' autocomplete'}>
         <input
@@ -125,7 +136,8 @@ class Autocomplete extends React.Component {
                 </li>
               )
             })}
-            {this.state.currentTypedText?.length > 0 ? (
+            {this.state.currentTypedText?.length > 0 &&
+            !this.state.responseIncludesExactMatch ? (
               <li key="_new-li" className={this.style.li}>
                 <button
                   id="_new"
