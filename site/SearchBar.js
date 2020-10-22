@@ -126,22 +126,35 @@ class SearchBar extends React.Component {
     return
   }
 
-  getSuggestions(val) {
-    switch (this.state.modifier) {
-      case this.modifiers.auth:
-        return db.getSuggestions(db.types.auth, val)
-      case this.modifiers.idea:
-        return db.getSuggestions(db.types.idea, val)
-      case this.modifiers.work:
-        return db.getSuggestions(db.types.work, val)
-      case this.modifiers.pile:
-        return db.getSuggestions(db.types.pile, val)
+  getSuggestions(type, val) {
+    var dbType = this.modifierToDbTypes(this.state.modifier)
+    if (dbType) {
+      return db.getSuggestions(dbType, val)
     }
 
     return null
   }
 
-  handleCreate() {}
+  async handleCreate(typedValue) {
+    var dbType = this.modifierToDbTypes(this.state.modifier)
+    var newRecord = await db.createRecord(dbType, typedValue)
+    navigate('/' + dbType + '/' + newRecord.data.data._id)
+  }
+
+  modifierToDbTypes(modifier) {
+    switch (modifier) {
+      case this.modifiers.auth:
+        return db.types.auth
+      case this.modifiers.idea:
+        return db.types.idea
+      case this.modifiers.work:
+        return db.types.work
+      case this.modifiers.pile:
+        return db.types.pile
+    }
+
+    return null
+  }
 
   handleEscape() {
     this.setState({
@@ -157,7 +170,6 @@ class SearchBar extends React.Component {
       case this.modifiers.work:
       case this.modifiers.pile:
         return true
-        break
     }
 
     return false
