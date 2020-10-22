@@ -251,6 +251,14 @@ class Note extends React.Component {
     })
   }
 
+  async handleClearAuthor() {
+    this.setState({ pendingAuthorId: null, pendingAuthorName: '' })
+  }
+
+  async handleClearWork() {
+    this.setState({ pendingWorkId: null, pendingWorkName: '' })
+  }
+
   render() {
     const { deleted } = this.state
     const { note } = this.props
@@ -453,6 +461,7 @@ class Note extends React.Component {
                     getSuggestions={db.getSuggestions}
                     apiType={db.types.auth}
                     handleNewSelect={this.handleCreateAuthorAndAssign}
+                    onClearText={this.handleClearAuthor.bind(this)}
                   />
                 </>
               ) : (
@@ -491,6 +500,7 @@ class Note extends React.Component {
                     getSuggestions={db.getSuggestions}
                     apiType={db.types.work}
                     handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
+                    onClearText={this.handleClearWork.bind(this)}
                   />
                 </>
               ) : this.state.pendingWorkId ? (
