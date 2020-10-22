@@ -222,7 +222,6 @@ div.main {
     display: block;
     font-family: $main_font;
     font-size: 14px;
-    // height: 12em;
     margin: auto;
     padding: 8px;
     resize: none;
@@ -234,14 +233,6 @@ div.main {
       outline: none;
       border-radius: 2px;
     }
-  }
-
-  .note-text.edit {
-    height: 14em;
-  }
-
-  .note-take.edit {
-    height: 6em;
   }
 
   .author,

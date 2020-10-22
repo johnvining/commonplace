@@ -13,6 +13,7 @@ import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 import PileListForItem from './PileListForItem'
 import * as constants from './constants'
+import autosize from 'autosize'
 
 class Note extends React.Component {
   state = {
@@ -88,10 +89,12 @@ class Note extends React.Component {
   }
 
   handleTextChange = val => {
+    autosize(document.querySelector('#text'))
     this.setState({ pendingText: val.target.value })
   }
 
   handleTakeChange = val => {
+    autosize(document.querySelector('#take'))
     this.setState({ pendingTake: val.target.value })
   }
 

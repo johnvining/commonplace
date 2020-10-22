@@ -169,10 +169,6 @@ div .top-bar {
     background-color: lightblue;
     outline: none;
     border-radius: 2px; }
-.note-full .note-text.edit {
-  height: 14em; }
-.note-full .note-take.edit {
-  height: 6em; }
 .note-full .author.label,
 .note-full .work.label {
   background-color: transparent;

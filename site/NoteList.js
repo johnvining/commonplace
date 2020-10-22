@@ -8,6 +8,7 @@ import Autocomplete from './Autocomplete'
 import * as constants from './constants'
 import left from './icons/left.svg'
 import right from './icons/right.svg'
+import autosize from 'autosize'
 
 class NoteList extends React.Component {
   state = {
@@ -43,6 +44,8 @@ class NoteList extends React.Component {
 
     if (this.props.editFirst && this.state.notes[0]) {
       this.setNoteMode(this.state.notes[0]._id, constants.note_modes.EDIT)
+      autosize(document.querySelector('#text'))
+      autosize(document.querySelector('#take'))
     }
   }
 
@@ -116,6 +119,8 @@ class NoteList extends React.Component {
       switch (event.keyCode) {
         case 69: // Ctrl E'
           this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT)
+          autosize(document.querySelector('#text'))
+          autosize(document.querySelector('#take'))
           break
         case 84: // Ctrl T
           this.setNoteMode(
