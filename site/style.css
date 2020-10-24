@@ -1,29 +1,40 @@
+* {
+  box-sizing: border-box; }
+
+.main {
+  width: 100%; }
+
 body {
   background: #f7fcf7;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-
-a {
-  color: black; }
-
-.url {
-  font-family: "Courier New", Courier, monospace; }
-
-div.main {
-  width: 96%;
-  margin: auto; }
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  margin: 0px;
+  padding: 0px; }
 
 div .top-bar {
   width: 100%;
-  min-height: 5em;
-  display: block; }
-.top-bar .title {
-  display: inline-block;
-  font-size: 50px;
-  width: 50%; }
+  display: flex;
+  flex-wrap: wrap; }
+.top-bar .title-bar {
+  display: block;
+  width: 100%;
+  align-self: flex-start; }
+  @media (min-width: 768px) {
+    .top-bar .title-bar {
+      width: 33%; } }
+  .top-bar .title-bar .title {
+    font-size: 28px;
+    padding: 5px; }
+    @media (min-width: 768px) {
+      .top-bar .title-bar .title {
+        font-size: 40px; } }
 .top-bar .top-action-bar {
   display: inline-flex;
   justify-content: flex-end;
-  width: 50%; }
+  width: 100%;
+  min-height: 5em; }
+  @media (min-width: 768px) {
+    .top-bar .top-action-bar {
+      width: 67%; } }
 .top-bar .tool-bar button {
   border-style: none;
   padding: 4px;
@@ -40,13 +51,20 @@ div .top-bar {
 .top-bar .tool-bar .button-selected:focus {
   outline: none; }
 .top-bar .tool-bar.div {
-  padding: 10px; }
+  padding: 10px;
+  align-self: center; }
 .top-bar .tool-bar .left {
   border-radius: 5px 0px 0px 5px; }
 .top-bar .tool-bar .right {
   border-radius: 0px 5px 5px 0px; }
 .top-bar .tool-bar .left-right {
   border-radius: 5px 5px 5px 5px; }
+
+a {
+  color: black; }
+
+.url {
+  font-family: "Courier New", Courier, monospace; }
 
 .top-level.button {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;

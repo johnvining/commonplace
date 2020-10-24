@@ -62,7 +62,7 @@ class App extends React.Component {
           </div>
         ) : (
           <div className="top-bar">
-            <div className="title">
+            <div className="title-bar">
               <Link to="/" className="title-link">
                 {process.env.NODE_ENV === 'development' ? (
                   <div className="title">common-dev </div>

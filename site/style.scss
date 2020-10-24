@@ -1,40 +1,54 @@
 @import '_variables';
 @import '_mixins';
 
+* {
+  box-sizing: border-box;
+}
+
+.main {
+  width: 100%;
+}
+
 body {
   background: $background_color;
   font-family: $main_font;
-}
-
-a {
-  color: $link_color;
-}
-
-.url {
-  font-family: $monospace;
-}
-
-div.main {
-  width: 96%;
-  margin: auto;
+  margin: 0px;
+  padding: 0px;
 }
 
 .top-bar {
   div & {
     width: 100%;
-    min-height: 5em;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
   }
-  .title {
-    display: inline-block;
-    font-size: 50px;
-    width: 50%;
+  .title-bar {
+    display: block;
+    width: 100%;
+    align-self: flex-start;
+
+    @include tablet-plus {
+      width: 33%;
+    }
+
+    .title {
+      font-size: 28px;
+      padding: 5px;
+      @include tablet-plus {
+        font-size: 40px;
+      }
+    }
   }
 
   .top-action-bar {
     display: inline-flex;
     justify-content: flex-end;
-    width: 50%;
+    width: 100%;
+    min-height: 5em;
+
+    @include tablet-plus {
+      width: 67%;
+    }
   }
 
   .tool-bar {
@@ -62,6 +76,7 @@ div.main {
 
     &.div {
       padding: 10px;
+      align-self: center;
     }
 
     .left {
@@ -76,6 +91,14 @@ div.main {
       border-radius: 5px 5px 5px 5px;
     }
   }
+}
+
+a {
+  color: $link_color;
+}
+
+.url {
+  font-family: $monospace;
 }
 
 .top-level {
