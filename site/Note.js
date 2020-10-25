@@ -378,31 +378,34 @@ class Note extends React.Component {
             </div>
           )}
           {/* Images */}
-          <div className="note-full image-row width-100">
-            {this.props.note?.images?.map((image, index) => (
-              <div
-                className={
-                  this.state.edit
-                    ? 'image-row image-frame remove'
-                    : this.state.largeImage == index
-                    ? 'image-row image-frame selected'
-                    : 'image-row image-frame'
-                }
-                key={this.props.id + index + 'div-img'}
-                onClick={this.handleFocusImage.bind(this)}
-                id={index}
-              >
-                {this.props.note?.imageUrls ? (
-                  <img
-                    key={this.props.id + index + 'img'}
-                    src={this.props.note.imageUrls[index]}
-                    className="image-row"
-                    id={index}
-                  />
-                ) : null}
-              </div>
-            ))}
-          </div>
+          {this.props.note?.images.length > 0 ? (
+            <div className="note-full image-row width-100">
+              {this.props.note?.images?.map((image, index) => (
+                <div
+                  className={
+                    this.state.edit
+                      ? 'image-row image-frame remove'
+                      : this.state.largeImage == index
+                      ? 'image-row image-frame selected'
+                      : 'image-row image-frame'
+                  }
+                  key={this.props.id + index + 'div-img'}
+                  onClick={this.handleFocusImage.bind(this)}
+                  id={index}
+                >
+                  {this.props.note?.imageUrls ? (
+                    <img
+                      key={this.props.id + index + 'img'}
+                      src={this.props.note.imageUrls[index]}
+                      className="image-row"
+                      id={index}
+                    />
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
           {/* Text area */}
           <div name="text" className="width-100">
             {edit ? (

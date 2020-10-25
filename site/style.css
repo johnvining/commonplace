@@ -87,7 +87,7 @@
   width: 100%;
   text-align: left;
   margin: 0px 12px 0px 0px;
-  background-color: lightgrey;
+  background-color: #f4f4f4;
   border-radius: 4px; }
   .note-full .year.input,
   .note-full .page.input {
@@ -98,7 +98,7 @@
   width: 100%;
   text-align: left;
   margin: 0px 12px 0px 0px;
-  background-color: lightgrey;
+  background-color: #f4f4f4;
   border-radius: 4px; }
   .note-full .title.input,
   .note-full .url.input {
@@ -130,7 +130,7 @@
   .note-full .work {
     width: 100%;
     text-align: left;
-    background-color: lightgrey; }
+    background-color: #f4f4f4; }
 .note-full .note-text,
 .note-full .note-take,
 .note-full .url {
@@ -148,7 +148,7 @@
   resize: none;
   width: 100%;
   white-space: pre-wrap;
-  background-color: lightgrey;
+  background-color: #f4f4f4;
   border-radius: 4px; }
   .note-full .note-text:focus,
   .note-full .note-take:focus {
@@ -207,7 +207,7 @@
     content: ''; }
 .note-full.form-label {
   font-size: 12px;
-  padding: 8px;
+  padding: 2px;
   text-transform: uppercase;
   font-family: "Avenir", "Candara", "Arial", sans-serif;
   display: block; }
