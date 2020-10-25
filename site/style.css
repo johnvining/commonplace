@@ -1,3 +1,217 @@
+.note-full.outer {
+  background-color: white;
+  border-color: #efefef;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 4px;
+  margin: 4px;
+  padding: 4px;
+  display: flex;
+  flex-wrap: wrap; }
+  .note-full.outer:focus {
+    border-color: gray;
+    outline: none; }
+  .note-full.outer.selected {
+    border-color: black; }
+  .note-full.outer.edit-note, .note-full.outer.edit-idea {
+    background-color: white;
+    border-color: lightblue; }
+  .note-full.outer.not-selected {
+    background-color: #f2f2f2; }
+.note-full .half {
+  display: inline-block;
+  width: 50%;
+  vertical-align: top;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 0px;
+  padding: 0px; }
+.note-full .full-width {
+  display: inline-block;
+  width: 100%;
+  vertical-align: top;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 0px;
+  padding: 0px; }
+.note-full .idea-container,
+.note-full .action-bar,
+.note-full .title,
+.note-full .year,
+.note-full .page,
+.note-full .url {
+  margin: 4px;
+  padding: 4px; }
+.note-full .title,
+.note-full .year,
+.note-full .page,
+.note-full .url {
+  display: inline-block;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  background-color: transparent;
+  border-style: none;
+  display: inline-block; }
+  .note-full .title:focus,
+  .note-full .year:focus,
+  .note-full .page:focus,
+  .note-full .url:focus {
+    background-color: lightblue;
+    outline: none;
+    border-radius: 2px; }
+.note-full .url {
+  font-family: "Courier New", Courier, monospace; }
+.note-full .width-80 {
+  width: 100%;
+  margin: 0px;
+  padding: 8px; }
+  @media (min-width: 768px) {
+    .note-full .width-80 {
+      width: 75%; } }
+.note-full .width-20 {
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  padding: 8px; }
+  @media (min-width: 768px) {
+    .note-full .width-20 {
+      width: 25%; } }
+.note-full .width-100 {
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  padding: 8px; }
+.note-full .year,
+.note-full .page {
+  width: 100%;
+  text-align: left;
+  margin: 0px 12px 0px 0px;
+  background-color: lightgrey;
+  border-radius: 4px; }
+  .note-full .year.input,
+  .note-full .page.input {
+    width: 100%;
+    text-align: left; }
+.note-full .title,
+.note-full .url {
+  width: 100%;
+  text-align: left;
+  margin: 0px 12px 0px 0px;
+  background-color: lightgrey;
+  border-radius: 4px; }
+  .note-full .title.input,
+  .note-full .url.input {
+    width: 100%;
+    text-align: left; }
+.note-full .note-text,
+.note-full .note-take,
+.note-full .author,
+.note-full .work {
+  margin: 4px;
+  padding: 4px;
+  width: 100%; }
+  .note-full .note-text.imputed, .note-full .note-text.work,
+  .note-full .note-take.imputed,
+  .note-full .note-take.work,
+  .note-full .author.imputed,
+  .note-full .author.work,
+  .note-full .work.imputed,
+  .note-full .work.work {
+    font-style: italic; }
+  .note-full .note-text.label,
+  .note-full .note-take.label,
+  .note-full .author.label,
+  .note-full .work.label {
+    text-decoration: none; }
+  input .note-full .note-text, input
+  .note-full .note-take, input
+  .note-full .author, input
+  .note-full .work {
+    width: 100%;
+    text-align: left;
+    background-color: lightgrey; }
+.note-full .note-text,
+.note-full .note-take,
+.note-full .url {
+  font-size: 14px; }
+.note-full .note-text,
+.note-full .note-take {
+  background-color: transparent;
+  border: none;
+  box-sizing: border-box;
+  display: block;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 14px;
+  margin: auto;
+  padding: 8px;
+  resize: none;
+  width: 100%;
+  white-space: pre-wrap;
+  background-color: lightgrey;
+  border-radius: 4px; }
+  .note-full .note-text:focus,
+  .note-full .note-take:focus {
+    background-color: lightblue;
+    outline: none;
+    border-radius: 2px; }
+.note-full .author.label,
+.note-full .work.label {
+  background-color: transparent;
+  display: inline-block;
+  width: 50%;
+  border: none;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 18px;
+  padding: 4px 4px 4px 8px;
+  margin: 0px; }
+  .note-full .author.label:focus,
+  .note-full .work.label:focus {
+    background-color: lightblue;
+    outline: none;
+    border-radius: 2px; }
+.note-full .author.autocomplete,
+.note-full .work.autocomplete {
+  margin: 0px;
+  padding: 0px; }
+.note-full .author.ul,
+.note-full .work.ul {
+  display: inline;
+  margin: 0px;
+  padding: 0px; }
+.note-full .author.li,
+.note-full .work.li {
+  display: inline;
+  margin: 0px;
+  padding: 0px; }
+.note-full .author.option,
+.note-full .work.option {
+  background: transparent;
+  border: none;
+  color: #393939;
+  display: inline;
+  margin: 0px;
+  padding: 4px;
+  font-size: 18px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .note-full .author.option::after,
+  .note-full .work.option::after {
+    content: '? '; }
+  .note-full .author.option.new::before,
+  .note-full .work.option.new::before {
+    background-image: url("/icons/plus.svg");
+    background-size: 17px 17px;
+    display: inline-block;
+    width: 17px;
+    height: 15px;
+    content: ''; }
+.note-full.form-label {
+  font-size: 12px;
+  padding: 8px;
+  text-transform: uppercase;
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
+  display: block; }
+
 html {
   box-sizing: border-box; }
 
@@ -84,192 +298,6 @@ a {
   .top-level.button:hover {
     background: lightblue;
     cursor: pointer; }
-
-.note-full.outer {
-  background-color: white;
-  border-color: #efefef;
-  border-style: solid;
-  border-width: 2px;
-  border-radius: 4px;
-  margin: 4px;
-  padding: 4px; }
-  .note-full.outer:focus {
-    border-color: gray;
-    outline: none; }
-  .note-full.outer.selected {
-    border-color: black; }
-  .note-full.outer.edit-note, .note-full.outer.edit-idea {
-    background-color: white;
-    border-color: lightblue; }
-  .note-full.outer.not-selected {
-    background-color: #f2f2f2; }
-.note-full .left-right-bar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin: 0px;
-  padding: 0px; }
-.note-full .idea-container,
-.note-full .action-bar,
-.note-full .title,
-.note-full .year,
-.note-full .page,
-.note-full .url {
-  margin: 4px;
-  padding: 4px; }
-.note-full .title,
-.note-full .year,
-.note-full .page,
-.note-full .url {
-  display: inline-block;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  background-color: transparent;
-  border-style: none;
-  display: inline-block; }
-  .note-full .title:focus,
-  .note-full .year:focus,
-  .note-full .page:focus,
-  .note-full .url:focus {
-    background-color: lightblue;
-    outline: none;
-    border-radius: 2px; }
-.note-full .url {
-  font-family: "Courier New", Courier, monospace; }
-.note-full .width-80 {
-  width: 100%;
-  margin: 0px 8px 0px 0px;
-  margin: 0px;
-  padding: 8px; }
-  @media (min-width: 768px) {
-    .note-full .width-80 {
-      width: 75%; } }
-.note-full .width-20 {
-  width: 100%;
-  margin: 0px;
-  padding: 0px;
-  padding: 8px; }
-  @media (min-width: 768px) {
-    .note-full .width-20 {
-      width: 25%; } }
-.note-full .year,
-.note-full .page {
-  width: 100%;
-  text-align: left;
-  margin: 0px 18px 0px 0px;
-  background-color: lightgrey;
-  border-radius: 4px; }
-  .note-full .year.input,
-  .note-full .page.input {
-    width: 100%;
-    text-align: left; }
-.note-full .title,
-.note-full .url {
-  width: 100%;
-  text-align: left;
-  margin: 0px 18px 0px 0px;
-  background-color: lightgrey;
-  border-radius: 4px; }
-  .note-full .title.input,
-  .note-full .url.input {
-    width: 100%;
-    text-align: left; }
-.note-full .note-text,
-.note-full .note-take,
-.note-full .author,
-.note-full .work {
-  margin: 4px;
-  padding: 4px; }
-  .note-full .note-text.imputed, .note-full .note-text.work,
-  .note-full .note-take.imputed,
-  .note-full .note-take.work,
-  .note-full .author.imputed,
-  .note-full .author.work,
-  .note-full .work.imputed,
-  .note-full .work.work {
-    font-style: italic; }
-  .note-full .note-text.label,
-  .note-full .note-take.label,
-  .note-full .author.label,
-  .note-full .work.label {
-    text-decoration: none; }
-.note-full .note-text,
-.note-full .note-take,
-.note-full .url {
-  font-size: 14px; }
-.note-full .note-text,
-.note-full .note-take {
-  background-color: transparent;
-  border: none;
-  box-sizing: border-box;
-  display: block;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 14px;
-  margin: auto;
-  padding: 8px;
-  resize: none;
-  width: 100%;
-  white-space: pre-wrap; }
-  .note-full .note-text:focus,
-  .note-full .note-take:focus {
-    background-color: lightblue;
-    outline: none;
-    border-radius: 2px; }
-.note-full .author.label,
-.note-full .work.label {
-  background-color: transparent;
-  display: inline-block;
-  width: 50%;
-  border: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 18px;
-  padding: 4px 4px 4px 8px;
-  margin: 0px; }
-  .note-full .author.label:focus,
-  .note-full .work.label:focus {
-    background-color: lightblue;
-    outline: none;
-    border-radius: 2px; }
-.note-full .author.autocomplete,
-.note-full .work.autocomplete {
-  margin: 0px;
-  padding: 0px; }
-.note-full .author.ul,
-.note-full .work.ul {
-  display: inline;
-  margin: 0px;
-  padding: 0px; }
-.note-full .author.li,
-.note-full .work.li {
-  display: inline;
-  margin: 0px;
-  padding: 0px; }
-.note-full .author.option,
-.note-full .work.option {
-  background: transparent;
-  border: none;
-  color: #393939;
-  display: inline;
-  margin: 0px;
-  padding: 4px;
-  font-size: 18px;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .note-full .author.option::after,
-  .note-full .work.option::after {
-    content: '? '; }
-  .note-full .author.option.new::before,
-  .note-full .work.option.new::before {
-    background-image: url("/icons/plus.svg");
-    background-size: 17px 17px;
-    display: inline-block;
-    width: 17px;
-    height: 15px;
-    content: ''; }
-.note-full.form-label {
-  font-size: 12px;
-  padding: 8px;
-  text-transform: uppercase;
-  font-family: "Avenir", "Candara", "Arial", sans-serif;
-  display: block; }
 
 .action-bar.container {
   font-size: 15px;
@@ -364,7 +392,8 @@ a {
 
 .pile.container {
   background-color: transparent;
-  padding: 2px; }
+  padding: 2px;
+  width: 100%; }
 .pile.label {
   border-radius: 4px;
   border-style: solid;
@@ -673,11 +702,6 @@ div .image-row {
   max-width: 120px;
   margin: auto;
   display: block; }
-
-.half {
-  display: inline-block;
-  width: 50%;
-  vertical-align: top; }
 
 .large-image {
   max-width: 97%;
