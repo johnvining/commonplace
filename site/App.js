@@ -105,7 +105,6 @@ class App extends React.Component {
           </div>
         )}
 
-        <br />
         <Router>
           <Author
             path="/auth/:id"
