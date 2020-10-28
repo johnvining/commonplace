@@ -217,7 +217,7 @@ a {
     padding: 0px;
   }
 
-  &.autocomplete {
+  &.autocomplete-div {
     text-align: right;
   }
 
@@ -330,7 +330,7 @@ a {
     }
   }
 
-  &.autocomplete {
+  &.autocomplete-div {
     display: inline-block;
     margin: 0px;
     padding: 0px;
@@ -384,7 +384,7 @@ a {
     border-radius: 4px;
   }
 
-  &.autocomplete {
+  &.autocomplete-div {
     display: inline-block;
   }
 
@@ -829,7 +829,6 @@ a {
 
   &.author-select {
     &.label {
-      background-color: $button_selected;
       display: inline-block;
       border: none;
       font-family: $main_font;
@@ -842,7 +841,7 @@ a {
       border-width: 1px;
     }
 
-    &.autocomplete {
+    &.autocomplete.div {
       display: inline-block;
     }
 

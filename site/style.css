@@ -365,7 +365,7 @@ a {
   display: inline;
   margin: 0px;
   padding: 0px; }
-.idea.autocomplete {
+.idea.autocomplete-div {
   text-align: right; }
 .idea .option {
   background-color: #efffff;
@@ -449,7 +449,7 @@ a {
     cursor: pointer;
     background-color: lightgoldenrodyellow;
     outline: none; }
-.pile-select.autocomplete {
+.pile-select.autocomplete-div {
   display: inline-block;
   margin: 0px;
   padding: 0px; }
@@ -487,7 +487,7 @@ a {
   border: 2px;
   border-style: solid;
   border-radius: 4px; }
-.search-bar.autocomplete {
+.search-bar.autocomplete-div {
   display: inline-block; }
 .search-bar.current-modifier {
   background: black;
@@ -811,7 +811,6 @@ a {
   border-color: white;
   border-width: 1px; }
 .work-page.author-select.label {
-  background-color: lightblue;
   display: inline-block;
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -822,7 +821,7 @@ a {
   border-style: solid;
   border-color: white;
   border-width: 1px; }
-.work-page.author-select.autocomplete {
+.work-page.author-select.autocomplete.div {
   display: inline-block; }
 .work-page.author-select.ul {
   display: inline;
