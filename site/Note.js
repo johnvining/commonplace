@@ -454,7 +454,7 @@ class Note extends React.Component {
                   Author
                 </label>
                 <Autocomplete
-                  className={'note-full author'}
+                  className={'note-full edit-author'}
                   defaultValue={this.state.pendingAuthorName || ''}
                   dontAutofocus={true}
                   inputName={this.props.id + 'author'}
@@ -495,7 +495,7 @@ class Note extends React.Component {
                 <Autocomplete
                   inputName={this.props.id + 'work'}
                   dontAutofocus={true}
-                  className={'note-full work edit'}
+                  className={'note-full edit-work'}
                   defaultValue={this.state.pendingWorkName || ''}
                   onSelect={this.handleUpdateWork.bind(this)}
                   getSuggestions={db.getSuggestions}

@@ -93,43 +93,6 @@
   .note-full .page.input {
     width: 100%;
     text-align: left; }
-.note-full .title,
-.note-full .url {
-  width: 100%;
-  text-align: left;
-  margin: 0px 12px 0px 0px;
-  background-color: #f4f4f4;
-  border-radius: 4px; }
-  .note-full .title.input,
-  .note-full .url.input {
-    width: 100%;
-    text-align: left; }
-.note-full .note-text,
-.note-full .note-take,
-.note-full .author,
-.note-full .work {
-  margin: 4px;
-  padding: 4px; }
-  .note-full .note-text.imputed, .note-full .note-text.work,
-  .note-full .note-take.imputed,
-  .note-full .note-take.work,
-  .note-full .author.imputed,
-  .note-full .author.work,
-  .note-full .work.imputed,
-  .note-full .work.work {
-    font-style: italic; }
-  .note-full .note-text.label,
-  .note-full .note-take.label,
-  .note-full .author.label,
-  .note-full .work.label {
-    text-decoration: none; }
-  input .note-full .note-text, input
-  .note-full .note-take, input
-  .note-full .author, input
-  .note-full .work {
-    width: 100%;
-    text-align: left;
-    background-color: #f4f4f4; }
 .note-full .note-text,
 .note-full .note-take,
 .note-full .url {
@@ -154,8 +117,35 @@
     background-color: lightblue;
     outline: none;
     border-radius: 2px; }
-.note-full .author.label,
-.note-full .work.label {
+.note-full .title,
+.note-full .url {
+  width: 100%;
+  text-align: left;
+  margin: 0px 12px 0px 0px;
+  background-color: #f4f4f4;
+  border-radius: 4px; }
+  .note-full .title.input,
+  .note-full .url.input {
+    width: 100%;
+    text-align: left; }
+.note-full .note-text,
+.note-full .note-take {
+  margin: 4px;
+  padding: 4px; }
+  .note-full .note-text.imputed, .note-full .note-text.work,
+  .note-full .note-take.imputed,
+  .note-full .note-take.work {
+    font-style: italic; }
+  .note-full .note-text.label,
+  .note-full .note-take.label {
+    text-decoration: none; }
+  input .note-full .note-text, input
+  .note-full .note-take {
+    width: 100%;
+    text-align: left;
+    background-color: #f4f4f4; }
+.note-full .edit-author.label,
+.note-full .edit-work.label {
   background-color: #f4f4f4;
   border-radius: 4px;
   display: inline-block;
@@ -164,28 +154,38 @@
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
   padding: 4px 4px 4px 8px;
-  margin: 0px; }
-  .note-full .author.label:focus,
-  .note-full .work.label:focus {
+  margin: 0px;
+  text-decoration: none; }
+  .note-full .edit-author.label:focus,
+  .note-full .edit-work.label:focus {
     background-color: lightblue;
     outline: none;
     border-radius: 2px; }
-.note-full .author.autocomplete,
-.note-full .work.autocomplete {
+input .note-full .edit-author, input
+.note-full .edit-work {
+  width: 100%;
+  text-align: left;
+  background-color: #f4f4f4; }
+.note-full .edit-author.imputed, .note-full .edit-author.work,
+.note-full .edit-work.imputed,
+.note-full .edit-work.work {
+  font-style: italic; }
+.note-full .edit-author.autocomplete,
+.note-full .edit-work.autocomplete {
   margin: 0px;
   padding: 0px; }
-.note-full .author.ul,
-.note-full .work.ul {
+.note-full .edit-author.ul,
+.note-full .edit-work.ul {
   display: inline;
   margin: 0px;
   padding: 0px; }
-.note-full .author.li,
-.note-full .work.li {
+.note-full .edit-author.li,
+.note-full .edit-work.li {
   display: inline;
   margin: 0px;
   padding: 0px; }
-.note-full .author.option,
-.note-full .work.option {
+.note-full .edit-author.option,
+.note-full .edit-work.option {
   background: transparent;
   border: none;
   color: #393939;
@@ -194,11 +194,11 @@
   padding: 4px;
   font-size: 18px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .note-full .author.option::after,
-  .note-full .work.option::after {
+  .note-full .edit-author.option::after,
+  .note-full .edit-work.option::after {
     content: '? '; }
-  .note-full .author.option.new::before,
-  .note-full .work.option.new::before {
+  .note-full .edit-author.option.new::before,
+  .note-full .edit-work.option.new::before {
     background-image: url("/icons/plus.svg");
     background-size: 17px 17px;
     display: inline-block;

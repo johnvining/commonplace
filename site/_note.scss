@@ -125,43 +125,6 @@
     }
   }
 
-  .title,
-  .url {
-    width: 100%;
-    text-align: left;
-    margin: 0px 12px 0px 0px;
-    background-color: $note_input_background;
-    border-radius: 4px;
-
-    &.input {
-      width: 100%;
-      text-align: left;
-    }
-  }
-
-  .note-text,
-  .note-take,
-  .author,
-  .work {
-    margin: 4px;
-    padding: 4px;
-
-    &.imputed,
-    &.work {
-      font-style: italic;
-    }
-
-    &.label {
-      text-decoration: none;
-    }
-
-    input & {
-      width: 100%;
-      text-align: left;
-      background-color: $note_input_background;
-    }
-  }
-
   .note-text,
   .note-take,
   .url {
@@ -191,8 +154,43 @@
     }
   }
 
-  .author,
-  .work {
+  .title,
+  .url {
+    width: 100%;
+    text-align: left;
+    margin: 0px 12px 0px 0px;
+    background-color: $note_input_background;
+    border-radius: 4px;
+
+    &.input {
+      width: 100%;
+      text-align: left;
+    }
+  }
+
+  .note-text,
+  .note-take {
+    margin: 4px;
+    padding: 4px;
+
+    &.imputed,
+    &.work {
+      font-style: italic;
+    }
+
+    &.label {
+      text-decoration: none;
+    }
+
+    input & {
+      width: 100%;
+      text-align: left;
+      background-color: $note_input_background;
+    }
+  }
+
+  .edit-author,
+  .edit-work {
     &.label {
       background-color: $note_input_background;
       border-radius: 4px;
@@ -204,11 +202,24 @@
       padding: 4px 4px 4px 8px;
       margin: 0px;
 
+      text-decoration: none;
+
       &:focus {
         background-color: $note_background_edit;
         outline: none;
         border-radius: 2px;
       }
+    }
+
+    input & {
+      width: 100%;
+      text-align: left;
+      background-color: $note_input_background;
+    }
+
+    &.imputed,
+    &.work {
+      font-style: italic;
     }
 
     &.autocomplete {
