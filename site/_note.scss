@@ -1,7 +1,7 @@
 .note-full {
   &.outer {
-    background-color: white;
-    border-color: $note_background;
+    background-color: $note_background;
+    border-color: $note_border;
     border-style: solid;
     border-width: 2px;
     border-radius: 4px;
@@ -11,25 +11,26 @@
     flex-wrap: wrap;
 
     &:focus {
-      border-color: gray;
+      border-color: $note_border_focused;
       outline: none;
     }
 
     &.selected {
-      border-color: black;
+      border-color: $note_border_selected;
     }
 
     &.edit-note,
     &.edit-idea {
-      background-color: white;
-      border-color: $note_background_edit;
+      background-color: $note_background_edit;
+      border-color: $note_border_edit;
     }
 
     &.not-selected {
-      background-color: #f2f2f2;
+      background-color: $note_background_not_selected;
     }
   }
 
+  // TODO: Dry
   .half {
     display: inline-block;
     width: 50%;
@@ -73,7 +74,7 @@
     display: inline-block;
 
     &:focus {
-      background-color: $note_background_edit;
+      background-color: $note_input_background_focus;
       outline: none;
       border-radius: 2px;
     }
@@ -148,7 +149,7 @@
     border-radius: 4px;
 
     &:focus {
-      background-color: $note_background_edit;
+      background-color: $note_input_background_focus;
       outline: none;
       border-radius: 2px;
     }
@@ -205,7 +206,7 @@
       text-decoration: none;
 
       &:focus {
-        background-color: $note_background_edit;
+        background-color: $note_input_background_focus;
         outline: none;
         border-radius: 2px;
       }

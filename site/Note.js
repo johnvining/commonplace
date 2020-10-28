@@ -378,7 +378,7 @@ class Note extends React.Component {
             </div>
           )}
           {/* Images */}
-          {this.props.note?.images.length > 0 ? (
+          {this.props.note?.images?.length > 0 ? (
             <div className="note-full image-row width-100">
               {this.props.note?.images?.map((image, index) => (
                 <div
