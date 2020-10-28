@@ -191,7 +191,7 @@
 
   .edit-author,
   .edit-work {
-    &.label {
+    &.search-box {
       background-color: $note_input_background;
       border-radius: 4px;
       display: inline-block;
@@ -222,7 +222,7 @@
       font-style: italic;
     }
 
-    &.autocomplete {
+    &.autocomplete-div {
       margin: 0px;
       padding: 0px;
     }

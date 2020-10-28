@@ -299,7 +299,7 @@ a {
 }
 
 .pile-select {
-  &.label {
+  &.search-box {
     background-color: $note_background_edit;
     border-color: white;
     border-radius: 4px;
@@ -401,7 +401,7 @@ a {
     vertical-align: top;
   }
 
-  &.label {
+  &.search-box {
     background: transparent;
     border-style: none;
     display: inline;
@@ -562,7 +562,7 @@ a.grid-link {
     outline: none;
   }
 
-  &.label {
+  &.search-box {
     font-family: $main_font;
     padding: 8px;
     margin: 2px;
@@ -828,7 +828,7 @@ a {
   }
 
   &.author-select {
-    &.label {
+    &.search-box {
       display: inline-block;
       border: none;
       font-family: $main_font;
@@ -841,7 +841,7 @@ a {
       border-width: 1px;
     }
 
-    &.autocomplete.div {
+    &.autocomplete-div {
       display: inline-block;
     }
 

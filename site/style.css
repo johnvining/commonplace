@@ -144,8 +144,8 @@
     width: 100%;
     text-align: left;
     background-color: #f4f4f4; }
-.note-full .edit-author.label,
-.note-full .edit-work.label {
+.note-full .edit-author.search-box,
+.note-full .edit-work.search-box {
   background-color: #f4f4f4;
   border-radius: 4px;
   display: inline-block;
@@ -156,8 +156,8 @@
   padding: 4px 4px 4px 8px;
   margin: 0px;
   text-decoration: none; }
-  .note-full .edit-author.label:focus,
-  .note-full .edit-work.label:focus {
+  .note-full .edit-author.search-box:focus,
+  .note-full .edit-work.search-box:focus {
     background-color: lightblue;
     outline: none;
     border-radius: 2px; }
@@ -170,8 +170,8 @@ input .note-full .edit-author, input
 .note-full .edit-work.imputed,
 .note-full .edit-work.work {
   font-style: italic; }
-.note-full .edit-author.autocomplete,
-.note-full .edit-work.autocomplete {
+.note-full .edit-author.autocomplete-div,
+.note-full .edit-work.autocomplete-div {
   margin: 0px;
   padding: 0px; }
 .note-full .edit-author.ul,
@@ -424,7 +424,7 @@ a {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
 
-.pile-select.label {
+.pile-select.search-box {
   background-color: lightblue;
   border-color: white;
   border-radius: 4px;
@@ -500,7 +500,7 @@ a {
   margin: 4px;
   padding: 8px;
   vertical-align: top; }
-.search-bar.label {
+.search-bar.search-box {
   background: transparent;
   border-style: none;
   display: inline;
@@ -508,7 +508,7 @@ a {
   font-size: 32px;
   margin: 4px auto;
   padding: 8px; }
-  .search-bar.label:focus {
+  .search-bar.search-box:focus {
     outline: none; }
 .search-bar.ul {
   display: block;
@@ -620,7 +620,7 @@ a.grid-link {
   .multi-select.button:focus {
     border-color: black;
     outline: none; }
-  .multi-select.label {
+  .multi-select.search-box {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
     margin: 2px;
@@ -810,7 +810,7 @@ a {
   border-style: solid;
   border-color: white;
   border-width: 1px; }
-.work-page.author-select.label {
+.work-page.author-select.search-box {
   display: inline-block;
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -821,7 +821,7 @@ a {
   border-style: solid;
   border-color: white;
   border-width: 1px; }
-.work-page.author-select.autocomplete.div {
+.work-page.author-select.autocomplete-div {
   display: inline-block; }
 .work-page.author-select.ul {
   display: inline;
