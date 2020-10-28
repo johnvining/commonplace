@@ -109,8 +109,7 @@
 .note-full .author,
 .note-full .work {
   margin: 4px;
-  padding: 4px;
-  width: 100%; }
+  padding: 4px; }
   .note-full .note-text.imputed, .note-full .note-text.work,
   .note-full .note-take.imputed,
   .note-full .note-take.work,
@@ -157,9 +156,10 @@
     border-radius: 2px; }
 .note-full .author.label,
 .note-full .work.label {
-  background-color: transparent;
+  background-color: #f4f4f4;
+  border-radius: 4px;
   display: inline-block;
-  width: 50%;
+  width: 40%;
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;

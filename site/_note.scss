@@ -145,7 +145,6 @@
   .work {
     margin: 4px;
     padding: 4px;
-    width: 100%;
 
     &.imputed,
     &.work {
@@ -195,9 +194,10 @@
   .author,
   .work {
     &.label {
-      background-color: transparent;
+      background-color: $note_input_background;
+      border-radius: 4px;
       display: inline-block;
-      width: 50%;
+      width: 40%;
       border: none;
       font-family: $main_font;
       font-size: 18px;
