@@ -30,27 +30,22 @@
     }
   }
 
-  // TODO: Dry
-  .half {
-    display: inline-block;
-    width: 50%;
-    vertical-align: top;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin: 0px;
-    padding: 0px;
-  }
-
+  .half-width,
   .full-width {
-    display: inline-block;
-    width: 100%;
-    vertical-align: top;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     margin: 0px;
     padding: 0px;
+    vertical-align: top;
+
+    &.half-width {
+      width: 50%;
+    }
+
+    &.full-width {
+      width: 100%;
+    }
   }
 
   .idea-container,
@@ -67,7 +62,6 @@
   .year,
   .page,
   .url {
-    display: inline-block;
     font-family: $main_font;
     background-color: transparent;
     border-style: none;
@@ -97,7 +91,6 @@
   .width-20 {
     width: 100%;
     margin: 0px;
-    padding: 0px;
     padding: 8px;
 
     @include tablet-plus {
@@ -108,7 +101,6 @@
   .width-100 {
     width: 100%;
     margin: 0px;
-    padding: 0px;
     padding: 8px;
   }
 
