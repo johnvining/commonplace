@@ -127,12 +127,6 @@
   }
 
   .note-text,
-  .note-take,
-  .url {
-    font-size: 14px;
-  }
-
-  .note-text,
   .note-take {
     background-color: transparent;
     border: none;
@@ -169,9 +163,12 @@
     }
   }
 
+  .title,
+  .year {
+    font-size: 18px;
+  }
   .note-text,
   .note-take {
-    margin: 4px;
     padding: 4px;
 
     &.imputed,

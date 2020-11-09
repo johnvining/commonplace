@@ -15,9 +15,9 @@
     border-color: black; }
   .note-full.outer.edit-note, .note-full.outer.edit-idea {
     background-color: white;
-    border-color: lightblue; }
+    border-color: #c1e1ec; }
   .note-full.outer.not-selected {
-    background-color: #f2f2f2; }
+    background-color: #f4f4f4; }
 .note-full .half {
   display: inline-block;
   width: 50%;
@@ -94,10 +94,6 @@
     width: 100%;
     text-align: left; }
 .note-full .note-text,
-.note-full .note-take,
-.note-full .url {
-  font-size: 14px; }
-.note-full .note-text,
 .note-full .note-take {
   background-color: transparent;
   border: none;
@@ -128,9 +124,11 @@
   .note-full .url.input {
     width: 100%;
     text-align: left; }
+.note-full .title,
+.note-full .year {
+  font-size: 18px; }
 .note-full .note-text,
 .note-full .note-take {
-  margin: 4px;
   padding: 4px; }
   .note-full .note-text.imputed, .note-full .note-text.work,
   .note-full .note-take.imputed,

@@ -11,9 +11,6 @@ $image_remove_background: '/icons/cross.svg';
 $image_stack_background: '/icons/stack.svg';
 $image_tags_background: '/icons/tags.svg';
 
-// TODO: use darken
-// TODO: use saturdate/desaturate
-
 // Actual Colors
 $background_color: hsl(120, 50%, 98%);
 $link_color: black;
@@ -27,14 +24,16 @@ $grey2: #efefef;
 $grey3: #d3d3d3;
 $grey4: #dadada;
 $grey5: darkgray;
+$black: black;
+$white: white;
 
 // Semantic Colors
-$note_background_edit: white;
-$note_background_not_selected: #f2f2f2;
-$note_background: white;
-$note_border_edit: lightblue;
+$note_background_edit: $white;
+$note_background_not_selected: $grey1;
+$note_background: $white;
+$note_border_edit: $highlight_dark;
 $note_border_focused: $grey5;
-$note_border_selected: black;
+$note_border_selected: $black;
 $note_border: $grey2;
 $note_input_background: $grey1;
 $note_input_background_focus: $highlight_dark;
