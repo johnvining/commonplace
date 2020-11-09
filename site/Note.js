@@ -342,41 +342,45 @@ class Note extends React.Component {
             />
           </div>
           {/* Title and Year */}
-          {edit ? (
-            <div className="width-80">
-              <label htmlFor="title" className="note-full form-label">
-                Title
-              </label>
-              <input
-                id="title"
-                className="note-full title input"
-                autoFocus
-                defaultValue={this.state.pendingTitle}
-                onChange={this.handleTitleChange}
-              ></input>
-            </div>
-          ) : (
-            <div className="note-full title">{this.state.pendingTitle}</div>
-          )}
-          {edit ? (
-            <div className="width-20">
-              <label htmlFor="year" className="note-full form-label">
-                Year
-              </label>
-              <input
-                id="year"
-                className="note-full year input"
-                defaultValue={this.state.pendingYear}
-                onChange={this.handleYearChange}
-              ></input>
-            </div>
-          ) : this.state.pendingYear ? (
-            <div className="note-full year">{this.state.pendingYear}</div>
-          ) : (
-            <div className="note-full year imputed">
-              {this.props.note.work?.year}
-            </div>
-          )}
+          <div className="width-80">
+            {edit ? (
+              <>
+                <label htmlFor="title" className="note-full form-label">
+                  Title
+                </label>
+                <input
+                  id="title"
+                  className="note-full title input edit"
+                  autoFocus
+                  defaultValue={this.state.pendingTitle}
+                  onChange={this.handleTitleChange}
+                ></input>
+              </>
+            ) : (
+              <div className="note-full title">{this.state.pendingTitle}</div>
+            )}
+          </div>
+          <div className="width-20">
+            {edit ? (
+              <>
+                <label htmlFor="year" className="note-full form-label">
+                  Year
+                </label>
+                <input
+                  id="year"
+                  className="note-full year input edit"
+                  defaultValue={this.state.pendingYear}
+                  onChange={this.handleYearChange}
+                ></input>
+              </>
+            ) : this.state.pendingYear ? (
+              <div className="note-full year">{this.state.pendingYear}</div>
+            ) : (
+              <div className="note-full year imputed">
+                {this.props.note.work?.year}
+              </div>
+            )}
+          </div>
           {/* Images */}
           {this.props.note?.images?.length > 0 ? (
             <div className="note-full image-row width-100">
@@ -523,43 +527,46 @@ class Note extends React.Component {
             ) : null}
           </div>
           {/* URL and Page */}
-
-          {edit ? (
-            <div className="width-80">
-              <label htmlFor="url" className="note-full form-label">
-                URL
-              </label>
-              <input
-                id="url"
-                className={'note-full url input'}
-                name="url"
-                defaultValue={this.state.pendingUrl}
-                onChange={this.handleUrlChange}
-              ></input>
-            </div>
-          ) : (
-            <span className={'note-full url'}>
-              <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
-            </span>
-          )}
-          {edit ? (
-            <div className="width-20">
-              <label htmlFor="page" className="note-full form-label">
-                Page
-              </label>
-              <input
-                id="page"
-                className={'note-full page input'}
-                name="url"
-                defaultValue={this.state.pendingPage}
-                onChange={this.handlePageChange}
-              ></input>
-            </div>
-          ) : (
-            <span className={'note-full page'}>
-              <a href={this.state.pendingPage}>{this.state.pendingPage}</a>
-            </span>
-          )}
+          <div className="width-80">
+            {edit ? (
+              <>
+                <label htmlFor="url" className="note-full form-label">
+                  URL
+                </label>
+                <input
+                  id="url"
+                  className={'note-full url input edit'}
+                  name="url"
+                  defaultValue={this.state.pendingUrl}
+                  onChange={this.handleUrlChange}
+                ></input>
+              </>
+            ) : (
+              <span className={'note-full url'}>
+                <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
+              </span>
+            )}
+          </div>
+          <div className="width-20">
+            {edit ? (
+              <>
+                <label htmlFor="page" className="note-full form-label">
+                  Page
+                </label>
+                <input
+                  id="page"
+                  className={'note-full page input edit'}
+                  name="url"
+                  defaultValue={this.state.pendingPage}
+                  onChange={this.handlePageChange}
+                ></input>
+              </>
+            ) : (
+              <span className={'note-full page'}>
+                <a href={this.state.pendingPage}>{this.state.pendingPage}</a>
+              </span>
+            )}
+          </div>
           {/* Ideas and Action bar */}
 
           <div className={'idea-container'}>

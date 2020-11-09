@@ -45,7 +45,6 @@
 .note-full .page,
 .note-full .url {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  background-color: transparent;
   border-style: none;
   display: inline-block; }
   .note-full .title:focus,
@@ -80,15 +79,17 @@
   width: 100%;
   text-align: left;
   margin: 0px 12px 0px 0px;
-  background-color: #f4f4f4;
   border-radius: 4px; }
+  .note-full .year.edit,
+  .note-full .page.edit {
+    background-color: #f4f4f4; }
   .note-full .year.input,
   .note-full .page.input {
     width: 100%;
     text-align: left; }
 .note-full .note-text,
 .note-full .note-take {
-  background-color: transparent;
+  border-radius: 4px;
   border: none;
   box-sizing: border-box;
   display: block;
@@ -97,10 +98,11 @@
   margin: auto;
   padding: 8px;
   resize: none;
-  width: 100%;
   white-space: pre-wrap;
-  background-color: #f4f4f4;
-  border-radius: 4px; }
+  width: 100%; }
+  .note-full .note-text.edit,
+  .note-full .note-take.edit {
+    background-color: #f4f4f4; }
   .note-full .note-text:focus,
   .note-full .note-take:focus {
     background-color: #c1e1ec;
@@ -111,8 +113,10 @@
   width: 100%;
   text-align: left;
   margin: 0px 12px 0px 0px;
-  background-color: #f4f4f4;
   border-radius: 4px; }
+  .note-full .title.edit,
+  .note-full .url.edit {
+    background-color: #f4f4f4; }
   .note-full .title.input,
   .note-full .url.input {
     width: 100%;

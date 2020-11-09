@@ -63,7 +63,6 @@
   .page,
   .url {
     font-family: $main_font;
-    background-color: transparent;
     border-style: none;
     display: inline-block;
 
@@ -109,8 +108,11 @@
     width: 100%;
     text-align: left;
     margin: 0px 12px 0px 0px;
-    background-color: $note_input_background;
     border-radius: 4px;
+
+    &.edit {
+      background-color: $note_input_background;
+    }
 
     &.input {
       width: 100%;
@@ -120,7 +122,7 @@
 
   .note-text,
   .note-take {
-    background-color: transparent;
+    border-radius: 4px;
     border: none;
     box-sizing: border-box;
     display: block;
@@ -129,10 +131,12 @@
     margin: auto;
     padding: 8px;
     resize: none;
-    width: 100%;
     white-space: pre-wrap;
-    background-color: $note_input_background;
-    border-radius: 4px;
+    width: 100%;
+
+    &.edit {
+      background-color: $note_input_background;
+    }
 
     &:focus {
       background-color: $note_input_background_focus;
@@ -146,8 +150,11 @@
     width: 100%;
     text-align: left;
     margin: 0px 12px 0px 0px;
-    background-color: $note_input_background;
     border-radius: 4px;
+
+    &.edit {
+      background-color: $note_input_background;
+    }
 
     &.input {
       width: 100%;
