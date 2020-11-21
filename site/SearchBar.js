@@ -34,7 +34,7 @@ class SearchBar extends React.Component {
   handleTextChange(event) {
     this.setState({ typedText: event.target.value }, () => {
       if (!this.state.modifier) {
-        var text = this.state.typedText
+        var text = this.state.typedText.toLowerCase()
         switch (text) {
           case this.modifiers.auth:
           case this.modifiers.work:
