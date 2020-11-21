@@ -144,7 +144,7 @@ class Work extends React.Component {
   }
 
   async createNoteForWork() {
-    const response = await createNewNoteForWork(this.props.id)
+    const response = await db.createNewNoteForWork(this.props.id)
     navigate('/note/' + response.data._id + '/edit')
   }
 
