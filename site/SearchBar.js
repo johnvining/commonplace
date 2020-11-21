@@ -103,6 +103,7 @@ class SearchBar extends React.Component {
     }
   }
 
+  // TODO Clean up unused param
   handleUpdate(id, name) {
     switch (this.state.modifier) {
       case this.modifiers.auth:
@@ -198,7 +199,7 @@ class SearchBar extends React.Component {
           />
         ) : (
           <input
-            className="search-bar label"
+            className="search-bar search-box"
             autoFocus
             value={typedText}
             onChange={this.handleTextChange.bind(this)}

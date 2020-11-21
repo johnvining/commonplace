@@ -481,7 +481,8 @@ a {
 .search-bar.container {
   border: 2px;
   border-style: solid;
-  border-radius: 4px; }
+  border-radius: 4px;
+  width: 100%; }
 .search-bar.autocomplete-div {
   display: inline-block; }
 .search-bar.current-modifier {

@@ -162,7 +162,6 @@ class Work extends React.Component {
               piles={this.state.piles}
               onSelect={this.handleNewPile.bind(this)}
               getSuggestions={db.getSuggestions}
-              apiType={db.types.pile}
               handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
               mainClassName="work-page"
               onStartPileEdit={() => {

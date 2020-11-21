@@ -28,6 +28,7 @@ body {
     display: flex;
     flex-wrap: wrap;
   }
+
   .title-bar {
     display: block;
     width: 100%;
@@ -382,6 +383,7 @@ a {
     border: 2px;
     border-style: solid;
     border-radius: 4px;
+    width: 100%;
   }
 
   &.autocomplete-div {
