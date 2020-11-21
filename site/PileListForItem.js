@@ -1,6 +1,7 @@
 import React from 'react'
 import Autocomplete from './Autocomplete'
 import { navigate } from '@reach/router'
+import * as db from './Database'
 
 class PileListForItem extends React.Component {
   render() {
@@ -29,10 +30,11 @@ class PileListForItem extends React.Component {
             dontAutofocus={false}
             escape={this.props.escape}
             getSuggestions={this.props.getSuggestions}
+            apiType={db.types.pile}
             handleNewSelect={this.props.handleNewSelect.bind(this)}
             inputName="work-pile"
             onSelect={this.props.onSelect.bind(this)}
-            excludeIds={this.props.piles.map(pile => pile._id)}
+            excludeIds={this.props.piles?.map(pile => pile._id)}
           />
         ) : (
           <button
