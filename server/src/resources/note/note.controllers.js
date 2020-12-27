@@ -25,10 +25,22 @@ export const reqDeleteNote = async (req, res) => {
 }
 
 export const reqGetRecentNotes = async (req, res) => {
-  const pageSize = 30
+  const pageSize = 20
   return findNotesAndPopulate(
     {},
     { updatedAt: -1 },
+    false,
+    (req.params.skip - 1) * pageSize,
+    pageSize
+  )
+}
+
+export const reqGetEarliestNotesToFile = async (req, res) => {
+  const pageSize = 20
+  // TODO: Faster way to do this? -- size: 0 may be slow
+  return findNotesAndPopulate(
+    { $or: [{ title: '' }, { ideas: { $size: 0 } }] },
+    { updatedAt: 1 },
     false,
     (req.params.skip - 1) * pageSize,
     pageSize
