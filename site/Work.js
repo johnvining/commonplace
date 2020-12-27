@@ -110,7 +110,7 @@ class Work extends React.Component {
   }
 
   async handleNewPile(pile) {
-    db.addLinkToRecord(db.types.pile, pile, db.types.note, this.props.id).then(
+    db.addLinkToRecord(db.types.pile, pile, db.types.work, this.props.id).then(
       () => {
         this.fetchWorkInfo(this.props.id)
       }
