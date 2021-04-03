@@ -342,9 +342,9 @@ class Note extends React.Component {
             />
           </div>
           {/* Title and Year */}
-          <div className="width-80">
-            {edit ? (
-              <>
+          {edit ? (
+            <>
+              <div className="width-80">
                 <label htmlFor="title" className="note-full form-label">
                   Title
                 </label>
@@ -355,14 +355,8 @@ class Note extends React.Component {
                   defaultValue={this.state.pendingTitle}
                   onChange={this.handleTitleChange}
                 ></input>
-              </>
-            ) : (
-              <div className="note-full title">{this.state.pendingTitle}</div>
-            )}
-          </div>
-          <div className="width-20">
-            {edit ? (
-              <>
+              </div>
+              <div className="width-20">
                 <label htmlFor="year" className="note-full form-label">
                   Year
                 </label>
@@ -372,15 +366,24 @@ class Note extends React.Component {
                   defaultValue={this.state.pendingYear}
                   onChange={this.handleYearChange}
                 ></input>
-              </>
-            ) : this.state.pendingYear ? (
-              <div className="note-full year">{this.state.pendingYear}</div>
-            ) : (
-              <div className="note-full year imputed">
-                {this.props.note.work?.year}
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <div className="width-100">
+              <div className="note-full title">
+                {this.state.pendingTitle}
+
+                {this.state.pendingYear ? (
+                  <>, {this.state.pendingYear}</>
+                ) : this.props.note.work?.year ? (
+                  <>, {this.props.note.work?.year}</>
+                ) : (
+                  ''
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Images */}
           {edit ? (
             <div className={'width-100 action-bar'}>

@@ -121,8 +121,7 @@
   .note-full .url.input {
     width: 100%;
     text-align: left; }
-.note-full .title,
-.note-full .year {
+.note-full .title {
   font-size: 18px; }
 .note-full .note-text,
 .note-full .note-take {
