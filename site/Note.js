@@ -373,7 +373,7 @@ class Note extends React.Component {
                 ></input>
               </div>
             </>
-          ) : (
+          ) : this.state.pendingTitle || this.state.pendingYear ? (
             <div className="width-100">
               <div className="note-full title">
                 {this.state.pendingTitle}
@@ -387,6 +387,8 @@ class Note extends React.Component {
                 )}
               </div>
             </div>
+          ) : (
+            ''
           )}
 
           {/* Images */}
