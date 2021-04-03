@@ -539,9 +539,9 @@ class Note extends React.Component {
           ) : null}
 
           {/* URL and Page */}
-          <div className="width-80">
-            {edit ? (
-              <>
+          {edit ? (
+            <>
+              <div className="width-80">
                 <label htmlFor="url" className="note-full form-label">
                   URL
                 </label>
@@ -552,16 +552,8 @@ class Note extends React.Component {
                   defaultValue={this.state.pendingUrl}
                   onChange={this.handleUrlChange}
                 ></input>
-              </>
-            ) : (
-              <span className={'note-full url'}>
-                <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
-              </span>
-            )}
-          </div>
-          <div className="width-20">
-            {edit ? (
-              <>
+              </div>
+              <div className="width-20">
                 <label htmlFor="page" className="note-full form-label">
                   Page
                 </label>
@@ -572,13 +564,9 @@ class Note extends React.Component {
                   defaultValue={this.state.pendingPage}
                   onChange={this.handlePageChange}
                 ></input>
-              </>
-            ) : (
-              <span className={'note-full page'}>
-                <a href={this.state.pendingPage}>{this.state.pendingPage}</a>
-              </span>
-            )}
-          </div>
+              </div>
+            </>
+          ) : null}
 
           {/* Ideas and Action bar */}
           <div className={'idea-container'}>
