@@ -342,9 +342,7 @@ class Note extends React.Component {
                 }}
               />
             </div>
-          ) : (
-            ''
-          )}
+          ) : null}
 
           {/* Title and Year */}
           {edit ? (
@@ -382,14 +380,10 @@ class Note extends React.Component {
                   <>, {this.state.pendingYear}</>
                 ) : this.props.note.work?.year ? (
                   <>, {this.props.note.work?.year}</>
-                ) : (
-                  ''
-                )}
+                ) : null}
               </div>
             </div>
-          ) : (
-            ''
-          )}
+          ) : null}
 
           {/* Images */}
           {edit ? (
@@ -426,45 +420,47 @@ class Note extends React.Component {
           ) : null}
 
           {/* Text area */}
-          <div name="text" className="width-100">
-            {edit ? (
-              <>
-                <label htmlFor="text" className="note-full form-label">
-                  Text
-                </label>
-                <textarea
-                  id="text"
-                  className={'note-full note-text edit'}
-                  onChange={this.handleTextChange}
-                  value={this.state.pendingText}
-                ></textarea>
-              </>
-            ) : (
+          {edit ? (
+            <div name="text" className="width-100">
+              <label htmlFor="text" className="note-full form-label">
+                Text
+              </label>
+              <textarea
+                id="text"
+                className={'note-full note-text edit'}
+                onChange={this.handleTextChange}
+                value={this.state.pendingText}
+              ></textarea>
+            </div>
+          ) : this.state.pendingText ? (
+            <div name="text" className="width-100">
               <div className={'note-full note-text'}>
                 {this.state.pendingText}
               </div>
-            )}
-          </div>
+            </div>
+          ) : null}
+
           {/* Take */}
-          <div name="take" className="width-100">
-            {edit ? (
-              <>
-                <label htmlFor="take" className="note-full form-label">
-                  Take
-                </label>
-                <textarea
-                  id="take"
-                  className={'note-full note-take edit'}
-                  onChange={this.handleTakeChange}
-                  value={this.state.pendingTake}
-                ></textarea>
-              </>
-            ) : this.state.pendingTake ? (
+          {edit ? (
+            <div name="take" className="width-100">
+              <label htmlFor="take" className="note-full form-label">
+                Take
+              </label>
+              <textarea
+                id="take"
+                className={'note-full note-take edit'}
+                onChange={this.handleTakeChange}
+                value={this.state.pendingTake}
+              ></textarea>
+            </div>
+          ) : this.state.pendingTake ? (
+            <div name="take" className="width-100">
               <div className="note-full note-take">
                 {this.state.pendingTake}
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
+
           {/* Author */}
           <div name="author" className="width-100">
             {edit ? (
