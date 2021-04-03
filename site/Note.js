@@ -461,10 +461,10 @@ class Note extends React.Component {
             </div>
           ) : null}
 
-          {/* Author */}
-          <div name="author" className="width-100">
-            {edit ? (
-              <>
+          {/* Author and Work */}
+          {edit ? (
+            <>
+              <div name="author" className="width-100">
                 <label htmlFor="author" className="note-full form-label">
                   Author
                 </label>
@@ -479,31 +479,8 @@ class Note extends React.Component {
                   handleNewSelect={this.handleCreateAuthorAndAssign}
                   onClearText={this.handleClearAuthor.bind(this)}
                 />
-              </>
-            ) : (
-              <div>
-                {this.state.pendingAuthorName ? (
-                  <Link
-                    to={'/auth/' + this.state.pendingAuthorId}
-                    className={'note-full author label'}
-                  >
-                    {this.state.pendingAuthorName}
-                  </Link>
-                ) : this.props.note?.work?.author ? (
-                  <Link
-                    to={'/auth/' + this.props.note?.work?.author?._id}
-                    className={'note-full author label imputed'}
-                  >
-                    {this.props.note?.work?.author?.name}
-                  </Link>
-                ) : null}
               </div>
-            )}
-          </div>
-          {/* Work */}
-          <div name="work" className="width-100">
-            {edit ? (
-              <>
+              <div name="work" className="width-100">
                 <label htmlFor="work" className="note-full form-label">
                   Work
                 </label>
@@ -518,25 +495,49 @@ class Note extends React.Component {
                   handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
                   onClearText={this.handleClearWork.bind(this)}
                 />
-              </>
-            ) : this.state.pendingWorkId ? (
-              <div>
-                <Link
-                  to={'/work/' + this.state.pendingWorkId}
-                  className={'note work label'}
-                >
-                  {this.state.pendingWorkName}
-                </Link>
-                {this.state.pendingWorkId == note.work?._id ? (
-                  note.work?.url?.length ? (
-                    <a href={note.work?.url}>
-                      <img src={link} />
-                    </a>
-                  ) : null
+              </div>
+            </>
+          ) : this.state.pendingAuthorId ||
+            this.props.note?.work?.author ||
+            this.state.pendingWorkId ? (
+            <div name="work" className="width-100">
+              <div className="citation">
+                {/* Author */}
+                {this.state.pendingAuthorId ? (
+                  <Link
+                    to={'/auth/' + this.state.pendingAuthorId}
+                    className={'note-full author label'}
+                  >
+                    {this.state.pendingAuthorName}
+                  </Link>
+                ) : this.props.note?.work?.author ? (
+                  <Link
+                    to={'/auth/' + this.props.note?.work?.author?._id}
+                    className={'note-full author label imputed'}
+                  >
+                    {this.props.note?.work?.author?.name}
+                  </Link>
+                ) : null}
+                {/* Separator */}
+                {(this.state.pendingAuthorId ||
+                  this.props.note?.work?.author) &&
+                this.state.pendingWorkId ? (
+                  <>, </>
+                ) : null}
+                {this.state.pendingWorkId ? (
+                  <em>
+                    <Link
+                      to={'/work/' + this.state.pendingWorkId}
+                      className={'note work label'}
+                    >
+                      {this.state.pendingWorkName}
+                    </Link>
+                  </em>
                 ) : null}
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
+
           {/* URL and Page */}
           <div className="width-80">
             {edit ? (
@@ -578,8 +579,8 @@ class Note extends React.Component {
               </span>
             )}
           </div>
-          {/* Ideas and Action bar */}
 
+          {/* Ideas and Action bar */}
           <div className={'idea-container'}>
             {note.ideas?.map(idea =>
               edit_ideas ? (

@@ -87,6 +87,8 @@
   .note-full .page.input {
     width: 100%;
     text-align: left; }
+.note-full .citation {
+  padding: 4px; }
 .note-full .note-text,
 .note-full .note-take {
   border-radius: 4px;
