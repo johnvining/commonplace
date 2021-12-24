@@ -275,6 +275,13 @@ div .top-bar {
 .top-bar .tool-bar .left-right {
   border-radius: 5px 5px 5px 5px; }
 
+.page-title {
+  font-size: 20px;
+  padding: 15px; }
+  @media (min-width: 768px) {
+    .page-title {
+      font-size: 30px; } }
+
 a {
   color: black; }
 

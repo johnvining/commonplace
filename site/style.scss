@@ -100,6 +100,14 @@ body {
   }
 }
 
+.page-title {
+  font-size: 20px;
+  padding: 15px;
+  @include tablet-plus {
+    font-size: 30px;
+  }
+}
+
 a {
   color: $link_color;
 }
