@@ -303,7 +303,8 @@ a {
     cursor: pointer; }
 
 .action-bar {
-  width: 100%; }
+  width: 100%;
+  text-align: right; }
   .action-bar.container {
     font-size: 15px;
     background-color: transparent;
