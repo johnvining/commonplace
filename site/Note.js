@@ -326,7 +326,7 @@ class Note extends React.Component {
           {note.piles?.length > 0 || edit || edit_piles ? (
             <div className="note-full pile container width-100">
               <PileListForItem
-                remove={this.state.edit}
+                remove={edit_piles}
                 allowTabbing={selected || edit_piles}
                 allowAdd={selected || edit_piles || no_selection}
                 edit={edit_piles}
