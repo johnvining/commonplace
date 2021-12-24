@@ -286,6 +286,7 @@ a {
     padding: 4px;
     text-decoration: none;
     font-family: $main_font;
+    background-color: $grey2;
 
     // TODO: Combine with others in _var
     &.remove::after {
@@ -341,6 +342,7 @@ a {
     margin: 0px;
     padding: 4px;
     text-decoration: none;
+    background-color: $grey2;
 
     &:hover {
       cursor: pointer;

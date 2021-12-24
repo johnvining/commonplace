@@ -414,7 +414,8 @@ a {
   margin: 2px;
   padding: 4px;
   text-decoration: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  background-color: #efefef; }
   .pile.label.remove::after {
     background-image: url("/icons/cross.svg");
     background-size: 15px 15px;
@@ -455,7 +456,8 @@ a {
   font-size: 18px;
   margin: 0px;
   padding: 4px;
-  text-decoration: none; }
+  text-decoration: none;
+  background-color: #efefef; }
   .pile-select.button:hover {
     cursor: pointer;
     background-color: lightgoldenrodyellow;
