@@ -180,6 +180,10 @@ a {
     padding: 2px;
   }
 
+  &.search-box {
+    font-family: $main_font;
+  }
+
   &.label {
     background-color: $option_blue;
     border-style: solid;

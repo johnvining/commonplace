@@ -335,6 +335,8 @@ a {
   font-size: 18px;
   margin: 0px;
   padding: 2px; }
+.idea.search-box {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
 .idea.label {
   background-color: #e8f4f8;
   border-style: solid;
