@@ -302,30 +302,35 @@ a {
     background: lightblue;
     cursor: pointer; }
 
-.action-bar.container {
-  font-size: 15px;
-  background-color: transparent;
-  width: 40%;
-  border: none;
-  font-size: 18px;
-  margin: 0px;
-  padding: 0px;
-  text-align: right; }
-.action-bar .action-button {
-  border-style: none;
-  cursor: pointer;
-  display: inline-block;
-  font-size: 18px;
-  margin: 4px;
-  padding: 4px;
-  text-decoration: none;
-  border-radius: 6px;
-  background-color: transparent; }
-  .action-bar .action-button:hover {
-    background-color: white; }
-  .action-bar .action-button:focus {
-    box-shadow: 0px 0px 4px 4px #dadada;
-    outline: none; }
+.action-bar {
+  width: 100%; }
+  .action-bar.container {
+    font-size: 15px;
+    background-color: transparent;
+    width: 40%;
+    border: none;
+    font-size: 18px;
+    margin: 0px;
+    padding: 0px;
+    text-align: right; }
+  @media (min-width: 768px) {
+    .action-bar {
+      width: 40%; } }
+  .action-bar .action-button {
+    border-style: none;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 18px;
+    margin: 4px;
+    padding: 4px;
+    text-decoration: none;
+    border-radius: 6px;
+    background-color: transparent; }
+    .action-bar .action-button:hover {
+      background-color: white; }
+    .action-bar .action-button:focus {
+      box-shadow: 0px 0px 4px 4px #dadada;
+      outline: none; }
 
 .idea.container {
   font-size: 15px;
