@@ -1,6 +1,4 @@
 import mongoose from 'mongoose'
-import random from 'mongoose-random'
-// var random = require('mongoose-random');
 
 const noteSchema = new mongoose.Schema(
   {
