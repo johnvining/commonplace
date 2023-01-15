@@ -26,7 +26,5 @@ const noteSchema = new mongoose.Schema(
 // TODO: How to refresh index?
 noteSchema.index({ title: 'text', text: 'text', take: 'text' })
 
-noteSchema.plugin(random, { path: 'r' })
-
 // TODO: Add indices
 export default mongoose.model('note', noteSchema)
