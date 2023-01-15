@@ -3,6 +3,7 @@ import { render } from 'react-dom'
 import { Router, Link, navigate } from '@reach/router'
 import Author from './Author'
 import FileList from './FileList'
+import FlipList from './FlipList'
 import Find from './Find'
 import Idea from './Idea'
 import NoteView from './NoteView'
@@ -114,6 +115,11 @@ class App extends React.Component {
           />
           <FileList
             path="/file"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <FlipList
+            path="/flip"
             viewMode={this.state.viewMode}
             setPageTitle={this.setPageTitle.bind(this)}
           />

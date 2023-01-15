@@ -165,3 +165,7 @@ export async function getRecentNotes(page) {
 export async function getEarliestNotesToFile(page) {
   return axios.get(url_api + `note/file/` + page)
 }
+
+export async function getRandomNotes() {
+  return axios.get(url_api + `note/flip`)
+}
