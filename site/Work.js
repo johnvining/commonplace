@@ -110,7 +110,7 @@ class Work extends React.Component {
   }
 
   async handleNewPile(pile) {
-    db.addLinkToRecord(db.types.pile, pile, db.types.note, this.props.id).then(
+    db.addLinkToRecord(db.types.pile, pile, db.types.work, this.props.id).then(
       () => {
         this.fetchWorkInfo(this.props.id)
       }
@@ -144,7 +144,7 @@ class Work extends React.Component {
   }
 
   async createNoteForWork() {
-    const response = await createNewNoteForWork(this.props.id)
+    const response = await db.createNewNoteForWork(this.props.id)
     navigate('/note/' + response.data._id + '/edit')
   }
 
@@ -162,7 +162,6 @@ class Work extends React.Component {
               piles={this.state.piles}
               onSelect={this.handleNewPile.bind(this)}
               getSuggestions={db.getSuggestions}
-              apiType={db.types.pile}
               handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
               mainClassName="work-page"
               onStartPileEdit={() => {

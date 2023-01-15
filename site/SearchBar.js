@@ -34,7 +34,7 @@ class SearchBar extends React.Component {
   handleTextChange(event) {
     this.setState({ typedText: event.target.value }, () => {
       if (!this.state.modifier) {
-        var text = this.state.typedText
+        var text = this.state.typedText.toLowerCase()
         switch (text) {
           case this.modifiers.auth:
           case this.modifiers.work:
@@ -103,6 +103,7 @@ class SearchBar extends React.Component {
     }
   }
 
+  // TODO Clean up unused param
   handleUpdate(id, name) {
     switch (this.state.modifier) {
       case this.modifiers.auth:
@@ -198,7 +199,7 @@ class SearchBar extends React.Component {
           />
         ) : (
           <input
-            className="search-bar label"
+            className="search-bar search-box"
             autoFocus
             value={typedText}
             onChange={this.handleTextChange.bind(this)}

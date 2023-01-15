@@ -98,7 +98,7 @@ class Author extends React.Component {
     return (
       <div>
         <div align="right" key="author-information">
-          <span className="title">{this.state.authorName}</span>
+          <span className="page-title">{this.state.authorName}</span>
           <br />
           {this.state.bornYear} - {this.state.diedYear}
           <div>

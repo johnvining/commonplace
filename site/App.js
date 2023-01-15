@@ -2,6 +2,8 @@ import { createNewNoteFromTitle } from './Database'
 import { render } from 'react-dom'
 import { Router, Link, navigate } from '@reach/router'
 import Author from './Author'
+import FileList from './FileList'
+import FlipList from './FlipList'
 import Find from './Find'
 import Idea from './Idea'
 import NoteView from './NoteView'
@@ -62,7 +64,7 @@ class App extends React.Component {
           </div>
         ) : (
           <div className="top-bar">
-            <div className="title">
+            <div className="title-bar">
               <Link to="/" className="title-link">
                 {process.env.NODE_ENV === 'development' ? (
                   <div className="title">common-dev </div>
@@ -105,10 +107,19 @@ class App extends React.Component {
           </div>
         )}
 
-        <br />
         <Router>
           <Author
             path="/auth/:id"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <FileList
+            path="/file"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <FlipList
+            path="/flip"
             viewMode={this.state.viewMode}
             setPageTitle={this.setPageTitle.bind(this)}
           />

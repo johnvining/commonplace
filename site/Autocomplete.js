@@ -9,7 +9,7 @@ class Autocomplete extends React.Component {
   }
   className = this.props.className
   style = {
-    searchBox: this.className + ' label',
+    searchBox: this.className + ' search-box',
     li: this.className + ' li',
     ul: this.className + ' ul',
     option: this.className + ' option',
@@ -114,7 +114,7 @@ class Autocomplete extends React.Component {
   render() {
     const { responses } = this.state
     return (
-      <div className={this.props.className + ' autocomplete'}>
+      <div className={this.props.className + ' autocomplete-div'}>
         <input
           id={this.props.inputName}
           autoFocus={this.props.dontAutofocus ? false : true}

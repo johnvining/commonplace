@@ -1,4 +1,6 @@
 import mongoose from 'mongoose'
+import random from 'mongoose-random'
+// var random = require('mongoose-random');
 
 const noteSchema = new mongoose.Schema(
   {
@@ -25,6 +27,8 @@ const noteSchema = new mongoose.Schema(
 // TODO: Title not working
 // TODO: How to refresh index?
 noteSchema.index({ title: 'text', text: 'text', take: 'text' })
+
+noteSchema.plugin(random, { path: 'r' })
 
 // TODO: Add indices
 export default mongoose.model('note', noteSchema)

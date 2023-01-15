@@ -1,40 +1,61 @@
 @import '_variables';
 @import '_mixins';
+@import '_note';
+
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+.main {
+  width: 100%;
+}
 
 body {
   background: $background_color;
   font-family: $main_font;
-}
-
-a {
-  color: $link_color;
-}
-
-.url {
-  font-family: $monospace;
-}
-
-div.main {
-  width: 96%;
-  margin: auto;
+  margin: 0px;
+  padding: 0px;
 }
 
 .top-bar {
   div & {
     width: 100%;
-    min-height: 5em;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
   }
-  .title {
-    display: inline-block;
-    font-size: 50px;
-    width: 50%;
+
+  .title-bar {
+    display: block;
+    width: 100%;
+    align-self: flex-start;
+
+    @include tablet-plus {
+      width: 33%;
+    }
+
+    .title {
+      font-size: 28px;
+      padding: 5px;
+      @include tablet-plus {
+        font-size: 40px;
+      }
+    }
   }
 
   .top-action-bar {
     display: inline-flex;
     justify-content: flex-end;
-    width: 50%;
+    width: 100%;
+    min-height: 5em;
+
+    @include tablet-plus {
+      width: 67%;
+    }
   }
 
   .tool-bar {
@@ -62,6 +83,7 @@ div.main {
 
     &.div {
       padding: 10px;
+      align-self: center;
     }
 
     .left {
@@ -76,6 +98,22 @@ div.main {
       border-radius: 5px 5px 5px 5px;
     }
   }
+}
+
+.page-title {
+  font-size: 20px;
+  padding: 15px;
+  @include tablet-plus {
+    font-size: 30px;
+  }
+}
+
+a {
+  color: $link_color;
+}
+
+.url {
+  font-family: $monospace;
 }
 
 .top-level {
@@ -97,214 +135,6 @@ div.main {
   }
 }
 
-.note-full {
-  &.outer {
-    background-color: white;
-    border-color: $note_background;
-    border-style: solid;
-    border-width: 2px;
-    border-radius: 4px;
-    margin: 4px;
-    padding: 4px;
-
-    &:focus {
-      border-color: gray;
-      outline: none;
-    }
-
-    &.selected {
-      border-color: black;
-    }
-
-    &.edit-note,
-    &.edit-idea {
-      background-color: white;
-      border-color: $note_background_edit;
-    }
-
-    &.not-selected {
-      background-color: #f2f2f2;
-    }
-  }
-
-  .left-right-bar {
-    display: flex;
-    justify-content: space-between;
-    margin: 0px;
-    padding: 0px;
-  }
-
-  .idea-container,
-  .action-bar,
-  .title,
-  .year,
-  .page,
-  .url {
-    margin: 4px;
-    padding: 4px;
-  }
-
-  .title {
-    font-size: 18px;
-  }
-
-  .year,
-  .page,
-  .url {
-    font-size: 14px;
-  }
-
-  .title,
-  .year,
-  .page,
-  .url {
-    display: inline-block;
-    font-family: $main_font;
-    background-color: transparent;
-    border-style: none;
-    display: inline-block;
-
-    &:focus {
-      background-color: $note_background_edit;
-      outline: none;
-      border-radius: 2px;
-    }
-  }
-
-  .url {
-    font-family: $monospace;
-  }
-
-  .title,
-  .url {
-    width: 85%;
-  }
-
-  .year,
-  .page {
-    width: 8%;
-    text-align: right;
-
-    &.input {
-      width: 80%;
-      text-align: left;
-    }
-  }
-
-  .note-text,
-  .note-take,
-  .author,
-  .work {
-    margin: 4px;
-    padding: 4px;
-
-    &.imputed,
-    &.work {
-      font-style: italic;
-    }
-
-    &.label {
-      text-decoration: none;
-    }
-  }
-
-  .note-text,
-  .note-take,
-  .url {
-    font-size: 14px;
-  }
-
-  .note-text,
-  .note-take {
-    background-color: transparent;
-    border: none;
-    box-sizing: border-box;
-    display: block;
-    font-family: $main_font;
-    font-size: 14px;
-    margin: auto;
-    padding: 8px;
-    resize: none;
-    width: 100%;
-    white-space: pre-wrap;
-
-    &:focus {
-      background-color: $note_background_edit;
-      outline: none;
-      border-radius: 2px;
-    }
-  }
-
-  .author,
-  .work {
-    &.label {
-      background-color: transparent;
-      display: inline-block;
-      width: 50%;
-      border: none;
-      font-family: $main_font;
-      font-size: 18px;
-      padding: 4px 4px 4px 8px;
-      margin: 0px;
-
-      &:focus {
-        background-color: $note_background_edit;
-        outline: none;
-        border-radius: 2px;
-      }
-    }
-
-    &.autocomplete {
-      margin: 0px;
-      padding: 0px;
-    }
-
-    &.ul {
-      display: inline;
-      margin: 0px;
-      padding: 0px;
-    }
-
-    &.li {
-      display: inline;
-      margin: 0px;
-      padding: 0px;
-    }
-
-    &.option {
-      background: transparent;
-      border: none;
-      color: #393939;
-      display: inline;
-      margin: 0px;
-      padding: 4px;
-      font-size: 18px;
-      font-family: $main_font;
-
-      &::after {
-        content: '? ';
-      }
-
-      &.new::before {
-        background-image: url($image_add_background);
-        background-size: 17px 17px;
-        display: inline-block;
-        width: 17px;
-        height: 15px;
-        content: '';
-      }
-    }
-  }
-
-  &.form-label {
-    font-size: 12px;
-    padding: 8px;
-    text-transform: uppercase;
-    font-family: $sans_font;
-    display: block;
-  }
-}
-
 .action-bar {
   &.container {
     font-size: 15px;
@@ -315,6 +145,12 @@ div.main {
     margin: 0px;
     padding: 0px;
     text-align: right;
+  }
+
+  width: 100%;
+  text-align: right;
+  @include tablet-plus {
+    width: 40%;
   }
 
   .action-button {
@@ -348,6 +184,10 @@ div.main {
     font-size: 18px;
     margin: 0px;
     padding: 2px;
+  }
+
+  &.search-box {
+    font-family: $main_font;
   }
 
   &.label {
@@ -396,7 +236,7 @@ div.main {
     padding: 0px;
   }
 
-  &.autocomplete {
+  &.autocomplete-div {
     text-align: right;
   }
 
@@ -433,6 +273,7 @@ div.main {
   &.container {
     background-color: transparent;
     padding: 2px;
+    width: 100%;
   }
 
   &.label {
@@ -445,6 +286,7 @@ div.main {
     padding: 4px;
     text-decoration: none;
     font-family: $main_font;
+    background-color: $grey2;
 
     // TODO: Combine with others in _var
     &.remove::after {
@@ -477,7 +319,7 @@ div.main {
 }
 
 .pile-select {
-  &.label {
+  &.search-box {
     background-color: $note_background_edit;
     border-color: white;
     border-radius: 4px;
@@ -500,6 +342,7 @@ div.main {
     margin: 0px;
     padding: 4px;
     text-decoration: none;
+    background-color: $grey2;
 
     &:hover {
       cursor: pointer;
@@ -508,7 +351,7 @@ div.main {
     }
   }
 
-  &.autocomplete {
+  &.autocomplete-div {
     display: inline-block;
     margin: 0px;
     padding: 0px;
@@ -560,9 +403,10 @@ div.main {
     border: 2px;
     border-style: solid;
     border-radius: 4px;
+    width: 100%;
   }
 
-  &.autocomplete {
+  &.autocomplete-div {
     display: inline-block;
   }
 
@@ -579,7 +423,7 @@ div.main {
     vertical-align: top;
   }
 
-  &.label {
+  &.search-box {
     background: transparent;
     border-style: none;
     display: inline;
@@ -606,12 +450,10 @@ div.main {
   &.option {
     background: transparent;
     font-size: 28px;
-    border-color: $de-emphasized-border-color;
     border-radius: 4px;
     border-style: solid;
     border-width: 1px;
     margin: 4px;
-    color: $de-emphasized-border-color;
     font-family: $main_font;
 
     &:focus {
@@ -740,7 +582,7 @@ a.grid-link {
     outline: none;
   }
 
-  &.label {
+  &.search-box {
     font-family: $main_font;
     padding: 8px;
     margin: 2px;
@@ -858,19 +700,9 @@ a.grid-link {
   }
 }
 
-.half {
-  display: inline-block;
-  width: 50%;
-  vertical-align: top;
-}
-
 .large-image {
   max-width: 97%;
   margin: auto;
-}
-
-.title {
-  font-size: 28px;
 }
 
 .work-list {
@@ -1016,8 +848,7 @@ a {
   }
 
   &.author-select {
-    &.label {
-      background-color: $button_selected;
+    &.search-box {
       display: inline-block;
       border: none;
       font-family: $main_font;
@@ -1030,7 +861,7 @@ a {
       border-width: 1px;
     }
 
-    &.autocomplete {
+    &.autocomplete-div {
       display: inline-block;
     }
 
@@ -1103,12 +934,4 @@ a {
     font-family: $sans_font;
     display: block;
   }
-}
-
-.width-80 {
-  width: 80%;
-}
-
-.width-20 {
-  width: 20%;
 }

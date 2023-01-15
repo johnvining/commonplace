@@ -161,3 +161,11 @@ export async function searchNotes(searchString) {
 export async function getRecentNotes(page) {
   return axios.get(url_api + `note/all/` + page)
 }
+
+export async function getEarliestNotesToFile(page) {
+  return axios.get(url_api + `note/file/` + page)
+}
+
+export async function getRandomNotes() {
+  return axios.get(url_api + `note/flip`)
+}

@@ -9,12 +9,14 @@ import controllers, {
   reqAddWork,
   reqDeleteNote,
   reqFindNotesByString,
+  reqGetEarliestNotesToFile,
   reqGetImageForNote,
   reqGetNoteDetails,
   reqGetRecentNotes,
   reqRemoveIdeaFromNote,
   reqRemoveImageFromNote,
   reqRemovePileFromNote,
+  reqGetRandomNotes,
   reqUpdateNote
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
@@ -26,6 +28,10 @@ router.route('/find').put(asyncWrapper(reqFindNotesByString, 200))
 router.route('/').post(asyncWrapper(controllers.createOne, 201))
 
 router.route('/all/:skip').get(asyncWrapper(reqGetRecentNotes, 200))
+
+router.route('/file/:skip').get(asyncWrapper(reqGetEarliestNotesToFile, 200))
+
+router.route('/flip').get(asyncWrapper(reqGetRandomNotes, 200))
 
 router.route('/:id/idea').put(asyncWrapper(reqAddIdea, 200))
 router.route('/:id/idea/create').put(asyncWrapper(reqAddNewIdea, 201))

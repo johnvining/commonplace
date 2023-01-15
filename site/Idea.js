@@ -68,7 +68,7 @@ class Idea extends React.Component {
     return (
       <div>
         <div align="right">
-          <span className="title">{this.state.ideaName}</span>
+          <span className="page-title">{this.state.ideaName}</span>
           <div>
             <button
               className="top-level button"

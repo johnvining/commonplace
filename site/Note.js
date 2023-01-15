@@ -308,7 +308,7 @@ class Note extends React.Component {
       >
         {this.state.largeImage >= 0 ? (
           <div
-            className="half"
+            className="half-width"
             onClick={() => {
               this.setState({ largeImage: -1 })
             }}
@@ -319,50 +319,14 @@ class Note extends React.Component {
             />
           </div>
         ) : null}
-        <div className={this.state.largeImage >= 0 ? 'half' : null}>
-          <div>
-            {/* Title and Year */}
-            <div className="note-full left-right-bar">
-              {edit ? (
-                <div className="width-80">
-                  <label htmlFor="title" className="note-full form-label">
-                    Title
-                  </label>
-                  <input
-                    id="title"
-                    className="note-full title input"
-                    autoFocus
-                    defaultValue={this.state.pendingTitle}
-                    onChange={this.handleTitleChange}
-                  ></input>
-                </div>
-              ) : (
-                <div className="note-full title">{this.state.pendingTitle}</div>
-              )}
-              {edit ? (
-                <div className="width-20">
-                  <label htmlFor="year" className="note-full form-label">
-                    Year
-                  </label>
-                  <input
-                    id="year"
-                    className="note-full year input"
-                    defaultValue={this.state.pendingYear}
-                    onChange={this.handleYearChange}
-                  ></input>
-                </div>
-              ) : this.state.pendingYear ? (
-                <div className="note-full year">{this.state.pendingYear}</div>
-              ) : (
-                <div className="note-full year imputed">
-                  {this.props.note.work?.year}
-                </div>
-              )}
-            </div>
-            {/* Piles */}
-            <div className="note-full pile container">
+        <div
+          className={this.state.largeImage >= 0 ? 'half-width' : 'full-width'}
+        >
+          {/* Piles */}
+          {note.piles?.length > 0 || edit || edit_piles ? (
+            <div className="note-full pile container width-100">
               <PileListForItem
-                remove={this.state.edit}
+                remove={edit_piles}
                 allowTabbing={selected || edit_piles}
                 allowAdd={selected || edit_piles || no_selection}
                 edit={edit_piles}
@@ -378,8 +342,57 @@ class Note extends React.Component {
                 }}
               />
             </div>
-            {/* Images */}
-            <div className="note-full image-row">
+          ) : null}
+
+          {/* Title and Year */}
+          {edit ? (
+            <>
+              <div className="width-80">
+                <label htmlFor="title" className="note-full form-label">
+                  Title
+                </label>
+                <input
+                  id="title"
+                  className="note-full title input edit"
+                  autoFocus
+                  defaultValue={this.state.pendingTitle}
+                  onChange={this.handleTitleChange}
+                ></input>
+              </div>
+              <div className="width-20">
+                <label htmlFor="year" className="note-full form-label">
+                  Year
+                </label>
+                <input
+                  id="year"
+                  className="note-full year input edit"
+                  defaultValue={this.state.pendingYear}
+                  onChange={this.handleYearChange}
+                ></input>
+              </div>
+            </>
+          ) : this.state.pendingTitle || this.state.pendingYear ? (
+            <div className="width-100">
+              <div className="note-full title">
+                {this.state.pendingTitle}
+
+                {this.state.pendingYear ? (
+                  <>, {this.state.pendingYear}</>
+                ) : this.props.note.work?.year ? (
+                  <>, {this.props.note.work?.year}</>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Images */}
+          {edit ? (
+            <div className={'width-100 action-bar'}>
+              <ImageUploader onImageUpload={this.onImageUpload.bind(this)} />
+            </div>
+          ) : null}
+          {this.props.note?.images?.length > 0 ? (
+            <div className="note-full image-row width-100">
               {this.props.note?.images?.map((image, index) => (
                 <div
                   className={
@@ -404,278 +417,265 @@ class Note extends React.Component {
                 </div>
               ))}
             </div>
-            {/* Text area */}
-            <div name="text">
-              {edit ? (
-                <>
-                  <label htmlFor="text" className="note-full form-label">
-                    Text
-                  </label>
-                  <textarea
-                    id="text"
-                    className={'note-full note-text edit'}
-                    onChange={this.handleTextChange}
-                    value={this.state.pendingText}
-                  ></textarea>
-                </>
-              ) : (
-                <div className={'note-full note-text'}>
-                  {this.state.pendingText}
-                </div>
-              )}
-            </div>
-            {/* Take */}
-            <div name="take">
-              {edit ? (
-                <>
-                  <label htmlFor="take" className="note-full form-label">
-                    Take
-                  </label>
-                  <textarea
-                    id="take"
-                    className={'note-full note-take edit'}
-                    onChange={this.handleTakeChange}
-                    value={this.state.pendingTake}
-                  ></textarea>
-                </>
-              ) : this.state.pendingTake ? (
-                <div className="note-full note-take">
-                  {this.state.pendingTake}
-                </div>
-              ) : null}
-            </div>
+          ) : null}
 
-            {/* Author */}
-            <div name="author">
-              {edit ? (
-                <>
-                  <label htmlFor="author" className="note-full form-label">
-                    Author
-                  </label>
-                  <Autocomplete
-                    className={'note-full author'}
-                    defaultValue={this.state.pendingAuthorName || ''}
-                    dontAutofocus={true}
-                    inputName={this.props.id + 'author'}
-                    onSelect={this.handleUpdateAuthor}
-                    getSuggestions={db.getSuggestions}
-                    apiType={db.types.auth}
-                    handleNewSelect={this.handleCreateAuthorAndAssign}
-                    onClearText={this.handleClearAuthor.bind(this)}
-                  />
-                </>
-              ) : (
-                <div>
-                  {this.state.pendingAuthorName ? (
-                    <Link
-                      to={'/auth/' + this.state.pendingAuthorId}
-                      className={'note-full author label'}
-                    >
-                      {this.state.pendingAuthorName}
-                    </Link>
-                  ) : this.props.note?.work?.author ? (
-                    <Link
-                      to={'/auth/' + this.props.note?.work?.author?._id}
-                      className={'note-full author label imputed'}
-                    >
-                      {this.props.note?.work?.author?.name}
-                    </Link>
-                  ) : null}
-                </div>
-              )}
+          {/* Text area */}
+          {edit ? (
+            <div name="text" className="width-100">
+              <label htmlFor="text" className="note-full form-label">
+                Text
+              </label>
+              <textarea
+                id="text"
+                className={'note-full note-text edit'}
+                onChange={this.handleTextChange}
+                value={this.state.pendingText}
+              ></textarea>
             </div>
-            {/* Work */}
-            <div>
-              {edit ? (
-                <>
-                  <label htmlFor="work" className="note-full form-label">
-                    Work
-                  </label>
-                  <Autocomplete
-                    inputName={this.props.id + 'work'}
-                    dontAutofocus={true}
-                    className={'note-full work edit'}
-                    defaultValue={this.state.pendingWorkName || ''}
-                    onSelect={this.handleUpdateWork.bind(this)}
-                    getSuggestions={db.getSuggestions}
-                    apiType={db.types.work}
-                    handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
-                    onClearText={this.handleClearWork.bind(this)}
-                  />
-                </>
-              ) : this.state.pendingWorkId ? (
-                <div>
+          ) : this.state.pendingText ? (
+            <div name="text" className="width-100">
+              <div className={'note-full note-text'}>
+                {this.state.pendingText}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Take */}
+          {edit ? (
+            <div name="take" className="width-100">
+              <label htmlFor="take" className="note-full form-label">
+                Take
+              </label>
+              <textarea
+                id="take"
+                className={'note-full note-take edit'}
+                onChange={this.handleTakeChange}
+                value={this.state.pendingTake}
+              ></textarea>
+            </div>
+          ) : this.state.pendingTake ? (
+            <div name="take" className="width-100">
+              <div className="note-full note-take">
+                {this.state.pendingTake}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Author and Work */}
+          {edit ? (
+            <>
+              <div name="author" className="width-100">
+                <label htmlFor="author" className="note-full form-label">
+                  Author
+                </label>
+                <Autocomplete
+                  className={'note-full edit-author'}
+                  defaultValue={this.state.pendingAuthorName || ''}
+                  dontAutofocus={true}
+                  inputName={this.props.id + 'author'}
+                  onSelect={this.handleUpdateAuthor}
+                  getSuggestions={db.getSuggestions}
+                  apiType={db.types.auth}
+                  handleNewSelect={this.handleCreateAuthorAndAssign}
+                  onClearText={this.handleClearAuthor.bind(this)}
+                />
+              </div>
+              <div name="work" className="width-100">
+                <label htmlFor="work" className="note-full form-label">
+                  Work
+                </label>
+                <Autocomplete
+                  inputName={this.props.id + 'work'}
+                  dontAutofocus={true}
+                  className={'note-full edit-work'}
+                  defaultValue={this.state.pendingWorkName || ''}
+                  onSelect={this.handleUpdateWork.bind(this)}
+                  getSuggestions={db.getSuggestions}
+                  apiType={db.types.work}
+                  handleNewSelect={this.handleCreateWorkAndAssign.bind(this)}
+                  onClearText={this.handleClearWork.bind(this)}
+                />
+              </div>
+            </>
+          ) : this.state.pendingAuthorId ||
+            this.props.note?.work?.author ||
+            this.state.pendingWorkId ? (
+            <div name="work" className="width-100">
+              <div className="citation">
+                {/* Author */}
+                {this.state.pendingAuthorId ? (
                   <Link
-                    to={'/work/' + this.state.pendingWorkId}
-                    className={'note work label'}
+                    to={'/auth/' + this.state.pendingAuthorId}
+                    className={'note-full author label'}
                   >
-                    {this.state.pendingWorkName}
+                    {this.state.pendingAuthorName}
                   </Link>
-                  {this.state.pendingWorkId == note.work?._id ? (
-                    note.work?.url?.length ? (
-                      <a href={note.work?.url}>
-                        <img src={link} />
-                      </a>
-                    ) : null
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-            {/* URL and Page */}
-            <div className={'left-right-bar'}>
-              {edit ? (
-                <div className="width-80">
-                  <label htmlFor="url" className="note-full form-label">
-                    URL
-                  </label>
-                  <input
-                    id="url"
-                    className={'note-full url input'}
-                    name="url"
-                    defaultValue={this.state.pendingUrl}
-                    onChange={this.handleUrlChange}
-                  ></input>
-                </div>
-              ) : (
-                <span className={'note-full url'}>
-                  <a href={this.state.pendingUrl}>{this.state.pendingUrl}</a>
-                </span>
-              )}
-              {edit ? (
-                <div className="width-20">
-                  <label htmlFor="page" className="note-full form-label">
-                    Page
-                  </label>
-                  <input
-                    id="page"
-                    className={'note-full page input'}
-                    name="url"
-                    defaultValue={this.state.pendingPage}
-                    onChange={this.handlePageChange}
-                  ></input>
-                </div>
-              ) : (
-                <span className={'note-full page'}>
-                  <a href={this.state.pendingPage}>{this.state.pendingPage}</a>
-                </span>
-              )}
-            </div>
-            {/* Ideas and Action bar */}
-            <div className={'left-right-bar'}>
-              <div className={'idea-container'}>
-                {note.ideas?.map(idea =>
-                  edit_ideas ? (
-                    <button
-                      className="idea label edit"
-                      key={'idea-button' + idea._id}
-                      tabIndex="-1"
-                      onClick={() => {
-                        this.removeIdea(idea._id)
-                      }}
+                ) : this.props.note?.work?.author ? (
+                  <Link
+                    to={'/auth/' + this.props.note?.work?.author?._id}
+                    className={'note-full author label imputed'}
+                  >
+                    {this.props.note?.work?.author?.name}
+                  </Link>
+                ) : null}
+                {/* Separator */}
+                {(this.state.pendingAuthorId ||
+                  this.props.note?.work?.author) &&
+                this.state.pendingWorkId ? (
+                  <>, </>
+                ) : null}
+                {this.state.pendingWorkId ? (
+                  <em>
+                    <Link
+                      to={'/work/' + this.state.pendingWorkId}
+                      className={'note work label'}
                     >
-                      {idea.name}
+                      {this.state.pendingWorkName}
+                    </Link>
+                  </em>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+
+          {/* URL and Page */}
+          {edit ? (
+            <>
+              <div className="width-80">
+                <label htmlFor="url" className="note-full form-label">
+                  URL
+                </label>
+                <input
+                  id="url"
+                  className={'note-full url input edit'}
+                  name="url"
+                  defaultValue={this.state.pendingUrl}
+                  onChange={this.handleUrlChange}
+                ></input>
+              </div>
+              <div className="width-20">
+                <label htmlFor="page" className="note-full form-label">
+                  Page
+                </label>
+                <input
+                  id="page"
+                  className={'note-full page input edit'}
+                  name="url"
+                  defaultValue={this.state.pendingPage}
+                  onChange={this.handlePageChange}
+                ></input>
+              </div>
+            </>
+          ) : null}
+
+          {/* Ideas and Action bar */}
+          <div className={'idea-container'}>
+            {note.ideas?.map(idea =>
+              edit_ideas ? (
+                <button
+                  className="idea label edit"
+                  key={'idea-button' + idea._id}
+                  tabIndex="-1"
+                  onClick={() => {
+                    this.removeIdea(idea._id)
+                  }}
+                >
+                  {idea.name}
+                </button>
+              ) : (
+                <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
+                  <button
+                    className="idea label"
+                    key={'idea-button' + idea._id}
+                    tabIndex="-1"
+                  >
+                    {idea.name}
+                  </button>
+                </Link>
+              )
+            )}
+          </div>
+          <div className={'action-bar'}>
+            {edit ? (
+              <>
+                <div>
+                  <button
+                    className={'action-button'}
+                    onClick={this.handleAccept.bind(this)}
+                  >
+                    <img src={check_circle}></img>
+                  </button>
+
+                  <button
+                    className={'action-button'}
+                    onClick={() => {
+                      this.props.setNoteMode(this.props.id, '')
+                    }}
+                  >
+                    <img src={cross_circle}></img>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {edit_ideas ? (
+                  <Autocomplete
+                    inputName={this.props.id + 'idea'}
+                    className={'idea'}
+                    clearOnSelect={true}
+                    escape={() => {
+                      this.setState({ addIdea: false })
+                    }}
+                    onSelect={this.handleNewIdea}
+                    handleNewSelect={this.handleCreateIdeaAndAddToNote}
+                    getSuggestions={db.getSuggestions}
+                    apiType={db.types.idea}
+                    excludeIds={note.ideas.map(idea => idea._id)}
+                  />
+                ) : (
+                  // Neither editing whole note nor ideas
+                  <span>
+                    <button
+                      className={'action-button'}
+                      onClick={() => {
+                        this.props.setNoteMode(
+                          this.props.id,
+                          constants.note_modes.EDIT_IDEAS
+                        )
+                      }}
+                      tabIndex="-1"
+                    >
+                      <img src={tags}></img>
                     </button>
-                  ) : (
-                    <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
-                      <button
-                        className="idea label"
-                        key={'idea-button' + idea._id}
-                        tabIndex="-1"
-                      >
-                        {idea.name}
+                    <Link to={'/note/' + this.props.id}>
+                      <button className={'action-button'} tabIndex="-1">
+                        <img src={document_image}></img>
                       </button>
                     </Link>
-                  )
-                )}
-              </div>
-              <div className={'action-bar'}>
-                {edit ? (
-                  <>
-                    <div>
-                      <button
-                        className={'action-button'}
-                        onClick={this.handleAccept.bind(this)}
-                      >
-                        <img src={check_circle}></img>
-                      </button>
 
-                      <button
-                        className={'action-button'}
-                        onClick={() => {
-                          this.props.setNoteMode(this.props.id, '')
-                        }}
-                      >
-                        <img src={cross_circle}></img>
-                      </button>
-                    </div>
-                    <div className={'container action-bar'}>
-                      <ImageUploader
-                        onImageUpload={this.onImageUpload.bind(this)}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {edit_ideas ? (
-                      <Autocomplete
-                        inputName={this.props.id + 'idea'}
-                        className={'idea'}
-                        clearOnSelect={true}
-                        escape={() => {
-                          this.setState({ addIdea: false })
-                        }}
-                        onSelect={this.handleNewIdea}
-                        handleNewSelect={this.handleCreateIdeaAndAddToNote}
-                        getSuggestions={db.getSuggestions}
-                        apiType={db.types.idea}
-                        excludeIds={note.ideas.map(idea => idea._id)}
-                      />
-                    ) : (
-                      // Neither editing whole note nor ideas
-                      <span>
-                        <button
-                          className={'action-button'}
-                          onClick={() => {
-                            this.props.setNoteMode(
-                              this.props.id,
-                              constants.note_modes.EDIT_IDEAS
-                            )
-                          }}
-                          tabIndex="-1"
-                        >
-                          <img src={tags}></img>
-                        </button>
-                        <Link to={'/note/' + this.props.id}>
-                          <button className={'action-button'} tabIndex="-1">
-                            <img src={document_image}></img>
-                          </button>
-                        </Link>
-
-                        <button
-                          className={'action-button'}
-                          onClick={() => {
-                            this.props.setNoteMode(
-                              this.props.id,
-                              constants.note_modes.EDIT
-                            )
-                          }}
-                          tabIndex="-1"
-                        >
-                          <img src={write}></img>
-                        </button>
-                        <button
-                          onClick={this.handleDelete.bind(this)}
-                          className={'action-button'}
-                          tabIndex="-1"
-                        >
-                          <img src={trash}></img>
-                        </button>
-                      </span>
-                    )}
-                  </>
+                    <button
+                      className={'action-button'}
+                      onClick={() => {
+                        this.props.setNoteMode(
+                          this.props.id,
+                          constants.note_modes.EDIT
+                        )
+                      }}
+                      tabIndex="-1"
+                    >
+                      <img src={write}></img>
+                    </button>
+                    <button
+                      onClick={this.handleDelete.bind(this)}
+                      className={'action-button'}
+                      tabIndex="-1"
+                    >
+                      <img src={trash}></img>
+                    </button>
+                  </span>
                 )}
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       </div>

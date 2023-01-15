@@ -6,6 +6,8 @@ import * as WorkControllers from '../work/work.controllers.js'
 import config from '../../config'
 import fs from 'fs'
 
+const pageSize = 40
+
 export const reqFindNotesByString = async (req, res) => {
   return await findNotesAndPopulate(
     { $text: { $search: '"' + req.body.searchString + '"' } },
@@ -25,7 +27,6 @@ export const reqDeleteNote = async (req, res) => {
 }
 
 export const reqGetRecentNotes = async (req, res) => {
-  const pageSize = 30
   return findNotesAndPopulate(
     {},
     { updatedAt: -1 },
@@ -33,6 +34,21 @@ export const reqGetRecentNotes = async (req, res) => {
     (req.params.skip - 1) * pageSize,
     pageSize
   )
+}
+
+export const reqGetEarliestNotesToFile = async (req, res) => {
+  // TODO: Faster way to do this? -- size: 0 may be slow
+  return findNotesAndPopulate(
+    { $or: [{ title: '' }, { ideas: { $size: 0 } }] },
+    { updatedAt: 1 },
+    false,
+    (req.params.skip - 1) * pageSize,
+    pageSize
+  )
+}
+
+export const reqGetRandomNotes = async (req, res) => {
+  return findRandomNotesAndPopulate({}, pageSize)
 }
 
 export const reqAddIdea = async (req, res) => {
@@ -208,6 +224,25 @@ export const findNotesAndPopulate = async function(
       .lean()
       .exec()
   }
+}
+
+export const findRandomNotesAndPopulate = async function(
+  searchObject,
+  limit = null
+) {
+  const random_notes = await Note.aggregate([
+    { $sample: { size: pageSize } }
+  ]).exec()
+
+  await Note.populate(random_notes, { path: 'author' })
+  await Note.populate(random_notes, { path: 'ideas' })
+  await Note.populate(random_notes, { path: 'piles' })
+  return await Note.populate(random_notes, {
+    path: 'work',
+    populate: {
+      path: 'author'
+    }
+  })
 }
 
 export default defaultControllers(Note)
