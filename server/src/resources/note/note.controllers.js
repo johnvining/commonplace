@@ -5,6 +5,7 @@ import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 import config from '../../config'
 import fs from 'fs'
+import { connect } from 'mongoose'
 
 export const reqFindNotesByString = async (req, res) => {
   return await findNotesAndPopulate(
@@ -45,6 +46,11 @@ export const reqGetEarliestNotesToFile = async (req, res) => {
     (req.params.skip - 1) * pageSize,
     pageSize
   )
+}
+
+export const reqGetRandomNotes = async (req, res) => {
+  const pageSize = 20
+  return findRandomNotesAndPopulate({}, pageSize)
 }
 
 export const reqAddIdea = async (req, res) => {
@@ -220,6 +226,23 @@ export const findNotesAndPopulate = async function(
       .lean()
       .exec()
   }
+}
+
+export const findRandomNotesAndPopulate = async function(
+  searchObject,
+  limit = null
+) {
+  const random_notes = await Note.aggregate([{ $sample: { size: 20 } }]).exec()
+
+  await Note.populate(random_notes, { path: 'author' })
+  await Note.populate(random_notes, { path: 'ideas' })
+  await Note.populate(random_notes, { path: 'piles' })
+  return await Note.populate(random_notes, {
+    path: 'work',
+    populate: {
+      path: 'author'
+    }
+  })
 }
 
 export default defaultControllers(Note)
