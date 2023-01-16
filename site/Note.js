@@ -489,6 +489,13 @@ class Note extends React.Component {
                   </em>
                 ) : null}
 
+                {/* Page */}
+                {this.state.pendingPage ? (
+                  <>, {this.state.pendingPage}</>
+                ) : this.props.note.work?.Page ? (
+                  <>, ({this.props.note.work?.Page}</>
+                ) : null}
+
                 {/* Year */}
                 {this.state.pendingYear ? (
                   <> ({this.state.pendingYear})</>
