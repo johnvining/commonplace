@@ -545,48 +545,53 @@ class Note extends React.Component {
           ) : null}
 
           {/* Piles and Ideas*/}
-          <div className={'note-full container width-100'}>
-            <PileListForItem
-              remove={edit_piles}
-              allowTabbing={selected || edit_piles}
-              allowAdd={selected || edit_piles || no_selection}
-              edit={edit_piles}
-              piles={note.piles}
-              onSelect={this.handleNewPile.bind(this)}
-              getSuggestions={db.getSuggestions}
-              apiType={db.types.pile}
-              handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-              mainClassName="note"
-              onPileRemove={this.handlePileRemove.bind(this)}
-              onStartPileEdit={() => {
-                this.props.onStartPileEdit(note._id)
-              }}
-            />
-            {note.ideas?.map(idea =>
-              edit_ideas ? (
-                <button
-                  className="idea label edit"
-                  key={'idea-button' + idea._id}
-                  tabIndex="-1"
-                  onClick={() => {
-                    this.removeIdea(idea._id)
-                  }}
-                >
-                  {idea.name}
-                </button>
-              ) : (
-                <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
+          {note.piles?.length > 0 || note.ideas?.length > 0 ? (
+            <div className={'note-full container width-100'}>
+              <PileListForItem
+                remove={edit_piles}
+                allowTabbing={selected || edit_piles}
+                allowAdd={selected || edit_piles || no_selection}
+                edit={edit_piles}
+                piles={note.piles}
+                onSelect={this.handleNewPile.bind(this)}
+                getSuggestions={db.getSuggestions}
+                apiType={db.types.pile}
+                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+                mainClassName="note"
+                onPileRemove={this.handlePileRemove.bind(this)}
+                onStartPileEdit={() => {
+                  this.props.onStartPileEdit(note._id)
+                }}
+              />
+              {note.ideas?.map(idea =>
+                edit_ideas ? (
                   <button
-                    className="idea label"
+                    className="idea label edit"
                     key={'idea-button' + idea._id}
                     tabIndex="-1"
+                    onClick={() => {
+                      this.removeIdea(idea._id)
+                    }}
                   >
                     {idea.name}
                   </button>
-                </Link>
-              )
-            )}
-          </div>
+                ) : (
+                  <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
+                    <button
+                      className="idea label"
+                      key={'idea-button' + idea._id}
+                      tabIndex="-1"
+                    >
+                      {idea.name}
+                    </button>
+                  </Link>
+                )
+              )}
+            </div>
+          ) : (
+            ''
+          )}
+
           {/* Action Bar */}
           <div className="note-full container width-100">
             <div className="action-bar">
