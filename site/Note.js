@@ -391,7 +391,7 @@ class Note extends React.Component {
               <ImageUploader onImageUpload={this.onImageUpload.bind(this)} />
             </div>
           ) : null}
-          {this.props.note?.images?.length > 0 ? (
+          {this.props.note?.images?.length > 0 && this.props.note?.imageUrls ? (
             <div className="note-full image-row width-100">
               {this.props.note?.images?.map((image, index) => (
                 <div
@@ -406,14 +406,12 @@ class Note extends React.Component {
                   onClick={this.handleFocusImage.bind(this)}
                   id={index}
                 >
-                  {this.props.note?.imageUrls ? (
-                    <img
-                      key={this.props.id + index + 'img'}
-                      src={this.props.note.imageUrls[index]}
-                      className="image-row"
-                      id={index}
-                    />
-                  ) : null}
+                  <img
+                    key={this.props.id + index + 'img'}
+                    src={this.props.note.imageUrls[index]}
+                    className="image-row"
+                    id={index}
+                  />
                 </div>
               ))}
             </div>
