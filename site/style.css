@@ -305,18 +305,6 @@ a {
 .action-bar {
   width: 100%;
   text-align: right; }
-  .action-bar.container {
-    font-size: 15px;
-    background-color: transparent;
-    width: 40%;
-    border: none;
-    font-size: 18px;
-    margin: 0px;
-    padding: 0px;
-    text-align: right; }
-  @media (min-width: 768px) {
-    .action-bar {
-      width: 40%; } }
   .action-bar .action-button {
     border-style: none;
     cursor: pointer;
@@ -401,16 +389,12 @@ a {
     height: 15px;
     content: ''; }
 
-.pile.container {
-  background-color: transparent;
-  padding: 2px;
-  width: 100%; }
 .pile.label {
   border-radius: 4px;
   border-style: solid;
   border-color: white;
   color: black;
-  font-size: 18px;
+  font-size: 15px;
   margin: 2px;
   padding: 4px;
   text-decoration: none;

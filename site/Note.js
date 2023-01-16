@@ -544,8 +544,24 @@ class Note extends React.Component {
             </>
           ) : null}
 
-          {/* Ideas and Action bar */}
-          <div className={'idea-container'}>
+          {/* Piles and Ideas*/}
+          <div className={'note-full container width-100'}>
+            <PileListForItem
+              remove={edit_piles}
+              allowTabbing={selected || edit_piles}
+              allowAdd={selected || edit_piles || no_selection}
+              edit={edit_piles}
+              piles={note.piles}
+              onSelect={this.handleNewPile.bind(this)}
+              getSuggestions={db.getSuggestions}
+              apiType={db.types.pile}
+              handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+              mainClassName="note"
+              onPileRemove={this.handlePileRemove.bind(this)}
+              onStartPileEdit={() => {
+                this.props.onStartPileEdit(note._id)
+              }}
+            />
             {note.ideas?.map(idea =>
               edit_ideas ? (
                 <button
@@ -572,106 +588,89 @@ class Note extends React.Component {
             )}
           </div>
           {/* Action Bar */}
-          <div className={'action-bar'}>
-            {edit ? (
-              <>
-                <div>
-                  <button
-                    className={'action-button'}
-                    onClick={this.handleAccept.bind(this)}
-                  >
-                    <img src={check_circle}></img>
-                  </button>
+          <div className="note-full container width-100">
+            <div className="action-bar">
+              {edit ? (
+                <>
+                  <div>
+                    <button
+                      className={'action-button'}
+                      onClick={this.handleAccept.bind(this)}
+                    >
+                      <img src={check_circle}></img>
+                    </button>
 
-                  <button
-                    className={'action-button'}
-                    onClick={() => {
-                      this.props.setNoteMode(this.props.id, '')
-                    }}
-                  >
-                    <img src={cross_circle}></img>
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                {edit_ideas ? (
-                  <Autocomplete
-                    inputName={this.props.id + 'idea'}
-                    className={'idea'}
-                    clearOnSelect={true}
-                    escape={() => {
-                      this.setState({ addIdea: false })
-                    }}
-                    onSelect={this.handleNewIdea}
-                    handleNewSelect={this.handleCreateIdeaAndAddToNote}
-                    getSuggestions={db.getSuggestions}
-                    apiType={db.types.idea}
-                    excludeIds={note.ideas.map(idea => idea._id)}
-                  />
-                ) : (
-                  // Neither editing whole note nor ideas
-                  <span>
                     <button
                       className={'action-button'}
                       onClick={() => {
-                        this.props.setNoteMode(
-                          this.props.id,
-                          constants.note_modes.EDIT_IDEAS
-                        )
+                        this.props.setNoteMode(this.props.id, '')
                       }}
-                      tabIndex="-1"
                     >
-                      <img src={tags}></img>
+                      <img src={cross_circle}></img>
                     </button>
-                    <Link to={'/note/' + this.props.id}>
-                      <button className={'action-button'} tabIndex="-1">
-                        <img src={document_image}></img>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {edit_ideas ? (
+                    <Autocomplete
+                      inputName={this.props.id + 'idea'}
+                      className={'idea'}
+                      clearOnSelect={true}
+                      escape={() => {
+                        this.setState({ addIdea: false })
+                      }}
+                      onSelect={this.handleNewIdea}
+                      handleNewSelect={this.handleCreateIdeaAndAddToNote}
+                      getSuggestions={db.getSuggestions}
+                      apiType={db.types.idea}
+                      excludeIds={note.ideas.map(idea => idea._id)}
+                    />
+                  ) : (
+                    // Neither editing whole note nor ideas
+                    <span>
+                      <button
+                        className={'action-button'}
+                        onClick={() => {
+                          this.props.setNoteMode(
+                            this.props.id,
+                            constants.note_modes.EDIT_IDEAS
+                          )
+                        }}
+                        tabIndex="-1"
+                      >
+                        <img src={tags}></img>
                       </button>
-                    </Link>
+                      <Link to={'/note/' + this.props.id}>
+                        <button className={'action-button'} tabIndex="-1">
+                          <img src={document_image}></img>
+                        </button>
+                      </Link>
 
-                    <button
-                      className={'action-button'}
-                      onClick={() => {
-                        this.props.setNoteMode(
-                          this.props.id,
-                          constants.note_modes.EDIT
-                        )
-                      }}
-                      tabIndex="-1"
-                    >
-                      <img src={write}></img>
-                    </button>
-                    <button
-                      onClick={this.handleDelete.bind(this)}
-                      className={'action-button'}
-                      tabIndex="-1"
-                    >
-                      <img src={trash}></img>
-                    </button>
-                  </span>
-                )}
-              </>
-            )}
-          </div>
-          {/* Piles */}
-          <div className="note-full pile container width-100">
-            <PileListForItem
-              remove={edit_piles}
-              allowTabbing={selected || edit_piles}
-              allowAdd={selected || edit_piles || no_selection}
-              edit={edit_piles}
-              piles={note.piles}
-              onSelect={this.handleNewPile.bind(this)}
-              getSuggestions={db.getSuggestions}
-              apiType={db.types.pile}
-              handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-              mainClassName="note"
-              onPileRemove={this.handlePileRemove.bind(this)}
-              onStartPileEdit={() => {
-                this.props.onStartPileEdit(note._id)
-              }}
-            />
+                      <button
+                        className={'action-button'}
+                        onClick={() => {
+                          this.props.setNoteMode(
+                            this.props.id,
+                            constants.note_modes.EDIT
+                          )
+                        }}
+                        tabIndex="-1"
+                      >
+                        <img src={write}></img>
+                      </button>
+                      <button
+                        onClick={this.handleDelete.bind(this)}
+                        className={'action-button'}
+                        tabIndex="-1"
+                      >
+                        <img src={trash}></img>
+                      </button>
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

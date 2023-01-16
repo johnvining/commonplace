@@ -37,14 +37,7 @@ class PileListForItem extends React.Component {
             excludeIds={this.props.piles?.map(pile => pile._id)}
           />
         ) : (
-          <button
-            className="pile-select button"
-            onClick={this.props.onStartPileEdit}
-            disabled={!this.props.allowAdd}
-            tabIndex={this.props.allowTabbing ? '' : '-1'}
-          >
-            +
-          </button>
+          ''
         )}
       </>
     )
