@@ -322,10 +322,10 @@ class Note extends React.Component {
         <div
           className={this.state.largeImage >= 0 ? 'half-width' : 'full-width'}
         >
-          {/* Title and Year */}
+          {/* Title */}
           {edit ? (
             <>
-              <div className="width-80">
+              <div className="width-100">
                 <label htmlFor="title" className="note-full form-label">
                   Title
                 </label>
@@ -337,38 +337,14 @@ class Note extends React.Component {
                   onChange={this.handleTitleChange}
                 ></input>
               </div>
-              <div className="width-20">
-                <label htmlFor="year" className="note-full form-label">
-                  Year
-                </label>
-                <input
-                  id="year"
-                  className="note-full year input edit"
-                  defaultValue={this.state.pendingYear}
-                  onChange={this.handleYearChange}
-                ></input>
-              </div>
             </>
-          ) : this.state.pendingTitle || this.state.pendingYear ? (
+          ) : this.state.pendingTitle ? (
             <div className="width-100">
-              <div className="note-full title">
-                {this.state.pendingTitle}
-
-                {this.state.pendingYear ? (
-                  <>, {this.state.pendingYear}</>
-                ) : this.props.note.work?.year ? (
-                  <>, {this.props.note.work?.year}</>
-                ) : null}
-              </div>
+              <div className="note-full title">{this.state.pendingTitle}</div>
             </div>
           ) : null}
 
           {/* Images */}
-          {edit ? (
-            <div className={'width-100 action-bar'}>
-              <ImageUploader onImageUpload={this.onImageUpload.bind(this)} />
-            </div>
-          ) : null}
           {this.props.note?.images?.length > 0 && this.props.note?.imageUrls ? (
             <div className="note-full image-row width-100">
               {this.props.note?.images?.map((image, index) => (
@@ -437,7 +413,7 @@ class Note extends React.Component {
             </div>
           ) : null}
 
-          {/* Author and Work */}
+          {/* Author, Work */}
           {edit ? (
             <>
               <div name="author" className="width-100">
@@ -475,7 +451,8 @@ class Note extends React.Component {
             </>
           ) : this.state.pendingAuthorId ||
             this.props.note?.work?.author ||
-            this.state.pendingWorkId ? (
+            this.state.pendingWorkId ||
+            this.state.pendingYear ? (
             <div name="work" className="width-100">
               <div className="citation">
                 {/* Author */}
@@ -494,7 +471,8 @@ class Note extends React.Component {
                     {this.props.note?.work?.author?.name}
                   </Link>
                 ) : null}
-                {/* Separator */}
+
+                {/* Work */}
                 {(this.state.pendingAuthorId ||
                   this.props.note?.work?.author) &&
                 this.state.pendingWorkId ? (
@@ -510,14 +488,21 @@ class Note extends React.Component {
                     </Link>
                   </em>
                 ) : null}
+
+                {/* Year */}
+                {this.state.pendingYear ? (
+                  <> ({this.state.pendingYear})</>
+                ) : this.props.note.work?.year ? (
+                  <> ({this.props.note.work?.year})</>
+                ) : null}
               </div>
             </div>
           ) : null}
 
-          {/* URL and Page */}
+          {/* URL, Page, Year */}
           {edit ? (
             <>
-              <div className="width-80">
+              <div className="width-100">
                 <label htmlFor="url" className="note-full form-label">
                   URL
                 </label>
@@ -527,18 +512,6 @@ class Note extends React.Component {
                   name="url"
                   defaultValue={this.state.pendingUrl}
                   onChange={this.handleUrlChange}
-                ></input>
-              </div>
-              <div className="width-20">
-                <label htmlFor="page" className="note-full form-label">
-                  Page
-                </label>
-                <input
-                  id="page"
-                  className={'note-full page input edit'}
-                  name="url"
-                  defaultValue={this.state.pendingPage}
-                  onChange={this.handlePageChange}
                 ></input>
               </div>
             </>
@@ -591,6 +564,40 @@ class Note extends React.Component {
           ) : (
             ''
           )}
+
+          {edit ? (
+            <>
+              <div className="width-20">
+                <label htmlFor="page" className="note-full form-label">
+                  Page
+                </label>
+                <input
+                  id="page"
+                  className={'note-full page input edit'}
+                  name="url"
+                  defaultValue={this.state.pendingPage}
+                  onChange={this.handlePageChange}
+                ></input>
+              </div>
+              <div className="width-20">
+                <label htmlFor="year" className="note-full form-label">
+                  Year
+                </label>
+                <input
+                  id="year"
+                  className="note-full year input edit"
+                  defaultValue={this.state.pendingYear}
+                  onChange={this.handleYearChange}
+                ></input>
+              </div>
+              <div className={'width-20'}>
+                <label htmlFor="image" className="note-full form-label">
+                  Image
+                </label>
+                <ImageUploader onImageUpload={this.onImageUpload.bind(this)} />
+              </div>
+            </>
+          ) : null}
 
           {/* Action Bar */}
           <div className="note-full container width-100">
