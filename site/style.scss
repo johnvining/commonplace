@@ -12,13 +12,15 @@ html {
 }
 
 .main {
-  width: 100%;
+  max-width: 56em;
+  padding: 16px;
+  margin: auto;
 }
 
 body {
   background: $background_color;
   font-family: $main_font;
-  margin: 0px;
+  margin: 16px;
   padding: 0px;
 }
 

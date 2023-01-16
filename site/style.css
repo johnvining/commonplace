@@ -217,12 +217,14 @@ html {
   box-sizing: inherit; }
 
 .main {
-  width: 100%; }
+  max-width: 56em;
+  padding: 16px;
+  margin: auto; }
 
 body {
   background: #f7fcf7;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  margin: 0px;
+  margin: 16px;
   padding: 0px; }
 
 div .top-bar {
