@@ -323,26 +323,24 @@ class Note extends React.Component {
           className={this.state.largeImage >= 0 ? 'half-width' : 'full-width'}
         >
           {/* Piles */}
-          {note.piles?.length > 0 || edit || edit_piles ? (
-            <div className="note-full pile container width-100">
-              <PileListForItem
-                remove={edit_piles}
-                allowTabbing={selected || edit_piles}
-                allowAdd={selected || edit_piles || no_selection}
-                edit={edit_piles}
-                piles={note.piles}
-                onSelect={this.handleNewPile.bind(this)}
-                getSuggestions={db.getSuggestions}
-                apiType={db.types.pile}
-                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-                mainClassName="note"
-                onPileRemove={this.handlePileRemove.bind(this)}
-                onStartPileEdit={() => {
-                  this.props.onStartPileEdit(note._id)
-                }}
-              />
-            </div>
-          ) : null}
+          <div className="note-full pile container width-100">
+            <PileListForItem
+              remove={edit_piles}
+              allowTabbing={selected || edit_piles}
+              allowAdd={selected || edit_piles || no_selection}
+              edit={edit_piles}
+              piles={note.piles}
+              onSelect={this.handleNewPile.bind(this)}
+              getSuggestions={db.getSuggestions}
+              apiType={db.types.pile}
+              handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+              mainClassName="note"
+              onPileRemove={this.handlePileRemove.bind(this)}
+              onStartPileEdit={() => {
+                this.props.onStartPileEdit(note._id)
+              }}
+            />
+          </div>
 
           {/* Title and Year */}
           {edit ? (
