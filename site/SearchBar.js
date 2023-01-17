@@ -21,8 +21,11 @@ class SearchBar extends React.Component {
     work: 'work',
     slim: 'slim',
     flip: 'flip',
-    file: 'file',
-    home: 'home'
+    file: 'file'
+  }
+  keyEvents = {
+    enter: 13,
+    delete: 8
   }
 
   componentDidMount() {
@@ -58,7 +61,7 @@ class SearchBar extends React.Component {
   async handleKeyDown(event) {
     if (
       // Delete to go back
-      event.keyCode == 8 &&
+      event.keyCode == this.keyEvents.delete &&
       this.state.modifier &&
       this.state.typedText == '' &&
       !this.shouldShowAutocomplete()
@@ -68,10 +71,9 @@ class SearchBar extends React.Component {
         typedText: previousModifier + '',
         modifier: ''
       })
-      // TODO: Set focus back on the input
     } else if (
       this.state.modifier == this.modifiers.note &&
-      event.keyCode == 13
+      event.keyCode == this.keyEvents.enter
     ) {
       this.setState({ modifier: '' }, async () => {
         const response = await db.createNewNoteFromTitle(this.state.typedText)
@@ -80,15 +82,8 @@ class SearchBar extends React.Component {
       })
     } else if (
       !this.state.modifier &&
-      this.state.typedText == this.modifiers.home &&
-      event.keyCode == 13
-    ) {
-      this.props.beforeNavigate()
-      navigate('/')
-    } else if (
-      !this.state.modifier &&
       this.state.typedText == this.modifiers.slim &&
-      event.keyCode == 13
+      event.keyCode == this.keyEvents.enter
     ) {
       this.setState({ typedText: '' }, () => {
         this.props.toggleSlim()
@@ -96,7 +91,7 @@ class SearchBar extends React.Component {
       })
     } else if (
       this.state.modifier == this.modifiers.find &&
-      event.keyCode == 13
+      event.keyCode == this.keyEvents.enter
     ) {
       var search = this.state.typedText
       this.setState({ typedText: '' }, () => {
@@ -104,10 +99,11 @@ class SearchBar extends React.Component {
         navigate('/find/' + search)
       })
     } else if (
+      !this.state.modifier &&
       (this.state.typedText == this.modifiers.flip ||
         this.state.typedText == this.modifiers.file ||
         this.state.typedText == this.modifiers.home) &&
-      event.keyCode == 13
+      event.keyCode == this.keyEvents.enter
     ) {
       var destination = this.state.typedText
       if (this.state.typedText == this.modifiers.home) {
