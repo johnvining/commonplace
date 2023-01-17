@@ -236,11 +236,8 @@ div .top-bar {
   padding: 4px; }
 .top-bar .title-bar {
   display: block;
-  width: 100%;
+  width: 50%;
   align-self: flex-start; }
-  @media (min-width: 768px) {
-    .top-bar .title-bar {
-      width: 33%; } }
   .top-bar .title-bar .title {
     font-size: 28px;
     padding: 5px; }
@@ -250,11 +247,8 @@ div .top-bar {
 .top-bar .top-action-bar {
   display: inline-flex;
   justify-content: flex-end;
-  width: 100%;
+  width: 50%;
   min-height: 5em; }
-  @media (min-width: 768px) {
-    .top-bar .top-action-bar {
-      width: 67%; } }
 .top-bar .tool-bar button {
   border-style: none;
   padding: 4px;

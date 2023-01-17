@@ -36,12 +36,8 @@ body {
 
   .title-bar {
     display: block;
-    width: 100%;
+    width: 50%;
     align-self: flex-start;
-
-    @include tablet-plus {
-      width: 33%;
-    }
 
     .title {
       font-size: 28px;
@@ -55,12 +51,8 @@ body {
   .top-action-bar {
     display: inline-flex;
     justify-content: flex-end;
-    width: 100%;
+    width: 50%;
     min-height: 5em;
-
-    @include tablet-plus {
-      width: 67%;
-    }
   }
 
   .tool-bar {
