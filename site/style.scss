@@ -438,6 +438,7 @@ a {
     font-size: 28px;
     border-radius: 4px;
     border-style: solid;
+    border-color: white;
     border-width: 1px;
     margin: 4px;
     font-family: $main_font;
@@ -449,6 +450,7 @@ a {
       border-width: 1px;
       outline: none;
       color: black;
+      background: $option_blue;
     }
 
     &:not(.new)::after {

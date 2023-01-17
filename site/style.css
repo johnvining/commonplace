@@ -521,6 +521,7 @@ a {
   font-size: 28px;
   border-radius: 4px;
   border-style: solid;
+  border-color: white;
   border-width: 1px;
   margin: 4px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
@@ -530,7 +531,8 @@ a {
     border-style: solid;
     border-width: 1px;
     outline: none;
-    color: black; }
+    color: black;
+    background: #e8f4f8; }
   .search-bar.option:not(.new)::after {
     content: '?'; }
   .search-bar.option.new::before {
