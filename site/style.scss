@@ -389,6 +389,7 @@ a {
     width: 100%;
     background-color: $background_color;
     z-index: 0;
+    display: flex;
   }
 
   &.autocomplete-div {
@@ -411,11 +412,11 @@ a {
   &.search-box {
     background: transparent;
     border-style: none;
-    display: inline;
-    font-family: $main_font;
+    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     font-size: 32px;
     margin: 4px auto;
     padding: 8px;
+    width: 100%;
 
     &:focus {
       outline: none; // TODO: Fix a11y

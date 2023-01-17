@@ -485,7 +485,8 @@ a {
   border-radius: 4px;
   width: 100%;
   background-color: #f7fcf7;
-  z-index: 0; }
+  z-index: 0;
+  display: flex; }
 .search-bar.autocomplete-div {
   display: inline-block; }
 .search-bar.current-modifier {
@@ -502,11 +503,11 @@ a {
 .search-bar.search-box {
   background: transparent;
   border-style: none;
-  display: inline;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 32px;
   margin: 4px auto;
-  padding: 8px; }
+  padding: 8px;
+  width: 100%; }
   .search-bar.search-box:focus {
     outline: none; }
 .search-bar.ul {
