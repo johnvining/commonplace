@@ -235,20 +235,27 @@ div .top-bar {
   margin: 0px 0px 12px 0px;
   padding: 4px; }
 .top-bar .title-bar {
-  display: block;
+  display: none;
   width: 50%;
   align-self: flex-start; }
+  @media (min-width: 768px) {
+    .top-bar .title-bar {
+      display: block; } }
   .top-bar .title-bar .title {
     font-size: 28px;
     padding: 5px; }
     @media (min-width: 768px) {
       .top-bar .title-bar .title {
+        display: block;
         font-size: 40px; } }
 .top-bar .top-action-bar {
   display: inline-flex;
   justify-content: flex-end;
-  width: 50%;
+  width: 100%;
   min-height: 5em; }
+  @media (min-width: 768px) {
+    .top-bar .top-action-bar {
+      width: 50%; } }
 .top-bar .tool-bar button {
   border-style: none;
   padding: 4px;

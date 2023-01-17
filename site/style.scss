@@ -35,14 +35,19 @@ body {
   }
 
   .title-bar {
-    display: block;
+    display: none;
     width: 50%;
     align-self: flex-start;
+
+    @include tablet-plus {
+      display: block;
+    }
 
     .title {
       font-size: 28px;
       padding: 5px;
       @include tablet-plus {
+        display: block;
         font-size: 40px;
       }
     }
@@ -51,8 +56,11 @@ body {
   .top-action-bar {
     display: inline-flex;
     justify-content: flex-end;
-    width: 50%;
+    width: 100%;
     min-height: 5em;
+    @include tablet-plus {
+      width: 50%;
+    }
   }
 
   .tool-bar {
