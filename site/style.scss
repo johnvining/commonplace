@@ -387,6 +387,8 @@ a {
     border-style: solid;
     border-radius: 4px;
     width: 100%;
+    background-color: $background_color;
+    z-index: 0;
   }
 
   &.autocomplete-div {
