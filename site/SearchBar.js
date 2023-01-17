@@ -104,50 +104,30 @@ class SearchBar extends React.Component {
         navigate('/find/' + search)
       })
     } else if (
-      this.state.typedText == this.modifiers.flip &&
+      (this.state.typedText == this.modifiers.flip ||
+        this.state.typedText == this.modifiers.file ||
+        this.state.typedText == this.modifiers.home) &&
       event.keyCode == 13
     ) {
+      var destination = this.state.typedText
+      if (this.state.typedText == this.modifiers.home) {
+        destination = ''
+      }
       this.setState({ typedText: '' }, () => {
         this.props.beforeNavigate()
-        navigate('/flip')
-      })
-    } else if (
-      this.state.typedText == this.modifiers.file &&
-      event.keyCode == 13
-    ) {
-      this.setState({ typedText: '' }, () => {
-        this.props.beforeNavigate()
-        navigate('/file')
-      })
-    } else if (
-      this.state.typedText == this.modifiers.home &&
-      event.keyCode == 13
-    ) {
-      this.setState({ typedText: '' }, () => {
-        this.props.beforeNavigate()
-        navigate('/')
+        navigate('/' + destination)
       })
     }
   }
 
-  // TODO Clean up unused param
-  handleUpdate(id, name) {
+  handleUpdate(id) {
     switch (this.state.modifier) {
       case this.modifiers.auth:
-        this.props.beforeNavigate()
-        navigate('/auth/' + id)
-        return
       case this.modifiers.idea:
-        this.props.beforeNavigate()
-        navigate('/idea/' + id)
-        return
       case this.modifiers.work:
-        this.props.beforeNavigate()
-        navigate('/work/' + id)
-        return
       case this.modifiers.pile:
         this.props.beforeNavigate()
-        navigate('/pile/' + id)
+        navigate('/' + this.state.modifier + '/' + id)
         return
     }
 
