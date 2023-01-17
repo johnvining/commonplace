@@ -19,7 +19,10 @@ class SearchBar extends React.Component {
     note: 'note',
     pile: 'pile',
     work: 'work',
-    slim: 'slim'
+    slim: 'slim',
+    flip: 'flip',
+    file: 'file',
+    home: 'home'
   }
 
   componentDidMount() {
@@ -99,6 +102,30 @@ class SearchBar extends React.Component {
       this.setState({ typedText: '' }, () => {
         this.props.beforeNavigate()
         navigate('/find/' + search)
+      })
+    } else if (
+      this.state.typedText == this.modifiers.flip &&
+      event.keyCode == 13
+    ) {
+      this.setState({ typedText: '' }, () => {
+        this.props.beforeNavigate()
+        navigate('/flip')
+      })
+    } else if (
+      this.state.typedText == this.modifiers.file &&
+      event.keyCode == 13
+    ) {
+      this.setState({ typedText: '' }, () => {
+        this.props.beforeNavigate()
+        navigate('/file')
+      })
+    } else if (
+      this.state.typedText == this.modifiers.home &&
+      event.keyCode == 13
+    ) {
+      this.setState({ typedText: '' }, () => {
+        this.props.beforeNavigate()
+        navigate('/')
       })
     }
   }
