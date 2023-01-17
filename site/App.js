@@ -32,6 +32,8 @@ class App extends React.Component {
   handleKeyDown(event) {
     if (event.ctrlKey && event.keyCode == 79) {
       this.setState({ barOpen: !this.state.barOpen })
+    } else if (event.keyCode == 27 && this.state.barOpen) {
+      this.setState({ barOpen: false })
     }
   }
 
