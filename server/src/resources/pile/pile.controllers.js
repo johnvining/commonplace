@@ -16,6 +16,14 @@ export const reqGetNotesForPile = async (req, res) => {
   return doc
 }
 
+export const reqGetPileList = async (req, res) => {
+  const doc = await findPiles({}, { name: 1 })
+  if (!doc) {
+    return res.status(400).end()
+  }
+  return doc
+}
+
 export const reqGetWorksForPile = async (req, res) => {
   const doc = await getWorksForPile(req.params.id)
   if (!doc) {
@@ -103,6 +111,20 @@ export const deletePile = async function(pileId) {
 export const findOrCreatePile = async name => {
   if (!name) return
   return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
+}
+
+export const findPiles = async function(
+  searchObject,
+  sortObject,
+  skip = 0,
+  limit = 100
+) {
+  return await Pile.find(searchObject)
+    .sort(sortObject)
+    .skip(skip)
+    .limit(limit)
+    .lean()
+    .exec()
 }
 
 export const getWorksForPile = async function(pileId) {
