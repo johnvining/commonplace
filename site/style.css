@@ -4,7 +4,7 @@
   border-style: solid;
   border-width: 2px;
   border-radius: 4px;
-  margin: 4px;
+  margin: 0px 0px 4px 0px;
   padding: 4px;
   display: flex;
   flex-wrap: wrap; }
@@ -623,7 +623,6 @@ a.grid-link {
   .multi-select.button {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
-    margin: 2px;
     background-color: #efefef;
     border-width: 2px;
     border-color: white;
