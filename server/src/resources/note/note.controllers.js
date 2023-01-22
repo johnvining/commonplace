@@ -39,7 +39,7 @@ export const reqGetRecentNotes = async (req, res) => {
 export const reqGetEarliestNotesToFile = async (req, res) => {
   // TODO: Faster way to do this? -- size: 0 may be slow
   return findNotesAndPopulate(
-    { $or: [{ title: '' }, { ideas: { $size: 0 } }] },
+    { ideas: { $size: 0 } },
     { updatedAt: 1 },
     false,
     (req.params.skip - 1) * pageSize,
