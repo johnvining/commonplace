@@ -232,8 +232,7 @@ div .top-bar {
   display: flex;
   flex-wrap: wrap;
   height: 4em;
-  margin: 0px 0px 12px 0px;
-  padding: 4px; }
+  margin: 0px 0px 12px 0px; }
 .top-bar .title-bar {
   display: none;
   width: 50%;
@@ -265,7 +264,7 @@ div .top-bar {
   border-radius: 4px;
   border-style: solid; }
 .top-bar .tool-bar.div {
-  padding: 10px;
+  margin: 0px 00px 0px 10px;
   align-self: center; }
 .top-bar .tool-bar .button {
   background: #efefef; }

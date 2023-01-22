@@ -31,7 +31,6 @@ body {
     flex-wrap: wrap;
     height: 4em;
     margin: 0px 0px 12px 0px;
-    padding: 4px;
   }
 
   .title-bar {
@@ -75,7 +74,7 @@ body {
     }
 
     &.div {
-      padding: 10px;
+      margin: 0px 00px 0px 10px;
       align-self: center;
     }
 
