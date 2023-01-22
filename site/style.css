@@ -232,7 +232,10 @@ div .top-bar {
   display: flex;
   flex-wrap: wrap;
   height: 4em;
-  margin: 0px 0px 12px 0px; }
+  margin: 0px 0px 12px 0px;
+  position: sticky;
+  top: 0;
+  background: #f7fcf7; }
 .top-bar .title-bar {
   display: none;
   width: 50%;
@@ -251,7 +254,7 @@ div .top-bar {
   display: inline-flex;
   justify-content: flex-end;
   width: 100%;
-  min-height: 5em; }
+  min-height: 4em; }
   @media (min-width: 768px) {
     .top-bar .top-action-bar {
       width: 50%; } }
