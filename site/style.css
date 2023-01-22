@@ -5,7 +5,7 @@
   border-width: 2px;
   border-radius: 4px;
   margin: 0px 0px 4px 0px;
-  padding: 4px;
+  padding: 2px;
   display: flex;
   flex-wrap: wrap; }
   .note-full.outer:focus {
@@ -38,8 +38,12 @@
 .note-full .year,
 .note-full .page,
 .note-full .url {
-  margin: 4px;
-  padding: 4px; }
+  margin: 2px;
+  padding: 2px; }
+.note-full .action-bar,
+.note-full .title {
+  margin: 2px;
+  padding: 0px; }
 .note-full .title,
 .note-full .year,
 .note-full .page,
@@ -59,26 +63,25 @@
 .note-full .width-80 {
   width: 100%;
   margin: 0px;
-  padding: 8px; }
+  padding: 2px; }
   @media (min-width: 768px) {
     .note-full .width-80 {
       width: 75%; } }
 .note-full .width-20 {
   width: 100%;
   margin: 0px;
-  padding: 8px; }
+  padding: 2px; }
   @media (min-width: 768px) {
     .note-full .width-20 {
       width: 25%; } }
 .note-full .width-100 {
   width: 100%;
   margin: 0px;
-  padding: 8px; }
+  padding: 2px; }
 .note-full .year,
 .note-full .page {
   width: 100%;
   text-align: left;
-  margin: 0px 12px 0px 0px;
   border-radius: 4px; }
   .note-full .year.edit,
   .note-full .page.edit {
@@ -88,7 +91,7 @@
     width: 100%;
     text-align: left; }
 .note-full .citation {
-  padding: 4px; }
+  padding: 2px; }
 .note-full .note-text,
 .note-full .note-take {
   border-radius: 4px;
@@ -98,7 +101,7 @@
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 14px;
   margin: auto;
-  padding: 8px;
+  padding: 2px;
   resize: none;
   white-space: pre-wrap;
   width: 100%; }
@@ -114,7 +117,6 @@
 .note-full .url {
   width: 100%;
   text-align: left;
-  margin: 0px 12px 0px 0px;
   border-radius: 4px; }
   .note-full .title.edit,
   .note-full .url.edit {
@@ -127,7 +129,7 @@
   font-size: 18px; }
 .note-full .note-text,
 .note-full .note-take {
-  padding: 4px; }
+  padding: 2px; }
   .note-full .note-text.imputed, .note-full .note-text.work,
   .note-full .note-take.imputed,
   .note-full .note-take.work {
@@ -187,7 +189,7 @@ input .note-full .edit-author, input
   color: #393939;
   display: inline;
   margin: 0px;
-  padding: 4px;
+  padding: 2px;
   font-size: 18px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
   .note-full .edit-author.option::after,
