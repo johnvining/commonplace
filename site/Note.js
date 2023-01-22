@@ -9,6 +9,7 @@ import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
 import link from './icons/link.svg'
 import tags from './icons/tags.svg'
+import pile_img from './icons/stack.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 import PileListForItem from './PileListForItem'
@@ -106,17 +107,6 @@ class Note extends React.Component {
       this.setState({ pendingUrl: val.target.value })
     }
   }
-
-  handleNewIdea = ideaId => {
-    db.addLinkToRecord(db.types.idea, ideaId, db.types.note, this.props.id)
-      .then(() => {
-        this.props.refetchMe(this.props.index)
-      })
-      .catch(e => {
-        console.error(e)
-      })
-  }
-
   // TODO: Clear entry after assignment
   handleCreateIdeaAndAddToNote = ideaName => {
     db.createAndLinkToRecord(
@@ -128,7 +118,21 @@ class Note extends React.Component {
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
+      .catch(e => {
+        console.error(e)
+      })
+  }
 
+  handleCreatePileAndAssign(pileName) {
+    db.createAndLinkToRecord(
+      db.types.pile,
+      pileName,
+      db.types.note,
+      this.props.id
+    )
+      .then(() => {
+        this.props.refetchMe(this.props.index)
+      })
       .catch(e => {
         console.error(e)
       })
@@ -221,23 +225,24 @@ class Note extends React.Component {
     }
   }
 
-  async handleNewPile(pile) {
-    db.addLinkToRecord(db.types.pile, pile, db.types.note, this.props.id).then(
-      () => {
+  handleNewPile = pileId => {
+    db.addLinkToRecord(db.types.pile, pileId, db.types.note, this.props.id)
+      .then(() => {
         this.props.refetchMe(this.props.index)
-      }
-    )
+      })
+      .catch(e => {
+        console.error(e)
+      })
   }
 
-  async handleCreatePileAndAssign(pileName) {
-    db.createAndLinkToRecord(
-      db.types.pile,
-      pileName,
-      db.types.note,
-      this.props.id
-    ).then(() => {
-      this.props.refetchMe(this.props.index)
-    })
+  handleNewIdea = ideaId => {
+    db.addLinkToRecord(db.types.idea, ideaId, db.types.note, this.props.id)
+      .then(() => {
+        this.props.refetchMe(this.props.index)
+      })
+      .catch(e => {
+        console.error(e)
+      })
   }
 
   async handlePileRemove(pileId) {
@@ -530,8 +535,8 @@ class Note extends React.Component {
               <PileListForItem
                 remove={edit_piles}
                 allowTabbing={selected || edit_piles}
-                allowAdd={selected || edit_piles || no_selection}
-                edit={edit_piles}
+                allowAdd={false}
+                edit={false}
                 piles={note.piles}
                 onSelect={this.handleNewPile.bind(this)}
                 getSuggestions={db.getSuggestions}
@@ -631,19 +636,33 @@ class Note extends React.Component {
                 </>
               ) : (
                 <>
-                  {edit_ideas ? (
+                  {edit_ideas || edit_piles ? (
                     <Autocomplete
-                      inputName={this.props.id + 'idea'}
-                      className={'idea'}
+                      inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
+                      className={edit_ideas ? 'idea' : 'pile'}
                       clearOnSelect={true}
                       escape={() => {
-                        this.setState({ addIdea: false })
+                        edit_ideas
+                          ? this.setState({ edit_ideas: false })
+                          : this.setState({ edit_piles: false })
                       }}
-                      onSelect={this.handleNewIdea}
-                      handleNewSelect={this.handleCreateIdeaAndAddToNote}
+                      onSelect={
+                        edit_ideas
+                          ? this.handleNewIdea.bind(this)
+                          : this.handleNewPile.bind(this)
+                      }
+                      handleNewSelect={
+                        edit_ideas
+                          ? this.handleCreateIdeaAndAddToNote.bind(this)
+                          : this.handleCreatePileAndAssign.bind(this)
+                      }
                       getSuggestions={db.getSuggestions}
-                      apiType={db.types.idea}
-                      excludeIds={note.ideas.map(idea => idea._id)}
+                      apiType={edit_ideas ? db.types.idea : db.types.pile}
+                      excludeIds={
+                        edit_ideas
+                          ? note.ideas.map(idea => idea._id)
+                          : note.piles.map(pile => pile._id)
+                      }
                     />
                   ) : (
                     // Neither editing whole note nor ideas
@@ -659,6 +678,18 @@ class Note extends React.Component {
                         tabIndex="-1"
                       >
                         <img src={tags}></img>
+                      </button>
+                      <button
+                        className={'action-button'}
+                        onClick={() => {
+                          this.props.setNoteMode(
+                            this.props.id,
+                            constants.note_modes.EDIT_PILES
+                          )
+                        }}
+                        tabIndex="-1"
+                      >
+                        <img src={pile_img}></img>
                       </button>
                       <Link to={'/note/' + this.props.id}>
                         <button className={'action-button'} tabIndex="-1">
