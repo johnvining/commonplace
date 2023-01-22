@@ -614,6 +614,7 @@ a.grid-link {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
     margin: 2px;
+    background-color: #efefef;
     border-width: 2px;
     border-color: white;
     border-radius: 4px;
