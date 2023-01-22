@@ -8,6 +8,7 @@ import Find from './Find'
 import Idea from './Idea'
 import NoteView from './NoteView'
 import Pile from './Pile'
+import PileHome from './PileHome'
 import plus from './icons/plus.svg'
 import React from 'react'
 import RecentList from './RecentList'
@@ -146,6 +147,11 @@ class App extends React.Component {
           />
           <Pile
             path="/pile/:id"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <PileHome
+            path="/piles"
             viewMode={this.state.viewMode}
             setPageTitle={this.setPageTitle.bind(this)}
           />
