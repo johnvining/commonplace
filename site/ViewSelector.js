@@ -23,8 +23,8 @@ class SearchBar extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.SLIM
-              ? 'button-selected'
-              : 'button'
+              ? 'button-selected middle'
+              : 'button middle'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.SLIM)

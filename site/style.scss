@@ -68,10 +68,20 @@ body {
       border-style: none;
       padding: 4px;
       margin: 0px;
+      border-width: 2px;
+      border-color: white;
+      border-radius: 4px;
+      border-style: solid;
+    }
+
+    &.div {
+      padding: 10px;
+      align-self: center;
     }
 
     .button {
       background: $button_background;
+
     }
 
     .button:hover {
@@ -80,28 +90,35 @@ body {
 
     .button-selected {
       background: $button_selected;
+
+      
+    }
+
+    .left {
+      border-radius: 5px 0px 0px 5px;
+      border-right: 0px;
+    }
+
+    .right {
+      border-radius: 0px 5px 5px 0px;
+      border-left: 0px;
+    }
+
+    .left-right {
+      border-radius: 5px 5px 5px 5px;
+    }
+
+    .middle {
+      border-radius: 0px;
+      border-left: 0px;
+      border-right: 0px;
     }
 
     .button-selected:focus {
       outline: none;
     }
 
-    &.div {
-      padding: 10px;
-      align-self: center;
-    }
 
-    .left {
-      border-radius: 5px 0px 0px 5px;
-    }
-
-    .right {
-      border-radius: 0px 5px 5px 0px;
-    }
-
-    .left-right {
-      border-radius: 5px 5px 5px 5px;
-    }
   }
 }
 
@@ -184,8 +201,6 @@ a {
   &.label {
     background-color: $option_blue;
     border-style: solid;
-
-    border-radius: 4px;
     border-radius: 4px;
     border-style: solid;
     border-color: white;
@@ -570,8 +585,7 @@ a.grid-link {
   }
 
   &.button:hover {
-    background: lightblue;
-    cursor: pointer;
+    @include button-hover($button_background_hover);
   }
 
   &.button:focus {

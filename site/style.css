@@ -259,27 +259,37 @@ div .top-bar {
 .top-bar .tool-bar button {
   border-style: none;
   padding: 4px;
-  margin: 0px; }
+  margin: 0px;
+  border-width: 2px;
+  border-color: white;
+  border-radius: 4px;
+  border-style: solid; }
+.top-bar .tool-bar.div {
+  padding: 10px;
+  align-self: center; }
 .top-bar .tool-bar .button {
   background: #efefef; }
 .top-bar .tool-bar .button:hover {
   background-color: lightcyan;
   cursor: pointer;
   outline: none;
-  border-color: black; }
+  border-color: white; }
 .top-bar .tool-bar .button-selected {
   background: lightblue; }
-.top-bar .tool-bar .button-selected:focus {
-  outline: none; }
-.top-bar .tool-bar.div {
-  padding: 10px;
-  align-self: center; }
 .top-bar .tool-bar .left {
-  border-radius: 5px 0px 0px 5px; }
+  border-radius: 5px 0px 0px 5px;
+  border-right: 0px; }
 .top-bar .tool-bar .right {
-  border-radius: 0px 5px 5px 0px; }
+  border-radius: 0px 5px 5px 0px;
+  border-left: 0px; }
 .top-bar .tool-bar .left-right {
   border-radius: 5px 5px 5px 5px; }
+.top-bar .tool-bar .middle {
+  border-radius: 0px;
+  border-left: 0px;
+  border-right: 0px; }
+.top-bar .tool-bar .button-selected:focus {
+  outline: none; }
 
 .page-title {
   font-size: 20px;
@@ -340,7 +350,6 @@ a {
 .idea.label {
   background-color: #e8f4f8;
   border-style: solid;
-  border-radius: 4px;
   border-radius: 4px;
   border-style: solid;
   border-color: white;
@@ -623,8 +632,10 @@ a.grid-link {
     .multi-select.button.hidden {
       display: none; }
   .multi-select.button:hover {
-    background: lightblue;
-    cursor: pointer; }
+    background-color: lightcyan;
+    cursor: pointer;
+    outline: none;
+    border-color: white; }
   .multi-select.button:focus {
     border-color: black;
     outline: none; }

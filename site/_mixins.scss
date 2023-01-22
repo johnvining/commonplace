@@ -2,7 +2,7 @@
   background-color: $background_color;
   cursor: pointer;
   outline: none; // TODO: Fix -- accessibility
-  border-color: black;
+  border-color: white;
 }
 
 @mixin note-edit-focus() {
