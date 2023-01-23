@@ -354,7 +354,7 @@ a {
   &.option {
     background: transparent;
     border: none;
-    color: #393939;
+    color: $grey5;
     display: inline;
     margin: 0px;
     padding: 4px;
@@ -470,7 +470,7 @@ a {
 // TODO: Sassify Slim
 
 .note-slim-outer {
-  color: green;
+  color: $grey2;
   display: flex;
   padding: 8px;
   margin: 8px;
@@ -865,7 +865,7 @@ a {
     &.option {
       background: transparent;
       border: none;
-      color: #393939;
+      color: $grey5;
       display: inline;
       margin: 0px;
       padding: 4px;
