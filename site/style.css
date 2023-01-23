@@ -340,7 +340,7 @@ a {
     .action-bar .action-button:hover {
       background-color: white; }
     .action-bar .action-button:focus {
-      box-shadow: 0px 0px 4px 4px #dadada;
+      box-shadow: 0px 0px 4px 4px darkgrey;
       outline: none; }
 
 .idea.container, .pile.container {

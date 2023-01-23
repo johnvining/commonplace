@@ -71,7 +71,7 @@ body {
       padding: 4px;
       margin: 0px;
       border-width: 2px;
-      border-color: white;
+      border-color: $white;
       border-radius: 4px;
       border-style: solid;
     }
@@ -141,7 +141,7 @@ a {
     padding: 8px;
     margin: 2px;
     border-width: 2px;
-    border-color: white;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
     background-color:$button_background;
@@ -169,7 +169,7 @@ a {
     background-color: transparent;
 
     &:hover {
-      background-color: white;
+      background-color: $white;
     }
 
     &:focus {
@@ -214,8 +214,8 @@ a {
     border-style: solid;
     border-radius: 4px;
     border-style: solid;
-    border-color: white;
-    color: black;
+    border-color: $white;
+    color: $black;
     font-size: 15px;
     margin: 2px;
     padding: 4px;
@@ -223,11 +223,11 @@ a {
     font-family: $main_font;
 
     &:focus {
-      border-color: black;
+      border-color: $black;
     }
 
     &:hover {
-      background-color: $selection_yellow;
+      background-color: $semantic_selection;
       cursor: pointer;
     }
 
@@ -269,7 +269,7 @@ a {
     border-radius: 4px;
     border-style: none;
     border-width: 0px;
-    color: black;
+    color: $black;
     cursor: pointer;
     font-size: 15px;
     margin: 2px;
@@ -303,10 +303,10 @@ a {
 .pile-select {
   &.search-box {
     background-color: $note_background_edit;
-    border-color: white;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
-    color: black;
+    color: $black;
     font-family: $main_font;
     font-size: 18px;
     margin: 0px;
@@ -315,10 +315,10 @@ a {
   }
 
   &.button {
-    border-color: white;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
-    color: black;
+    color: $black;
     font-family: $main_font;
     font-size: 18px;
     margin: 0px;
@@ -328,7 +328,7 @@ a {
 
     &:hover {
       cursor: pointer;
-      background-color: $selection_yellow;
+      background-color: $semantic_selection;
       outline: none;
     }
   }
@@ -396,10 +396,10 @@ a {
   }
 
   &.current-modifier {
-    background: black;
+    background: $black;
     border-radius: 4px;
     border-style: none;
-    color: white;
+    color: $white;
     display: inline-block;
     font-family: $main_font;
     font-size: 32px;
@@ -437,19 +437,19 @@ a {
     font-size: 28px;
     border-radius: 4px;
     border-style: solid;
-    border-color: white;
+    border-color: $white;
     border-width: 1px;
     margin: 4px;
     font-family: $main_font;
 
     &:focus {
-      border-color: black;
+      border-color: $black;
       border-radius: 4px;
       border-style: solid;
       border-width: 1px;
       outline: none;
-      color: black;
-      background: $option_blue;
+      color: $black;
+      background: $highlight_blue;
     }
 
     &:not(.new)::after {
@@ -478,7 +478,7 @@ a {
   background-color: transparent;
 
   &.selected {
-    background-color: $selection_yellow;
+    background-color: $semantic_selection;
   }
 
   a {
@@ -497,7 +497,7 @@ a {
   display: inline-block;
   vertical-align: middle;
   width: 100%;
-  background: $selection_yellow;
+  background: $semantic_selection;
   align-items: center;
 }
 
@@ -549,7 +549,7 @@ a.grid-link {
     padding: 8px;
     background-color: $grey2;
     border-width: 2px;
-    border-color: white;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
     height: 42px;
@@ -564,7 +564,7 @@ a.grid-link {
   }
 
   &.button:focus {
-    border-color: black;
+    border-color: $black;
     outline: none;
   }
 
@@ -573,7 +573,7 @@ a.grid-link {
     padding: 8px;
     margin: 2px;
     border-width: 2px;
-    border-color: black;
+    border-color: $black;
     border-radius: 4px;
     border-style: solid;
   }
@@ -596,7 +596,7 @@ a.grid-link {
     padding: 8px;
     margin: 2px;
     border-width: 2px;
-    border-color: white;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
     background: transparent;
@@ -604,7 +604,7 @@ a.grid-link {
 
   &.option:focus,
   &.option-new:focus {
-    border-color: black;
+    border-color: $black;
   }
 
   // TODO: Create a mixin for the add button
@@ -665,16 +665,16 @@ a.grid-link {
     display: flex;
 
     &.selected {
-      background-color: white;
+      background-color: $white;
     }
 
     &:hover {
-      background-color: $selection_yellow;
+      background-color: $semantic_selection;
       cursor: pointer;
     }
 
     &.remove:hover {
-      background-color: $removal;
+      background-color: $semantic_removal;
     }
   }
 
@@ -702,7 +702,7 @@ a.grid-link {
     margin: 4px;
 
     &:hover {
-      background-color: white;
+      background-color: $white;
       border-radius: 4px;
     }
   }
@@ -721,7 +721,7 @@ a.grid-link {
   .idea {
     border-radius: 4px;
     border-style: none;
-    color: black;
+    color: $black;
     font-size: 13px;
     margin: 4px;
     padding: 2px;
@@ -730,7 +730,7 @@ a.grid-link {
   }
 
   .pile {
-    background-color: white;
+    background-color: $white;
   }
 
   .pile::before {
@@ -809,7 +809,7 @@ a {
 .work-page {
   &.title {
     background-color: transparent;
-    border-color: white;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
     border-width: 1px;
@@ -828,7 +828,7 @@ a {
     padding: 4px;
     border-radius: 4px;
     border-style: solid;
-    border-color: white;
+    border-color: $white;
     border-width: 1px;
   }
 
@@ -842,7 +842,7 @@ a {
       padding: 4px;
       border-radius: 4px;
       border-style: solid;
-      border-color: white;
+      border-color: $white;
       border-width: 1px;
     }
 
@@ -890,7 +890,7 @@ a {
   &.year,
   &.url {
     background-color: transparent;
-    border-color: white;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
     border-width: 1px;
@@ -905,7 +905,7 @@ a {
     padding: 4px;
     border-radius: 4px;
     border-style: solid;
-    border-color: white;
+    border-color: $white;
     border-width: 1px;
   }
 

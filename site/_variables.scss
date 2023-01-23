@@ -6,6 +6,7 @@ $sans_font: 'Avenir', 'Candara', 'Arial', sans-serif;
 // $standard_button_border: 2px;
 // $standard_button_border-radius: 4px;
 
+// Images
 $image_add_background: '/icons/plus.svg';
 $image_remove_background: '/icons/cross.svg';
 $image_stack_background: '/icons/stack.svg';
@@ -14,39 +15,39 @@ $image_tags_background: '/icons/tags.svg';
 // Actual Colors
 $theme_blue: #add8e6;
 $theme_mint: #F7FCF7;
-$highlight: lighten($theme_blue, 15%);
-$highlight_dark: lighten($theme_blue, 5%);
-$option_blue: $highlight;
-$removal: lightcoral;
+$theme_yellow: lightgoldenrodyellow;
+$theme_coral: lightcoral;
+$highlight_blue: lighten($theme_blue, 15%);
+$highlight_blue_dark: lighten($theme_blue, 5%);
+
 $grey1: #f4f4f4;
 $grey2: #efefef;
-$grey3: #d3d3d3;
-$grey4: #dadada;
+// $grey3: #d3d3d3;
+// $grey4: #dadada;
 $grey5: darkgray;
 $black: black;
 $white: white;
 
-// Semantic Colors
+
+$semantic_idea: $highlight_blue;
+$semantic_pile: $grey2;
+$semantic_selection: $theme_yellow;
+$semantic_removal: $theme_coral;
+
 $background_color: $theme_mint;
+$link_color: black;
 
 $note_background_edit: $white;
 $note_background_not_selected: $grey1;
 $note_background: $white;
-$note_border_edit: $highlight;
+$note_border_edit: $highlight_blue;
 $note_border_focused: $grey5;
 $note_border_selected: $black;
 $note_border: $grey2;
 $note_input_background: $grey1;
-$note_input_background_focus: $highlight;
+$note_input_background_focus: $highlight_blue;
 
 $button_background: $grey2;
-$button_background_hover: $highlight;
-$button_selected: $highlight_dark;
-$button_shadow_color: $grey4;
-
-$semantic_idea: $highlight;
-$semantic_pile: $grey2;
-
-$selection_yellow: lightgoldenrodyellow;
-
-$link_color: black;
+$button_background_hover: $highlight_blue;
+$button_selected: $highlight_blue_dark;
+$button_shadow_color: $grey5;
