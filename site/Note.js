@@ -672,18 +672,6 @@ class Note extends React.Component {
                         onClick={() => {
                           this.props.setNoteMode(
                             this.props.id,
-                            constants.note_modes.EDIT_IDEAS
-                          )
-                        }}
-                        tabIndex="-1"
-                      >
-                        <img src={tags}></img>
-                      </button>
-                      <button
-                        className={'action-button'}
-                        onClick={() => {
-                          this.props.setNoteMode(
-                            this.props.id,
                             constants.note_modes.EDIT_PILES
                           )
                         }}
@@ -691,12 +679,23 @@ class Note extends React.Component {
                       >
                         <img src={pile_img}></img>
                       </button>
+                      <button
+                        className={'action-button'}
+                        onClick={() => {
+                          this.props.setNoteMode(
+                            this.props.id,
+                            constants.note_modes.EDIT_IDEAS
+                          )
+                        }}
+                        tabIndex="-1"
+                      >
+                        <img src={tags}></img>
+                      </button>
                       <Link to={'/note/' + this.props.id}>
                         <button className={'action-button'} tabIndex="-1">
                           <img src={document_image}></img>
                         </button>
                       </Link>
-
                       <button
                         className={'action-button'}
                         onClick={() => {
