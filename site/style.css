@@ -15,7 +15,7 @@
     border-color: black; }
   .note-full.outer.edit-note, .note-full.outer.edit-idea {
     background-color: white;
-    border-color: #c1e1ec; }
+    border-color: #e8f4f8; }
   .note-full.outer.not-selected {
     background-color: #f4f4f4; }
 .note-full .half-width,
@@ -55,7 +55,7 @@
   .note-full .year:focus,
   .note-full .page:focus,
   .note-full .url:focus {
-    background-color: #c1e1ec;
+    background-color: #e8f4f8;
     outline: none;
     border-radius: 2px; }
 .note-full .url {
@@ -110,7 +110,7 @@
     background-color: #f4f4f4; }
   .note-full .note-text:focus,
   .note-full .note-take:focus {
-    background-color: #c1e1ec;
+    background-color: #e8f4f8;
     outline: none;
     border-radius: 2px; }
 .note-full .title,
@@ -156,7 +156,7 @@
   text-decoration: none; }
   .note-full .edit-author.search-box:focus,
   .note-full .edit-work.search-box:focus {
-    background-color: #c1e1ec;
+    background-color: #e8f4f8;
     outline: none;
     border-radius: 2px; }
 input .note-full .edit-author, input
@@ -274,20 +274,20 @@ div .top-bar {
 .top-bar .tool-bar .button {
   background: #efefef; }
 .top-bar .tool-bar .button:hover {
-  background-color: lightcyan;
+  background-color: #e8f4f8;
   cursor: pointer;
   outline: none;
   border-color: white; }
 .top-bar .tool-bar .button-selected {
-  background: lightblue; }
+  background: #c1e1ec; }
 .top-bar .tool-bar .left {
-  border-radius: 5px 0px 0px 5px;
+  border-radius: 4px 0px 0px 4px;
   border-right: 0px; }
 .top-bar .tool-bar .right {
-  border-radius: 0px 5px 5px 0px;
+  border-radius: 0px 4px 4px 0px;
   border-left: 0px; }
 .top-bar .tool-bar .left-right {
-  border-radius: 5px 5px 5px 5px; }
+  border-radius: 4px 4px 4px 4px; }
 .top-bar .tool-bar .middle {
   border-radius: 0px;
   border-left: 0px;
@@ -319,7 +319,7 @@ a {
   background-color: #efefef;
   height: 42px; }
   .top-level.button:hover {
-    background-color: lightcyan;
+    background-color: #e8f4f8;
     cursor: pointer;
     outline: none;
     border-color: white; }
@@ -335,7 +335,7 @@ a {
     margin: 4px;
     padding: 4px;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 4px;
     background-color: transparent; }
     .action-bar .action-button:hover {
       background-color: white; }
@@ -343,18 +343,27 @@ a {
       box-shadow: 0px 0px 4px 4px #dadada;
       outline: none; }
 
-.idea.container {
-  font-size: 15px;
+.idea.container, .pile.container {
   background-color: transparent;
   width: 60%;
   border: none;
   font-size: 18px;
   margin: 0px;
   padding: 2px; }
-.idea.search-box {
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-.idea.label {
-  background-color: #e8f4f8;
+.idea.search-box, .pile.search-box {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  border: solid;
+  border-radius: 4px;
+  font-size: 15px;
+  margin: 4px;
+  padding: 4px; }
+  .idea.search-box:focus, .pile.search-box:focus {
+    outline: none; }
+  .idea.search-box.pile, .pile.search-box.pile {
+    border-color: #efefef; }
+  .idea.search-box.idea, .pile.search-box.idea {
+    border-color: #e8f4f8; }
+.idea.label, .pile.label {
   border-style: solid;
   border-radius: 4px;
   border-style: solid;
@@ -365,31 +374,33 @@ a {
   padding: 4px;
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .idea.label:focus {
+  .idea.label:focus, .pile.label:focus {
     border-color: black; }
-  .idea.label:hover {
+  .idea.label:hover, .pile.label:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
-  .idea.label.edit::after {
+  .idea.label.edit::after, .pile.label.edit::after {
     background-image: url("/icons/cross.svg");
     background-size: 15px 15px;
     display: inline-block;
     width: 14px;
     height: 14px;
     content: ''; }
-.idea.ul {
+  .idea.label.pile, .pile.label.pile {
+    background-color: #efefef; }
+  .idea.label.idea, .pile.label.idea {
+    background-color: #e8f4f8; }
+.idea.ul, .pile.ul {
   display: block;
   margin: 0px;
   padding: 0px; }
-.idea.li {
+.idea.li, .pile.li {
   display: inline;
   margin: 0px;
   padding: 0px; }
-.idea.autocomplete-div {
+.idea.autocomplete-div, .pile.autocomplete-div {
   text-align: right; }
-.idea .option {
-  background-color: #e8f4f8;
-  border-radius: 2px;
+.idea .option, .pile .option {
   border-radius: 4px;
   border-style: none;
   border-width: 0px;
@@ -400,46 +411,19 @@ a {
   padding: 4px;
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .idea .option::after {
+  .idea .option.pile, .pile .option.pile {
+    background-color: #efefef; }
+  .idea .option.idea, .pile .option.idea {
+    background-color: #e8f4f8; }
+  .idea .option::after, .pile .option::after {
     content: '? '; }
-  .idea .option.new::before {
+  .idea .option.new::before, .pile .option.new::before {
     background-image: url("/icons/plus.svg");
     background-size: 17px 17px;
     display: inline-block;
     width: 17px;
     height: 15px;
     content: ''; }
-
-.pile.label {
-  border-radius: 4px;
-  border-style: solid;
-  border-color: white;
-  color: black;
-  font-size: 15px;
-  margin: 2px;
-  padding: 4px;
-  text-decoration: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  background-color: #efefef; }
-  .pile.label.remove::after {
-    background-image: url("/icons/cross.svg");
-    background-size: 15px 15px;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    content: ''; }
-  .pile.label.remove:hover {
-    background-color: lightcoral; }
-  .pile.label::before {
-    background-image: url("/icons/stack.svg");
-    background-size: 15px 15px;
-    display: inline-block;
-    width: 16px;
-    height: 14px;
-    content: ''; }
-  .pile.label:hover {
-    background-color: lightgoldenrodyellow;
-    cursor: pointer; }
 
 .pile-select.search-box {
   background-color: white;
@@ -637,7 +621,7 @@ a.grid-link {
     .multi-select.button.hidden {
       display: none; }
   .multi-select.button:hover {
-    background-color: lightcyan;
+    background-color: #e8f4f8;
     cursor: pointer;
     outline: none;
     border-color: white; }
@@ -750,7 +734,6 @@ div .image-row {
   .slim-inner-container .pile,
   .slim-inner-container .idea {
     border-radius: 4px;
-    border-radius: 4px;
     border-style: none;
     color: black;
     font-size: 13px;
@@ -839,7 +822,7 @@ a {
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 20px;
-  background-color: lightblue;
+  background-color: #c1e1ec;
   padding: 4px;
   border-radius: 4px;
   border-style: solid;
@@ -884,7 +867,7 @@ a {
   margin: 0px;
   padding: 4px; }
 .work-page.input {
-  background-color: lightblue;
+  background-color: #c1e1ec;
   padding: 4px;
   border-radius: 4px;
   border-style: solid;

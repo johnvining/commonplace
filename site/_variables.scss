@@ -12,11 +12,10 @@ $image_stack_background: '/icons/stack.svg';
 $image_tags_background: '/icons/tags.svg';
 
 // Actual Colors
-$background_color: hsl(120, 50%, 98%);
-$link_color: black;
-$highlight: lighten(#add8e6, 15%);
-$highlight_dark: lighten(#add8e6, 5%);
-$selection_yellow: lightgoldenrodyellow;
+$theme_blue: #add8e6;
+$theme_mint: #F7FCF7;
+$highlight: lighten($theme_blue, 15%);
+$highlight_dark: lighten($theme_blue, 5%);
 $option_blue: $highlight;
 $removal: lightcoral;
 $grey1: #f4f4f4;
@@ -28,17 +27,26 @@ $black: black;
 $white: white;
 
 // Semantic Colors
+$background_color: $theme_mint;
+
 $note_background_edit: $white;
 $note_background_not_selected: $grey1;
-$note_background: $white;
-$note_border_edit: $highlight_dark;
+$note_background: white;
+$note_border_edit: $highlight;
 $note_border_focused: $grey5;
 $note_border_selected: $black;
 $note_border: $grey2;
 $note_input_background: $grey1;
-$note_input_background_focus: $highlight_dark;
+$note_input_background_focus: $highlight;
 
 $button_background: $grey2;
-$button_background_hover: lightcyan;
-$button_selected: lightblue;
+$button_background_hover: $highlight;
+$button_selected: $highlight_dark;
 $button_shadow_color: $grey4;
+
+$semantic_idea: $highlight;
+$semantic_pile: $grey2;
+
+$selection_yellow: lightgoldenrodyellow;
+
+$link_color: black;
