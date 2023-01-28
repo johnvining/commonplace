@@ -269,7 +269,7 @@ class NoteList extends React.Component {
               <div>
                 <button
                   onClick={this.delete.bind(this)}
-                  className="multi-select button"
+                  className="multi-select standard-button left-right"
                 >
                   Delete
                 </button>
@@ -277,7 +277,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.idea })
                   }}
-                  className="multi-select button"
+                  className="multi-select standard-button left"
                 >
                   Idea
                 </button>
@@ -285,7 +285,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.work })
                   }}
-                  className="multi-select button"
+                  className="multi-select standard-button middle"
                 >
                   Work
                 </button>
@@ -293,7 +293,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.auth })
                   }}
-                  className="multi-select button"
+                  className="multi-select standard-button middle"
                 >
                   Author
                 </button>
@@ -301,7 +301,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.pile })
                   }}
-                  className="multi-select button"
+                  className="multi-select standard-button right"
                 >
                   Pile
                 </button>
@@ -309,7 +309,7 @@ class NoteList extends React.Component {
                   onClick={() => {
                     this.setState({ selected: [], lastSelectedIndex: 0 })
                   }}
-                  className="multi-select button"
+                  className="multi-select standard-button left-right"
                 >
                   Unselect All
                 </button>
@@ -321,7 +321,7 @@ class NoteList extends React.Component {
             <div>
               <button
                 onClick={this.selectAll.bind(this)}
-                className="multi-select button"
+                className="multi-select standard-button"
               >
                 Select All
               </button>
@@ -331,8 +331,8 @@ class NoteList extends React.Component {
               <button
                 className={
                   this.state.page == 1
-                    ? 'multi-select button hidden'
-                    : 'multi-select button'
+                    ? 'multi-select standard-button hidden'
+                    : 'multi-select standard-button'
                 }
                 onClick={this.decPage.bind(this)}
               >
@@ -341,7 +341,7 @@ class NoteList extends React.Component {
               </button>
 
               <button
-                className="multi-select button"
+                className="multi-select standard-button"
                 onClick={this.incPage.bind(this)}
               >
                 <img src={right} />

@@ -11,8 +11,8 @@ class SearchBar extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.FULL
-              ? 'button-selected left'
-              : 'button left'
+              ? 'standard-button button-selected left'
+              : 'standard-button left'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.FULL)
@@ -23,8 +23,8 @@ class SearchBar extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.SLIM
-              ? 'button-selected middle'
-              : 'button middle'
+              ? 'standard-button button-selected middle'
+              : 'standard-button middle'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.SLIM)
@@ -35,8 +35,8 @@ class SearchBar extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.GRID
-              ? 'button-selected right'
-              : 'button right'
+              ? 'standard-button button-selected right'
+              : 'standard-button right'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.GRID)

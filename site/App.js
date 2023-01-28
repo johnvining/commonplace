@@ -79,7 +79,7 @@ class App extends React.Component {
             <div className="top-action-bar">
               <div className="tool-bar div">
                 <button
-                  className="button left-right"
+                  className="standard-button left-right"
                   onClick={async () => {
                     this.setState({ barOpen: true })
                   }}
@@ -90,7 +90,7 @@ class App extends React.Component {
               </div>
               <div className="tool-bar div">
                 <button
-                  className="button left-right"
+                  className="standard-button left-right"
                   onClick={async () => {
                     const response = await createNewNoteFromTitle('')
                     navigate('/note/' + response.data._id + '/edit')

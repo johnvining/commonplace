@@ -24,6 +24,14 @@ body {
   padding: 0px;
 }
 
+a {
+  color: $link_color;
+}
+
+.url {
+  font-family: $monospace;
+}
+
 .top-bar {
   div & {
     width: 100%;
@@ -64,57 +72,10 @@ body {
     }
   }
 
-  .tool-bar {
-    button {
-      border-style: none;
-      padding: 4px;
-      margin: 0px;
-      border-width: 2px;
-      border-color: $white;
-      border-radius: 4px;
-      border-style: solid;
-    }
-
-    &.div {
-      margin: 0px 00px 0px 10px;
+  .tool-bar.div {
+      margin: 0px 0px 0px 10px;
       align-self: center;
-    }
-
-    .button {
-      background: $button_background;
-    }
-
-    .button:hover {
-      @include button-hover($button_background_hover);
-    }
-
-    .button-selected {
-      background: $button_selected;
-    }
-
-    .left {
-      border-radius: 4px 0px 0px 4px;
-      border-right: 0px;
-    }
-
-    .right {
-      border-radius: 0px 4px 4px 0px;
-      border-left: 0px;
-    }
-
-    .left-right {
-      border-radius: 4px 4px 4px 4px;
-    }
-
-    .middle {
-      border-radius: 0px;
-      border-left: 0px;
-      border-right: 0px;
-    }
-
-    .button-selected:focus {
-      outline: none;
-    }
+    
   }
 }
 
@@ -126,55 +87,53 @@ body {
   }
 }
 
-a {
-  color: $link_color;
-}
-
-.url {
-  font-family: $monospace;
-}
-
-.top-level {
-  &.button {
-    font-family: $main_font;
-    padding: 8px;
-    margin: 2px;
-    border-width: 2px;
+.standard-button {
+    background-color:$button_background;
     border-color: $white;
     border-radius: 4px;
     border-style: solid;
-    background-color:$button_background;
+    border-width: 2px;
+    font-family: $main_font;
     height: 42px;
+    margin: 0px;
+    padding: 6px;
 
-    &:hover {
-      @include button-hover($button_background_hover); 
-    }
+  &.left {
+    border-radius: 4px 0px 0px 4px;
+    border-right: 0px;
   }
-}
 
-.action-bar {
-  width: 100%;
-  text-align: right;
+  &.right {
+    border-radius: 0px 4px 4px 0px;
+    border-left: 0px;
+  }
 
-  .action-button {
-    border-style: none;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 18px;
-    margin: 4px;
-    padding: 4px;
-    text-decoration: none;
-    border-radius: 4px;
-    background-color: transparent;
+  &.left-right {
+    border-radius: 4px 4px 4px 4px;
+  }
 
-    &:hover {
-      background-color: $white;
-    }
+  &.middle {
+    border-radius: 0px;
+    border-left: 0px;
+    border-right: 0px;
+  }
 
-    &:focus {
-      box-shadow: 0px 0px 4px 4px $button_shadow_color;
-      outline: none;
-    }
+  &.button-selected:focus {
+    border-color: $button_selected;
+    outline: none;
+  }
+
+  &.button-selected {
+    background-color: $button_selected;
+  }
+
+  &:focus {
+    border-color: $button_selected;
+    outline: none;
+  }
+
+  &:hover {
+    @include button-hover($button_background_hover);
   }
 }
 
@@ -543,29 +502,6 @@ a.grid-link {
   font-size: 14px;
   font-family: $main_font;
   z-index: -2;
-
-  &.button {
-    font-family: $main_font;
-    padding: 4px;
-    background-color: $grey2;
-    border-width: 2px;
-    border-color: $white;
-    border-radius: 4px;
-    border-style: solid;
-
-    &.hidden {
-      display: none;
-    }
-  }
-
-  &.button:hover {
-    @include button-hover($button_background_hover);
-  }
-
-  &.button:focus {
-    border-color: $black;
-    outline: none;
-  }
 
   &.search-box {
     font-family: $main_font;
