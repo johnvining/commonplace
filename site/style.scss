@@ -20,7 +20,7 @@ html {
 body {
   background: $background_color;
   font-family: $main_font;
-  margin: 16px;
+  margin: 0px;
   padding: 0px;
 }
 
@@ -566,6 +566,8 @@ a.grid-link {
   position: sticky;
   top: 4em;
   background: $background_color;
+  padding-bottom: 4px;
+  padding-top: 4px;
 }
 
 .flex-end {

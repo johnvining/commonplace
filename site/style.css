@@ -245,7 +245,7 @@ html {
 body {
   background: #f7fcf7;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  margin: 16px;
+  margin: 0px;
   padding: 0px; }
 
 a {
@@ -643,7 +643,9 @@ a.grid-link {
   justify-content: space-between;
   position: sticky;
   top: 4em;
-  background: #f7fcf7; }
+  background: #f7fcf7;
+  padding-bottom: 4px;
+  padding-top: 4px; }
 
 .flex-end {
   align-self: flex-end; }
