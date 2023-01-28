@@ -103,7 +103,7 @@ class Author extends React.Component {
           {this.state.bornYear} - {this.state.diedYear}
           <div>
             <button
-              className="top-level button"
+              className="top-level standard-button"
               onClick={this.deleteAuthor.bind(this)}
             >
               Delete author

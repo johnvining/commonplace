@@ -71,7 +71,7 @@ class Idea extends React.Component {
           <span className="page-title">{this.state.ideaName}</span>
           <div>
             <button
-              className="top-level button"
+              className="top-level standard-button"
               onClick={this.deleteIdea.bind(this)}
             >
               Delete idea

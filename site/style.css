@@ -305,18 +305,22 @@ div .top-bar {
   height: 42px;
   margin: 0px;
   padding: 6px; }
+  .standard-button + .standard-button {
+    margin-left: 4px; }
   .standard-button.left {
     border-radius: 4px 0px 0px 4px;
     border-right: 0px; }
   .standard-button.right {
     border-radius: 0px 4px 4px 0px;
-    border-left: 0px; }
+    border-left: 0px;
+    margin-left: 0px; }
   .standard-button.left-right {
     border-radius: 4px 4px 4px 4px; }
   .standard-button.middle {
     border-radius: 0px;
     border-left: 0px;
-    border-right: 0px; }
+    border-right: 0px;
+    margin-left: 0px; }
   .standard-button.button-selected:focus {
     border-color: #c1e1ec;
     outline: none; }

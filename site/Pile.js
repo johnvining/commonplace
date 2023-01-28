@@ -87,7 +87,7 @@ class Pile extends React.Component {
           <span className="page-title">{this.state.pileName}</span>
           <div>
             <button
-              className="top-level button"
+              className="top-level standard-button"
               onClick={this.handleDeletePile.bind(this)}
             >
               Delete pile

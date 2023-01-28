@@ -262,7 +262,7 @@ class Work extends React.Component {
           <div>
             {this.state.edit ? (
               <button
-                className="top-level button"
+                className="top-level standard-button left-right"
                 onClick={this.handleAcceptUpdates.bind(this)}
               >
                 Done
@@ -270,7 +270,7 @@ class Work extends React.Component {
             ) : (
               <>
                 <button
-                  className="top-level button"
+                  className="top-level standard-button left-right"
                   onClick={() => {
                     this.setState({ edit: true, editPiles: false })
                   }}
@@ -278,13 +278,13 @@ class Work extends React.Component {
                   Edit
                 </button>
                 <button
-                  className="top-level button"
+                  className="top-level standard-button left-right"
                   onClick={this.deleteWork.bind(this)}
                 >
                   Delete
                 </button>
                 <button
-                  className="top-level button"
+                  className="top-level standard-button left-right"
                   onClick={this.createNoteForWork.bind(this)}
                 >
                   + Note
