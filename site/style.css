@@ -258,7 +258,7 @@ div .top-bar {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  height: 4em;
+  height: 60px;
   position: sticky;
   top: 0;
   background: #f7fcf7; }
@@ -270,12 +270,12 @@ div .top-bar {
     .top-bar .title-bar {
       display: block; } }
   .top-bar .title-bar .title {
-    font-size: 28px;
+    font-size: 24px;
     padding: 5px; }
     @media (min-width: 768px) {
       .top-bar .title-bar .title {
         display: block;
-        font-size: 40px; } }
+        font-size: 34px; } }
 .top-bar .top-action-bar {
   display: inline-flex;
   justify-content: flex-end;
@@ -483,7 +483,7 @@ div .top-bar {
   border-radius: 4px;
   width: 100%;
   background-color: #f7fcf7;
-  z-index: 0;
+  z-index: -1;
   display: flex; }
 .search-bar.autocomplete-div {
   display: inline-block; }
@@ -494,17 +494,17 @@ div .top-bar {
   color: white;
   display: inline-block;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 32px;
+  font-size: 18px;
   margin: 4px;
-  padding: 8px;
+  padding: 4px;
   vertical-align: top; }
 .search-bar.search-box {
   background: transparent;
   border-style: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 32px;
+  font-size: 18px;
   margin: 4px auto;
-  padding: 8px;
+  padding: 6px;
   width: 100%; }
   .search-bar.search-box:focus {
     outline: none; }
@@ -516,7 +516,7 @@ div .top-bar {
   display: inline; }
 .search-bar.option {
   background: transparent;
-  font-size: 28px;
+  font-size: 18px;
   border-radius: 4px;
   border-style: solid;
   border-color: white;
@@ -601,7 +601,8 @@ a.grid-link {
 .multi-select {
   font-size: 14px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  z-index: -2; }
+  z-index: -1;
+  position: relative; }
   .multi-select.search-box {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
