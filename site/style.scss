@@ -13,7 +13,7 @@ html {
 
 .main {
   max-width: 56em;
-  padding: 16px;
+  padding: 0px;
   margin: auto;
 }
 
@@ -30,7 +30,6 @@ body {
     display: flex;
     flex-wrap: wrap;
     height: 4em;
-    margin: 0px 0px 12px 0px;
     position: sticky;
     top: 0;
     background: $background_color;
@@ -543,16 +542,16 @@ a.grid-link {
 .multi-select {
   font-size: 14px;
   font-family: $main_font;
+  z-index: -2;
 
   &.button {
     font-family: $main_font;
-    padding: 8px;
+    padding: 4px;
     background-color: $grey2;
     border-width: 2px;
     border-color: $white;
     border-radius: 4px;
     border-style: solid;
-    height: 42px;
 
     &.hidden {
       display: none;
@@ -623,14 +622,17 @@ a.grid-link {
   align-items: baseline;
   flex-direction: row;
   justify-content: space-between;
+  position: sticky;
+  top: 4em;
+  background: $background_color;
 }
+
 .flex-end {
   align-self: flex-end;
 }
 
 .section-header {
-  font-size: 28px;
-
+  font-size: 18px;
   padding: 18px 4px 4px 4px;
   margin: 4px;
 }

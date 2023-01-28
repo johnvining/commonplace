@@ -251,7 +251,7 @@ class NoteList extends React.Component {
     return (
       <div className="multi-select">
         {showMultiselect ? null : this.state.selected.length ? (
-          <div>
+          <div className="multi-select-top-bar">
             {this.state.addSomething ? (
               <Autocomplete
                 inputName="multiselect"

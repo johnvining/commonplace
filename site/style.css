@@ -220,7 +220,7 @@ html {
 
 .main {
   max-width: 56em;
-  padding: 16px;
+  padding: 0px;
   margin: auto; }
 
 body {
@@ -234,7 +234,6 @@ div .top-bar {
   display: flex;
   flex-wrap: wrap;
   height: 4em;
-  margin: 0px 0px 12px 0px;
   position: sticky;
   top: 0;
   background: #f7fcf7; }
@@ -608,16 +607,16 @@ a.grid-link {
 
 .multi-select {
   font-size: 14px;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  z-index: -2; }
   .multi-select.button {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-    padding: 8px;
+    padding: 4px;
     background-color: #efefef;
     border-width: 2px;
     border-color: white;
     border-radius: 4px;
-    border-style: solid;
-    height: 42px; }
+    border-style: solid; }
     .multi-select.button.hidden {
       display: none; }
   .multi-select.button:hover {
@@ -667,13 +666,16 @@ a.grid-link {
   display: flex;
   align-items: baseline;
   flex-direction: row;
-  justify-content: space-between; }
+  justify-content: space-between;
+  position: sticky;
+  top: 4em;
+  background: #f7fcf7; }
 
 .flex-end {
   align-self: flex-end; }
 
 .section-header {
-  font-size: 28px;
+  font-size: 18px;
   padding: 18px 4px 4px 4px;
   margin: 4px; }
 
