@@ -523,7 +523,8 @@ div .top-bar {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 28px;
   margin: 4px;
-  padding: 4px; }
+  padding: 4px;
+  text-align: left; }
   .search-bar.option:focus {
     background-color: #e8f4f8;
     border-color: black;
