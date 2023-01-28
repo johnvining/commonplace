@@ -639,7 +639,7 @@ a.grid-link {
 
 .multi-select-top-bar {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-direction: row;
   justify-content: space-between;
   position: sticky;
