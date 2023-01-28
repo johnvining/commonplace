@@ -366,9 +366,9 @@ a {
     color: $white;
     display: inline-block;
     font-family: $main_font;
-    font-size: 18px;
-    margin: 4px;
-    padding: 4px;
+    font-size: 28px;
+    margin: -2px;
+    padding: 12px;
     vertical-align: top;
   }
 
@@ -376,7 +376,7 @@ a {
     background: transparent;
     border-style: none;
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-    font-size: 18px;
+    font-size: 28px;
     margin: 4px auto;
     padding: 6px;
     width: 100%;
@@ -397,23 +397,20 @@ a {
   }
 
   &.option {
-    background: transparent;
-    font-size: 18px;
+    background-color: $button_background;
+    border-color: $white;
     border-radius: 4px;
     border-style: solid;
-    border-color: $white;
-    border-width: 1px;
-    margin: 4px;
+    border-width: 2px;
     font-family: $main_font;
+    font-size: 28px;
+    margin: 4px;
+    padding: 4px;
 
     &:focus {
+      background-color: $highlight_blue;
       border-color: $black;
-      border-radius: 4px;
-      border-style: solid;
-      border-width: 1px;
       outline: none;
-      color: $black;
-      background: $highlight_blue;
     }
 
     &:not(.new)::after {

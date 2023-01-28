@@ -494,15 +494,15 @@ div .top-bar {
   color: white;
   display: inline-block;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 18px;
-  margin: 4px;
-  padding: 4px;
+  font-size: 28px;
+  margin: -2px;
+  padding: 12px;
   vertical-align: top; }
 .search-bar.search-box {
   background: transparent;
   border-style: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 18px;
+  font-size: 28px;
   margin: 4px auto;
   padding: 6px;
   width: 100%; }
@@ -515,22 +515,19 @@ div .top-bar {
 .search-bar.li {
   display: inline; }
 .search-bar.option {
-  background: transparent;
-  font-size: 18px;
+  background-color: #efefef;
+  border-color: white;
   border-radius: 4px;
   border-style: solid;
-  border-color: white;
-  border-width: 1px;
+  border-width: 2px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 28px;
   margin: 4px;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  padding: 4px; }
   .search-bar.option:focus {
+    background-color: #e8f4f8;
     border-color: black;
-    border-radius: 4px;
-    border-style: solid;
-    border-width: 1px;
-    outline: none;
-    color: black;
-    background: #e8f4f8; }
+    outline: none; }
   .search-bar.option:not(.new)::after {
     content: '?'; }
   .search-bar.option.new::before {
