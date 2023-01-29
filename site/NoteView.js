@@ -18,7 +18,14 @@ class NoteView extends React.Component {
       .catch(error => {
         console.error(error)
       })
-    this.props.setPageTitle(notesResponse.data.data[0].title)
+    if (notesResponse.data.data[0].title) {
+      this.props.setPageTitle(notesResponse.data.data[0].title)
+    } else if (notesResponse.data.data[0].text) {
+      this.props.setPageTitle(notesResponse.data.data[0].text)
+    } else {
+      this.props.setPageTitle('Untitled Note')
+    }
+
     return notesResponse
   }
 
