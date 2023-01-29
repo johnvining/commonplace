@@ -2,7 +2,9 @@ import mongoose from 'mongoose'
 
 const authSchema = new mongoose.Schema(
   {
-    name: String
+    name: String,
+    birth_year: Number,
+    death_year: Number
   },
   { timestamps: true }
 )

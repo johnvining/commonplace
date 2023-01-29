@@ -9,7 +9,9 @@ class Author extends React.Component {
   state = {
     id: '',
     edit: false,
-    pendingName: ''
+    pendingName: '',
+    birthYear: '',
+    deathYear: ''
   }
 
   componentDidMount() {
@@ -29,8 +31,8 @@ class Author extends React.Component {
       .then(response => {
         this.setState({
           pendingName: response.data.data.name,
-          bornYear: response.data.data.bornYear,
-          diedYear: response.data.data.diedYear
+          birthYear: response.data.data.birth_year,
+          deathYear: response.data.data.death_year
         })
         this.props.setPageTitle(response.data.data.name)
       })
@@ -98,8 +100,12 @@ class Author extends React.Component {
 
   async handleAcceptUpdates() {
     var updateObject = {
-      name: this.state.pendingName
+      name: this.state.pendingName,
+      birth_year: this.state.birthYear,
+      death_year: this.state.deathYear
     }
+
+    console.log(updateObject)
 
     db.updateRecord(db.types.auth, this.props.id, updateObject)
     this.setState({ edit: false })
@@ -122,6 +128,28 @@ class Author extends React.Component {
                   this.setState({ pendingName: e.target.value })
                 }}
               />
+              <label htmlFor="birthYear" className="work-page form-label">
+                Birth Year
+              </label>
+              <input
+                className="title input"
+                id="title"
+                defaultValue={this.state.birthYear}
+                onChange={e => {
+                  this.setState({ birthYear: e.target.value })
+                }}
+              />
+              <label htmlFor="deathYear" className="work-page form-label">
+                Death Year
+              </label>
+              <input
+                className="title input"
+                id="title"
+                defaultValue={this.state.deathYear}
+                onChange={e => {
+                  this.setState({ deathYear: e.target.value })
+                }}
+              />
               <button
                 className="top-level standard-button left-right"
                 onClick={this.handleAcceptUpdates.bind(this)}
@@ -133,7 +161,8 @@ class Author extends React.Component {
             <>
               <span className="page-title">{this.state.pendingName}</span>
               <br />
-              {this.state.bornYear} - {this.state.diedYear}
+              {this.state.birthYear ? 'b. ' + this.state.birthYear : null}
+              {this.state.deathYear ? ' d. ' + this.state.deathYear : null}
               <div>
                 <button
                   className="top-level standard-button"
