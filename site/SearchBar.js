@@ -16,6 +16,7 @@ class SearchBar extends React.Component {
     help: 'help',
     home: 'home',
     idea: 'idea',
+    list: 'list',
     note: 'note',
     pile: 'pile',
     work: 'work',
@@ -43,11 +44,12 @@ class SearchBar extends React.Component {
         var text = this.state.typedText.toLowerCase()
         switch (text) {
           case this.modifiers.auth:
-          case this.modifiers.work:
-          case this.modifiers.idea:
           case this.modifiers.find:
+          case this.modifiers.idea:
+          case this.modifiers.list:
           case this.modifiers.note:
           case this.modifiers.pile:
+          case this.modifiers.work:
             this.setState({
               modifier: text,
               typedText: ''
@@ -112,6 +114,14 @@ class SearchBar extends React.Component {
       this.setState({ typedText: '' }, () => {
         this.props.beforeNavigate()
         navigate('/' + destination)
+      })
+    } else if (
+      this.state.modifier == this.modifiers.list &&
+      this.state.typedText == this.modifiers.pile
+    ) {
+      this.setState({ typedText: '' }, () => {
+        this.props.beforeNavigate()
+        navigate('/piles')
       })
     }
   }
