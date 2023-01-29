@@ -516,11 +516,22 @@ class Note extends React.Component {
                     <YearSpan year={this.props.note.work?.year} parens={true} />
                   </>
                 ) : null}
+
+                {/* URL */}
+                {this.state.pendingUrl ? (
+                  <>
+                    <a href={this.state.pendingUrl} target="_blank">
+                      <button className={'action-button'}>
+                        <img src={link}></img>
+                      </button>
+                    </a>
+                  </>
+                ) : null}
               </div>
             </div>
           ) : null}
 
-          {/* URL, Page, Year */}
+          {/* Edit URL */}
           {edit ? (
             <>
               <div className="width-100">

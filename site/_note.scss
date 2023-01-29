@@ -290,25 +290,25 @@
 .action-bar {
   width: 100%;
   text-align: right;
+}
 
-  .action-button {
-    border-style: none;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 18px;
-    margin: 4px;
-    padding: 4px;
-    text-decoration: none;
-    border-radius: 4px;
-    background-color: transparent;
+.action-button {
+  border-style: none;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 18px;
+  margin: 4px;
+  padding: 4px;
+  text-decoration: none;
+  border-radius: 4px;
+  background-color: transparent;
 
-    &:hover {
-      background-color: $white;
-    }
+  &:hover {
+    background-color: $white;
+  }
 
-    &:focus {
-      box-shadow: 0px 0px 4px 4px $button_shadow_color;
-      outline: none;
-    }
+  &:focus {
+    box-shadow: 0px 0px 4px 4px $button_shadow_color;
+    outline: none;
   }
 }
