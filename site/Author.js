@@ -114,14 +114,14 @@ class Author extends React.Component {
   render() {
     return (
       <div>
-        <div align="right" key="author-information">
+        <div key="author-information">
           {this.state.edit ? (
             <>
               <label htmlFor="title" className="work-page form-label">
                 Title
               </label>
               <input
-                className="title input"
+                className="work-page title input"
                 id="title"
                 defaultValue={this.state.pendingName}
                 onChange={e => {
@@ -132,7 +132,7 @@ class Author extends React.Component {
                 Birth Year
               </label>
               <input
-                className="title input"
+                className="work-page title input"
                 id="title"
                 defaultValue={this.state.birthYear}
                 onChange={e => {
@@ -143,7 +143,7 @@ class Author extends React.Component {
                 Death Year
               </label>
               <input
-                className="title input"
+                className="work-page title input"
                 id="title"
                 defaultValue={this.state.deathYear}
                 onChange={e => {
@@ -159,10 +159,14 @@ class Author extends React.Component {
             </>
           ) : (
             <>
-              <span className="page-title">{this.state.pendingName}</span>
-              <br />
-              {this.state.birthYear ? 'b. ' + this.state.birthYear : null}
-              {this.state.deathYear ? ' d. ' + this.state.deathYear : null}
+              <div className="page-title">{this.state.pendingName}</div>
+              {this.state.birthYear || this.state.deathYear ? (
+                <div className="page-sub-title">
+                  {this.state.birthYear ? 'b. ' + this.state.birthYear : null}
+                  {this.state.deathYear ? ' d. ' + this.state.deathYear : null}
+                </div>
+              ) : null}
+
               <div>
                 <button
                   className="top-level standard-button"

@@ -282,7 +282,7 @@ div .top-bar {
       display: block; } }
   .top-bar .title-bar .title {
     font-size: 24px;
-    padding: 5px; }
+    padding: 8px 8px 8px 0px; }
     @media (min-width: 768px) {
       .top-bar .title-bar .title {
         display: block;
@@ -301,10 +301,17 @@ div .top-bar {
 
 .page-title {
   font-size: 20px;
-  padding: 15px; }
+  padding: 8px 8px 8px 0px; }
   @media (min-width: 768px) {
     .page-title {
       font-size: 30px; } }
+
+.page-sub-title {
+  font-size: 14px;
+  padding: 8px 8px 8px 0px; }
+  @media (min-width: 768px) {
+    .page-sub-title {
+      font-size: 14px; } }
 
 .standard-button {
   background-color: #efefef;
