@@ -355,7 +355,7 @@ class Note extends React.Component {
               {this.props.note?.images?.map((image, index) => (
                 <div
                   className={
-                    this.state.edit
+                    edit
                       ? 'image-row image-frame remove'
                       : this.state.largeImage == index
                       ? 'image-row image-frame selected'

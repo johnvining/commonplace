@@ -375,6 +375,8 @@ div .top-bar {
   .idea.label:hover, .pile.label:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }
+  .idea.label.edit:hover, .pile.label.edit:hover {
+    background-color: lightcoral; }
   .idea.label.edit::after, .pile.label.edit::after {
     background-image: url("/icons/cross.svg");
     background-size: 15px 15px;
