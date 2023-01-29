@@ -106,6 +106,13 @@
   white-space: pre-wrap;
   width: 100%;
   overflow-x: hidden; }
+  .note-full .note-text.note-take,
+  .note-full .note-take.note-take {
+    color: black;
+    background-color: #f7fcf7;
+    font-style: italic;
+    font-size: 12px;
+    padding: 4px; }
   .note-full .note-text.edit,
   .note-full .note-take.edit {
     background-color: #f4f4f4; }

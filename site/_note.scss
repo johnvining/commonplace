@@ -144,6 +144,14 @@
     width: 100%;
     overflow-x:hidden;
 
+    &.note-take {
+      color: black;
+      background-color: $background_color;
+      font-style: italic;
+      font-size: 12px;
+      padding: 4px
+    }
+
     &.edit {
       background-color: $note_input_background;
     }
