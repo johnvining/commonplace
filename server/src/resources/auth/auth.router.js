@@ -20,6 +20,9 @@ router.route('/autocomplete').post(asyncWrapper(getAutoComplete, 200))
 router.route('/:id/delete').delete(asyncWrapper(reqDeleteAuthor, 204))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForAuthor, 200))
 router.route('/:id/works').get(asyncWrapper(reqGetWorksForAuthor, 200))
-router.route('/:id').get(asyncWrapper(defaultControllers.getOne, 200))
+router
+  .route('/:id')
+  .get(asyncWrapper(defaultControllers.getOne, 200))
+  .put(asyncWrapper(defaultControllers.updateOne, 200))
 
 export default router

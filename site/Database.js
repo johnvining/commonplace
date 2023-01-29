@@ -26,13 +26,13 @@ export async function getInfo(type, Id) {
   return axios.get(url_api + type + `/${Id}`)
 }
 
-// Supported types: idea, auth, work, pile,
+// Supported types: idea, auth, work, pile
 export async function createRecord(type, name) {
   const data = { name: name }
   return axios.post(url_api + type, data)
 }
 
-// Supported types: note, work
+// Supported types: note, work, idea, pile, auth
 export async function updateRecord(type, id, params) {
   return axios.put(url_api + type + `/${id}`, params)
 }
