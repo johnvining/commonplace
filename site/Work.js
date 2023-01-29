@@ -19,12 +19,22 @@ class Work extends React.Component {
   }
 
   componentDidMount() {
+    this.keyDownListener = this.handleKeyDown.bind(this)
+    document.addEventListener('keydown', this.keyDownListener, false)
+
     this.fetchWorkInfo(this.props.id)
   }
 
   componentDidUpdate(prevState) {
     if (prevState.id !== this.state.id) {
       this.fetchWorkInfo(this.state.id)
+    }
+  }
+
+  handleKeyDown(event) {
+    console.log('key: ' + event)
+    if (event.ctrlKey && event.keyCode == 78) {
+      this.createNoteForWork()
     }
   }
 
