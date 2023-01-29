@@ -55,7 +55,9 @@ class Note extends React.Component {
 
   handleKeyDown(event) {
     if (
-      this.props.mode == constants.note_modes.EDIT &&
+      (this.props.mode == constants.note_modes.EDIT ||
+        this.props.mode == constants.note_modes.EDIT_IDEAS ||
+        this.props.mode == constants.note_modes.EDIT_PILES) &&
       event.ctrlKey &&
       event.keyCode == 65
     ) {
