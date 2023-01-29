@@ -13,6 +13,7 @@ import pile_img from './icons/stack.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 import PileListForItem from './PileListForItem'
+import YearSpan from './YearSpan'
 import * as constants from './constants'
 import autosize from 'autosize'
 
@@ -505,9 +506,15 @@ class Note extends React.Component {
 
                 {/* Year */}
                 {this.state.pendingYear ? (
-                  <> ({this.state.pendingYear})</>
+                  <>
+                    {' '}
+                    <YearSpan year={this.state.pendingYear} parens={true} />
+                  </>
                 ) : this.props.note.work?.year ? (
-                  <> ({this.props.note.work?.year})</>
+                  <>
+                    {' '}
+                    <YearSpan year={this.props.note.work?.year} parens={true} />
+                  </>
                 ) : null}
               </div>
             </div>

@@ -4,6 +4,7 @@ import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
 import PileListForItem from './PileListForItem'
+import YearSpan from './YearSpan'
 import React from 'react'
 
 class Work extends React.Component {
@@ -255,7 +256,7 @@ class Work extends React.Component {
                 />
               </>
             ) : (
-              <span className="work-page year">{pendingYear}</span>
+              <YearSpan year={pendingYear} spanStyle="work-page year" />
             )}
           </div>
           {/* Buttons */}
