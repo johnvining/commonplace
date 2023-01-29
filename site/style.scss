@@ -5,6 +5,7 @@
 html {
   box-sizing: border-box;
 }
+
 *,
 *:before,
 *:after {
@@ -540,10 +541,11 @@ a.grid-link {
     padding: 8px;
     margin: 2px;
     border-width: 2px;
-    border-color: $white;
+    border-color: $button_background;
     border-radius: 4px;
     border-style: solid;
-    background: transparent;
+    background: $white;
+    text-align: left;
   }
 
   &.option:focus,
@@ -560,6 +562,8 @@ a.grid-link {
     height: 13px;
     content: '';
   }
+
+
 }
 
 .multi-select-top-bar {
@@ -572,6 +576,7 @@ a.grid-link {
   background: $background_color;
   padding-bottom: 4px;
   padding-top: 4px;
+  min-height: 52px;
 }
 
 .flex-end {

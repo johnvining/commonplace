@@ -624,10 +624,11 @@ a.grid-link {
     padding: 8px;
     margin: 2px;
     border-width: 2px;
-    border-color: white;
+    border-color: #efefef;
     border-radius: 4px;
     border-style: solid;
-    background: transparent; }
+    background: white;
+    text-align: left; }
   .multi-select.option:focus, .multi-select.option-new:focus {
     border-color: black; }
   .multi-select.option-new::before {
@@ -647,7 +648,8 @@ a.grid-link {
   top: 4em;
   background: #f7fcf7;
   padding-bottom: 4px;
-  padding-top: 4px; }
+  padding-top: 4px;
+  min-height: 52px; }
 
 .flex-end {
   align-self: flex-end; }
