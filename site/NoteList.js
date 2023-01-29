@@ -332,7 +332,7 @@ class NoteList extends React.Component {
                 className={
                   this.state.page == 1
                     ? 'multi-select standard-button hidden'
-                    : 'multi-select standard-button'
+                    : 'multi-select standard-button left'
                 }
                 onClick={this.decPage.bind(this)}
               >
@@ -341,7 +341,11 @@ class NoteList extends React.Component {
               </button>
 
               <button
-                className="multi-select standard-button"
+                className={
+                  this.state.page == 1
+                    ? 'multi-select standard-button left-right'
+                    : 'multi-select standard-button right'
+                }
                 onClick={this.incPage.bind(this)}
               >
                 <img src={right} />

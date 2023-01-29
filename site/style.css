@@ -262,7 +262,8 @@ div .top-bar {
   height: 60px;
   position: sticky;
   top: 0;
-  background: #f7fcf7; }
+  background: #f7fcf7;
+  z-index: 1; }
 .top-bar .title-bar {
   display: none;
   width: 50%;
@@ -335,6 +336,8 @@ div .top-bar {
     cursor: pointer;
     outline: none;
     border-color: white; }
+  .standard-button.hidden {
+    display: none; }
 
 .idea.container, .pile.container {
   background-color: transparent;
@@ -484,7 +487,6 @@ div .top-bar {
   border-radius: 4px;
   width: 100%;
   background-color: #f7fcf7;
-  z-index: -1;
   display: flex; }
 .search-bar.autocomplete-div {
   display: inline-block; }
@@ -600,7 +602,6 @@ a.grid-link {
 .multi-select {
   font-size: 14px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  z-index: -1;
   position: relative; }
   .multi-select.search-box {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;

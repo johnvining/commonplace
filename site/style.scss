@@ -42,6 +42,7 @@ a {
     position: sticky;
     top: 0;
     background: $background_color;
+    z-index: 1;
   }
 
   .title-bar {
@@ -141,6 +142,10 @@ a {
 
   &:hover {
     @include button-hover($button_background_hover);
+  }
+
+  &.hidden {
+    display: none;
   }
 }
 
@@ -352,7 +357,6 @@ a {
     border-radius: 4px;
     width: 100%;
     background-color: $background_color;
-    z-index: -1;
     display: flex;
   }
 
@@ -506,7 +510,6 @@ a.grid-link {
 .multi-select {
   font-size: 14px;
   font-family: $main_font;
-  z-index: -1;
   position: relative;
 
   &.search-box {
