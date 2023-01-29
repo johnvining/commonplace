@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import controllers, {
+import defaultControllers, {
   reqCreatePile,
   reqDeletePile,
   reqGetAutoComplete,
@@ -25,7 +25,8 @@ router.route('/:id/works').get(asyncWrapper(reqGetWorksForPile, 200))
 
 router
   .route('/:id')
-  .get(asyncWrapper(controllers.getOne, 200))
+  .get(asyncWrapper(defaultControllers.getOne, 200))
+  .put(asyncWrapper(defaultControllers.updateOne, 200))
   .delete(asyncWrapper(reqDeletePile, 204))
 
 export default router
