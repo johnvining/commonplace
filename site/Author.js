@@ -7,7 +7,9 @@ import ResultWork from './ResultWork'
 
 class Author extends React.Component {
   state = {
-    id: ''
+    id: '',
+    edit: false,
+    pendingName: ''
   }
 
   componentDidMount() {
@@ -26,7 +28,7 @@ class Author extends React.Component {
     db.getInfo(db.types.auth, authorId)
       .then(response => {
         this.setState({
-          authorName: response.data.data.name,
+          pendingName: response.data.data.name,
           bornYear: response.data.data.bornYear,
           diedYear: response.data.data.diedYear
         })
@@ -85,7 +87,7 @@ class Author extends React.Component {
 
   async deleteAuthor() {
     if (
-      !confirm(`Do you want to permanently delete '${this.state.authorName}'?`)
+      !confirm(`Do you want to permanently delete '${this.state.pendingName}'?`)
     ) {
       return
     }
@@ -94,21 +96,62 @@ class Author extends React.Component {
     navigate('/')
   }
 
+  async handleAcceptUpdates() {
+    var updateObject = {
+      name: this.state.pendingName
+    }
+
+    db.updateRecord(db.types.auth, this.props.id, updateObject)
+    this.setState({ edit: false })
+  }
+
   render() {
     return (
       <div>
         <div align="right" key="author-information">
-          <span className="page-title">{this.state.authorName}</span>
-          <br />
-          {this.state.bornYear} - {this.state.diedYear}
-          <div>
-            <button
-              className="top-level standard-button"
-              onClick={this.deleteAuthor.bind(this)}
-            >
-              Delete author
-            </button>
-          </div>
+          {this.state.edit ? (
+            <>
+              <label htmlFor="title" className="work-page form-label">
+                Title
+              </label>
+              <input
+                className="title input"
+                id="title"
+                defaultValue={this.state.pendingName}
+                onChange={e => {
+                  this.setState({ pendingName: e.target.value })
+                }}
+              />
+              <button
+                className="top-level standard-button left-right"
+                onClick={this.handleAcceptUpdates.bind(this)}
+              >
+                Done
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="page-title">{this.state.pendingName}</span>
+              <br />
+              {this.state.bornYear} - {this.state.diedYear}
+              <div>
+                <button
+                  className="top-level standard-button"
+                  onClick={this.deleteAuthor.bind(this)}
+                >
+                  Delete
+                </button>
+                <button
+                  className="top-level standard-button"
+                  onClick={() => {
+                    this.setState({ edit: true, editPiles: false })
+                  }}
+                >
+                  Edit
+                </button>
+              </div>
+            </>
+          )}
         </div>
         {this.state.works?.map((work, workindex) => (
           <div key={'work-listing-' + workindex}>
