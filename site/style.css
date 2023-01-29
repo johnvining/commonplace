@@ -104,7 +104,8 @@
   padding: 2px;
   resize: none;
   white-space: pre-wrap;
-  width: 100%; }
+  width: 100%;
+  overflow-x: hidden; }
   .note-full .note-text.edit,
   .note-full .note-take.edit {
     background-color: #f4f4f4; }

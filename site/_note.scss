@@ -142,6 +142,7 @@
     resize: none;
     white-space: pre-wrap;
     width: 100%;
+    overflow-x:hidden;
 
     &.edit {
       background-color: $note_input_background;
