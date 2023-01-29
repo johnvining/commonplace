@@ -5,6 +5,27 @@ import slim from './icons/slim.svg'
 import grid from './icons/grid.svg'
 
 class SearchBar extends React.Component {
+  componentDidMount() {
+    this.keyDownListener = this.handleKeyDown.bind(this)
+    document.addEventListener('keydown', this.keyDownListener, false)
+  }
+
+  handleKeyDown(event) {
+    if (event.ctrlKey) {
+      switch (event.keyCode) {
+        case 50:
+          this.props.setView(constants.view_modes.FULL)
+          break
+        case 51:
+          this.props.setView(constants.view_modes.SLIM)
+          break
+        case 52:
+          this.props.setView(constants.view_modes.GRID)
+          break
+      }
+    }
+  }
+
   render() {
     return (
       <>
