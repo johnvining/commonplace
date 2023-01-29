@@ -10,8 +10,8 @@ class Author extends React.Component {
     id: '',
     edit: false,
     pendingName: '',
-    birthYear: '',
-    deathYear: ''
+    pendingBirthYear: '',
+    pendingDeathYear: ''
   }
 
   componentDidMount() {
@@ -31,8 +31,8 @@ class Author extends React.Component {
       .then(response => {
         this.setState({
           pendingName: response.data.data.name,
-          birthYear: response.data.data.birth_year,
-          deathYear: response.data.data.death_year
+          pendingBirthYear: response.data.data.birth_year,
+          pendignDeathYear: response.data.data.death_year
         })
         this.props.setPageTitle(response.data.data.name)
       })
@@ -101,11 +101,9 @@ class Author extends React.Component {
   async handleAcceptUpdates() {
     var updateObject = {
       name: this.state.pendingName,
-      birth_year: this.state.birthYear,
-      death_year: this.state.deathYear
+      birth_year: this.state.pendingBirthYear,
+      death_year: this.state.pendignDeathYear
     }
-
-    console.log(updateObject)
 
     db.updateRecord(db.types.auth, this.props.id, updateObject)
     this.setState({ edit: false })
@@ -114,11 +112,12 @@ class Author extends React.Component {
   render() {
     return (
       <div>
+        {/* Header and Edit */}
         <div key="author-information">
           {this.state.edit ? (
             <>
-              <label htmlFor="title" className="work-page form-label">
-                Title
+              <label htmlFor="name" className="work-page form-label">
+                Name
               </label>
               <input
                 className="work-page title input"
@@ -134,9 +133,9 @@ class Author extends React.Component {
               <input
                 className="work-page title input"
                 id="title"
-                defaultValue={this.state.birthYear}
+                defaultValue={this.state.pendingBirthYear}
                 onChange={e => {
-                  this.setState({ birthYear: e.target.value })
+                  this.setState({ pendingBirthYear: e.target.value })
                 }}
               />
               <label htmlFor="deathYear" className="work-page form-label">
@@ -145,9 +144,9 @@ class Author extends React.Component {
               <input
                 className="work-page title input"
                 id="title"
-                defaultValue={this.state.deathYear}
+                defaultValue={this.state.pendingDeathYear}
                 onChange={e => {
-                  this.setState({ deathYear: e.target.value })
+                  this.setState({ pendingDeathYear: e.target.value })
                 }}
               />
               <button
@@ -160,10 +159,14 @@ class Author extends React.Component {
           ) : (
             <>
               <div className="page-title">{this.state.pendingName}</div>
-              {this.state.birthYear || this.state.deathYear ? (
+              {this.state.pendingBirthYear || this.state.pendingDeathYear ? (
                 <div className="page-sub-title">
-                  {this.state.birthYear ? 'b. ' + this.state.birthYear : null}
-                  {this.state.deathYear ? ' d. ' + this.state.deathYear : null}
+                  {this.state.pendingBirthYear
+                    ? 'b. ' + this.state.pendingBirthYear
+                    : null}
+                  {this.state.pendingDeathYear
+                    ? ' d. ' + this.state.pendingDeathYear
+                    : null}
                 </div>
               ) : null}
 
@@ -186,6 +189,8 @@ class Author extends React.Component {
             </>
           )}
         </div>
+
+        {/* Work List */}
         {this.state.works?.map((work, workindex) => (
           <div key={'work-listing-' + workindex}>
             <ResultWork work={work} key={'work-' + work._id} />
