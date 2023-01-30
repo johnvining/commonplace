@@ -150,12 +150,12 @@ class Idea extends React.Component {
                   className="top-level standard-button"
                   onClick={this.deleteIdea.bind(this)}
                 >
-                  Delete idea
+                  Delete
                 </button>
                 <button
                   className="top-level standard-button"
                   onClick={() => {
-                    this.setState({ edit: true, editPiles: false })
+                    this.setState({ edit: true })
                   }}
                 >
                   Edit
