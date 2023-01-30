@@ -4,6 +4,7 @@ import * as db from './Database'
 import NoteList from './NoteList'
 import React from 'react'
 import ResultWork from './ResultWork'
+import YearSpan from './YearSpan'
 
 class Author extends React.Component {
   state = {
@@ -32,7 +33,7 @@ class Author extends React.Component {
         this.setState({
           pendingName: response.data.data.name,
           pendingBirthYear: response.data.data.birth_year,
-          pendignDeathYear: response.data.data.death_year
+          pendingDeathYear: response.data.data.death_year
         })
         this.props.setPageTitle(response.data.data.name)
       })
@@ -102,14 +103,17 @@ class Author extends React.Component {
     var updateObject = {
       name: this.state.pendingName,
       birth_year: this.state.pendingBirthYear,
-      death_year: this.state.pendignDeathYear
+      death_year: this.state.pendingDeathYear
     }
+
+    console.log(updateObject)
 
     db.updateRecord(db.types.auth, this.props.id, updateObject)
     this.setState({ edit: false })
   }
 
   render() {
+    console.log(this.state.pendingDeathYear)
     return (
       <div>
         {/* Header and Edit */}
@@ -132,7 +136,7 @@ class Author extends React.Component {
               </label>
               <input
                 className="work-page title input"
-                id="title"
+                id="birth-year"
                 defaultValue={this.state.pendingBirthYear}
                 onChange={e => {
                   this.setState({ pendingBirthYear: e.target.value })
@@ -143,7 +147,7 @@ class Author extends React.Component {
               </label>
               <input
                 className="work-page title input"
-                id="title"
+                id="death-year"
                 defaultValue={this.state.pendingDeathYear}
                 onChange={e => {
                   this.setState({ pendingDeathYear: e.target.value })
@@ -161,12 +165,16 @@ class Author extends React.Component {
               <div className="page-title">{this.state.pendingName}</div>
               {this.state.pendingBirthYear || this.state.pendingDeathYear ? (
                 <div className="page-sub-title">
-                  {this.state.pendingBirthYear
-                    ? 'b. ' + this.state.pendingBirthYear
-                    : null}
-                  {this.state.pendingDeathYear
-                    ? ' d. ' + this.state.pendingDeathYear
-                    : null}
+                  {this.state.pendingBirthYear ? (
+                    <>
+                      {'b. '} <YearSpan year={this.state.pendingBirthYear} />
+                    </>
+                  ) : null}
+                  {this.state.pendingDeathYear ? (
+                    <>
+                      {' d. '} <YearSpan year={this.state.pendingDeathYear} />
+                    </>
+                  ) : null}
                 </div>
               ) : null}
 
@@ -180,7 +188,7 @@ class Author extends React.Component {
                 <button
                   className="top-level standard-button"
                   onClick={() => {
-                    this.setState({ edit: true, editPiles: false })
+                    this.setState({ edit: true })
                   }}
                 >
                   Edit

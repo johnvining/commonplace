@@ -2,6 +2,7 @@ import { navigate } from '@reach/router'
 import * as db from './Database'
 import NoteList from './NoteList'
 import React from 'react'
+import YearSpan from './YearSpan'
 
 class Idea extends React.Component {
   state = {
@@ -76,8 +77,6 @@ class Idea extends React.Component {
       end_year: this.state.pendingEndYear
     }
 
-    console.log(updateObject)
-
     db.updateRecord(db.types.idea, this.props.id, updateObject)
     this.setState({ edit: false })
   }
@@ -106,7 +105,7 @@ class Idea extends React.Component {
               </label>
               <input
                 className="work-page title input"
-                id="title"
+                id="startYear"
                 defaultValue={this.state.pendingStartYear}
                 onChange={e => {
                   this.setState({ pendingStartYear: e.target.value })
@@ -117,7 +116,7 @@ class Idea extends React.Component {
               </label>
               <input
                 className="work-page title input"
-                id="title"
+                id="endYear"
                 defaultValue={this.state.pendingEndYear}
                 onChange={e => {
                   this.setState({ pendingEndYear: e.target.value })
@@ -135,13 +134,15 @@ class Idea extends React.Component {
               <div className="page-title">{this.state.pendingName}</div>
               {this.state.pendingStartYear || this.state.pendingEndYear ? (
                 <div className="page-sub-title">
-                  {this.state.pendingStartYear
-                    ? this.state.pendingStartYear
-                    : null}
+                  {this.state.pendingStartYear ? (
+                    <YearSpan year={this.state.pendingStartYear} />
+                  ) : null}
                   {this.state.pendingStartYear && this.state.pendingEndYear
                     ? ' to '
                     : null}
-                  {this.state.pendingEndYear ? this.state.pendingEndYear : null}
+                  {this.state.pendingEndYear ? (
+                    <YearSpan year={this.state.pendingEndYear} />
+                  ) : null}
                 </div>
               ) : null}
               <div>
