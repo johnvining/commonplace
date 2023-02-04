@@ -42,10 +42,6 @@ class App extends React.Component {
     this.setState({ barOpen: false })
   }
 
-  toggleSlim() {
-    this.setState({ slim: !this.state.slim })
-  }
-
   setView(view) {
     this.setState({ viewMode: view })
     localStorage.viewMode = view
@@ -62,7 +58,7 @@ class App extends React.Component {
           <div className="top-bar">
             <SearchBar
               beforeNavigate={this.beforeSearchNavigate.bind(this)}
-              toggleSlim={this.toggleSlim.bind(this)}
+              setView={this.setView.bind(this)}
             />
           </div>
         ) : (

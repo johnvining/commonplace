@@ -2,6 +2,7 @@ import React from 'react'
 import { navigate } from '@reach/router'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
+import * as constants from './constants'
 
 class SearchBar extends React.Component {
   state = {
@@ -20,9 +21,11 @@ class SearchBar extends React.Component {
     note: 'note',
     pile: 'pile',
     work: 'work',
-    slim: 'slim',
     flip: 'flip',
-    file: 'file'
+    file: 'file',
+    slim: 'slim',
+    grid: 'grid',
+    full: 'full'
   }
   keyEvents = {
     enter: 13,
@@ -83,15 +86,6 @@ class SearchBar extends React.Component {
         navigate('/note/' + response.data._id + '/edit')
       })
     } else if (
-      !this.state.modifier &&
-      this.state.typedText == this.modifiers.slim &&
-      event.keyCode == this.keyEvents.enter
-    ) {
-      this.setState({ typedText: '' }, () => {
-        this.props.toggleSlim()
-        this.props.beforeNavigate()
-      })
-    } else if (
       this.state.modifier == this.modifiers.find &&
       event.keyCode == this.keyEvents.enter
     ) {
@@ -122,6 +116,27 @@ class SearchBar extends React.Component {
       this.setState({ typedText: '' }, () => {
         this.props.beforeNavigate()
         navigate('/piles')
+      })
+    } else if (
+      (this.state.typedText == this.modifiers.slim ||
+        this.state.typedText == this.modifiers.full ||
+        this.state.typedText == this.modifiers.grid) &&
+      event.keyCode == this.keyEvents.enter
+    ) {
+      var command = this.state.typedText
+      this.setState({ typedText: '' }, () => {
+        this.props.beforeNavigate()
+        switch (command) {
+          case this.modifiers.slim:
+            this.props.setView(constants.view_modes.SLIM)
+            break
+          case this.modifiers.full:
+            this.props.setView(constants.view_modes.FULL)
+            break
+          case this.modifiers.grid:
+            this.props.setView(constants.view_modes.GRID)
+            break
+        }
       })
     }
   }
