@@ -34,6 +34,8 @@ class Work extends React.Component {
   handleKeyDown(event) {
     if (event.ctrlKey && event.keyCode == 78) {
       this.createNoteForWork()
+    } else if (event.keyCode == 27) {
+      this.handleFinishEditing()
     }
   }
 
