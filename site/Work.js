@@ -32,7 +32,6 @@ class Work extends React.Component {
   }
 
   handleKeyDown(event) {
-    console.log('key: ' + event)
     if (event.ctrlKey && event.keyCode == 78) {
       this.createNoteForWork()
     }
@@ -143,6 +142,10 @@ class Work extends React.Component {
     this.setState({ pendingAuthorId: null, pendingAuthorName: '' })
   }
 
+  async handleFinishEditing() {
+    this.setState({ editPiles: false, edit: false })
+  }
+
   async handlePileRemove(pileId) {
     db.removeFromRecord(
       db.types.pile,
@@ -169,7 +172,7 @@ class Work extends React.Component {
           <div className="work-page form-container">
             <PileListForItem
               remove={this.state.edit}
-              edit={this.state.editPiles}
+              edit={false}
               piles={this.state.piles}
               onSelect={this.handleNewPile.bind(this)}
               getSuggestions={db.getSuggestions}
@@ -278,6 +281,27 @@ class Work extends React.Component {
               >
                 Done
               </button>
+            ) : this.state.editPiles ? (
+              <>
+                <button
+                  className="top-level standard-button left-right"
+                  onClick={this.handleFinishEditing.bind(this)}
+                >
+                  Done
+                </button>
+                <Autocomplete
+                  inputName="work-work-pile"
+                  className={'work-page pile-select'}
+                  dontAutofocus={false}
+                  defaultValue={''}
+                  onSelect={this.handleNewPile.bind(this)}
+                  getSuggestions={db.getSuggestions}
+                  apiType={db.types.pile}
+                  handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+                  clearOnSelect={true}
+                  excludeIds={this.state.piles?.map(pile => pile._id)}
+                />
+              </>
             ) : (
               <>
                 <button
@@ -294,7 +318,7 @@ class Work extends React.Component {
                     this.setState({ edit: false, editPiles: true })
                   }}
                 >
-                  Edit Piles
+                  Piles
                 </button>
                 <button
                   className="top-level standard-button left-right"
