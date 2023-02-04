@@ -290,6 +290,14 @@ class Work extends React.Component {
                 </button>
                 <button
                   className="top-level standard-button left-right"
+                  onClick={() => {
+                    this.setState({ edit: false, editPiles: true })
+                  }}
+                >
+                  Edit Piles
+                </button>
+                <button
+                  className="top-level standard-button left-right"
                   onClick={this.deleteWork.bind(this)}
                 >
                   Delete
