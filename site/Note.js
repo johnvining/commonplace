@@ -680,8 +680,8 @@ class Note extends React.Component {
                       apiType={edit_ideas ? db.types.idea : db.types.pile}
                       excludeIds={
                         edit_ideas
-                          ? note.ideas.map(idea => idea._id)
-                          : note.piles.map(pile => pile._id)
+                          ? note.ideas?.map(idea => idea._id)
+                          : note.piles?.map(pile => pile._id)
                       }
                     />
                   ) : (
