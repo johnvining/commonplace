@@ -18,7 +18,8 @@ import controllers, {
   reqRemovePileFromNote,
   reqGetRandomNotes,
   reqGetSuggestionForNoteTitle,
-  reqUpdateNote
+  reqUpdateNote,
+  reqGetSuggestedTagsForNote
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
@@ -55,6 +56,7 @@ router.route('/:id/images/:image').get(reqGetImageForNote)
 router.route('/:id/image/').delete(reqRemoveImageFromNote)
 
 router.route('/:id/title/suggest').get(reqGetSuggestionForNoteTitle)
+router.route('/:id/ideas/suggest').get(reqGetSuggestedTagsForNote)
 
 router
   .route('/:id')

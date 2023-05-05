@@ -3,7 +3,7 @@ import Pile from '../pile/pile.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
-import { getSuggestedTitle } from '../../utils/suggestions.js'
+import { getSuggestedTags, getSuggestedTitle } from '../../utils/suggestions.js'
 import config from '../../config'
 import fs from 'fs'
 
@@ -175,6 +175,17 @@ export const reqGetSuggestionForNoteTitle = async function(req, res) {
     let note = await Note.findOne({ _id: req.params.id })
     let suggestion = await getSuggestedTitle(note.text)
     res.send({ suggested_title: suggestion })
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqGetSuggestedTagsForNote = async function(req, res) {
+  try {
+    let note = await Note.findOne({ _id: req.params.id })
+    let suggestion = await getSuggestedTags(note.title, note.text)
+    res.send({ suggested_tags: suggestion })
   } catch (e) {
     console.error(e)
     res.status(400).end()
