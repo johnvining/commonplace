@@ -199,6 +199,16 @@ class Note extends React.Component {
     this.props.refetchMe(this.props.index)
   }
 
+  async generateTitleSuggestion() {
+    const title_suggestion = await db
+      .getTitleSuggestion(this.props.id)
+      .then(response => {
+        this.setState({
+          pendingTitle: response.data.suggested_title
+        })
+      })
+  }
+
   async onImageUpload(image) {
     await db.addImageToNote(this.props.id, image)
 
@@ -334,14 +344,22 @@ class Note extends React.Component {
           {edit ? (
             <>
               <div className="width-100">
-                <label htmlFor="title" className="note-full form-label">
-                  Title
-                </label>
+                <button
+                  tabIndex="-1"
+                  onClick={() => {
+                    this.generateTitleSuggestion()
+                  }}
+                >
+                  <label htmlFor="title" className="note-full form-label">
+                    Title (Suggest)
+                  </label>
+                </button>
+
                 <input
                   id="title"
                   className="note-full title input edit"
                   autoFocus
-                  defaultValue={this.state.pendingTitle}
+                  value={this.state.pendingTitle}
                   onChange={this.handleTitleChange}
                 ></input>
               </div>

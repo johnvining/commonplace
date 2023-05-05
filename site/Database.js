@@ -173,3 +173,8 @@ export async function getEarliestNotesToFile(page) {
 export async function getRandomNotes() {
   return axios.get(url_api + `note/flip`)
 }
+
+export async function getTitleSuggestion(noteID) {
+  console.log(url_api + `note/` + noteID + `/title/suggest`)
+  return axios.get(url_api + `note/` + noteID + `/title/suggest`)
+}
