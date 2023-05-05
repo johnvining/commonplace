@@ -27,6 +27,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^6.8.3",
     "morgan": "^1.9.1",
+    "openai": "^3.2.1",
     "parcel": "^1.12.4",
     "prompt-sync": "^4.2.0",
     "react": "^16.14.0",

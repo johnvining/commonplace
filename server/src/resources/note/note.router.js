@@ -17,6 +17,7 @@ import controllers, {
   reqRemoveImageFromNote,
   reqRemovePileFromNote,
   reqGetRandomNotes,
+  reqGetSuggestionForNoteTitle,
   reqUpdateNote
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
@@ -52,6 +53,8 @@ router.route('/:id/work/create').put(asyncWrapper(reqAddNewWork, 201))
 router.route('/:id/image').put(reqAddImageToNote)
 router.route('/:id/images/:image').get(reqGetImageForNote)
 router.route('/:id/image/').delete(reqRemoveImageFromNote)
+
+router.route('/:id/title/suggest').get(reqGetSuggestionForNoteTitle)
 
 router
   .route('/:id')

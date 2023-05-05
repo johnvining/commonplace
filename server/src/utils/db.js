@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
-import options from '../config'
+import config from '../config'
 
-export const connect = (url = options.dbUrl, opts = {}) => {
+export const connect = (url = config.dbUrl, opts = {}) => {
   mongoose.set('strictQuery', false)
   return mongoose.connect(url, {
     ...opts

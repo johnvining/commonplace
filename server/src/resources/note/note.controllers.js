@@ -3,6 +3,7 @@ import Pile from '../pile/pile.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
+import { getSuggestedTitle } from '../../utils/suggestions.js'
 import config from '../../config'
 import fs from 'fs'
 
@@ -163,6 +164,20 @@ export const reqGetImageForNote = async function(req, res) {
     res.sendFile(
       config.imageStorePath + '/' + note.images[req.params.image - 1]
     )
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+}
+
+export const reqGetSuggestionForNoteTitle = async function(req, res) {
+  try {
+    console.log('testing')
+    let note = await Note.findOne({ _id: req.params.id })
+    let suggestion = await getSuggestedTitle('testing')
+    res.send(suggestion)
+    console.log('this is the response')
+    console.log(suggestion)
   } catch (e) {
     console.error(e)
     res.status(400).end()
