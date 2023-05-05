@@ -9,9 +9,11 @@ const openai = new OpenAIApi(configuration)
 export const getSuggestedTitle = async function(note_text) {
   const completion = await openai.createCompletion({
     model: 'text-davinci-003',
-    prompt: 'Return a terse summary of the following text: ' + note_text,
-    temperature: 0,
-    max_tokens: 100
+    prompt:
+      'Return a terse summary (maximum 15 words) of the following text: ' +
+      note_text,
+    temperature: 0.3,
+    max_tokens: 30
   })
   const suggested_title = completion.data.choices[0].text
   return suggested_title
