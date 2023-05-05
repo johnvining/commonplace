@@ -19,6 +19,7 @@ RUN apk --no-cache --virtual build-dependencies add \
     make \
     g++ \
     && npm install \
+    && npm i openai\
     && apk del build-dependencies
 
 # TODO: Production build
