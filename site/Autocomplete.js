@@ -42,53 +42,55 @@ class Autocomplete extends React.Component {
   }
 
   handleTypingChange = val => {
-    this.setState({ hideResults: false })
-    this.setState({ currentTypedText: val.target.value }, () => {
-      if (!this.state.currentTypedText) {
-        if (this.props.onClearText) this.props.onClearText()
-        return
-      } else if (this.state.currentTypedText.length < 3) {
-        this.state.responses = []
-        return
+    this.setState(
+      { hideResults: false, currentTypedText: val.target.value },
+      () => {
+        this.handleTextUpdate()
       }
-      this.props
-        .getSuggestions(this.props.apiType, this.state.currentTypedText)
-        .then(response => {
-          var options = response.data.data
-          for (var i = 0; i < options.length; i++) {
-            var hasExact = false
-            if (this.state.currentTypedText == options[i].name) {
-              hasExact = true
-              break
-            }
+    )
+  }
+
+  handleTextUpdate = () => {
+    if (!this.state.currentTypedText) {
+      if (this.props.onClearText) this.props.onClearText()
+      return
+    } else if (this.state.currentTypedText.length < 3) {
+      this.state.responses = []
+      return
+    }
+    this.props
+      .getSuggestions(this.props.apiType, this.state.currentTypedText)
+      .then(response => {
+        var options = response.data.data
+        for (var i = 0; i < options.length; i++) {
+          var hasExact = false
+          if (this.state.currentTypedText == options[i].name) {
+            hasExact = true
+            break
           }
-          if (this.props.excludeIds) {
-            options = options.filter(
-              item => !this.props.excludeIds.includes(item._id)
-            )
-          }
-          this.setState({
-            responses: options,
-            responseIncludesExactMatch: hasExact
-          })
+        }
+        if (this.props.excludeIds) {
+          options = options.filter(
+            item => !this.props.excludeIds.includes(item._id)
+          )
+        }
+        this.setState({
+          responses: options,
+          responseIncludesExactMatch: hasExact
         })
-        .catch(error => {
-          console.error(error)
-        })
-    })
+      })
+      .catch(error => {
+        console.error(error)
+      })
   }
 
   handleFetchIdeaSuggestions = () => {
-    this.setState({ fetchingIdeaSuggestions: true })
+    this.setState({ fetchingIdeaSuggestions: true, hideResults: true })
     this.props.getIdeaSuggestions().then(response => {
-      console.log('got idea suggestions')
-      console.log(response.data.suggested_ideas)
       this.setState({
         fetchingIdeaSuggestions: false,
         suggested_ideas: response.data.suggested_ideas
       })
-
-      console.log(this.state)
     })
   }
 
@@ -115,10 +117,15 @@ class Autocomplete extends React.Component {
   }
 
   handleSuggestionSelect = val => {
-    this.setState({
-      currentTypedText: val.target.name,
-      hideResults: false
-    })
+    this.setState(
+      {
+        currentTypedText: val.target.name,
+        hideResults: false
+      },
+      () => {
+        this.handleTextUpdate()
+      }
+    )
   }
 
   handleNewSelect = val => {
