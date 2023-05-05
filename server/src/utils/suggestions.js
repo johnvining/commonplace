@@ -13,5 +13,9 @@ export const getSuggestedTitle = async function(note_text) {
     temperature: 0,
     max_tokens: 100
   })
-  return completion.data.choices[0].text
+  const suggested_title = completion.data.choices[0].text
+  return suggested_title
+    .replace('\n\n', '')
+    .replace('\n', '')
+    .replace('.', '')
 }
