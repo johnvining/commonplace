@@ -8,6 +8,7 @@ import cross_circle from './icons/cross_circle.svg'
 import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
 import link from './icons/link.svg'
+import lightbulb from './icons/lightbulb.svg'
 import tags from './icons/tags.svg'
 import pile_img from './icons/stack.svg'
 import trash from './icons/trash.svg'
@@ -29,7 +30,8 @@ class Note extends React.Component {
     pendingUrl: '',
     pendingWorkId: null,
     pendingWorkName: '',
-    pendingYear: ''
+    pendingYear: '',
+    fetchingTitleSuggestion: false
   }
 
   componentDidMount() {
@@ -200,11 +202,13 @@ class Note extends React.Component {
   }
 
   async generateTitleSuggestion() {
+    this.setState({ fetchingTitleSuggestion: true })
     const title_suggestion = await db
       .getTitleSuggestion(this.props.id)
       .then(response => {
         this.setState({
-          pendingTitle: response.data.suggested_title
+          pendingTitle: response.data.suggested_title,
+          fetchingTitleSuggestion: false
         })
       })
   }
@@ -344,16 +348,26 @@ class Note extends React.Component {
           {edit ? (
             <>
               <div className="width-100">
-                <button
-                  tabIndex="-1"
-                  onClick={() => {
-                    this.generateTitleSuggestion()
-                  }}
-                >
-                  <label htmlFor="title" className="note-full form-label">
-                    Title (Suggest)
-                  </label>
-                </button>
+                <label htmlFor="title" className="note-full form-label">
+                  Title
+                  <button
+                    className={'action-button'}
+                    tabIndex="-1"
+                    onClick={() => {
+                      this.generateTitleSuggestion()
+                    }}
+                  >
+                    <img src={lightbulb}></img>
+                  </button>
+                </label>
+
+                {this.state.fetchingTitleSuggestion ? (
+                  <em>
+                    <small>Fetching title suggestion...</small>
+                  </em>
+                ) : (
+                  ''
+                )}
 
                 <input
                   id="title"
