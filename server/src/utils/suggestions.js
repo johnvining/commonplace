@@ -35,6 +35,7 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
   const suggested_tags = completion.data.choices[0].text
     .replace('\n\n', '')
     .replace('\n', '')
+    .replace('Tags:', '')
     .replace('.', '')
     .split(',')
     .map(function(tag) {
