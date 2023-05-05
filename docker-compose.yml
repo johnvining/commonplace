@@ -20,7 +20,7 @@ services:
     networks:
       - app-network
   mongo:
-    image: mongo
+    image: mongo:4.4.8
     container_name: commonplace-db
     volumes:
       - mongo-data:/data/db
