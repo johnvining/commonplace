@@ -172,12 +172,9 @@ export const reqGetImageForNote = async function(req, res) {
 
 export const reqGetSuggestionForNoteTitle = async function(req, res) {
   try {
-    console.log('testing')
     let note = await Note.findOne({ _id: req.params.id })
-    let suggestion = await getSuggestedTitle('testing')
-    res.send(suggestion)
-    console.log('this is the response')
-    console.log(suggestion)
+    let suggestion = await getSuggestedTitle(note.text)
+    res.send({ suggested_title: suggestion })
   } catch (e) {
     console.error(e)
     res.status(400).end()

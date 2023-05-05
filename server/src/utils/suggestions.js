@@ -6,13 +6,12 @@ const configuration = new Configuration({
 })
 const openai = new OpenAIApi(configuration)
 
-export const getSuggestedTitle = async function(title) {
-  console.log('suggested title')
+export const getSuggestedTitle = async function(note_text) {
   const completion = await openai.createCompletion({
     model: 'text-davinci-003',
-    prompt: 'Return the value ABCDEFGH twice',
+    prompt: 'Return a terse summary of the following text: ' + note_text,
     temperature: 0,
-    max_tokens: 7
+    max_tokens: 100
   })
   return completion.data.choices[0].text
 }
