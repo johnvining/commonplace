@@ -114,6 +114,13 @@ class Autocomplete extends React.Component {
     }
   }
 
+  handleSuggestionSelect = val => {
+    this.setState({
+      currentTypedText: val.target.name,
+      hideResults: false
+    })
+  }
+
   handleNewSelect = val => {
     this.props.handleNewSelect(this.state.currentTypedText)
     this.setState({ hideResults: true })
@@ -164,7 +171,7 @@ class Autocomplete extends React.Component {
                         id={val}
                         name={val}
                         className={this.style.option}
-                        onClick={this.handleOptionSelect.bind(this)}
+                        onClick={this.handleSuggestionSelect.bind(this)}
                       >
                         {val}
                       </button>
