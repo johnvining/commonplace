@@ -188,7 +188,7 @@ export const reqGetSuggestedIdeasForNote = async function(req, res) {
   try {
     let note = await Note.findOne({ _id: req.params.id })
     let suggestion = await getSuggestedIdeas(note.title, note.text)
-    res.send({ suggested_tags: suggestion })
+    res.send({ suggested_ideas: suggestion })
   } catch (e) {
     console.error(e)
     res.status(400).end()

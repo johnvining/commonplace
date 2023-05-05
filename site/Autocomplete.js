@@ -7,7 +7,8 @@ class Autocomplete extends React.Component {
     currentTypedText: '',
     hideResults: false,
     responseIncludesExactMatch: false,
-    fetchingIdeaSuggestions: false
+    fetchingIdeaSuggestions: false,
+    suggested_ideas: []
   }
   className = this.props.className
   style = {
@@ -81,8 +82,13 @@ class Autocomplete extends React.Component {
     this.setState({ fetchingIdeaSuggestions: true })
     this.props.getIdeaSuggestions().then(response => {
       console.log('got idea suggestions')
-      console.log(response)
-      this.setState({ fetchingIdeaSuggestions: false })
+      console.log(response.data.suggested_ideas)
+      this.setState({
+        fetchingIdeaSuggestions: false,
+        suggested_ideas: response.data.suggested_ideas
+      })
+
+      console.log(this.state)
     })
   }
 
@@ -147,37 +153,62 @@ class Autocomplete extends React.Component {
           onChange={this.handleTypingChange.bind(this)}
         ></input>
         {this.state.hideResults ? (
-          <span></span>
+          <>
+            {/* Generated Options */}
+            {this.state.suggested_ideas != null ? (
+              <ul className={this.style.ul}>
+                {this.state.suggested_ideas?.map(val => {
+                  return (
+                    <li key={val} className={this.style.li}>
+                      <button
+                        id={val}
+                        name={val}
+                        className={this.style.option}
+                        onClick={this.handleOptionSelect.bind(this)}
+                      >
+                        {val}
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : (
+              ''
+            )}
+          </>
         ) : (
-          <ul className={this.style.ul}>
-            {responses?.map(res => {
-              return (
-                <li key={res._id} className={this.style.li}>
+          <>
+            {/* Options */}
+            <ul className={this.style.ul}>
+              {responses?.map(res => {
+                return (
+                  <li key={res._id} className={this.style.li}>
+                    <button
+                      id={res._id}
+                      name={res.name}
+                      className={this.style.option}
+                      onClick={this.handleOptionSelect.bind(this)}
+                    >
+                      {res.name}
+                    </button>
+                  </li>
+                )
+              })}
+              {this.state.currentTypedText?.length > 0 &&
+              !this.state.responseIncludesExactMatch ? (
+                <li key="_new-li" className={this.style.li}>
                   <button
-                    id={res._id}
-                    name={res.name}
-                    className={this.style.option}
-                    onClick={this.handleOptionSelect.bind(this)}
+                    id="_new"
+                    name="New"
+                    className={this.style.newOption}
+                    onClick={this.handleNewSelect.bind(this)}
                   >
-                    {res.name}
+                    {this.state.currentTypedText}
                   </button>
                 </li>
-              )
-            })}
-            {this.state.currentTypedText?.length > 0 &&
-            !this.state.responseIncludesExactMatch ? (
-              <li key="_new-li" className={this.style.li}>
-                <button
-                  id="_new"
-                  name="New"
-                  className={this.style.newOption}
-                  onClick={this.handleNewSelect.bind(this)}
-                >
-                  {this.state.currentTypedText}
-                </button>
-              </li>
-            ) : null}
-          </ul>
+              ) : null}
+            </ul>
+          </>
         )}
       </div>
     )
