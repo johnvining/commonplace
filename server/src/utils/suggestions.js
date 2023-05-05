@@ -19,7 +19,7 @@ export const getSuggestedTitle = async function(note_text) {
   return suggested_title
 }
 
-export const getSuggestedTags = async function(note_title, note_text) {
+export const getSuggestedIdeas = async function(note_title, note_text) {
   const completion = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt:

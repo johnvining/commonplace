@@ -1,11 +1,13 @@
 import React from 'react'
+import lightbulb from './icons/lightbulb.svg'
 
 class Autocomplete extends React.Component {
   state = {
     loading: true,
     currentTypedText: '',
     hideResults: false,
-    responseIncludesExactMatch: false
+    responseIncludesExactMatch: false,
+    fetchingIdeaSuggestions: false
   }
   className = this.props.className
   style = {
@@ -75,6 +77,15 @@ class Autocomplete extends React.Component {
     })
   }
 
+  handleFetchIdeaSuggestions = () => {
+    this.setState({ fetchingIdeaSuggestions: true })
+    this.props.getIdeaSuggestions().then(response => {
+      console.log('got idea suggestions')
+      console.log(response)
+      this.setState({ fetchingIdeaSuggestions: false })
+    })
+  }
+
   handleOptionSelect = val => {
     this.setState(
       {
@@ -115,6 +126,19 @@ class Autocomplete extends React.Component {
     const { responses } = this.state
     return (
       <div className={this.props.className + ' autocomplete-div'}>
+        {this.props.showSuggestedIdeas ? (
+          <button
+            className={'action-button'}
+            tabIndex="-1"
+            onClick={() => {
+              this.handleFetchIdeaSuggestions()
+            }}
+          >
+            <img src={lightbulb}></img>
+          </button>
+        ) : (
+          ''
+        )}
         <input
           id={this.props.inputName}
           autoFocus={this.props.dontAutofocus ? false : true}

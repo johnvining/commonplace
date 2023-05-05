@@ -31,7 +31,8 @@ class Note extends React.Component {
     pendingWorkId: null,
     pendingWorkName: '',
     pendingYear: '',
-    fetchingTitleSuggestion: false
+    fetchingTitleSuggestion: false,
+    suggestedTags: []
   }
 
   componentDidMount() {
@@ -203,14 +204,16 @@ class Note extends React.Component {
 
   async generateTitleSuggestion() {
     this.setState({ fetchingTitleSuggestion: true })
-    const title_suggestion = await db
-      .getTitleSuggestion(this.props.id)
-      .then(response => {
-        this.setState({
-          pendingTitle: response.data.suggested_title,
-          fetchingTitleSuggestion: false
-        })
+    await db.getTitleSuggestion(this.props.id).then(response => {
+      this.setState({
+        pendingTitle: response.data.suggested_title,
+        fetchingTitleSuggestion: false
       })
+    })
+  }
+
+  handleSuggestedIdeas() {
+    return db.getIdeaSuggestions(this.props.id)
   }
 
   async onImageUpload(image) {
@@ -689,33 +692,39 @@ class Note extends React.Component {
               ) : (
                 <>
                   {edit_ideas || edit_piles ? (
-                    <Autocomplete
-                      inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
-                      className={edit_ideas ? 'idea' : 'pile'}
-                      clearOnSelect={true}
-                      escape={() => {
-                        edit_ideas
-                          ? this.setState({ edit_ideas: false })
-                          : this.setState({ edit_piles: false })
-                      }}
-                      onSelect={
-                        edit_ideas
-                          ? this.handleNewIdea.bind(this)
-                          : this.handleNewPile.bind(this)
-                      }
-                      handleNewSelect={
-                        edit_ideas
-                          ? this.handleCreateIdeaAndAddToNote.bind(this)
-                          : this.handleCreatePileAndAssign.bind(this)
-                      }
-                      getSuggestions={db.getSuggestions}
-                      apiType={edit_ideas ? db.types.idea : db.types.pile}
-                      excludeIds={
-                        edit_ideas
-                          ? note.ideas?.map(idea => idea._id)
-                          : note.piles?.map(pile => pile._id)
-                      }
-                    />
+                    <>
+                      <Autocomplete
+                        inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
+                        className={edit_ideas ? 'idea' : 'pile'}
+                        clearOnSelect={true}
+                        showSuggestedIdeas={edit_ideas}
+                        getIdeaSuggestions={this.handleSuggestedIdeas.bind(
+                          this
+                        )}
+                        escape={() => {
+                          edit_ideas
+                            ? this.setState({ edit_ideas: false })
+                            : this.setState({ edit_piles: false })
+                        }}
+                        onSelect={
+                          edit_ideas
+                            ? this.handleNewIdea.bind(this)
+                            : this.handleNewPile.bind(this)
+                        }
+                        handleNewSelect={
+                          edit_ideas
+                            ? this.handleCreateIdeaAndAddToNote.bind(this)
+                            : this.handleCreatePileAndAssign.bind(this)
+                        }
+                        getSuggestions={db.getSuggestions}
+                        apiType={edit_ideas ? db.types.idea : db.types.pile}
+                        excludeIds={
+                          edit_ideas
+                            ? note.ideas?.map(idea => idea._id)
+                            : note.piles?.map(pile => pile._id)
+                        }
+                      />
+                    </>
                   ) : (
                     // Neither editing whole note nor ideas
                     <span>
