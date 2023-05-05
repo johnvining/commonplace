@@ -74,6 +74,12 @@ class Autocomplete extends React.Component {
             item => !this.props.excludeIds.includes(item._id)
           )
         }
+
+        if (this.props.excludeNames) {
+          options = options.filter(
+            item => !this.props.excludeNames.includes(item.name)
+          )
+        }
         this.setState({
           responses: options,
           responseIncludesExactMatch: hasExact
@@ -87,9 +93,15 @@ class Autocomplete extends React.Component {
   handleFetchIdeaSuggestions = () => {
     this.setState({ fetchingIdeaSuggestions: true, hideResults: true })
     this.props.getIdeaSuggestions().then(response => {
+      let suggested_ideas = response.data.suggested_ideas
+      if (this.props.excludeNames) {
+        suggested_ideas = suggested_ideas.filter(
+          item => !this.props.excludeNames.includes(item)
+        )
+      }
       this.setState({
         fetchingIdeaSuggestions: false,
-        suggested_ideas: response.data.suggested_ideas
+        suggested_ideas: suggested_ideas
       })
     })
   }

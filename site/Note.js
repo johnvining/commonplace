@@ -723,6 +723,9 @@ class Note extends React.Component {
                             ? note.ideas?.map(idea => idea._id)
                             : note.piles?.map(pile => pile._id)
                         }
+                        excludeNames={
+                          edit_ideas ? note.ideas?.map(idea => idea.name) : null
+                        }
                       />
                     </>
                   ) : (
