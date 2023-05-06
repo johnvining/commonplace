@@ -14,7 +14,8 @@ class NoteResult extends React.Component {
           <div className="result-box header">
             <img src={note_img}></img>
             <span className="truncate">
-              <NoteAuthorSpan note={this.props.note} />: {this.props.note.title}
+              <NoteAuthorSpan note={this.props.note} separator=":" />{' '}
+              {this.props.note.title}
             </span>
           </div>
         </div>

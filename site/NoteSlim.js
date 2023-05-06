@@ -47,7 +47,7 @@ class NoteSlim extends React.Component {
           <Link to={'/note/' + this.props.id} className="note-slim">
             <div tabIndex={this.props.tabIndex} className="note-slim">
               <div className="slim-inner-container">
-                <NoteAuthorSpan note={this.props.note} />
+                <NoteAuthorSpan note={this.props.note} separator="" />
                 <>: </>
                 <b>
                   {this.props.note.title?.length ? (
