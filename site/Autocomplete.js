@@ -1,5 +1,6 @@
 import React from 'react'
 import lightbulb from './icons/lightbulb.svg'
+import loader from './icons/loader.svg'
 
 class Autocomplete extends React.Component {
   state = {
@@ -166,7 +167,11 @@ class Autocomplete extends React.Component {
               this.handleFetchIdeaSuggestions()
             }}
           >
-            <img src={lightbulb}></img>
+            {this.state.fetchingIdeaSuggestions ? (
+              <img src={loader}></img>
+            ) : (
+              <img src={lightbulb}></img>
+            )}
           </button>
         ) : (
           ''

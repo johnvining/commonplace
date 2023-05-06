@@ -17,6 +17,7 @@ import PileListForItem from './PileListForItem'
 import YearSpan from './YearSpan'
 import * as constants from './constants'
 import autosize from 'autosize'
+import loader from './icons/loader.svg'
 
 class Note extends React.Component {
   state = {
@@ -360,17 +361,13 @@ class Note extends React.Component {
                       this.generateTitleSuggestion()
                     }}
                   >
-                    <img src={lightbulb}></img>
+                    {this.state.fetchingTitleSuggestion ? (
+                      <img src={loader}></img>
+                    ) : (
+                      <img src={lightbulb}></img>
+                    )}
                   </button>
                 </label>
-
-                {this.state.fetchingTitleSuggestion ? (
-                  <em>
-                    <small>Fetching title suggestion...</small>
-                  </em>
-                ) : (
-                  ''
-                )}
 
                 <input
                   id="title"
