@@ -182,15 +182,25 @@ class Pile extends React.Component {
         </div>
 
         {/* Note and Work List */}
-        <WorkList
-          key={'workList' + this.props.id}
-          getListOfWorks={this.getListOfWorks.bind(this)}
-        />
-        <NoteList
-          key={'noteList' + this.props.id}
-          viewMode={constants.view_modes.RESULT}
-          getListOfNotes={this.getListOfNotes.bind(this)}
-        />
+        {this.props.showNotes ? (
+          <NoteList
+            key={'noteList' + this.props.id}
+            viewMode={this.props.viewMode}
+            getListOfNotes={this.getListOfNotes.bind(this)}
+          />
+        ) : (
+          <>
+            <WorkList
+              key={'workList' + this.props.id}
+              getListOfWorks={this.getListOfWorks.bind(this)}
+            />
+            <NoteList
+              key={'noteList' + this.props.id}
+              viewMode={constants.view_modes.RESULT}
+              getListOfNotes={this.getListOfNotes.bind(this)}
+            />
+          </>
+        )}
       </div>
     )
   }

@@ -145,6 +145,13 @@ class App extends React.Component {
             path="/pile/:id"
             viewMode={this.state.viewMode}
             setPageTitle={this.setPageTitle.bind(this)}
+            showNotes={false}
+          />
+          <Pile
+            path="/pile/:id/notes"
+            viewMode={this.state.viewMode}
+            setPageTitle={this.setPageTitle.bind(this)}
+            showNotes={true}
           />
           <PileHome
             path="/piles"
