@@ -7,7 +7,7 @@ class NoteAuthorSpan extends React.Component {
         {this.props.note.author?.name?.length ? (
           this.props.note.author.name + this.props.separator
         ) : this.props.note.work?.author?.name.length ? (
-          <>{this.props.note.work.author.name}</>
+          <>{this.props.note.work.author.name + this.props.separator}</>
         ) : (
           ''
         )}
