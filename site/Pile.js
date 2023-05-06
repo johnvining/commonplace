@@ -5,6 +5,7 @@ import NoteList from './NoteList'
 import React from 'react'
 import WorkList from './WorkList'
 import YearSpan from './YearSpan'
+import { Link } from '@reach/router'
 
 class Pile extends React.Component {
   state = {
@@ -176,6 +177,18 @@ class Pile extends React.Component {
                 >
                   Edit
                 </button>
+                {this.props.showNotes ? (
+                  ''
+                ) : (
+                  <Link to={'/pile/' + this.state.id + '/notes'}>
+                    <button
+                      className="top-level standard-button"
+                      style={{ marginLeft: '4px' }} // Margins come from standard-button + standard-button which doesn't work becasue of the <a>
+                    >
+                      Notes
+                    </button>
+                  </Link>
+                )}
               </div>
             </>
           )}
