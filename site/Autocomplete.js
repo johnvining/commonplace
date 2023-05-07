@@ -27,8 +27,6 @@ class Autocomplete extends React.Component {
       currentTypedText: this.props.defaultValue,
       hideResults: true
     })
-
-    this.handleFetchIdeaSuggestions()
   }
 
   componentWillUnmount() {
@@ -41,6 +39,9 @@ class Autocomplete extends React.Component {
       this.setState({ currentTypedText: '' })
     } else if (event.keyCode == 8 && !this.state.currentTypedText) {
       if (this.props.escape) this.props.escape()
+    }
+    if (this.props.showSuggestedIdeas && event.ctrlKey && event.key == 's') {
+      this.handleFetchIdeaSuggestions()
     }
   }
 
