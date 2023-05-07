@@ -33,7 +33,9 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
     temperature: 0.3,
     max_tokens: 75
   })
-  const suggested_tags = completion.data.choices[0].text
+  let suggested_tags = completion.data.choices[0].text
+  console.log(suggested_tags)
+  return suggested_tags
     .replaceAll('\n', '')
     .replaceAll('Tags:', '')
     .replaceAll('.', '')
@@ -42,5 +44,4 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
       let trimmed = tag.trim()
       return trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
     })
-  return suggested_tags
 }
