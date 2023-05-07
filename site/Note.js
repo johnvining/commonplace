@@ -88,7 +88,7 @@ class Note extends React.Component {
 
   formatMainText() {
     let originalText = this.state.pendingText
-    let newText = originalText.replaceAll('\n', ' ')
+    let newText = originalText.replaceAll('\n', ' ').replaceAll('  ', ' ')
     this.setState({ pendingText: newText })
   }
 
