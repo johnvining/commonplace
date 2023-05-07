@@ -35,13 +35,11 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
   })
   let suggested_tags = completion.data.choices[0].text
 
-  console.log(completion.data)
-  console.log(suggested_tags)
-  console.log(typeof suggested_tags)
+  // Server doesn't support .replaceAll apparently
   return suggested_tags
-    .replaceAll('\n', '')
-    .replaceAll('Tags:', '')
-    .replaceAll('.', '')
+    .replace('\n', '')
+    .replace('Tags:', '')
+    .replace('.', '')
     .split(',')
     .map(function(tag) {
       let trimmed = tag.trim()
