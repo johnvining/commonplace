@@ -27,6 +27,8 @@ class Autocomplete extends React.Component {
       currentTypedText: this.props.defaultValue,
       hideResults: true
     })
+
+    this.handleFetchIdeaSuggestions()
   }
 
   componentWillUnmount() {
