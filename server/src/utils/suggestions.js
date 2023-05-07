@@ -37,6 +37,7 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
 
   console.log(completion.data)
   console.log(suggested_tags)
+  console.log(typeof suggested_tags)
   return suggested_tags
     .replaceAll('\n', '')
     .replaceAll('Tags:', '')
