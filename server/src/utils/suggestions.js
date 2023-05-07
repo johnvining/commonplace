@@ -31,7 +31,7 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
       '\n' +
       note_text,
     temperature: 0.3,
-    max_tokens: 150
+    max_tokens: 125
   })
   const suggested_tags = completion.data.choices[0].text
     .replaceAll('\n', '')
