@@ -23,14 +23,15 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
   const completion = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt:
-      "Create a list of 8 tags for the following text, and add a list of 5 possible decades of the form (1950's) this could be about," +
-      ' including the comma before "s". Combine those lists and print them without quotes, title-case, separated by commas. Do not print the original' +
-      ' lists, just print the combined list. Do not print a period at the end of your answer.\nThe Text: ' +
+      "Create a list of 15 tags for the following text, and add an additional list of 3 possible decades of the form (1950's) that the text is describing, " +
+      'including the comma before "s". Combine those lists and print them with the following formatting rules: 1) there should not be any quote ' +
+      'characters, 2) the tags should be separated by commas. For each tag, make every word lowercase except proper nouns. Do not print the original ' +
+      'lists, just print the combined list. Do not print a period at the end of your answer.\nThe Text: ' +
       note_title +
       '\n' +
       note_text,
     temperature: 0.3,
-    max_tokens: 70
+    max_tokens: 130
   })
   const suggested_tags = completion.data.choices[0].text
     .replaceAll('\n', '')
@@ -38,7 +39,8 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
     .replaceAll('.', '')
     .split(',')
     .map(function(tag) {
-      return tag.trim()
+      let trimmed = tag.trim()
+      return trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
     })
   return suggested_tags
 }
