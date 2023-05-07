@@ -69,7 +69,20 @@ class Note extends React.Component {
       this.handleAccept()
     } else if (this.state.edit && event.keyCode == 27) {
       this.props.setNoteMode('', '')
+    } else if (
+      this.props.mode == constants.note_modes.EDIT &&
+      event.ctrlKey &&
+      event.key == 'f'
+    ) {
+      // Ctrl F to format text
+      this.formatMainText()
     }
+  }
+
+  formatMainText() {
+    let originalText = this.state.pendingText
+    let newText = originalText.replaceAll('\n', ' ')
+    this.setState({ pendingText: newText })
   }
 
   handleDelete() {
