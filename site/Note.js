@@ -76,7 +76,14 @@ class Note extends React.Component {
     ) {
       // Ctrl F to format text
       this.formatMainText()
-    }
+    } else if (
+      this.props.mode == constants.note_modes.EDIT &&
+      event.ctrlKey &&
+      event.key == 's'
+    ) {
+      // Ctrl S for suggestion
+      this.generateTitleSuggestion()
+    } // TODO: Add suggestion keyboard shortcut in autocmplete
   }
 
   formatMainText() {
