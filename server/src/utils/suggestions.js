@@ -34,6 +34,8 @@ export const getSuggestedIdeas = async function(note_title, note_text) {
     max_tokens: 75
   })
   let suggested_tags = completion.data.choices[0].text
+
+  console.log(completion.data)
   console.log(suggested_tags)
   return suggested_tags
     .replaceAll('\n', '')
