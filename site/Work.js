@@ -15,7 +15,9 @@ class Work extends React.Component {
     pendingWorkTitle: '',
     pendingUrl: '',
     pendingYear: '',
-    pendingAuthorName: ''
+    pendingAuthorName: '',
+    pendingSummary: '',
+    pendingCitationInfo: ''
   }
 
   componentDidMount() {
@@ -48,7 +50,9 @@ class Work extends React.Component {
           pendingAuthorName: response.data.data.author?.name,
           pendingAuthorId: response.data.data.author?._id,
           pendingUrl: response.data.data.url,
-          pendingYear: response.data.data.year
+          pendingYear: response.data.data.year,
+          pendingSummary: response.data.data.summary,
+          pendingCitationInfo: response.data.data.citation_information
         })
       })
       .catch(error => {
@@ -114,7 +118,9 @@ class Work extends React.Component {
       author: this.state.pendingAuthorId,
       year: this.state.pendingYear,
       url: this.state.pendingUrl,
-      name: this.state.pendingWorkTitle
+      name: this.state.pendingWorkTitle,
+      summary: this.state.pendingSummary,
+      citation_information: this.state.pendingCitationInfo
     }
 
     db.updateRecord(db.types.work, this.props.id, updateObject)
@@ -165,7 +171,13 @@ class Work extends React.Component {
   }
 
   render() {
-    var { pendingWorkTitle, pendingUrl, pendingYear } = this.state
+    var {
+      pendingWorkTitle,
+      pendingUrl,
+      pendingYear,
+      pendingCitationInfo,
+      pendingSummary
+    } = this.state
     this.props.setPageTitle(pendingWorkTitle)
     return (
       <div>
@@ -272,6 +284,46 @@ class Work extends React.Component {
               </>
             ) : (
               <YearSpan year={pendingYear} spanStyle="work-page year" />
+            )}
+          </div>
+          {/* Summary */}
+          <div className="work-page  form-container">
+            {this.state.edit ? (
+              <>
+                <label htmlFor="url" className="work-page form-label">
+                  Summary
+                </label>
+                <input
+                  defaultValue={pendingSummary}
+                  id="url"
+                  className="work-page url input"
+                  onChange={e => {
+                    this.setState({ pendingSummary: e.target.value })
+                  }}
+                />
+              </>
+            ) : (
+              <span className="work-page url">{pendingSummary}</span>
+            )}
+          </div>
+          {/* Citation Info */}
+          <div className="work-page  form-container">
+            {this.state.edit ? (
+              <>
+                <label htmlFor="citation-info" className="work-page form-label">
+                  Citation Information
+                </label>
+                <input
+                  defaultValue={pendingCitationInfo}
+                  id="citation-info"
+                  className="work-page input"
+                  onChange={e => {
+                    this.setState({ pendingCitationInfo: e.target.value })
+                  }}
+                />
+              </>
+            ) : (
+              <span className="work-page url">{pendingCitationInfo}</span>
             )}
           </div>
           {/* Buttons */}
