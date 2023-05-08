@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "parcel index.html",
-    "sass": "sass --watch style.scss",
+    "sass": "sass --watch style.scss:style.css",
     "build": "parcel build index.html --no-minify"
   },
   "engines": {

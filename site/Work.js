@@ -220,6 +220,26 @@ class Work extends React.Component {
               <span className="work-page title">{pendingWorkTitle}</span>
             )}
           </div>
+          {/* Citation Info */}
+          <div className="work-page form-container">
+            {this.state.edit ? (
+              <>
+                <label htmlFor="citation-info" className="work-page form-label">
+                  Citation Information
+                </label>
+                <input
+                  defaultValue={pendingCitationInfo}
+                  id="citation-info"
+                  className="work-page citation-info input"
+                  onChange={e => {
+                    this.setState({ pendingCitationInfo: e.target.value })
+                  }}
+                />
+              </>
+            ) : (
+              <span className="work-page url">{pendingCitationInfo}</span>
+            )}
+          </div>
           {/* Author */}
           <div className="work-page  form-container">
             {this.state.edit ? (
@@ -267,6 +287,7 @@ class Work extends React.Component {
               <span className="work-page url">{pendingUrl}</span>
             )}
           </div>
+
           {/* Year */}
           <div className="work-page  form-container">
             {this.state.edit ? (
@@ -296,7 +317,7 @@ class Work extends React.Component {
                 <input
                   defaultValue={pendingSummary}
                   id="url"
-                  className="work-page url input"
+                  className="work-page summary input"
                   onChange={e => {
                     this.setState({ pendingSummary: e.target.value })
                   }}
@@ -306,26 +327,7 @@ class Work extends React.Component {
               <span className="work-page url">{pendingSummary}</span>
             )}
           </div>
-          {/* Citation Info */}
-          <div className="work-page  form-container">
-            {this.state.edit ? (
-              <>
-                <label htmlFor="citation-info" className="work-page form-label">
-                  Citation Information
-                </label>
-                <input
-                  defaultValue={pendingCitationInfo}
-                  id="citation-info"
-                  className="work-page input"
-                  onChange={e => {
-                    this.setState({ pendingCitationInfo: e.target.value })
-                  }}
-                />
-              </>
-            ) : (
-              <span className="work-page url">{pendingCitationInfo}</span>
-            )}
-          </div>
+
           {/* Buttons */}
           <div>
             {this.state.edit ? (

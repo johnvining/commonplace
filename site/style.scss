@@ -854,7 +854,9 @@ a {
   }
 
   &.year,
-  &.url {
+  &.url,
+  &.summary,
+  &.citation-info {
     background-color: transparent;
     border-color: $white;
     border-radius: 4px;
