@@ -179,226 +179,201 @@ class Work extends React.Component {
       pendingSummary
     } = this.state
     this.props.setPageTitle(pendingWorkTitle)
+    // <div className="work-page form-container">
     return (
-      <div>
+      <>
+        {/* Piles */}
         <div>
-          {/* Piles */}
-          <div className="work-page form-container">
-            <PileListForItem
-              remove={this.state.edit}
-              edit={false}
-              piles={this.state.piles}
-              onSelect={this.handleNewPile.bind(this)}
-              getSuggestions={db.getSuggestions}
-              handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-              mainClassName="work-page"
-              onStartPileEdit={() => {
-                this.setState({ editPiles: true })
+          <PileListForItem
+            remove={this.state.edit}
+            edit={false}
+            piles={this.state.piles}
+            onSelect={this.handleNewPile.bind(this)}
+            getSuggestions={db.getSuggestions}
+            handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+            mainClassName="work-page"
+            onStartPileEdit={() => {
+              this.setState({ editPiles: true })
+            }}
+            allowAdd={true}
+            allowTabbing={true}
+            onPileRemove={this.handlePileRemove.bind(this)}
+          />
+        </div>
+        {/* Main Content */}
+        {this.state.edit ? (
+          <>
+            <label htmlFor="title" className="work-page form-label">
+              Title
+            </label>
+            <input
+              className="work-page title input"
+              id="title"
+              defaultValue={pendingWorkTitle}
+              onChange={e => {
+                this.setState({ pendingWorkTitle: e.target.value })
               }}
-              allowAdd={true}
-              allowTabbing={true}
-              onPileRemove={this.handlePileRemove.bind(this)}
             />
-          </div>
-          {/* Title */}
-          <div className="work-page  form-container">
-            {this.state.edit ? (
-              <>
-                <label htmlFor="title" className="work-page form-label">
-                  Title
-                </label>
-                <input
-                  className="work-page title input"
-                  id="title"
-                  defaultValue={pendingWorkTitle}
-                  onChange={e => {
-                    this.setState({ pendingWorkTitle: e.target.value })
-                  }}
-                />
-              </>
-            ) : (
-              <span className="work-page title">{pendingWorkTitle}</span>
-            )}
-          </div>
-          {/* Citation Info */}
-          <div className="work-page form-container">
-            {this.state.edit ? (
-              <>
-                <label htmlFor="citation-info" className="work-page form-label">
-                  Citation Information
-                </label>
-                <input
-                  defaultValue={pendingCitationInfo}
-                  id="citation-info"
-                  className="work-page citation-info input"
-                  onChange={e => {
-                    this.setState({ pendingCitationInfo: e.target.value })
-                  }}
-                />
-              </>
-            ) : (
-              <span className="work-page url">{pendingCitationInfo}</span>
-            )}
-          </div>
-          {/* Author */}
-          <div className="work-page  form-container">
-            {this.state.edit ? (
-              <>
-                <label htmlFor="work-author" className="work-page form-label">
-                  Author
-                </label>
-                <Autocomplete
-                  inputName="work-author"
-                  className={'work-page author-select'}
-                  dontAutofocus={true}
-                  defaultValue={this.state.pendingAuthorName || ''}
-                  onSelect={this.handleUpdateAuthor.bind(this)}
-                  getSuggestions={db.getSuggestions}
-                  apiType={db.types.auth}
-                  handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
-                  onClearText={this.handleClearAuthor.bind(this)}
-                />
-              </>
-            ) : (
-              <div className={'work-page author'}>
-                <Link to={'/auth/' + this.state.pendingAuthorId}>
-                  {this.state.pendingAuthorName}
-                </Link>
-              </div>
-            )}
-          </div>
-          {/* URL */}
-          <div className="work-page  form-container">
-            {this.state.edit ? (
-              <>
-                <label htmlFor="url" className="work-page form-label">
-                  URL
-                </label>
-                <input
-                  defaultValue={pendingUrl}
-                  id="url"
-                  className="work-page url input"
-                  onChange={e => {
-                    this.setState({ pendingUrl: e.target.value })
-                  }}
-                />
-              </>
-            ) : (
-              <span className="work-page url">{pendingUrl}</span>
-            )}
-          </div>
+            <label htmlFor="citation-info" className="work-page form-label">
+              Citation Information
+            </label>
+            <input
+              defaultValue={pendingCitationInfo}
+              id="citation-info"
+              className="work-page citation-info input"
+              onChange={e => {
+                this.setState({ pendingCitationInfo: e.target.value })
+              }}
+            />
+            <label htmlFor="work-author" className="work-page form-label">
+              Author
+            </label>
+            <Autocomplete
+              inputName="work-author"
+              className={'work-page author-select'}
+              dontAutofocus={true}
+              defaultValue={this.state.pendingAuthorName || ''}
+              onSelect={this.handleUpdateAuthor.bind(this)}
+              getSuggestions={db.getSuggestions}
+              apiType={db.types.auth}
+              handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
+              onClearText={this.handleClearAuthor.bind(this)}
+            />
 
-          {/* Year */}
-          <div className="work-page  form-container">
-            {this.state.edit ? (
-              <>
-                <label htmlFor="year" className="work-page form-label">
-                  Year
-                </label>
-                <input
-                  defaultValue={pendingYear}
-                  className="work-page year input"
-                  onChange={e => {
-                    this.setState({ pendingYear: e.target.value })
-                  }}
-                />
-              </>
-            ) : (
-              <YearSpan year={pendingYear} spanStyle="work-page year" />
-            )}
-          </div>
-          {/* Summary */}
-          <div className="work-page  form-container">
-            {this.state.edit ? (
-              <>
-                <label htmlFor="url" className="work-page form-label">
-                  Summary
-                </label>
-                <input
-                  defaultValue={pendingSummary}
-                  id="url"
-                  className="work-page summary input"
-                  onChange={e => {
-                    this.setState({ pendingSummary: e.target.value })
-                  }}
-                />
-              </>
-            ) : (
-              <span className="work-page url">{pendingSummary}</span>
-            )}
-          </div>
+            <label htmlFor="url" className="work-page form-label">
+              URL
+            </label>
+            <input
+              defaultValue={pendingUrl}
+              id="url"
+              className="work-page url input"
+              onChange={e => {
+                this.setState({ pendingUrl: e.target.value })
+              }}
+            />
+            <label htmlFor="year" className="work-page form-label">
+              Year
+            </label>
+            <input
+              defaultValue={pendingYear}
+              className="work-page year input"
+              onChange={e => {
+                this.setState({ pendingYear: e.target.value })
+              }}
+            />
+            <label htmlFor="url" className="work-page form-label">
+              Summary
+            </label>
+            <input
+              defaultValue={pendingSummary}
+              id="url"
+              className="work-page summary input"
+              onChange={e => {
+                this.setState({ pendingSummary: e.target.value })
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <span className="work-page title">{pendingWorkTitle}</span>
+            <br />
+            <span className="work-page title">
+              <small>
+                {pendingCitationInfo}{' '}
+                {pendingYear ? (
+                  <YearSpan year={pendingYear} spanStyle="work-page year" />
+                ) : (
+                  ''
+                )}
+                {pendingUrl ? (
+                  <>
+                    (<a href={pendingUrl}>link</a>)
+                  </>
+                ) : (
+                  ''
+                )}
+              </small>
+            </span>
+            <div className={'work-page author'}>
+              <Link to={'/auth/' + this.state.pendingAuthorId}>
+                {this.state.pendingAuthorName}
+              </Link>
+            </div>
 
-          {/* Buttons */}
-          <div>
-            {this.state.edit ? (
+            <span className="work-page url">
+              <small>{pendingSummary}</small>
+            </span>
+          </>
+        )}
+        {/* Buttons */}
+        <div>
+          {this.state.edit ? (
+            <button
+              className="top-level standard-button left-right"
+              onClick={this.handleAcceptUpdates.bind(this)}
+            >
+              Done
+            </button>
+          ) : this.state.editPiles ? (
+            <>
               <button
                 className="top-level standard-button left-right"
-                onClick={this.handleAcceptUpdates.bind(this)}
+                onClick={this.handleFinishEditing.bind(this)}
               >
                 Done
               </button>
-            ) : this.state.editPiles ? (
-              <>
-                <button
-                  className="top-level standard-button left-right"
-                  onClick={this.handleFinishEditing.bind(this)}
-                >
-                  Done
-                </button>
-                <Autocomplete
-                  inputName="work-work-pile"
-                  className={'work-page pile-select'}
-                  dontAutofocus={false}
-                  defaultValue={''}
-                  onSelect={this.handleNewPile.bind(this)}
-                  getSuggestions={db.getSuggestions}
-                  apiType={db.types.pile}
-                  handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-                  clearOnSelect={true}
-                  excludeIds={this.state.piles?.map(pile => pile._id)}
-                />
-              </>
-            ) : (
-              <>
-                <button
-                  className="top-level standard-button left-right"
-                  onClick={() => {
-                    this.setState({ edit: true, editPiles: false })
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  className="top-level standard-button left-right"
-                  onClick={() => {
-                    this.setState({ edit: false, editPiles: true })
-                  }}
-                >
-                  Piles
-                </button>
-                <button
-                  className="top-level standard-button left-right"
-                  onClick={this.deleteWork.bind(this)}
-                >
-                  Delete
-                </button>
-                <button
-                  className="top-level standard-button left-right"
-                  onClick={this.createNoteForWork.bind(this)}
-                >
-                  + Note
-                </button>
-              </>
-            )}
-          </div>
+              <Autocomplete
+                inputName="work-work-pile"
+                className={'work-page pile-select'}
+                dontAutofocus={false}
+                defaultValue={''}
+                onSelect={this.handleNewPile.bind(this)}
+                getSuggestions={db.getSuggestions}
+                apiType={db.types.pile}
+                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+                clearOnSelect={true}
+                excludeIds={this.state.piles?.map(pile => pile._id)}
+              />
+            </>
+          ) : (
+            <>
+              <button
+                className="top-level standard-button left-right"
+                onClick={() => {
+                  this.setState({ edit: true, editPiles: false })
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className="top-level standard-button left-right"
+                onClick={() => {
+                  this.setState({ edit: false, editPiles: true })
+                }}
+              >
+                Piles
+              </button>
+              <button
+                className="top-level standard-button left-right"
+                onClick={this.deleteWork.bind(this)}
+              >
+                Delete
+              </button>
+              <button
+                className="top-level standard-button left-right"
+                onClick={this.createNoteForWork.bind(this)}
+              >
+                + Note
+              </button>
+            </>
+          )}
         </div>
-
         <NoteList
           key={'work' + this.props.id}
           viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
         />
-      </div>
+      </>
     )
   }
 }
