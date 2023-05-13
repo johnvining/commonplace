@@ -796,6 +796,19 @@ class Note extends React.Component {
                       >
                         <img src={trash}></img>
                       </button>
+                      <button
+                        onClick={() => {
+                          console.log('runnnning')
+                          db.getNoteNick(this.props.id).then(response => {
+                            console.log(response.data.data.key)
+                            navigator.clipboard.writeText(
+                              response.data.data.key
+                            )
+                          })
+                        }}
+                      >
+                        Nickname
+                      </button>
                     </span>
                   )}
                 </>

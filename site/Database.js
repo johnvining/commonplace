@@ -181,3 +181,7 @@ export async function getTitleSuggestion(noteID) {
 export async function getIdeaSuggestions(noteID) {
   return axios.get(url_api + `note/` + noteID + `/ideas/suggest`)
 }
+
+export async function getNoteNick(noteID) {
+  return axios.put(url_api + `nick/note/` + noteID)
+}

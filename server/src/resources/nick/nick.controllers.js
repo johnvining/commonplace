@@ -6,7 +6,6 @@ import { defaultControllers } from '../../utils/default.controllers.js'
 
 export const reqGenerateNickForNote = async (req, res) => {
   let existingNick = await Nick.findOne({ note: req.params.id })
-  console.log(existingNick)
 
   if (!existingNick || existingNick._id == null) {
     var hash = hashFunc(req.params.id)
