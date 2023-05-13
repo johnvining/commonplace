@@ -756,8 +756,9 @@ class Note extends React.Component {
                   ) : (
                     // Neither editing whole note nor ideas
                     <span>
-                      <code>{this.state.nick}</code>
-
+                      <code style={{ verticalAlign: 'super', color: 'grey' }}>
+                        <small>{this.state.nick}</small>
+                      </code>
                       <button
                         className={'action-button'}
                         onClick={() => {
