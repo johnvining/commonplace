@@ -1,7 +1,5 @@
 import mongoose from 'mongoose'
 
-// TODO: Add year
-// TODO: Add author
 const workSchema = new mongoose.Schema(
   {
     name: String,
