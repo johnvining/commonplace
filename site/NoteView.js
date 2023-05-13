@@ -13,7 +13,6 @@ class NoteView extends React.Component {
     var noteId
     if (!this.props.id) {
       const nick = await db.getNick(this.props.nick)
-      console.log(nick)
       noteId = nick.data.data.note
     } else {
       noteId = this.props.id

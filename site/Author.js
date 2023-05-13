@@ -106,14 +106,11 @@ class Author extends React.Component {
       death_year: this.state.pendingDeathYear
     }
 
-    console.log(updateObject)
-
     db.updateRecord(db.types.auth, this.props.id, updateObject)
     this.setState({ edit: false })
   }
 
   render() {
-    console.log(this.state.pendingDeathYear)
     return (
       <div>
         {/* Header and Edit */}
