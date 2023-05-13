@@ -758,9 +758,9 @@ class Note extends React.Component {
                         className={'action-button'}
                         onClick={() => {
                           db.getNoteNick(this.props.id).then(response => {
-                            navigator.clipboard.writeText(
-                              response.data.data.key
-                            )
+                            // navigator.clipboard.writeText(
+                            //   response.data.data.key
+                            // )
                             this.setState({
                               fetchNick: true,
                               nick: response.data.data.key
