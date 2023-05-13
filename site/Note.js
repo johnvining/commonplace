@@ -35,7 +35,9 @@ class Note extends React.Component {
     pendingWorkName: '',
     pendingYear: '',
     fetchingTitleSuggestion: false,
-    suggestedTags: []
+    suggestedTags: [],
+    fetchNick: false,
+    nick: ''
   }
 
   componentDidMount() {
@@ -52,8 +54,7 @@ class Note extends React.Component {
       pendingUrl: this.props.note.url,
       pendingWorkId: this.props.note.work?._id,
       pendingWorkName: this.props.note.work?.name,
-      pendingYear: this.props.note.year,
-      fetchNick: false
+      pendingYear: this.props.note.year
     })
   }
 
@@ -751,6 +752,8 @@ class Note extends React.Component {
                   ) : (
                     // Neither editing whole note nor ideas
                     <span>
+                      <small>{' ' + this.state.nick}</small>
+
                       <button
                         className={'action-button'}
                         onClick={() => {
@@ -758,12 +761,14 @@ class Note extends React.Component {
                             navigator.clipboard.writeText(
                               response.data.data.key
                             )
-                            this.setState({ fetchNick: true })
+                            this.setState({
+                              fetchNick: true,
+                              nick: response.data.data.key
+                            })
                           })
                         }}
                         tabIndex="-1"
                       >
-                        {' '}
                         {this.state.fetchNick ? (
                           <img src={clipboard_check}></img>
                         ) : (
