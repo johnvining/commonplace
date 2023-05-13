@@ -44,6 +44,10 @@ class Note extends React.Component {
     this.keyDownListener = this.handleKeyDown.bind(this)
     document.addEventListener('keydown', this.keyDownListener, false)
 
+    db.getNoteNick(this.props.id).then(response => {
+      this.setState({ nick: response.data.data.key })
+    })
+
     this.setState({
       pendingAuthorId: this.props.note.author?._id,
       pendingAuthorName: this.props.note.author?.name,
@@ -752,7 +756,7 @@ class Note extends React.Component {
                   ) : (
                     // Neither editing whole note nor ideas
                     <span>
-                      <small>{' ' + this.state.nick}</small>
+                      <code>{this.state.nick}</code>
 
                       <button
                         className={'action-button'}
@@ -761,10 +765,6 @@ class Note extends React.Component {
                             // navigator.clipboard.writeText(
                             //   response.data.data.key
                             // )
-                            this.setState({
-                              fetchNick: true,
-                              nick: response.data.data.key
-                            })
                           })
                         }}
                         tabIndex="-1"
