@@ -139,7 +139,12 @@ class SearchBar extends React.Component {
         }
       })
     } else if (event.keyCode == this.keyEvents.enter) {
-      // Check if the type text is a nick
+      const nick = await db.getNick(this.state.typedText)
+      if (nick) {
+        // TODO: this is assuming all nicks belong to notes
+        this.props.beforeNavigate()
+        navigate('/note/' + nick.data.data.note)
+      }
     }
   }
 
@@ -169,6 +174,7 @@ class SearchBar extends React.Component {
   async handleCreate(typedValue) {
     var dbType = this.modifierToDbTypes(this.state.modifier)
     var newRecord = await db.createRecord(dbType, typedValue)
+    this.props.beforeNavigate()
     navigate('/' + dbType + '/' + newRecord.data.data._id)
   }
 
