@@ -138,6 +138,8 @@ class SearchBar extends React.Component {
             break
         }
       })
+    } else if (event.keyCode == this.keyEvents.enter) {
+      // Check if the type text is a nick
     }
   }
 

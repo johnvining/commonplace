@@ -24,8 +24,9 @@ export const reqGenerateNickForNote = async (req, res) => {
   }
 }
 
-export const findNick = async function(nick) {
-  return await Nick.findOne({ key: nick })
+export const reqGetNick = async (req, res) => {
+  const nick = await Nick.findOne({ key: req.params.nick })
+  return nick
 }
 
 export const hashFunc = function hash(str) {
