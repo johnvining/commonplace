@@ -10,8 +10,17 @@ class NoteView extends React.Component {
 
   async getListOfOneNote(index, page) {
     var notesResponse
+    var noteId
+    if (!this.props.id) {
+      const nick = await db.getNick(this.props.nick)
+      console.log(nick)
+      noteId = nick.data.data.note
+    } else {
+      noteId = this.props.id
+    }
+
     await db
-      .getInfo(db.types.note, this.props.id)
+      .getInfo(db.types.note, noteId)
       .then(response => {
         notesResponse = response
       })
@@ -32,7 +41,7 @@ class NoteView extends React.Component {
   render() {
     return (
       <NoteList
-        key={'note' + this.props.id}
+        key={'note' + (this.props.id ?? this.props.nick)}
         viewMode={constants.view_modes.FULL}
         editFirst={this.props.edit}
         getListOfNotes={this.getListOfOneNote.bind(this)}

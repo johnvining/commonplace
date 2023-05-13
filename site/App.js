@@ -137,6 +137,10 @@ class App extends React.Component {
             setPageTitle={this.setPageTitle.bind(this)}
           />
           <NoteView
+            path="/nick/:nick"
+            setPageTitle={this.setPageTitle.bind(this)}
+          />
+          <NoteView
             path="/note/:id/edit"
             edit={true}
             setPageTitle={this.setPageTitle.bind(this)}
