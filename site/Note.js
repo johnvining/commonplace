@@ -5,6 +5,8 @@ import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import check_circle from './icons/check_circle.svg'
 import cross_circle from './icons/cross_circle.svg'
+import clipboard from './icons/clipboard.svg'
+import clipboard_check from './icons/clipboard_check.svg'
 import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
 import link from './icons/link.svg'
@@ -50,7 +52,8 @@ class Note extends React.Component {
       pendingUrl: this.props.note.url,
       pendingWorkId: this.props.note.work?._id,
       pendingWorkName: this.props.note.work?.name,
-      pendingYear: this.props.note.year
+      pendingYear: this.props.note.year,
+      fetchNick: false
     })
   }
 
@@ -751,6 +754,27 @@ class Note extends React.Component {
                       <button
                         className={'action-button'}
                         onClick={() => {
+                          console.log('runnnning')
+                          db.getNoteNick(this.props.id).then(response => {
+                            console.log(response.data.data.key)
+                            navigator.clipboard.writeText(
+                              response.data.data.key
+                            )
+                            this.setState({ fetchNick: true })
+                          })
+                        }}
+                        tabIndex="-1"
+                      >
+                        {' '}
+                        {this.state.fetchNick ? (
+                          <img src={clipboard_check}></img>
+                        ) : (
+                          <img src={clipboard}></img>
+                        )}
+                      </button>
+                      <button
+                        className={'action-button'}
+                        onClick={() => {
                           this.props.setNoteMode(
                             this.props.id,
                             constants.note_modes.EDIT_PILES
@@ -795,19 +819,6 @@ class Note extends React.Component {
                         tabIndex="-1"
                       >
                         <img src={trash}></img>
-                      </button>
-                      <button
-                        onClick={() => {
-                          console.log('runnnning')
-                          db.getNoteNick(this.props.id).then(response => {
-                            console.log(response.data.data.key)
-                            navigator.clipboard.writeText(
-                              response.data.data.key
-                            )
-                          })
-                        }}
-                      >
-                        Nickname
                       </button>
                     </span>
                   )}
