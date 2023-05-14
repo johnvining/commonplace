@@ -445,6 +445,16 @@ class Note extends React.Component {
               <label htmlFor="text" className="note-full form-label">
                 Text
               </label>
+              <button
+                onClick={() => {
+                  db.getNoteTextOCR(this.props.id).then(response => {
+                    const newText = response.data.data
+                    this.setState({ pendingText: newText })
+                  })
+                }}
+              >
+                ocr
+              </button>
               <textarea
                 id="text"
                 className={'note-full note-text edit'}
