@@ -1,4 +1,5 @@
 const Tesseract = require('tesseract.js')
+import { getLLMCorrectedText } from './suggestions.js'
 
 export const ocr = async function(url) {
   // todo: language support
@@ -13,8 +14,9 @@ export const ocr = async function(url) {
       data: { text }
     } = await worker.recognize(url)
     await worker.terminate()
+    let corrected_text = await getLLMCorrectedText(text)
 
-    return text
+    return corrected_text
   } catch (e) {
     console.log('error')
     console.log(e)
