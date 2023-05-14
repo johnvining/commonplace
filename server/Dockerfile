@@ -2,7 +2,7 @@
 # https://medium.com/mozilla-club-bbsr/dockerizing-a-mern-stack-web-application-ebf78babf136
 
 
-FROM node:20-alpine3.16
+FROM node:19-alpine
 
 # Create App Directory
 RUN mkdir -p /usr/src/app
@@ -19,6 +19,8 @@ RUN apk --no-cache --virtual build-dependencies add \
     make \
     g++ \
     && npm install \
+    && npm i openai\
+    && npm i tesseract.js\
     && apk del build-dependencies
 
 # TODO: Production build
