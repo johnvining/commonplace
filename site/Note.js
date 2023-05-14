@@ -40,14 +40,14 @@ class Note extends React.Component {
     suggestedTags: [],
     fetchNick: false,
     fetchingOcr: false,
-    nick: ''
+    nick: '',
   }
 
   componentDidMount() {
     this.keyDownListener = this.handleKeyDown.bind(this)
     document.addEventListener('keydown', this.keyDownListener, false)
 
-    db.getNoteNick(this.props.id).then(response => {
+    db.getNoteNick(this.props.id).then((response) => {
       this.setState({ nick: response.data.data.key })
     })
 
@@ -61,7 +61,7 @@ class Note extends React.Component {
       pendingUrl: this.props.note.url,
       pendingWorkId: this.props.note.work?._id,
       pendingWorkName: this.props.note.work?.name,
-      pendingYear: this.props.note.year
+      pendingYear: this.props.note.year,
     })
   }
 
@@ -109,35 +109,35 @@ class Note extends React.Component {
         .then(() => {
           this.setState({ deleted: true })
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error)
         })
     }
   }
 
-  handleTitleChange = val => {
+  handleTitleChange = (val) => {
     this.setState({ pendingTitle: val.target.value })
   }
 
-  handlePageChange = val => {
+  handlePageChange = (val) => {
     this.setState({ pendingPage: val.target.value })
   }
 
-  handleYearChange = val => {
+  handleYearChange = (val) => {
     this.setState({ pendingYear: val.target.value })
   }
 
-  handleTextChange = val => {
+  handleTextChange = (val) => {
     autosize(document.querySelector('#text'))
     this.setState({ pendingText: val.target.value })
   }
 
-  handleTakeChange = val => {
+  handleTakeChange = (val) => {
     autosize(document.querySelector('#take'))
     this.setState({ pendingTake: val.target.value })
   }
 
-  handleUrlChange = val => {
+  handleUrlChange = (val) => {
     var year = guessYearFromURL(val.target.value)
     if (!this.state.pendingYear && year) {
       this.setState({ pendingUrl: val.target.value, pendingYear: year })
@@ -146,7 +146,7 @@ class Note extends React.Component {
     }
   }
   // TODO: Clear entry after assignment
-  handleCreateIdeaAndAddToNote = ideaName => {
+  handleCreateIdeaAndAddToNote = (ideaName) => {
     db.createAndLinkToRecord(
       db.types.idea,
       ideaName,
@@ -156,7 +156,7 @@ class Note extends React.Component {
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e)
       })
   }
@@ -171,7 +171,7 @@ class Note extends React.Component {
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e)
       })
   }
@@ -180,11 +180,11 @@ class Note extends React.Component {
     this.setState({ pendingAuthorName: authorName, pendingAuthorId: authorId })
   }
 
-  handleCreateAuthorAndAssign = authorName => {
-    db.createRecord(db.types.auth, authorName).then(response => {
+  handleCreateAuthorAndAssign = (authorName) => {
+    db.createRecord(db.types.auth, authorName).then((response) => {
       this.setState({
         pendingAuthorId: response.data.data._id,
-        pendingAuthorName: authorName
+        pendingAuthorName: authorName,
       })
     })
   }
@@ -193,11 +193,11 @@ class Note extends React.Component {
     this.setState({ pendingWorkId: workId, pendingWorkName: workName })
   }
 
-  handleCreateWorkAndAssign = workName => {
-    db.createRecord(db.types.work, workName).then(response => {
+  handleCreateWorkAndAssign = (workName) => {
+    db.createRecord(db.types.work, workName).then((response) => {
       this.setState({
         pendingWorkId: response.data.data._id,
-        pendingWorkName: workName
+        pendingWorkName: workName,
       })
     })
   }
@@ -210,7 +210,7 @@ class Note extends React.Component {
       text: this.state.pendingText,
       title: this.state.pendingTitle,
       url: this.state.pendingUrl,
-      work: this.state.pendingWorkId
+      work: this.state.pendingWorkId,
     }
 
     // TODO: Change to server-side validation, add client-side UI
@@ -223,7 +223,7 @@ class Note extends React.Component {
     await db
       .updateRecord(db.types.note, this.props.id, updateObject)
       .then(this.props.refetchMe(this.props.index))
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
   }
@@ -236,10 +236,10 @@ class Note extends React.Component {
 
   async generateTitleSuggestion() {
     this.setState({ fetchingTitleSuggestion: true })
-    await db.getTitleSuggestion(this.props.id).then(response => {
+    await db.getTitleSuggestion(this.props.id).then((response) => {
       this.setState({
         pendingTitle: response.data.suggested_title,
-        fetchingTitleSuggestion: false
+        fetchingTitleSuggestion: false,
       })
     })
   }
@@ -272,27 +272,27 @@ class Note extends React.Component {
       })
     } else {
       this.setState({
-        largeImage: click.target.id
+        largeImage: click.target.id,
       })
     }
   }
 
-  handleNewPile = pileId => {
+  handleNewPile = (pileId) => {
     db.addLinkToRecord(db.types.pile, pileId, db.types.note, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e)
       })
   }
 
-  handleNewIdea = ideaId => {
+  handleNewIdea = (ideaId) => {
     db.addLinkToRecord(db.types.idea, ideaId, db.types.note, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch(e => {
+      .catch((e) => {
         console.error(e)
       })
   }
@@ -452,12 +452,17 @@ class Note extends React.Component {
                   tabIndex="-1"
                   onClick={() => {
                     this.setState({ fetchingOcr: true })
-                    db.getNoteTextOCR(this.props.id).then(response => {
+                    db.getNoteTextOCR(this.props.id).then((response) => {
                       const newText = response.data.data
                       this.setState({
                         pendingText: newText,
-                        fetchingOcr: false
+                        fetchingOcr: false,
                       })
+                      console.log('landed')
+                      let input = document.querySelector('#text')
+
+                      var event = new Event('input', { bubbles: true })
+                      input.dispatchEvent(event)
                     })
                   }}
                 >
@@ -652,7 +657,7 @@ class Note extends React.Component {
                   this.props.onStartPileEdit(note._id)
                 }}
               />
-              {note.ideas?.map(idea =>
+              {note.ideas?.map((idea) =>
                 edit_ideas ? (
                   <button
                     className="idea label edit"
@@ -769,11 +774,13 @@ class Note extends React.Component {
                         apiType={edit_ideas ? db.types.idea : db.types.pile}
                         excludeIds={
                           edit_ideas
-                            ? note.ideas?.map(idea => idea._id)
-                            : note.piles?.map(pile => pile._id)
+                            ? note.ideas?.map((idea) => idea._id)
+                            : note.piles?.map((pile) => pile._id)
                         }
                         excludeNames={
-                          edit_ideas ? note.ideas?.map(idea => idea.name) : null
+                          edit_ideas
+                            ? note.ideas?.map((idea) => idea.name)
+                            : null
                         }
                       />
                     </>
@@ -786,7 +793,7 @@ class Note extends React.Component {
                       <button
                         className={'action-button'}
                         onClick={() => {
-                          db.getNoteNick(this.props.id).then(response => {
+                          db.getNoteNick(this.props.id).then((response) => {
                             // navigator.clipboard.writeText(
                             //   response.data.data.key
                             // )
