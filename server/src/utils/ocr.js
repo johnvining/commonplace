@@ -1,12 +1,20 @@
-// import Tesseract from 'tesseract.js'
 const Tesseract = require('tesseract.js')
 
 export const ocr = async function(url) {
   // todo: language support
   try {
-    const result = await Tesseract.recognize(url, 'eng')
+    const worker = await Tesseract.createWorker({
+      logger: m => console.log(m)
+    })
 
-    return result.data.text
+    await worker.loadLanguage('eng')
+    await worker.initialize('eng')
+    const {
+      data: { text }
+    } = await worker.recognize(url)
+    await worker.terminate()
+
+    return text
   } catch (e) {
     console.log('error')
     console.log(e)

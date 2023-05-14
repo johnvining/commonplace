@@ -21,6 +21,7 @@ export const reqFindNotesByString = async (req, res) => {
 }
 
 export const reqGetNoteDetails = async (req, res) => {
+  console.log('note details')
   return await findNotesAndPopulate({ _id: req.params.id })
 }
 
