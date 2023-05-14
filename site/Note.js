@@ -5,6 +5,8 @@ import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import check_circle from './icons/check_circle.svg'
 import cross_circle from './icons/cross_circle.svg'
+import eye from './icons/eye.svg'
+import eye_closed from './icons/eye_closed.svg'
 import clipboard from './icons/clipboard.svg'
 import clipboard_check from './icons/clipboard_check.svg'
 import document_image from './icons/document.svg'
@@ -37,6 +39,7 @@ class Note extends React.Component {
     fetchingTitleSuggestion: false,
     suggestedTags: [],
     fetchNick: false,
+    fetchingOcr: false,
     nick: ''
   }
 
@@ -444,17 +447,28 @@ class Note extends React.Component {
             <div name="text" className="width-100">
               <label htmlFor="text" className="note-full form-label">
                 Text
+                <button
+                  className={'action-button'}
+                  tabIndex="-1"
+                  onClick={() => {
+                    this.setState({ fetchingOcr: true })
+                    db.getNoteTextOCR(this.props.id).then(response => {
+                      const newText = response.data.data
+                      this.setState({
+                        pendingText: newText,
+                        fetchingOcr: false
+                      })
+                    })
+                  }}
+                >
+                  {this.state.fetchingOcr ? (
+                    <img src={eye_closed}></img>
+                  ) : (
+                    <img src={eye}></img>
+                  )}
+                </button>
               </label>
-              <button
-                onClick={() => {
-                  db.getNoteTextOCR(this.props.id).then(response => {
-                    const newText = response.data.data
-                    this.setState({ pendingText: newText })
-                  })
-                }}
-              >
-                ocr
-              </button>
+
               <textarea
                 id="text"
                 className={'note-full note-text edit'}
