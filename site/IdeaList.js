@@ -18,7 +18,7 @@ class IdeaList extends React.Component {
       <div className="idea-list">
         {this.state.ideas === undefined ? null : (
           <div>
-            {this.state.ideas.map((idea, index) => {
+            {this.state.ideas.map((idea) => {
               return (
                 <Link to={`/idea/${idea._id}`} key={'idea-list-' + idea._id}>
                   <div className="result-box">
