@@ -36,7 +36,7 @@ class NoteList extends React.Component {
         notes: response.data.data
       },
       () => {
-        for (var i = 0; i < this.state.notes.length; i++) {
+        for (var i = 0; i < this.state.notes?.length; i++) {
           this.getImagesForNoteAtIndex(i, false)
         }
       }

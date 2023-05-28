@@ -1,13 +1,13 @@
 import React from 'react'
 import Autocomplete from './Autocomplete'
-import { navigate } from '@reach/router'
+import { useNavigate } from 'react-router-dom'
 import * as db from './Database'
 
 class PileListForItem extends React.Component {
   render() {
     return (
       <>
-        {this.props.piles?.map(pile => (
+        {this.props.piles?.map((pile) => (
           <button
             key={'/pile/' + pile._id}
             className={this.props.remove ? 'pile label remove' : 'pile label'}
@@ -15,6 +15,7 @@ class PileListForItem extends React.Component {
               if (this.props.remove) {
                 this.props.onPileRemove(pile._id)
               } else {
+                const navigate = useNavigate()
                 navigate('/pile/' + pile._id)
               }
             }}
@@ -34,7 +35,7 @@ class PileListForItem extends React.Component {
             handleNewSelect={this.props.handleNewSelect.bind(this)}
             inputName="work-pile"
             onSelect={this.props.onSelect.bind(this)}
-            excludeIds={this.props.piles?.map(pile => pile._id)}
+            excludeIds={this.props.piles?.map((pile) => pile._id)}
           />
         ) : (
           ''

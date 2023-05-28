@@ -5,7 +5,7 @@ export const types = {
   note: 'note',
   work: 'work',
   idea: 'idea',
-  pile: 'pile'
+  pile: 'pile',
 }
 
 export const url_api = process.env.SERVER_API
@@ -138,7 +138,7 @@ export async function deleteImage(noteId, imagePath) {
 
 export async function getImagesForNote(noteId, imageN) {
   return axios.get(url_api + 'note/' + noteId + '/images/' + imageN, {
-    responseType: 'blob'
+    responseType: 'blob',
   })
 }
 

@@ -9,6 +9,7 @@
 /site/.sass-cache/
 /site/dist/
 /site/node_modules/
+/site/.parcel-cache/
 Notes.md
 server/src/config/devconfig.js
 server/src/config/prodconfig.js

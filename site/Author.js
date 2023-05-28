@@ -1,4 +1,4 @@
-import { navigate } from '@reach/router'
+import { useNavigate } from 'react-router-dom'
 import * as constants from './constants'
 import * as db from './Database'
 import NoteList from './NoteList'
@@ -12,7 +12,7 @@ class Author extends React.Component {
     edit: false,
     pendingName: '',
     pendingBirthYear: '',
-    pendingDeathYear: ''
+    pendingDeathYear: '',
   }
 
   componentDidMount() {
@@ -29,27 +29,27 @@ class Author extends React.Component {
 
   fetchAuthorInfo(authorId) {
     db.getInfo(db.types.auth, authorId)
-      .then(response => {
+      .then((response) => {
         this.setState({
           pendingName: response.data.data.name,
           pendingBirthYear: response.data.data.birth_year,
-          pendingDeathYear: response.data.data.death_year
+          pendingDeathYear: response.data.data.death_year,
         })
         this.props.setPageTitle(response.data.data.name)
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
   }
 
   fetchAuthorWorks(authorId) {
     db.getRecordsWithFilter(db.types.work, db.types.auth, authorId)
-      .then(response => {
+      .then((response) => {
         this.setState({
-          works: response.data.data
+          works: response.data.data,
         })
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
   }
@@ -59,20 +59,20 @@ class Author extends React.Component {
     if (index == undefined) {
       await db
         .getRecordsWithFilter(db.types.note, db.types.auth, this.state.id)
-        .then(response => {
+        .then((response) => {
           notesResponse = response
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error)
         })
     } else {
       var workId = this.state.works[index]?._id
       await db
         .getRecordsWithFilter(db.types.note, db.types.work, workId)
-        .then(response => {
+        .then((response) => {
           notesResponse = response
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error)
         })
     }
@@ -96,6 +96,7 @@ class Author extends React.Component {
     }
 
     await db.deleteRecord(db.types.auth, this.state.id)
+    const navigate = useNavigate()
     navigate('/')
   }
 
@@ -103,7 +104,7 @@ class Author extends React.Component {
     var updateObject = {
       name: this.state.pendingName,
       birth_year: this.state.pendingBirthYear,
-      death_year: this.state.pendingDeathYear
+      death_year: this.state.pendingDeathYear,
     }
 
     db.updateRecord(db.types.auth, this.props.id, updateObject)
@@ -124,7 +125,7 @@ class Author extends React.Component {
                 className="work-page title input"
                 id="title"
                 defaultValue={this.state.pendingName}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingName: e.target.value })
                 }}
               />
@@ -135,7 +136,7 @@ class Author extends React.Component {
                 className="work-page title input"
                 id="birth-year"
                 defaultValue={this.state.pendingBirthYear}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingBirthYear: e.target.value })
                 }}
               />
@@ -146,7 +147,7 @@ class Author extends React.Component {
                 className="work-page title input"
                 id="death-year"
                 defaultValue={this.state.pendingDeathYear}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingDeathYear: e.target.value })
                 }}
               />

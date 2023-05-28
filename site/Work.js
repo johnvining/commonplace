@@ -1,5 +1,4 @@
-import { Link } from '@reach/router'
-import { navigate } from '@reach/router'
+import { Link, useNavigate } from 'react-router-dom'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
@@ -17,7 +16,7 @@ class Work extends React.Component {
     pendingYear: '',
     pendingAuthorName: '',
     pendingSummary: '',
-    pendingCitationInfo: ''
+    pendingCitationInfo: '',
   }
 
   componentDidMount() {
@@ -43,7 +42,7 @@ class Work extends React.Component {
 
   fetchWorkInfo(workId) {
     db.getInfo(db.types.work, workId)
-      .then(response => {
+      .then((response) => {
         this.setState({
           pendingWorkTitle: response.data.data.name,
           piles: response.data.data.piles,
@@ -52,10 +51,10 @@ class Work extends React.Component {
           pendingUrl: response.data.data.url,
           pendingYear: response.data.data.year,
           pendingSummary: response.data.data.summary,
-          pendingCitationInfo: response.data.data.citation_information
+          pendingCitationInfo: response.data.data.citation_information,
         })
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
   }
@@ -64,10 +63,10 @@ class Work extends React.Component {
     var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.work, this.state.id)
-      .then(response => {
+      .then((response) => {
         notesResponse = response
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
 
@@ -93,9 +92,9 @@ class Work extends React.Component {
       authorName,
       db.types.work,
       this.props.id
-    ).then(response => {
+    ).then((response) => {
       this.setState({
-        pendingAuthorId: response.data.data.id
+        pendingAuthorId: response.data.data.id,
       })
     })
   }
@@ -110,6 +109,7 @@ class Work extends React.Component {
     }
 
     await db.deleteRecord(db.types.work, this.state.id)
+    const navigate = useNavigate()
     navigate('/')
   }
 
@@ -120,7 +120,7 @@ class Work extends React.Component {
       url: this.state.pendingUrl,
       name: this.state.pendingWorkTitle,
       summary: this.state.pendingSummary,
-      citation_information: this.state.pendingCitationInfo
+      citation_information: this.state.pendingCitationInfo,
     }
 
     db.updateRecord(db.types.work, this.props.id, updateObject)
@@ -167,6 +167,7 @@ class Work extends React.Component {
 
   async createNoteForWork() {
     const response = await db.createNewNoteForWork(this.props.id)
+    const navigate = useNavigate()
     navigate('/note/' + response.data._id + '/edit')
   }
 
@@ -176,7 +177,7 @@ class Work extends React.Component {
       pendingUrl,
       pendingYear,
       pendingCitationInfo,
-      pendingSummary
+      pendingSummary,
     } = this.state
     this.props.setPageTitle(pendingWorkTitle)
     // <div className="work-page form-container">
@@ -210,7 +211,7 @@ class Work extends React.Component {
               className="work-page title input"
               id="title"
               defaultValue={pendingWorkTitle}
-              onChange={e => {
+              onChange={(e) => {
                 this.setState({ pendingWorkTitle: e.target.value })
               }}
             />
@@ -221,7 +222,7 @@ class Work extends React.Component {
               defaultValue={pendingCitationInfo}
               id="citation-info"
               className="work-page citation-info input"
-              onChange={e => {
+              onChange={(e) => {
                 this.setState({ pendingCitationInfo: e.target.value })
               }}
             />
@@ -247,7 +248,7 @@ class Work extends React.Component {
               defaultValue={pendingUrl}
               id="url"
               className="work-page url input"
-              onChange={e => {
+              onChange={(e) => {
                 this.setState({ pendingUrl: e.target.value })
               }}
             />
@@ -257,7 +258,7 @@ class Work extends React.Component {
             <input
               defaultValue={pendingYear}
               className="work-page year input"
-              onChange={e => {
+              onChange={(e) => {
                 this.setState({ pendingYear: e.target.value })
               }}
             />
@@ -268,7 +269,7 @@ class Work extends React.Component {
               defaultValue={pendingSummary}
               id="url"
               className="work-page summary input"
-              onChange={e => {
+              onChange={(e) => {
                 this.setState({ pendingSummary: e.target.value })
               }}
             />
@@ -332,7 +333,7 @@ class Work extends React.Component {
                 apiType={db.types.pile}
                 handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
                 clearOnSelect={true}
-                excludeIds={this.state.piles?.map(pile => pile._id)}
+                excludeIds={this.state.piles?.map((pile) => pile._id)}
               />
             </>
           ) : (

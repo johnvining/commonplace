@@ -1,11 +1,11 @@
-import { navigate } from '@reach/router'
+import { useNavigate } from 'react-router-dom'
 import * as constants from './constants'
 import * as db from './Database'
 import NoteList from './NoteList'
 import React from 'react'
 import WorkList from './WorkList'
 import YearSpan from './YearSpan'
-import { Link } from '@reach/router'
+import { Link } from 'react-router-dom'
 
 class Pile extends React.Component {
   state = {
@@ -13,7 +13,7 @@ class Pile extends React.Component {
     edit: false,
     pendingName: '',
     pendingStartYear: '',
-    pendingEndYear: ''
+    pendingEndYear: '',
   }
 
   componentDidMount() {
@@ -28,14 +28,14 @@ class Pile extends React.Component {
 
   fetchPileInfo(pileId) {
     db.getInfo(db.types.pile, pileId)
-      .then(response => {
+      .then((response) => {
         this.setState({
           pendingName: response.data.data.name,
           pendingStartYear: response.data.data.start_year,
-          pendingEndYear: response.data.data.end_year
+          pendingEndYear: response.data.data.end_year,
         })
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
   }
@@ -56,6 +56,7 @@ class Pile extends React.Component {
     }
 
     await db.deleteRecord(db.types.pile, this.state.id)
+    const navigate = useNavigate()
     navigate('/')
   }
 
@@ -63,10 +64,10 @@ class Pile extends React.Component {
     var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.pile, this.state.id)
-      .then(response => {
+      .then((response) => {
         notesResponse = response
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
 
@@ -77,10 +78,10 @@ class Pile extends React.Component {
     var worksResponse
     await db
       .getRecordsWithFilter(db.types.work, db.types.pile, this.state.id)
-      .then(response => {
+      .then((response) => {
         worksResponse = response
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
 
@@ -91,7 +92,7 @@ class Pile extends React.Component {
     var updateObject = {
       name: this.state.pendingName,
       start_year: this.state.pendingStartYear,
-      end_year: this.state.pendingEndYear
+      end_year: this.state.pendingEndYear,
     }
 
     db.updateRecord(db.types.pile, this.props.id, updateObject)
@@ -113,7 +114,7 @@ class Pile extends React.Component {
                 className="work-page title input"
                 id="title"
                 defaultValue={this.state.pendingName}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingName: e.target.value })
                 }}
               />
@@ -124,7 +125,7 @@ class Pile extends React.Component {
                 className="work-page title input"
                 id="startYear"
                 defaultValue={this.state.pendingStartYear}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingStartYear: e.target.value })
                 }}
               />
@@ -135,7 +136,7 @@ class Pile extends React.Component {
                 className="work-page title input"
                 id="endYear"
                 defaultValue={this.state.pendingEndYear}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingEndYear: e.target.value })
                 }}
               />

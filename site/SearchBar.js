@@ -1,5 +1,5 @@
 import React from 'react'
-import { navigate } from '@reach/router'
+import { useNavigate } from 'react-router-dom'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
@@ -9,7 +9,7 @@ class SearchBar extends React.Component {
     loading: true,
     modifierSelected: false,
     modifier: '',
-    typedText: ''
+    typedText: '',
   }
   modifiers = {
     auth: 'auth',
@@ -25,11 +25,11 @@ class SearchBar extends React.Component {
     file: 'file',
     slim: 'slim',
     grid: 'grid',
-    full: 'full'
+    full: 'full',
   }
   keyEvents = {
     enter: 13,
-    delete: 8
+    delete: 8,
   }
 
   componentDidMount() {
@@ -55,7 +55,7 @@ class SearchBar extends React.Component {
           case this.modifiers.work:
             this.setState({
               modifier: text,
-              typedText: ''
+              typedText: '',
             })
             break
         }
@@ -64,6 +64,7 @@ class SearchBar extends React.Component {
   }
 
   async handleKeyDown(event) {
+    const navigate = useNavigate()
     if (
       // Delete to go back
       event.keyCode == this.keyEvents.delete &&
@@ -74,7 +75,7 @@ class SearchBar extends React.Component {
       var previousModifier = this.state.modifier
       this.setState({
         typedText: previousModifier + '',
-        modifier: ''
+        modifier: '',
       })
     } else if (
       this.state.modifier == this.modifiers.note &&
@@ -155,6 +156,7 @@ class SearchBar extends React.Component {
       case this.modifiers.work:
       case this.modifiers.pile:
         this.props.beforeNavigate()
+        const navigate = useNavigate()
         navigate('/' + this.state.modifier + '/' + id)
         return
     }
@@ -175,6 +177,7 @@ class SearchBar extends React.Component {
     var dbType = this.modifierToDbTypes(this.state.modifier)
     var newRecord = await db.createRecord(dbType, typedValue)
     this.props.beforeNavigate()
+    const navigate = useNavigate()
     navigate('/' + dbType + '/' + newRecord.data.data._id)
   }
 
@@ -196,7 +199,7 @@ class SearchBar extends React.Component {
   handleEscape() {
     this.setState({
       modifier: '',
-      typedText: this.state.modifier
+      typedText: this.state.modifier,
     })
   }
 

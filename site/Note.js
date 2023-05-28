@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from '@reach/router'
+import { Link } from 'react-router-dom'
 import { guessYearFromURL } from './utils'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'

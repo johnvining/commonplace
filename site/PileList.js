@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from '@reach/router'
+import { Link } from 'react-router-dom'
 import pile_img from './icons/stack.svg'
 import work_img from './icons/work.svg'
 import note_img from './icons/write.svg'
@@ -10,7 +10,7 @@ class PileList extends React.Component {
   async componentDidMount() {
     const response = await this.props.getListOfPiles()
     this.setState({
-      piles: response.data.data
+      piles: response.data.data,
     })
   }
 

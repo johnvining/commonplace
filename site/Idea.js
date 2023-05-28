@@ -1,4 +1,4 @@
-import { navigate } from '@reach/router'
+import { useNavigate } from 'react-router-dom'
 import * as db from './Database'
 import NoteList from './NoteList'
 import React from 'react'
@@ -10,7 +10,7 @@ class Idea extends React.Component {
     edit: false,
     pendingName: '',
     pendingStartYear: '',
-    pendingEndYear: ''
+    pendingEndYear: '',
   }
 
   componentDidMount() {
@@ -25,14 +25,14 @@ class Idea extends React.Component {
 
   fetchIdeaInfo(ideaId) {
     db.getInfo(db.types.idea, ideaId)
-      .then(response => {
+      .then((response) => {
         this.setState({
           pendingName: response.data.data.name,
           pendingStartYear: response.data.data.start_year,
-          pendingEndYear: response.data.data.end_year
+          pendingEndYear: response.data.data.end_year,
         })
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
   }
@@ -41,10 +41,10 @@ class Idea extends React.Component {
     var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.idea, this.state.id)
-      .then(response => {
+      .then((response) => {
         notesResponse = response
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
 
@@ -67,6 +67,7 @@ class Idea extends React.Component {
     }
 
     await db.deleteRecord(db.types.idea, this.state.id)
+    const navigate = useNavigate()
     navigate('/')
   }
 
@@ -74,7 +75,7 @@ class Idea extends React.Component {
     var updateObject = {
       name: this.state.pendingName,
       start_year: this.state.pendingStartYear,
-      end_year: this.state.pendingEndYear
+      end_year: this.state.pendingEndYear,
     }
 
     db.updateRecord(db.types.idea, this.props.id, updateObject)
@@ -96,7 +97,7 @@ class Idea extends React.Component {
                 className="work-page title input"
                 id="title"
                 defaultValue={this.state.pendingName}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingName: e.target.value })
                 }}
               />
@@ -107,7 +108,7 @@ class Idea extends React.Component {
                 className="work-page title input"
                 id="startYear"
                 defaultValue={this.state.pendingStartYear}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingStartYear: e.target.value })
                 }}
               />
@@ -118,7 +119,7 @@ class Idea extends React.Component {
                 className="work-page title input"
                 id="endYear"
                 defaultValue={this.state.pendingEndYear}
-                onChange={e => {
+                onChange={(e) => {
                   this.setState({ pendingEndYear: e.target.value })
                 }}
               />

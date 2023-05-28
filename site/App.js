@@ -1,6 +1,6 @@
 import { createNewNoteFromTitle } from './Database'
 import { render } from 'react-dom'
-import { Router, Link, navigate } from '@reach/router'
+import { Routes, Route, useNavigate, Link } from 'react-router-dom'
 import Author from './Author'
 import FileList from './FileList'
 import FlipList from './FlipList'
@@ -16,6 +16,8 @@ import search from './icons/search.svg'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
+
+import { BrowserRouter } from 'react-router-dom'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }
@@ -89,6 +91,7 @@ class App extends React.Component {
                   className="standard-button left-right"
                   onClick={async () => {
                     const response = await createNewNoteFromTitle('')
+                    const navigate = useNavigate()
                     navigate('/note/' + response.data._id + '/edit')
                   }}
                 >
@@ -106,76 +109,125 @@ class App extends React.Component {
           </div>
         )}
 
-        <Router>
-          <Author
+        <Routes>
+          <Route
             path="/auth/:id"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <Author
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <FileList
+          <Route
             path="/file"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <FileList
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <FlipList
+          <Route
             path="/flip"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <FlipList
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <Find
+          <Route
             path="/find/:search"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <Find
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <Idea
+          <Route
             path="/idea/:id"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <Idea
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <NoteView
+          <Route
             path="/note/:id"
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={<NoteView setPageTitle={this.setPageTitle.bind(this)} />}
           />
-          <NoteView
+          <Route
             path="/nick/:nick"
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={<NoteView setPageTitle={this.setPageTitle.bind(this)} />}
           />
-          <NoteView
+          <Route
             path="/note/:id/edit"
-            edit={true}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <NoteView
+                edit={true}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <Pile
+          <Route
             path="/pile/:id"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
-            showNotes={false}
+            element={
+              <Pile
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+                showNotes={false}
+              />
+            }
           />
-          <Pile
+          <Route
             path="/pile/:id/notes"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
-            showNotes={true}
+            element={
+              <Pile
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+                showNotes={true}
+              />
+            }
           />
-          <PileHome
+          <Route
             path="/piles"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <PileHome
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <RecentList
+          <Route
             path="/"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <RecentList
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-          <Work
+          <Route
             path="/work/:id"
-            viewMode={this.state.viewMode}
-            setPageTitle={this.setPageTitle.bind(this)}
+            element={
+              <Work
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
           />
-        </Router>
+        </Routes>
       </div>
     )
   }
 }
 
-render(<App />, document.getElementById('root'))
+render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>,
+  document.getElementById('root')
+)

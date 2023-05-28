@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from '@reach/router'
+import { Link } from 'react-router-dom'
 import author_img from './icons/author.svg'
 import note_img from './icons/write.svg'
 import work_img from './icons/work.svg'
@@ -10,7 +10,7 @@ class AuthorList extends React.Component {
   async componentDidMount() {
     const response = await this.props.getListOfAuthors()
     this.setState({
-      authors: response.data.data
+      authors: response.data.data,
     })
   }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from '@reach/router'
+import { Link } from 'react-router-dom'
 import idea_img from './icons/idea.svg'
 import note_img from './icons/write.svg'
 
@@ -9,7 +9,7 @@ class IdeaList extends React.Component {
   async componentDidMount() {
     const response = await this.props.getListOfIdeas()
     this.setState({
-      ideas: response.data.data
+      ideas: response.data.data,
     })
   }
 

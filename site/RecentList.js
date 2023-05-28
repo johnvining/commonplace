@@ -7,10 +7,10 @@ class RecentList extends React.Component {
     var notesResponse
     await db
       .getRecentNotes(page)
-      .then(response => {
+      .then((response) => {
         notesResponse = response
       })
-      .catch(error => {
+      .catch((error) => {
         console.error(error)
       })
 
