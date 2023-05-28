@@ -5,8 +5,6 @@ import PileList from './PileList'
 class PileHome extends React.Component {
   async componentDidMount() {}
 
-  componentDidUpdate(prevState) {}
-
   getListOfPiles() {
     return db.getAllPiles()
   }
@@ -15,7 +13,7 @@ class PileHome extends React.Component {
     this.props.setPageTitle('Piles')
     return (
       <div>
-        <div align="right">
+        <div>
           <PileList
             key={'pileList'}
             getListOfPiles={this.getListOfPiles.bind(this)}
