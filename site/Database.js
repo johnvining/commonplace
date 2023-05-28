@@ -8,6 +8,7 @@ export const types = {
   pile: 'pile',
 }
 
+// eslint-disable-next-line no-undef
 export const url_api = process.env.SERVER_API
 
 // Supported types: idea, auth, work, pile
