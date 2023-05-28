@@ -7,14 +7,15 @@ class ImageUploader extends React.Component {
   onFileSelect(event) {
     this.setState({
       selectedFile: event.target.files[0],
-      ready: true
+      ready: true,
     })
   }
 
   onSubmit() {
     this.setState({ ready: false, uploading: true }, () => {
       this.props.onImageUpload(this.state.selectedFile).then(() => {
-        fileUploadInput.value = ''
+        // eslint-disable-next-line no-undef
+        fileUploadInput.value = '' // TODO: Fix this -- working but janky
         this.setState({ uploading: false, selectedFile: '' })
       })
     })
