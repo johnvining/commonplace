@@ -1,15 +1,15 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
 
 function SearchBar(props) {
-  const [modifier, setModifier] = React.useState('')
-  const [typedText, setTypedText] = React.useState('')
+  const [modifier, setModifier] = useState('')
+  const [typedText, setTypedText] = useState('')
   const navigate = useNavigate()
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKeyDown = async (event) => {
       if (
         // Delete to go back
@@ -108,7 +108,6 @@ function SearchBar(props) {
         case constants.modifiers.note:
         case constants.modifiers.pile:
         case constants.modifiers.work:
-          console.log('match')
           setModifier(text)
           setTypedText('')
           break
