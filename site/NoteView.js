@@ -5,14 +5,14 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 
 function NoteView(props) {
-  const { id } = useParams()
+  const { id, nick } = useParams()
 
   const getListOfOneNote = async () => {
     var notesResponse
     var noteId
     if (!id) {
-      const nick = await db.getNick(this.props.nick)
-      noteId = nick.data.data.note
+      const nickResponse = await db.getNick(nick)
+      noteId = nickResponse.data.data.note
     } else {
       noteId = id
     }
@@ -38,7 +38,7 @@ function NoteView(props) {
 
   return (
     <NoteList
-      key={'note' + (id ?? this.props.nick)}
+      key={'note' + (id ?? nick)}
       viewMode={constants.view_modes.FULL}
       editFirst={props.edit}
       getListOfNotes={getListOfOneNote}
