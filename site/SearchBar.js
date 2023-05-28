@@ -11,8 +11,6 @@ function SearchBar(props) {
 
   React.useEffect(() => {
     const onKeyDown = async (event) => {
-      console.log('event')
-      console.log(event)
       if (
         // Delete to go back
         event.keyCode == constants.keyEvents.delete &&
@@ -28,12 +26,10 @@ function SearchBar(props) {
         modifier == constants.modifiers.note &&
         event.keyCode == constants.keyEvents.enter
       ) {
-        console.log('test')
         setModifier('')
         const response = await db.createNewNoteFromTitle(typedText)
         props.beforeNavigate()
         navigate('/note/' + response.data._id + '/edit')
-        console.log('test2')
       } else if (
         modifier == constants.modifiers.find &&
         event.keyCode == constants.keyEvents.enter
