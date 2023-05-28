@@ -4,168 +4,138 @@ import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
 
-class SearchBar extends React.Component {
-  state = {
-    loading: true,
-    modifierSelected: false,
-    modifier: '',
-    typedText: '',
-  }
-  modifiers = {
-    auth: 'auth',
-    find: 'find',
-    help: 'help',
-    home: 'home',
-    idea: 'idea',
-    list: 'list',
-    note: 'note',
-    pile: 'pile',
-    work: 'work',
-    flip: 'flip',
-    file: 'file',
-    slim: 'slim',
-    grid: 'grid',
-    full: 'full',
-  }
-  keyEvents = {
-    enter: 13,
-    delete: 8,
-  }
+function SearchBar(props) {
+  const [modifier, setModifier] = React.useState('')
+  const [typedText, setTypedText] = React.useState('')
+  const navigate = useNavigate()
 
-  componentDidMount() {
-    this.keyDownListener = this.handleKeyDown.bind(this)
-    document.addEventListener('keydown', this.keyDownListener, false)
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.keyDownListener, false)
-  }
-
-  handleTextChange(event) {
-    this.setState({ typedText: event.target.value }, () => {
-      if (!this.state.modifier) {
-        var text = this.state.typedText.toLowerCase()
-        switch (text) {
-          case this.modifiers.auth:
-          case this.modifiers.find:
-          case this.modifiers.idea:
-          case this.modifiers.list:
-          case this.modifiers.note:
-          case this.modifiers.pile:
-          case this.modifiers.work:
-            this.setState({
-              modifier: text,
-              typedText: '',
-            })
-            break
-        }
-      }
-    })
-  }
-
-  async handleKeyDown(event) {
-    const navigate = useNavigate()
-    if (
-      // Delete to go back
-      event.keyCode == this.keyEvents.delete &&
-      this.state.modifier &&
-      this.state.typedText == '' &&
-      !this.shouldShowAutocomplete()
-    ) {
-      var previousModifier = this.state.modifier
-      this.setState({
-        typedText: previousModifier + '',
-        modifier: '',
-      })
-    } else if (
-      this.state.modifier == this.modifiers.note &&
-      event.keyCode == this.keyEvents.enter
-    ) {
-      this.setState({ modifier: '' }, async () => {
-        const response = await db.createNewNoteFromTitle(this.state.typedText)
-        this.props.beforeNavigate()
+  React.useEffect(() => {
+    const onKeyDown = async (event) => {
+      console.log('event')
+      console.log(event)
+      if (
+        // Delete to go back
+        event.keyCode == constants.keyEvents.delete &&
+        modifier &&
+        typedText == '' &&
+        !shouldShowAutocomplete()
+      ) {
+        var previousModifier = modifier
+        setTypedText(previousModifier + '')
+        setModifier('')
+      } else if (
+        // Create new note
+        modifier == constants.modifiers.note &&
+        event.keyCode == constants.keyEvents.enter
+      ) {
+        console.log('test')
+        setModifier('')
+        const response = await db.createNewNoteFromTitle(typedText)
+        props.beforeNavigate()
         navigate('/note/' + response.data._id + '/edit')
-      })
-    } else if (
-      this.state.modifier == this.modifiers.find &&
-      event.keyCode == this.keyEvents.enter
-    ) {
-      var search = this.state.typedText
-      this.setState({ typedText: '' }, () => {
-        this.props.beforeNavigate()
+        console.log('test2')
+      } else if (
+        modifier == constants.modifiers.find &&
+        event.keyCode == constants.keyEvents.enter
+      ) {
+        var search = typedText
+        setTypedText('')
+        props.beforeNavigate()
         navigate('/find/' + search)
-      })
-    } else if (
-      !this.state.modifier &&
-      (this.state.typedText == this.modifiers.flip ||
-        this.state.typedText == this.modifiers.file ||
-        this.state.typedText == this.modifiers.home) &&
-      event.keyCode == this.keyEvents.enter
-    ) {
-      var destination = this.state.typedText
-      if (this.state.typedText == this.modifiers.home) {
-        destination = ''
-      }
-      this.setState({ typedText: '' }, () => {
-        this.props.beforeNavigate()
+      } else if (
+        !modifier &&
+        (typedText == constants.modifiers.flip ||
+          typedText == constants.modifiers.file ||
+          typedText == constants.modifiers.home) &&
+        event.keyCode == constants.keyEvents.enter
+      ) {
+        var destination = typedText
+        if (typedText == constants.modifiers.home) {
+          destination = ''
+        }
+        setTypedText('')
+        props.beforeNavigate()
         navigate('/' + destination)
-      })
-    } else if (
-      this.state.modifier == this.modifiers.list &&
-      this.state.typedText == this.modifiers.pile
-    ) {
-      this.setState({ typedText: '' }, () => {
-        this.props.beforeNavigate()
+      } else if (
+        modifier == constants.modifiers.list &&
+        typedText == constants.modifiers.pile
+      ) {
+        setTypedText('')
+        props.beforeNavigate()
         navigate('/piles')
-      })
-    } else if (
-      (this.state.typedText == this.modifiers.slim ||
-        this.state.typedText == this.modifiers.full ||
-        this.state.typedText == this.modifiers.grid) &&
-      event.keyCode == this.keyEvents.enter
-    ) {
-      var command = this.state.typedText
-      this.setState({ typedText: '' }, () => {
-        this.props.beforeNavigate()
+      } else if (
+        (typedText == constants.modifiers.slim ||
+          typedText == constants.modifiers.full ||
+          typedText == constants.modifiers.grid) &&
+        event.keyCode == constants.keyEvents.enter
+      ) {
+        var command = typedText
+        setTypedText('')
+
+        props.beforeNavigate()
         switch (command) {
-          case this.modifiers.slim:
-            this.props.setView(constants.view_modes.SLIM)
+          case constants.modifiers.slim:
+            props.setView(constants.view_modes.SLIM)
             break
-          case this.modifiers.full:
-            this.props.setView(constants.view_modes.FULL)
+          case constants.modifiers.full:
+            props.setView(constants.view_modes.FULL)
             break
-          case this.modifiers.grid:
-            this.props.setView(constants.view_modes.GRID)
+          case constants.modifiers.grid:
+            props.setView(constants.view_modes.GRID)
             break
         }
-      })
-    } else if (event.keyCode == this.keyEvents.enter) {
-      const nick = await db.getNick(this.state.typedText)
-      if (nick) {
-        // TODO: this is assuming all nicks belong to notes
-        this.props.beforeNavigate()
-        navigate('/note/' + nick.data.data.note)
+      } else if (event.keyCode == constants.keyEvents.enter) {
+        const nick = await db.getNick(typedText)
+        if (nick) {
+          // TODO: this is assuming all nicks belong to notes
+          props.beforeNavigate()
+          navigate('/note/' + nick.data.data.note)
+        }
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  })
+
+  const handleTextChange = (input) => {
+    setTypedText(input.target.value)
+    if (!modifier) {
+      var text = input.target.value
+      switch (text) {
+        case constants.modifiers.auth:
+        case constants.modifiers.find:
+        case constants.modifiers.idea:
+        case constants.modifiers.list:
+        case constants.modifiers.note:
+        case constants.modifiers.pile:
+        case constants.modifiers.work:
+          console.log('match')
+          setModifier(text)
+          setTypedText('')
+          break
       }
     }
   }
 
-  handleUpdate(id) {
-    switch (this.state.modifier) {
-      case this.modifiers.auth:
-      case this.modifiers.idea:
-      case this.modifiers.work:
-      case this.modifiers.pile:
-        this.props.beforeNavigate()
-        const navigate = useNavigate()
-        navigate('/' + this.state.modifier + '/' + id)
+  const handleUpdate = (id) => {
+    switch (modifier) {
+      case constants.modifiers.auth:
+      case constants.modifiers.idea:
+      case constants.modifiers.work:
+      case constants.modifiers.pile:
+        props.beforeNavigate()
+        navigate('/' + modifier + '/' + id)
         return
     }
 
     return
   }
 
-  getSuggestions(type, val) {
-    var dbType = this.modifierToDbTypes(this.state.modifier)
+  const getSuggestions = (type, val) => {
+    var dbType = modifierToDbTypes(modifier)
     if (dbType) {
       return db.getSuggestions(dbType, val)
     }
@@ -173,80 +143,72 @@ class SearchBar extends React.Component {
     return null
   }
 
-  async handleCreate(typedValue) {
-    var dbType = this.modifierToDbTypes(this.state.modifier)
+  const handleCreate = async (typedValue) => {
+    var dbType = modifierToDbTypes(modifier)
     var newRecord = await db.createRecord(dbType, typedValue)
-    this.props.beforeNavigate()
-    const navigate = useNavigate()
+    props.beforeNavigate()
     navigate('/' + dbType + '/' + newRecord.data.data._id)
   }
 
-  modifierToDbTypes(modifier) {
+  const modifierToDbTypes = (modifier) => {
     switch (modifier) {
-      case this.modifiers.auth:
+      case constants.modifiers.auth:
         return db.types.auth
-      case this.modifiers.idea:
+      case constants.modifiers.idea:
         return db.types.idea
-      case this.modifiers.work:
+      case constants.modifiers.work:
         return db.types.work
-      case this.modifiers.pile:
+      case constants.modifiers.pile:
         return db.types.pile
     }
 
     return null
   }
 
-  handleEscape() {
-    this.setState({
-      modifier: '',
-      typedText: this.state.modifier,
-    })
+  const handleEscape = () => {
+    setTypedText(modifier)
+    setModifier('')
   }
 
-  shouldShowAutocomplete() {
-    switch (this.state.modifier) {
-      case this.modifiers.auth:
-      case this.modifiers.idea:
-      case this.modifiers.work:
-      case this.modifiers.pile:
+  const shouldShowAutocomplete = () => {
+    switch (modifier) {
+      case constants.modifiers.auth:
+      case constants.modifiers.idea:
+      case constants.modifiers.work:
+      case constants.modifiers.pile:
         return true
     }
 
     return false
   }
 
-  render() {
-    const { modifier, typedText } = this.state
+  var showAutocomplete = shouldShowAutocomplete()
+  return (
+    <div className="search-bar container">
+      {modifier.length ? (
+        <div className="search-bar current-modifier">{modifier}</div>
+      ) : null}
 
-    var showAutocomplete = this.shouldShowAutocomplete()
-
-    return (
-      <div className="search-bar container">
-        {modifier.length ? (
-          <div className="search-bar current-modifier">{modifier}</div>
-        ) : null}
-
-        {showAutocomplete ? (
-          <Autocomplete
-            inputName="searchBar"
-            className="search-bar"
-            defaultValue={typedText || ''}
-            onSelect={this.handleUpdate.bind(this)}
-            getSuggestions={this.getSuggestions.bind(this)}
-            handleNewSelect={this.handleCreate.bind(this)}
-            escape={this.handleEscape.bind(this)}
-          />
-        ) : (
-          <input
-            className="search-bar search-box"
-            autoFocus
-            value={typedText}
-            onChange={this.handleTextChange.bind(this)}
-          ></input>
-        )}
-      </div>
-    )
-  }
+      {showAutocomplete ? (
+        <Autocomplete
+          inputName="searchBar"
+          className="search-bar"
+          defaultValue={typedText || ''}
+          onSelect={handleUpdate}
+          getSuggestions={getSuggestions}
+          handleNewSelect={handleCreate}
+          escape={handleEscape}
+        />
+      ) : (
+        <input
+          className="search-bar search-box"
+          autoFocus
+          value={typedText}
+          onChange={(event) => handleTextChange(event)}
+        ></input>
+      )}
+    </div>
+  )
 }
 
 export default SearchBar
