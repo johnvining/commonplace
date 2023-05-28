@@ -20,7 +20,7 @@ class NoteList extends React.Component {
     deleted: [],
     lastSelectedIndex: 0,
     useGridView: 1,
-    page: 1
+    page: 1,
   }
 
   async componentDidMount() {
@@ -33,7 +33,7 @@ class NoteList extends React.Component {
     )
     this.setState(
       {
-        notes: response.data.data
+        notes: response.data.data,
       },
       () => {
         for (var i = 0; i < this.state.notes?.length; i++) {
@@ -61,7 +61,7 @@ class NoteList extends React.Component {
     this.setState({
       notes: response.data.data,
       page: this.state.page + 1,
-      selected: []
+      selected: [],
     })
   }
 
@@ -73,7 +73,7 @@ class NoteList extends React.Component {
     this.setState({
       notes: response.data.data,
       page: this.state.page - 1,
-      selected: []
+      selected: [],
     })
   }
 
@@ -102,10 +102,10 @@ class NoteList extends React.Component {
       imagePromises.push(db.getImagesForNote(notes[index]._id, i))
     }
 
-    await Promise.all(imagePromises).then(responses => {
+    await Promise.all(imagePromises).then((responses) => {
       var imagesArray = []
       var note = notes[index]
-      responses.map(response => {
+      responses.map((response) => {
         imagesArray.push(URL.createObjectURL(response.data))
       })
       note.imageUrls = imagesArray
@@ -161,7 +161,7 @@ class NoteList extends React.Component {
     }
     this.setState({
       selectedNote: noteId,
-      focusType: mode
+      focusType: mode,
     })
   }
 
@@ -170,15 +170,16 @@ class NoteList extends React.Component {
   }
 
   markChecked(noteIndex) {
+    var tempArray
     if (this.state.selected.includes(noteIndex)) {
-      var tempArray = this.state.selected
+      tempArray = this.state.selected
       const index = tempArray.indexOf(noteIndex)
       if (index > -1) {
         tempArray.splice(index, 1)
       }
       this.setState({ selected: tempArray })
     } else {
-      var tempArray = this.state.selected
+      tempArray = this.state.selected
       tempArray.push(noteIndex)
       this.setState({ selected: tempArray, lastSelectedIndex: noteIndex })
     }
@@ -228,7 +229,7 @@ class NoteList extends React.Component {
     for (let i = 0; i < this.state.selected.length; i++) {
       var noteId = this.state.notes[this.state.selected[i]]._id
       db.addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
-        response => {
+        (response) => {
           var tempNotes = this.state.notes
           const note = response.data.data
           tempNotes[this.state.selected[i]] = note
