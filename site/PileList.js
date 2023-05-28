@@ -19,7 +19,7 @@ class PileList extends React.Component {
       <div className="pile-list">
         {this.state.piles === undefined
           ? null
-          : this.state.piles.map((pile, index) => {
+          : this.state.piles.map((pile) => {
               return (
                 <Link to={`/pile/${pile._id}`} key={'pile-list-' + pile._id}>
                   <div className="result-box">
