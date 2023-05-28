@@ -7,8 +7,8 @@
     "build": "parcel build index.html"
   },
   "engines": {
-    "node": "18.13.0",
-    "npm": "8.19.3"
+    "node": "18.16.0",
+    "npm": "9.6.6"
   },
   "dependencies": {
     "autosize": "^6.0.1",
