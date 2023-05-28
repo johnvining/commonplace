@@ -609,7 +609,11 @@ class Note extends React.Component {
                 {/* URL */}
                 {this.state.pendingUrl ? (
                   <>
-                    <a href={this.state.pendingUrl} target="_blank">
+                    <a
+                      href={this.state.pendingUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       <button className={'action-button'}>
                         <img src={link}></img>
                       </button>
@@ -793,7 +797,7 @@ class Note extends React.Component {
                       <button
                         className={'action-button'}
                         onClick={() => {
-                          db.getNoteNick(this.props.id).then((response) => {
+                          db.getNoteNick(this.props.id).then(() => {
                             // navigator.clipboard.writeText(
                             //   response.data.data.key
                             // )
