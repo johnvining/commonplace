@@ -39,14 +39,14 @@ class Find extends React.Component {
   }
 
   render() {
-    const { notes, ideas, works, authors } = this.state
+    const { notes } = this.state
     const { search } = this.props
 
     this.props.setPageTitle('Find: ' + search)
 
     return (
       <div>
-        <div align="right">
+        <div>
           <span className="title">{search}</span>
         </div>
         <PileList
