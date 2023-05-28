@@ -58,6 +58,8 @@ class App extends React.Component {
   }
 
   render() {
+    // eslint-disable-next-line no-undef
+    let environment = process.env.NODE_ENV
     return (
       <div className="main">
         {this.state.barOpen ? (
@@ -71,7 +73,7 @@ class App extends React.Component {
           <div className="top-bar">
             <div className="title-bar">
               <Link to="/" className="title-link">
-                {process.env.NODE_ENV === 'development' ? (
+                {environment === 'development' ? (
                   <div className="title">DEVELOPMENT </div>
                 ) : (
                   <div className="title">commonplace </div>
