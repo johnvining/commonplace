@@ -1,6 +1,12 @@
 import { createNewNoteFromTitle } from './Database'
 import { render } from 'react-dom'
-import { Routes, Route, useNavigate, Link } from 'react-router-dom'
+import {
+  Routes,
+  Route,
+  useNavigate,
+  Link,
+  BrowserRouter,
+} from 'react-router-dom'
 import Author from './Author'
 import FileList from './FileList'
 import FlipList from './FlipList'
@@ -16,8 +22,6 @@ import search from './icons/search.svg'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
-
-import { BrowserRouter } from 'react-router-dom'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }

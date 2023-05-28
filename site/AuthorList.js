@@ -19,7 +19,7 @@ class AuthorList extends React.Component {
       <div className="author-list">
         {this.state.authors === undefined ? null : (
           <div>
-            {this.state.authors.map((author, index) => {
+            {this.state.authors.map((author) => {
               return (
                 <Link
                   to={`/auth/${author._id}`}
