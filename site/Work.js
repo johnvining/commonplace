@@ -43,20 +43,21 @@ function Work(props) {
     fetchWorkInfo(id)
   }, [id])
 
-  // TODO: Keyboard shortcuts
-  // componentDidMount() {
-  //   this.keyDownListener = this.handleKeyDown.bind(this)
-  //   document.addEventListener('keydown', this.keyDownListener, false)
+  useEffect(() => {
+    const onKeyDown = async (event) => {
+      if (event.ctrlKey && event.keyCode == 78) {
+        createNoteForWork()
+      } else if (event.keyCode == 27) {
+        // TODO: This crashes because of a failure in NoteList
+        handleFinishEditing()
+      }
+    }
 
-  // }
-
-  // handleKeyDown(event) {
-  //   if (event.ctrlKey && event.keyCode == 78) {
-  //     createNoteForWork()
-  //   } else if (event.keyCode == 27) {
-  //     handleFinishEditing()
-  //   }
-  // }
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  })
 
   const getListOfNotes = async () => {
     var notesResponse
