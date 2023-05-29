@@ -22,7 +22,6 @@ function Author(props) {
         setPendingName(response.data.data.name)
         setPendingBirthYear(response.data.data.birth_year)
         setPendingDeathYear(response.data.data.death_year)
-        props.setPageTitle(response.data.data.name)
       })
       .catch((error) => {
         console.error(error)
@@ -90,6 +89,7 @@ function Author(props) {
     setEdit(false)
   }
 
+  props.setPageTitle(pendingName)
   return (
     <div>
       {/* Header and Edit */}
