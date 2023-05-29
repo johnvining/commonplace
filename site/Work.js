@@ -1,68 +1,67 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
 import PileListForItem from './PileListForItem'
 import YearSpan from './YearSpan'
 import React from 'react'
+import { useState, useEffect } from 'react'
 
-class Work extends React.Component {
-  state = {
-    id: '',
-    edit: false,
-    editPiles: false,
-    pendingWorkTitle: '',
-    pendingUrl: '',
-    pendingYear: '',
-    pendingAuthorName: '',
-    pendingSummary: '',
-    pendingCitationInfo: '',
-  }
+function Work(props) {
+  const { id } = useParams()
+  const [edit, setEdit] = useState(false)
+  const [editPiles, setEditPiles] = useState(false)
+  // TODO: Create pending object
+  const [pendingWorkTitle, setPendingWorkTitle] = useState('')
+  const [pendingUrl, setPendingUrl] = useState('')
+  const [pendingYear, setPendingYear] = useState('')
+  const [pendingAuthorName, setPendingAuthorName] = useState('')
+  const [pendingAuthorId, setPendingAuthorId] = useState('')
+  const [pendingSummary, setPendingSummary] = useState('')
+  const [pendingCitationInfo, setPendingCitationInfo] = useState('')
+  const [piles, setPiles] = useState()
+  const navigate = useNavigate()
 
-  componentDidMount() {
-    this.keyDownListener = this.handleKeyDown.bind(this)
-    document.addEventListener('keydown', this.keyDownListener, false)
-
-    this.fetchWorkInfo(this.props.id)
-  }
-
-  componentDidUpdate(prevState) {
-    if (prevState.id !== this.state.id) {
-      this.fetchWorkInfo(this.state.id)
-    }
-  }
-
-  handleKeyDown(event) {
-    if (event.ctrlKey && event.keyCode == 78) {
-      this.createNoteForWork()
-    } else if (event.keyCode == 27) {
-      this.handleFinishEditing()
-    }
-  }
-
-  fetchWorkInfo(workId) {
+  const fetchWorkInfo = (workId) => {
     db.getInfo(db.types.work, workId)
       .then((response) => {
-        this.setState({
-          pendingWorkTitle: response.data.data.name,
-          piles: response.data.data.piles,
-          pendingAuthorName: response.data.data.author?.name,
-          pendingAuthorId: response.data.data.author?._id,
-          pendingUrl: response.data.data.url,
-          pendingYear: response.data.data.year,
-          pendingSummary: response.data.data.summary,
-          pendingCitationInfo: response.data.data.citation_information,
-        })
+        setPendingWorkTitle(response.data.data.name)
+        setPiles(response.data.data.piles)
+        setPendingAuthorName(response.data.data.author?.name)
+        setPendingAuthorId(response.data.data.author?._id)
+        setPendingUrl(response.data.data.url)
+        setPendingYear(response.data.data.year)
+        setPendingSummary(response.data.data.summary)
+        setPendingCitationInfo(response.data.data.citation_information)
       })
       .catch((error) => {
         console.error(error)
       })
   }
 
-  async getListOfNotes() {
+  useEffect(() => {
+    fetchWorkInfo(id)
+  }, [id])
+
+  // TODO: Keyboard shortcuts
+  // componentDidMount() {
+  //   this.keyDownListener = this.handleKeyDown.bind(this)
+  //   document.addEventListener('keydown', this.keyDownListener, false)
+
+  // }
+
+  // handleKeyDown(event) {
+  //   if (event.ctrlKey && event.keyCode == 78) {
+  //     createNoteForWork()
+  //   } else if (event.keyCode == 27) {
+  //     handleFinishEditing()
+  //   }
+  // }
+
+  const getListOfNotes = async () => {
     var notesResponse
     await db
-      .getRecordsWithFilter(db.types.note, db.types.work, this.state.id)
+      .getRecordsWithFilter(db.types.note, db.types.work, id)
       .then((response) => {
         notesResponse = response
       })
@@ -73,310 +72,275 @@ class Work extends React.Component {
     return notesResponse
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.id !== prevState.id) {
-      return { id: nextProps.id }
-    }
-
-    return null
+  const handleUpdateAuthor = (authorId, authorName) => {
+    setPendingAuthorName(authorName)
+    setPendingAuthorId(authorId)
   }
 
-  handleUpdateAuthor = (authorId, authorName) => {
-    this.setState({ pendingAuthorName: authorName, pendingAuthorId: authorId })
-  }
-
-  handleCreateAuthorAndAssign(authorName) {
-    this.setState({ pendingAuthorName: authorName })
-    db.createAndLinkToRecord(
-      db.types.auth,
-      authorName,
-      db.types.work,
-      this.props.id
-    ).then((response) => {
-      this.setState({
-        pendingAuthorId: response.data.data.id,
-      })
-    })
-  }
-
-  async deleteWork() {
-    if (
-      !confirm(
-        `Do you want to permanently delete '${this.state.pendingWorkTitle}'?`
-      )
-    ) {
-      return
-    }
-
-    await db.deleteRecord(db.types.work, this.state.id)
-    const navigate = useNavigate()
-    navigate('/')
-  }
-
-  async handleAcceptUpdates() {
-    var updateObject = {
-      author: this.state.pendingAuthorId,
-      year: this.state.pendingYear,
-      url: this.state.pendingUrl,
-      name: this.state.pendingWorkTitle,
-      summary: this.state.pendingSummary,
-      citation_information: this.state.pendingCitationInfo,
-    }
-
-    db.updateRecord(db.types.work, this.props.id, updateObject)
-    this.setState({ edit: false })
-  }
-
-  async handleNewPile(pile) {
-    db.addLinkToRecord(db.types.pile, pile, db.types.work, this.props.id).then(
-      () => {
-        this.fetchWorkInfo(this.props.id)
+  const handleCreateAuthorAndAssign = (authorName) => {
+    setPendingAuthorName(authorName)
+    db.createAndLinkToRecord(db.types.auth, authorName, db.types.work, id).then(
+      (response) => {
+        setPendingAuthorId(response.data.data.id)
       }
     )
   }
 
-  async handleCreatePileAndAssign(pileName) {
-    db.createAndLinkToRecord(
-      db.types.pile,
-      pileName,
-      db.types.work,
-      this.props.id
-    ).then(() => {
-      this.fetchWorkInfo(this.props.id)
+  const deleteWork = async () => {
+    if (!confirm(`Do you want to permanently delete '${pendingWorkTitle}'?`)) {
+      return
+    }
+
+    await db.deleteRecord(db.types.work, id)
+    navigate('/')
+  }
+
+  const handleAcceptUpdates = async () => {
+    var updateObject = {
+      author: pendingAuthorId,
+      year: pendingYear,
+      url: pendingUrl,
+      name: pendingWorkTitle,
+      summary: pendingSummary,
+      citation_information: pendingCitationInfo,
+    }
+
+    db.updateRecord(db.types.work, id, updateObject)
+    setEdit(false)
+  }
+
+  const handleNewPile = async (pile) => {
+    db.addLinkToRecord(db.types.pile, pile, db.types.work, id).then(() => {
+      fetchWorkInfo(id)
     })
   }
 
-  async handleClearAuthor() {
-    this.setState({ pendingAuthorId: null, pendingAuthorName: '' })
+  const handleCreatePileAndAssign = (pileName) => {
+    db.createAndLinkToRecord(db.types.pile, pileName, db.types.work, id).then(
+      () => {
+        fetchWorkInfo(id)
+      }
+    )
   }
 
-  async handleFinishEditing() {
-    this.setState({ editPiles: false, edit: false })
+  const handleClearAuthor = async () => {
+    setPendingAuthorId(null)
+    setPendingAuthorName('')
   }
 
-  async handlePileRemove(pileId) {
-    db.removeFromRecord(
-      db.types.pile,
-      pileId,
-      db.types.work,
-      this.state.id
-    ).then(() => {
-      this.fetchWorkInfo(this.props.id)
+  const handleFinishEditing = async () => {
+    setEdit(false)
+    setEditPiles(false)
+  }
+
+  const handlePileRemove = async (pileId) => {
+    db.removeFromRecord(db.types.pile, pileId, db.types.work, id).then(() => {
+      fetchWorkInfo(id)
     })
   }
 
-  async createNoteForWork() {
-    const response = await db.createNewNoteForWork(this.props.id)
-    const navigate = useNavigate()
+  const createNoteForWork = async () => {
+    const response = await db.createNewNoteForWork(id)
     navigate('/note/' + response.data._id + '/edit')
   }
 
-  render() {
-    var {
-      pendingWorkTitle,
-      pendingUrl,
-      pendingYear,
-      pendingCitationInfo,
-      pendingSummary,
-    } = this.state
-    this.props.setPageTitle(pendingWorkTitle)
-    // <div className="work-page form-container">
-    return (
-      <>
-        {/* Piles */}
-        <div>
-          <PileListForItem
-            remove={this.state.edit}
-            edit={false}
-            piles={this.state.piles}
-            onSelect={this.handleNewPile.bind(this)}
-            getSuggestions={db.getSuggestions}
-            handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-            mainClassName="work-page"
-            onStartPileEdit={() => {
-              this.setState({ editPiles: true })
-            }}
-            allowAdd={true}
-            allowTabbing={true}
-            onPileRemove={this.handlePileRemove.bind(this)}
-          />
-        </div>
-        {/* Main Content */}
-        {this.state.edit ? (
-          <>
-            <label htmlFor="title" className="work-page form-label">
-              Title
-            </label>
-            <input
-              className="work-page title input"
-              id="title"
-              defaultValue={pendingWorkTitle}
-              onChange={(e) => {
-                this.setState({ pendingWorkTitle: e.target.value })
-              }}
-            />
-            <label htmlFor="citation-info" className="work-page form-label">
-              Citation Information
-            </label>
-            <input
-              defaultValue={pendingCitationInfo}
-              id="citation-info"
-              className="work-page citation-info input"
-              onChange={(e) => {
-                this.setState({ pendingCitationInfo: e.target.value })
-              }}
-            />
-            <label htmlFor="work-author" className="work-page form-label">
-              Author
-            </label>
-            <Autocomplete
-              inputName="work-author"
-              className={'work-page author-select'}
-              dontAutofocus={true}
-              defaultValue={this.state.pendingAuthorName || ''}
-              onSelect={this.handleUpdateAuthor.bind(this)}
-              getSuggestions={db.getSuggestions}
-              apiType={db.types.auth}
-              handleNewSelect={this.handleCreateAuthorAndAssign.bind(this)}
-              onClearText={this.handleClearAuthor.bind(this)}
-            />
+  props.setPageTitle(pendingWorkTitle)
 
-            <label htmlFor="url" className="work-page form-label">
-              URL
-            </label>
-            <input
-              defaultValue={pendingUrl}
-              id="url"
-              className="work-page url input"
-              onChange={(e) => {
-                this.setState({ pendingUrl: e.target.value })
-              }}
-            />
-            <label htmlFor="year" className="work-page form-label">
-              Year
-            </label>
-            <input
-              defaultValue={pendingYear}
-              className="work-page year input"
-              onChange={(e) => {
-                this.setState({ pendingYear: e.target.value })
-              }}
-            />
-            <label htmlFor="url" className="work-page form-label">
-              Summary
-            </label>
-            <input
-              defaultValue={pendingSummary}
-              id="url"
-              className="work-page summary input"
-              onChange={(e) => {
-                this.setState({ pendingSummary: e.target.value })
-              }}
+  return (
+    <>
+      {/* Piles */}
+      <div>
+        <PileListForItem
+          remove={edit}
+          edit={false}
+          piles={piles}
+          onSelect={handleNewPile}
+          getSuggestions={db.getSuggestions}
+          handleNewSelect={handleCreatePileAndAssign}
+          mainClassName="work-page"
+          onStartPileEdit={() => {
+            setEditPiles(true)
+          }}
+          allowAdd={true}
+          allowTabbing={true}
+          onPileRemove={handlePileRemove}
+        />
+      </div>
+      {/* Main Content */}
+      {edit ? (
+        <>
+          <label htmlFor="title" className="work-page form-label">
+            Title
+          </label>
+          <input
+            className="work-page title input"
+            id="title"
+            defaultValue={pendingWorkTitle}
+            onChange={(e) => {
+              setPendingWorkTitle(e.target.value)
+            }}
+          />
+          <label htmlFor="citation-info" className="work-page form-label">
+            Citation Information
+          </label>
+          <input
+            defaultValue={pendingCitationInfo}
+            id="citation-info"
+            className="work-page citation-info input"
+            onChange={(e) => {
+              setPendingCitationInfo(e.target.value)
+            }}
+          />
+          <label htmlFor="work-author" className="work-page form-label">
+            Author
+          </label>
+          <Autocomplete
+            inputName="work-author"
+            className={'work-page author-select'}
+            dontAutofocus={true}
+            defaultValue={pendingAuthorName || ''}
+            onSelect={handleUpdateAuthor}
+            getSuggestions={db.getSuggestions}
+            apiType={db.types.auth}
+            handleNewSelect={handleCreateAuthorAndAssign}
+            onClearText={handleClearAuthor}
+          />
+
+          <label htmlFor="url" className="work-page form-label">
+            URL
+          </label>
+          <input
+            defaultValue={pendingUrl}
+            id="url"
+            className="work-page url input"
+            onChange={(e) => {
+              setPendingUrl(e.target.value)
+            }}
+          />
+          <label htmlFor="year" className="work-page form-label">
+            Year
+          </label>
+          <input
+            defaultValue={pendingYear}
+            className="work-page year input"
+            onChange={(e) => {
+              setPendingYear(e.target.value)
+            }}
+          />
+          <label htmlFor="url" className="work-page form-label">
+            Summary
+          </label>
+          <input
+            defaultValue={pendingSummary}
+            id="url"
+            className="work-page summary input"
+            onChange={(e) => {
+              setPendingSummary(e.target.value)
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <span className="work-page title">{pendingWorkTitle}</span>
+          <br />
+          <span className="work-page title">
+            <small>
+              {pendingCitationInfo}{' '}
+              {pendingYear ? (
+                <YearSpan year={pendingYear} spanStyle="work-page year" />
+              ) : (
+                ''
+              )}
+              {pendingUrl ? (
+                <>
+                  (<a href={pendingUrl}>link</a>)
+                </>
+              ) : (
+                ''
+              )}
+            </small>
+          </span>
+          <div className={'work-page author'}>
+            <Link to={'/auth/' + pendingAuthorId}>{pendingAuthorName}</Link>
+          </div>
+
+          <span className="work-page url">
+            <small>{pendingSummary}</small>
+          </span>
+        </>
+      )}
+      {/* Buttons */}
+      <div>
+        {edit ? (
+          <button
+            className="top-level standard-button left-right"
+            onClick={handleAcceptUpdates}
+          >
+            Done
+          </button>
+        ) : editPiles ? (
+          <>
+            <button
+              className="top-level standard-button left-right"
+              onClick={handleFinishEditing}
+            >
+              Done
+            </button>
+            <Autocomplete
+              inputName="work-work-pile"
+              className={'work-page pile-select'}
+              dontAutofocus={false}
+              defaultValue={''}
+              onSelect={handleNewPile}
+              getSuggestions={db.getSuggestions}
+              apiType={db.types.pile}
+              handleNewSelect={handleCreatePileAndAssign}
+              clearOnSelect={true}
+              excludeIds={piles?.map((pile) => pile._id)}
             />
           </>
         ) : (
           <>
-            <span className="work-page title">{pendingWorkTitle}</span>
-            <br />
-            <span className="work-page title">
-              <small>
-                {pendingCitationInfo}{' '}
-                {pendingYear ? (
-                  <YearSpan year={pendingYear} spanStyle="work-page year" />
-                ) : (
-                  ''
-                )}
-                {pendingUrl ? (
-                  <>
-                    (<a href={pendingUrl}>link</a>)
-                  </>
-                ) : (
-                  ''
-                )}
-              </small>
-            </span>
-            <div className={'work-page author'}>
-              <Link to={'/auth/' + this.state.pendingAuthorId}>
-                {this.state.pendingAuthorName}
-              </Link>
-            </div>
-
-            <span className="work-page url">
-              <small>{pendingSummary}</small>
-            </span>
-          </>
-        )}
-        {/* Buttons */}
-        <div>
-          {this.state.edit ? (
             <button
               className="top-level standard-button left-right"
-              onClick={this.handleAcceptUpdates.bind(this)}
+              onClick={() => {
+                setEdit(true)
+                setEditPiles(false)
+              }}
             >
-              Done
+              Edit
             </button>
-          ) : this.state.editPiles ? (
-            <>
-              <button
-                className="top-level standard-button left-right"
-                onClick={this.handleFinishEditing.bind(this)}
-              >
-                Done
-              </button>
-              <Autocomplete
-                inputName="work-work-pile"
-                className={'work-page pile-select'}
-                dontAutofocus={false}
-                defaultValue={''}
-                onSelect={this.handleNewPile.bind(this)}
-                getSuggestions={db.getSuggestions}
-                apiType={db.types.pile}
-                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-                clearOnSelect={true}
-                excludeIds={this.state.piles?.map((pile) => pile._id)}
-              />
-            </>
-          ) : (
-            <>
-              <button
-                className="top-level standard-button left-right"
-                onClick={() => {
-                  this.setState({ edit: true, editPiles: false })
-                }}
-              >
-                Edit
-              </button>
-              <button
-                className="top-level standard-button left-right"
-                onClick={() => {
-                  this.setState({ edit: false, editPiles: true })
-                }}
-              >
-                Piles
-              </button>
-              <button
-                className="top-level standard-button left-right"
-                onClick={this.deleteWork.bind(this)}
-              >
-                Delete
-              </button>
-              <button
-                className="top-level standard-button left-right"
-                onClick={this.createNoteForWork.bind(this)}
-              >
-                + Note
-              </button>
-            </>
-          )}
-        </div>
-        <NoteList
-          key={'work' + this.props.id}
-          viewMode={this.props.viewMode}
-          getListOfNotes={this.getListOfNotes.bind(this)}
-        />
-      </>
-    )
-  }
+            <button
+              className="top-level standard-button left-right"
+              onClick={() => {
+                setEdit(false)
+                setEditPiles(true)
+              }}
+            >
+              Piles
+            </button>
+            <button
+              className="top-level standard-button left-right"
+              onClick={deleteWork}
+            >
+              Delete
+            </button>
+            <button
+              className="top-level standard-button left-right"
+              onClick={createNoteForWork}
+            >
+              + Note
+            </button>
+          </>
+        )}
+      </div>
+      <NoteList
+        key={'work' + id}
+        viewMode={props.viewMode}
+        getListOfNotes={getListOfNotes}
+      />
+    </>
+  )
 }
 
 export default Work
