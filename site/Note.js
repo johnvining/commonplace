@@ -75,22 +75,22 @@ class Note extends React.Component {
         this.props.mode == constants.note_modes.EDIT_IDEAS ||
         this.props.mode == constants.note_modes.EDIT_PILES) &&
       event.ctrlKey &&
-      event.keyCode == 65
+      event.keyCode == constants.keyCodes.accept
     ) {
       this.handleAccept()
-    } else if (this.state.edit && event.keyCode == 27) {
+    } else if (this.state.edit && event.keyCode == constants.keyCodes.esc) {
       this.props.setNoteMode('', '')
     } else if (
       this.props.mode == constants.note_modes.EDIT &&
       event.ctrlKey &&
-      event.key == 'f'
+      event.keyCode == constants.keyCodes.format
     ) {
       // Ctrl F to format text
       this.formatMainText()
     } else if (
       this.props.mode == constants.note_modes.EDIT &&
       event.ctrlKey &&
-      event.key == 's'
+      event.keyCode == constants.keyCodes.S
     ) {
       // Ctrl S for suggestion
       this.generateTitleSuggestion()

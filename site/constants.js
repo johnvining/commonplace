@@ -36,7 +36,16 @@ export const modifiers = {
   grid: 'grid',
   full: 'full',
 }
+
 export const keyEvents = {
   enter: 13,
   delete: 8,
+}
+
+export const keyCodes = {
+  new_note: 78, // n
+  esc: 27,
+  format: 70, // f
+  S: 83,
+  accept: 65, // a
 }

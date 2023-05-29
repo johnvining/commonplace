@@ -6,6 +6,7 @@ import PileListForItem from './PileListForItem'
 import YearSpan from './YearSpan'
 import React from 'react'
 import { useState, useEffect } from 'react'
+import * as constants from './constants'
 
 function Work(props) {
   const { id } = useParams()
@@ -45,9 +46,9 @@ function Work(props) {
 
   useEffect(() => {
     const onKeyDown = async (event) => {
-      if (event.ctrlKey && event.keyCode == 78) {
+      if (event.ctrlKey && event.keyCode == constants.keyCodes.new_note) {
         createNoteForWork()
-      } else if (event.keyCode == 27) {
+      } else if (event.keyCode == constants.keyCodes.esc) {
         // TODO: This crashes because of a failure in NoteList
         handleFinishEditing()
       }
