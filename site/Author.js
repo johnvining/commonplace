@@ -1,64 +1,54 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as constants from './constants'
 import * as db from './Database'
 import NoteList from './NoteList'
 import React from 'react'
 import ResultWork from './ResultWork'
 import YearSpan from './YearSpan'
+import { useState, useEffect } from 'react'
 
-class Author extends React.Component {
-  state = {
-    id: '',
-    edit: false,
-    pendingName: '',
-    pendingBirthYear: '',
-    pendingDeathYear: '',
-  }
+function Author(props) {
+  const { id } = useParams()
+  const [edit, setEdit] = useState(false)
+  const [pendingName, setPendingName] = useState('')
+  const [pendingBirthYear, setPendingBirthYear] = useState('')
+  const [pendingDeathYear, setPendingDeathYear] = useState('')
+  const [works, setWorks] = useState(null)
+  const navigate = useNavigate()
 
-  componentDidMount() {
-    this.fetchAuthorInfo(this.props.id)
-    this.fetchAuthorWorks(this.props.id)
-  }
-
-  componentDidUpdate(prevState) {
-    if (prevState.id !== this.state.id) {
-      this.fetchAuthorInfo(this.state.id)
-      this.fetchAuthorWorks(this.state.id)
-    }
-  }
-
-  fetchAuthorInfo(authorId) {
-    db.getInfo(db.types.auth, authorId)
+  const fetchAuthorInfo = (id) => {
+    db.getInfo(db.types.auth, id)
       .then((response) => {
-        this.setState({
-          pendingName: response.data.data.name,
-          pendingBirthYear: response.data.data.birth_year,
-          pendingDeathYear: response.data.data.death_year,
-        })
-        this.props.setPageTitle(response.data.data.name)
+        setPendingName(response.data.data.name)
+        setPendingBirthYear(response.data.data.birth_year)
+        setPendingDeathYear(response.data.data.death_year)
+        props.setPageTitle(response.data.data.name)
       })
       .catch((error) => {
         console.error(error)
       })
   }
 
-  fetchAuthorWorks(authorId) {
-    db.getRecordsWithFilter(db.types.work, db.types.auth, authorId)
+  const fetchAuthorWorks = (id) => {
+    db.getRecordsWithFilter(db.types.work, db.types.auth, id)
       .then((response) => {
-        this.setState({
-          works: response.data.data,
-        })
+        setWorks(response.data.data)
       })
       .catch((error) => {
         console.error(error)
       })
   }
 
-  async getListOfNotes(index, page) {
+  useEffect(() => {
+    fetchAuthorInfo(id)
+    fetchAuthorWorks(id)
+  }, [id])
+
+  const getListOfNotes = async (index, page) => {
     var notesResponse
     if (index == undefined) {
       await db
-        .getRecordsWithFilter(db.types.note, db.types.auth, this.state.id)
+        .getRecordsWithFilter(db.types.note, db.types.auth, id)
         .then((response) => {
           notesResponse = response
         })
@@ -66,7 +56,7 @@ class Author extends React.Component {
           console.error(error)
         })
     } else {
-      var workId = this.state.works[index]?._id
+      var workId = works[index]?._id
       await db
         .getRecordsWithFilter(db.types.note, db.types.work, workId)
         .then((response) => {
@@ -80,145 +70,132 @@ class Author extends React.Component {
     return notesResponse
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.id !== prevState.id) {
-      return { id: nextProps.id }
-    }
-
-    return null
-  }
-
-  async deleteAuthor() {
-    if (
-      !confirm(`Do you want to permanently delete '${this.state.pendingName}'?`)
-    ) {
+  const deleteAuthor = async () => {
+    if (!confirm(`Do you want to permanently delete '${pendingName}'?`)) {
       return
     }
 
-    await db.deleteRecord(db.types.auth, this.state.id)
-    const navigate = useNavigate()
+    await db.deleteRecord(db.types.auth, id)
     navigate('/')
   }
 
-  async handleAcceptUpdates() {
+  const handleAcceptUpdates = async () => {
     var updateObject = {
-      name: this.state.pendingName,
-      birth_year: this.state.pendingBirthYear,
-      death_year: this.state.pendingDeathYear,
+      name: pendingName,
+      birth_year: pendingBirthYear,
+      death_year: pendingDeathYear,
     }
 
-    db.updateRecord(db.types.auth, this.props.id, updateObject)
-    this.setState({ edit: false })
+    db.updateRecord(db.types.auth, id, updateObject)
+    setEdit(false)
   }
 
-  render() {
-    return (
-      <div>
-        {/* Header and Edit */}
-        <div key="author-information">
-          {this.state.edit ? (
-            <>
-              <label htmlFor="name" className="work-page form-label">
-                Name
-              </label>
-              <input
-                className="work-page title input"
-                id="title"
-                defaultValue={this.state.pendingName}
-                onChange={(e) => {
-                  this.setState({ pendingName: e.target.value })
-                }}
-              />
-              <label htmlFor="birthYear" className="work-page form-label">
-                Birth Year
-              </label>
-              <input
-                className="work-page title input"
-                id="birth-year"
-                defaultValue={this.state.pendingBirthYear}
-                onChange={(e) => {
-                  this.setState({ pendingBirthYear: e.target.value })
-                }}
-              />
-              <label htmlFor="deathYear" className="work-page form-label">
-                Death Year
-              </label>
-              <input
-                className="work-page title input"
-                id="death-year"
-                defaultValue={this.state.pendingDeathYear}
-                onChange={(e) => {
-                  this.setState({ pendingDeathYear: e.target.value })
-                }}
-              />
-              <button
-                className="top-level standard-button left-right"
-                onClick={this.handleAcceptUpdates.bind(this)}
-              >
-                Done
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="page-title">{this.state.pendingName}</div>
-              {this.state.pendingBirthYear || this.state.pendingDeathYear ? (
-                <div className="page-sub-title">
-                  {this.state.pendingBirthYear ? (
-                    <>
-                      {'b. '} <YearSpan year={this.state.pendingBirthYear} />
-                    </>
-                  ) : null}
-                  {this.state.pendingDeathYear ? (
-                    <>
-                      {' d. '} <YearSpan year={this.state.pendingDeathYear} />
-                    </>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <div>
-                <button
-                  className="top-level standard-button"
-                  onClick={this.deleteAuthor.bind(this)}
-                >
-                  Delete
-                </button>
-                <button
-                  className="top-level standard-button"
-                  onClick={() => {
-                    this.setState({ edit: true })
-                  }}
-                >
-                  Edit
-                </button>
+  return (
+    <div>
+      {/* Header and Edit */}
+      <div key="author-information">
+        {edit ? (
+          <>
+            <label htmlFor="name" className="work-page form-label">
+              Name
+            </label>
+            <input
+              className="work-page title input"
+              id="title"
+              defaultValue={pendingName}
+              onChange={(e) => {
+                setPendingName(e.target.value)
+              }}
+            />
+            <label htmlFor="birthYear" className="work-page form-label">
+              Birth Year
+            </label>
+            <input
+              className="work-page title input"
+              id="birth-year"
+              defaultValue={pendingBirthYear}
+              onChange={(e) => {
+                setPendingBirthYear(e.target.value)
+              }}
+            />
+            <label htmlFor="deathYear" className="work-page form-label">
+              Death Year
+            </label>
+            <input
+              className="work-page title input"
+              id="death-year"
+              defaultValue={pendingDeathYear}
+              onChange={(e) => {
+                setPendingDeathYear(e.target.value)
+              }}
+            />
+            <button
+              className="top-level standard-button left-right"
+              onClick={handleAcceptUpdates}
+            >
+              Done
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="page-title">{pendingName}</div>
+            {pendingBirthYear || pendingDeathYear ? (
+              <div className="page-sub-title">
+                {pendingBirthYear ? (
+                  <>
+                    {'b. '} <YearSpan year={pendingBirthYear} />
+                  </>
+                ) : null}
+                {pendingDeathYear ? (
+                  <>
+                    {' d. '} <YearSpan year={pendingDeathYear} />
+                  </>
+                ) : null}
               </div>
-            </>
-          )}
-        </div>
+            ) : null}
 
-        {/* Work List */}
-        {this.state.works?.map((work, workindex) => (
-          <div key={'work-listing-' + workindex}>
-            <ResultWork work={work} key={'work-' + work._id} />
-            <div className="result-box parent">
-              <NoteList
-                key={'notes-for-work' + work._id}
-                index={workindex}
-                viewMode={constants.view_modes.RESULT}
-                getListOfNotes={this.getListOfNotes.bind(this)}
-              />
+            <div>
+              <button
+                className="top-level standard-button"
+                onClick={deleteAuthor}
+              >
+                Delete
+              </button>
+              <button
+                className="top-level standard-button"
+                onClick={() => {
+                  setEdit(true)
+                }}
+              >
+                Edit
+              </button>
             </div>
-          </div>
-        ))}
-        <NoteList
-          key={'auth' + this.props.id}
-          viewMode={constants.view_modes.RESULT}
-          useGroupings={true}
-          getListOfNotes={this.getListOfNotes.bind(this)}
-        />
+          </>
+        )}
       </div>
-    )
-  }
+
+      {/* Work List */}
+      {works?.map((work, workindex) => (
+        <div key={'work-listing-' + workindex}>
+          <ResultWork work={work} key={'work-' + work._id} />
+          <div className="result-box parent">
+            <NoteList
+              key={'notes-for-work' + work._id}
+              index={workindex}
+              viewMode={constants.view_modes.RESULT}
+              getListOfNotes={getListOfNotes}
+            />
+          </div>
+        </div>
+      ))}
+      <NoteList
+        key={'auth' + id}
+        viewMode={constants.view_modes.RESULT}
+        useGroupings={true}
+        getListOfNotes={getListOfNotes}
+      />
+    </div>
+  )
 }
 
 export default Author
