@@ -90,7 +90,7 @@ class Note extends React.Component {
     } else if (
       this.props.mode == constants.note_modes.EDIT &&
       event.ctrlKey &&
-      event.keyCode == constants.keyCodes.S
+      event.keyCode == constants.keyCodes.save
     ) {
       // Ctrl S for suggestion
       this.generateTitleSuggestion()

@@ -22,6 +22,7 @@ import search from './icons/search.svg'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
+import * as constants from './constants'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1 }
@@ -37,9 +38,9 @@ class App extends React.Component {
   }
 
   handleKeyDown(event) {
-    if (event.ctrlKey && event.keyCode == 79) {
+    if (event.ctrlKey && event.keyCode == constants.keyCodes.open) {
       this.setState({ barOpen: !this.state.barOpen })
-    } else if (event.keyCode == 27 && this.state.barOpen) {
+    } else if (event.keyCode == constants.keyCodes.esc && this.state.barOpen) {
       this.setState({ barOpen: false })
     }
   }

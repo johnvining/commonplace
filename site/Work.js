@@ -46,7 +46,7 @@ function Work(props) {
 
   useEffect(() => {
     const onKeyDown = async (event) => {
-      if (event.ctrlKey && event.keyCode == constants.keyCodes.new_note) {
+      if (event.ctrlKey && event.keyCode == constants.keyCodes.new) {
         createNoteForWork()
       } else if (event.keyCode == constants.keyCodes.esc) {
         // TODO: This crashes because of a failure in NoteList

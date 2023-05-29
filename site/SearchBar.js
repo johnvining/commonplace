@@ -14,7 +14,7 @@ function SearchBar(props) {
     const onKeyDown = async (event) => {
       if (
         // Delete to go back
-        event.keyCode == constants.keyEvents.delete &&
+        event.keyCode == constants.keyCodes.delete &&
         modifier &&
         typedText == '' &&
         !shouldShowAutocomplete()
@@ -25,7 +25,7 @@ function SearchBar(props) {
       } else if (
         // Create new note
         modifier == constants.modifiers.note &&
-        event.keyCode == constants.keyEvents.enter
+        event.keyCode == constants.keyCodes.enter
       ) {
         setModifier('')
         const response = await db.createNewNoteFromTitle(typedText)
@@ -33,7 +33,7 @@ function SearchBar(props) {
         navigate('/note/' + response.data._id + '/edit')
       } else if (
         modifier == constants.modifiers.find &&
-        event.keyCode == constants.keyEvents.enter
+        event.keyCode == constants.keyCodes.enter
       ) {
         var search = typedText
         setTypedText('')
@@ -44,7 +44,7 @@ function SearchBar(props) {
         (typedText == constants.modifiers.flip ||
           typedText == constants.modifiers.file ||
           typedText == constants.modifiers.home) &&
-        event.keyCode == constants.keyEvents.enter
+        event.keyCode == constants.keyCodes.enter
       ) {
         var destination = typedText
         if (typedText == constants.modifiers.home) {
@@ -64,7 +64,7 @@ function SearchBar(props) {
         (typedText == constants.modifiers.slim ||
           typedText == constants.modifiers.full ||
           typedText == constants.modifiers.grid) &&
-        event.keyCode == constants.keyEvents.enter
+        event.keyCode == constants.keyCodes.enter
       ) {
         var command = typedText
         setTypedText('')
@@ -81,7 +81,7 @@ function SearchBar(props) {
             props.setView(constants.view_modes.GRID)
             break
         }
-      } else if (event.keyCode == constants.keyEvents.enter) {
+      } else if (event.keyCode == constants.keyCodes.enter) {
         const nick = await db.getNick(typedText)
         if (nick) {
           // TODO: this is assuming all nicks belong to notes

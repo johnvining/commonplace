@@ -37,15 +37,19 @@ export const modifiers = {
   full: 'full',
 }
 
-export const keyEvents = {
-  enter: 13,
-  delete: 8,
-}
-
 export const keyCodes = {
-  new_note: 78, // n
-  esc: 27,
+  delete: 8,
+  new: 78, // n
+  esc: 27, // escape
   format: 70, // f
-  S: 83,
+  save: 83, // s
   accept: 65, // a
+  edit: 69, // e
+  ideas: 84, // t (tags)
+  piles: 80, // p
+  enter: 13, //enter
+  open: 79, // o
+  full: 50, // 2
+  slim: 51, // 3
+  grid: 52, // 4
 }

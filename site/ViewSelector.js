@@ -13,13 +13,13 @@ class SearchBar extends React.Component {
   handleKeyDown(event) {
     if (event.ctrlKey) {
       switch (event.keyCode) {
-        case 50:
+        case constants.keyCodes.full:
           this.props.setView(constants.view_modes.FULL)
           break
-        case 51:
+        case constants.keyCodes.slim:
           this.props.setView(constants.view_modes.SLIM)
           break
-        case 52:
+        case constants.keyCodes.grid:
           this.props.setView(constants.view_modes.GRID)
           break
       }

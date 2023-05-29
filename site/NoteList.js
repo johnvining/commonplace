@@ -121,18 +121,18 @@ class NoteList extends React.Component {
   handleKeyDown(event) {
     if (event.ctrlKey) {
       switch (event.keyCode) {
-        case 69: // Ctrl E'
+        case constants.keyCodes.edit:
           this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT)
           autosize(document.querySelector('#text'))
           autosize(document.querySelector('#take'))
           break
-        case 84: // Ctrl T
+        case constants.keyCodes.ideas:
           this.setNoteMode(
             document.activeElement.id,
             constants.note_modes.EDIT_IDEAS
           )
           break
-        case 80: // Ctrl P
+        case constants.keyCodes.piles: // Ctrl P
           this.setNoteMode(
             document.activeElement.id,
             constants.note_modes.EDIT_PILES
@@ -140,7 +140,7 @@ class NoteList extends React.Component {
       }
     } else {
       switch (event.keyCode) {
-        case 13: // Enter
+        case constants.keyCodes.enter:
           if (this.state.focusType == constants.note_modes.NO_SELECTION) {
             this.setNoteMode(
               document.activeElement.id,
@@ -149,7 +149,7 @@ class NoteList extends React.Component {
           }
 
           break
-        case 27: // Escape
+        case constants.keyCodes.esc:
           var divToFocus = document.getElementById(this.state.selectedNote)
           this.setNoteMode('', constants.note_modes.NO_SELECTION)
           divToFocus.focus()

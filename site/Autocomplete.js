@@ -1,6 +1,7 @@
 import React from 'react'
 import lightbulb from './icons/lightbulb.svg'
 import loader from './icons/loader.svg'
+import * as constants from './constants'
 
 class Autocomplete extends React.Component {
   state = {
@@ -34,7 +35,7 @@ class Autocomplete extends React.Component {
   }
 
   handleKeyDown(event) {
-    if (event.keyCode == 27) {
+    if (event.keyCode == constants.keyCodes.esc) {
       if (this.props.escape) this.props.escape()
       this.setState({ currentTypedText: '' })
     } else if (event.keyCode == 8 && !this.state.currentTypedText) {
