@@ -34,7 +34,6 @@ services:
       dockerfile: Dockerfile
     image: commonplace-site-image 
     container_name: commonplace-site
-    # TODO
     volumes:
       - ./client/:/usr/app
       - /usr/app/node_modules

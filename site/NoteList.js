@@ -84,6 +84,10 @@ class NoteList extends React.Component {
     note.imageUrls = this.state.notes[index].imageUrls
     notes[index] = note
     this.setState({ notes: notes })
+
+    if (this.props.fromNoteView) {
+      this.props.setPageTitle(notes[0].title)
+    }
   }
 
   async getImagesForNoteAtIndex(index, refetch) {

@@ -25,6 +25,7 @@ function NoteView(props) {
       .catch((error) => {
         console.error(error)
       })
+
     if (notesResponse.data.data[0].title) {
       props.setPageTitle(notesResponse.data.data[0].title)
     } else if (notesResponse.data.data[0].text) {
@@ -42,6 +43,8 @@ function NoteView(props) {
       viewMode={constants.view_modes.FULL}
       editFirst={props.edit}
       getListOfNotes={getListOfOneNote}
+      fromNoteView={true}
+      setPageTitle={props.setPageTitle}
     />
   )
 }

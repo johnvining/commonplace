@@ -23,8 +23,6 @@ RUN apk --no-cache --virtual build-dependencies add \
     && npm i tesseract.js\
     && apk del build-dependencies
 
-# TODO: Production build
-
 # Copy app source code
 COPY . .
 
