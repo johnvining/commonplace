@@ -10,6 +10,7 @@ import ideaRouter from './resources/idea/idea.router'
 import workRouter from './resources/work/work.router'
 import pileRouter from './resources/pile/pile.router'
 import nickRouter from './resources/nick/nick.router'
+import userRouter from './resources/user/user.router'
 import fileUpload from 'express-fileupload'
 
 export const app = express()
@@ -18,7 +19,7 @@ app.disable('x-powered-by')
 
 app.use(
   fileUpload({
-    createParentPath: true
+    createParentPath: true,
   })
 )
 
@@ -33,6 +34,7 @@ app.use('/api/idea', ideaRouter)
 app.use('/api/work', workRouter)
 app.use('/api/pile', pileRouter)
 app.use('/api/nick', nickRouter)
+app.use('/api/user', userRouter)
 
 export const start = async () => {
   try {
