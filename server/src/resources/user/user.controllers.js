@@ -1,5 +1,7 @@
 import User from '../user/user.model.js'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+import config from '../../config'
 
 export const reqRegisterUser = async (req, res) => {
   const { username, password } = req.body
@@ -14,12 +16,20 @@ export const reqRegisterUser = async (req, res) => {
       await User.create({
         username,
         password: hash,
-      }).then((user) =>
-        res.status(200).json({
-          message: 'User successfully created',
-          user,
+      }).then((user) => {
+        const maxAge = 24 * 60 * 60
+        const token = jwt.sign({ id: user._id, username }, config.secrets.jwt, {
+          expiresIn: maxAge,
         })
-      )
+        res.cookie('jwt', token, {
+          httpOnly: true,
+          maxAge: maxAge * 1000,
+        })
+        res.status(201).json({
+          message: 'User successfully created',
+          user: user._id,
+        })
+      })
     })
   } catch (error) {
     res.status(401).json({
@@ -46,12 +56,26 @@ export const reqAuthorizeUser = async (req, res) => {
       })
     } else {
       bcrypt.compare(password, user.password).then(function (result) {
-        result
-          ? res.status(200).json({
-              message: 'Login successful',
-              user,
-            })
-          : res.status(400).json({ message: 'Login not succesful' })
+        if (result) {
+          const maxAge = 24 * 60 * 60
+          const token = jwt.sign(
+            { id: user._id, username, role: user.role },
+            config.secrets.jwt,
+            {
+              expiresIn: maxAge,
+            }
+          )
+          res.cookie('jwt', token, {
+            httpOnly: true,
+            maxAge: maxAge * 1000,
+          })
+          res.status(201).json({
+            message: 'User successfully Logged in',
+            user: user._id,
+          })
+        } else {
+          res.status(400).json({ message: 'Login not succesful' })
+        }
       })
     }
   } catch (error) {
