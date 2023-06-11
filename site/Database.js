@@ -194,3 +194,8 @@ export async function getNoteNick(noteID) {
 export async function getNick(nick) {
   return axios.get(url_api + `nick/` + nick)
 }
+
+export async function getAuthentication(password) {
+  const data = { username: 'commonplace', password: password }
+  return axios.post(url_api + `user/auth`, data)
+}

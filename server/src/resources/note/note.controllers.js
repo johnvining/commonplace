@@ -5,7 +5,7 @@ import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 import {
   getSuggestedIdeas,
-  getSuggestedTitle
+  getSuggestedTitle,
 } from '../../utils/suggestions.js'
 import config from '../../config'
 import fs from 'fs'
@@ -21,7 +21,6 @@ export const reqFindNotesByString = async (req, res) => {
 }
 
 export const reqGetNoteDetails = async (req, res) => {
-  console.log('note details')
   return await findNotesAndPopulate({ _id: req.params.id })
 }
 
@@ -68,7 +67,7 @@ export const reqAddNewIdea = async (req, res) => {
 
 export const reqRemoveIdeaFromNote = async (req, res) => {
   return await updateNote(req.params.id, {
-    $pull: { ideas: req.params.ideaId }
+    $pull: { ideas: req.params.ideaId },
   })
 }
 
@@ -128,8 +127,8 @@ export const reqAddImageToNote = async (req, res) => {
         status: true,
         message: 'File uploaded',
         data: {
-          newNote
-        }
+          newNote,
+        },
       })
     }
   } catch (e) {
@@ -138,7 +137,7 @@ export const reqAddImageToNote = async (req, res) => {
   }
 }
 
-export const reqRemoveImageFromNote = async function(req, res) {
+export const reqRemoveImageFromNote = async function (req, res) {
   try {
     var filename = req.body.filename
     const noteId = req.params.id
@@ -163,7 +162,7 @@ export const reqRemoveImageFromNote = async function(req, res) {
   }
 }
 
-export const reqGetImageForNote = async function(req, res) {
+export const reqGetImageForNote = async function (req, res) {
   try {
     let note = await Note.findOne({ _id: req.params.id })
     res.sendFile(
@@ -175,7 +174,7 @@ export const reqGetImageForNote = async function(req, res) {
   }
 }
 
-export const reqGetSuggestionForNoteTitle = async function(req, res) {
+export const reqGetSuggestionForNoteTitle = async function (req, res) {
   try {
     let note = await Note.findOne({ _id: req.params.id })
     let suggestion = await getSuggestedTitle(note.text)
@@ -186,7 +185,7 @@ export const reqGetSuggestionForNoteTitle = async function(req, res) {
   }
 }
 
-export const reqGetSuggestedIdeasForNote = async function(req, res) {
+export const reqGetSuggestedIdeasForNote = async function (req, res) {
   try {
     let note = await Note.findOne({ _id: req.params.id })
     let suggestion = await getSuggestedIdeas(note.title, note.text)
@@ -197,11 +196,11 @@ export const reqGetSuggestedIdeasForNote = async function(req, res) {
   }
 }
 
-export const createNote = async function(title, author) {
+export const createNote = async function (title, author) {
   return await Note.create({ title: title, author: author })
 }
 
-export const createNoteObj = async function(obj) {
+export const createNoteObj = async function (obj) {
   return await Note.create(obj)
 }
 
@@ -213,8 +212,8 @@ export const updateNote = async (noteId, updateObj) => {
     .populate({
       path: 'work',
       populate: {
-        path: 'author'
-      }
+        path: 'author',
+      },
     })
     .lean()
     .exec()
@@ -232,7 +231,7 @@ export const getOcrForNote = async (req, res) => {
 }
 
 // slim: don't need any population
-export const findNotesAndPopulate = async function(
+export const findNotesAndPopulate = async function (
   searchObject,
   sortObject,
   slim = false,
@@ -257,20 +256,20 @@ export const findNotesAndPopulate = async function(
       .populate({
         path: 'work',
         populate: {
-          path: 'author'
-        }
+          path: 'author',
+        },
       })
       .lean()
       .exec()
   }
 }
 
-export const findRandomNotesAndPopulate = async function(
+export const findRandomNotesAndPopulate = async function (
   searchObject,
   limit = null
 ) {
   const random_notes = await Note.aggregate([
-    { $sample: { size: pageSize } }
+    { $sample: { size: pageSize } },
   ]).exec()
 
   await Note.populate(random_notes, { path: 'author' })
@@ -279,8 +278,8 @@ export const findRandomNotesAndPopulate = async function(
   return await Note.populate(random_notes, {
     path: 'work',
     populate: {
-      path: 'author'
-    }
+      path: 'author',
+    },
   })
 }
 

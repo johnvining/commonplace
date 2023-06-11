@@ -12,6 +12,7 @@ import FileList from './FileList'
 import FlipList from './FlipList'
 import Find from './Find'
 import Idea from './Idea'
+import Login from './Login'
 import NoteView from './NoteView'
 import Pile from './Pile'
 import PileHome from './PileHome'
@@ -22,10 +23,12 @@ import search from './icons/search.svg'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
+import jwt from 'jsonwebtoken'
+import axios from 'axios'
 import * as constants from './constants'
 
 class App extends React.Component {
-  state = { barOpen: false, viewMode: 1 }
+  state = { barOpen: false, viewMode: 1, hasToken: false }
 
   componentDidMount() {
     this.setState({ viewMode: localStorage.viewMode })
@@ -58,7 +61,36 @@ class App extends React.Component {
     document.title = title
   }
 
+  setAuthToken(token) {
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `${token}`
+    } else {
+      delete axios.defaults.headers.common['Authorization']
+    }
+  }
+
+  tokenIsExpired(token) {
+    if (!token) {
+      return true
+    }
+    var decodedToken = jwt.decode(token, { complete: true })
+    var dateNow = new Date()
+
+    return decodedToken.exp < dateNow.getTime()
+  }
+
   render() {
+    const token = localStorage.getItem('token')
+    const expired = this.tokenIsExpired(token)
+    if (token && !expired) {
+      this.setAuthToken(token)
+    } else if (expired) {
+      this.setAuthToken(null)
+      return <Login />
+    } else {
+      return <Login />
+    }
+
     // eslint-disable-next-line no-undef
     let environment = process.env.NODE_ENV
     return (

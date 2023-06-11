@@ -14,6 +14,7 @@
     "autosize": "^6.0.1",
     "axios": "^1.4.0",
     "dotenv": "^16.0.3",
+    "jsonwebtoken": "^9.0.0",
     "parcel": "^2.9.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -45,7 +46,9 @@
     "eslint-plugin-standard": "^5.0.0",
     "nodemon": "^2.0.22",
     "parcel-bundler": "^1.12.5",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5"
   },
   "browserslist": [
     "last 2 Chrome versions"

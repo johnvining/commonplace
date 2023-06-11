@@ -72,6 +72,7 @@ export const reqAuthorizeUser = async (req, res) => {
           res.status(201).json({
             message: 'User successfully Logged in',
             user: user._id,
+            token: token,
           })
         } else {
           res.status(400).json({ message: 'Login not succesful' })
@@ -87,12 +88,13 @@ export const reqAuthorizeUser = async (req, res) => {
 }
 
 export const reqAuthenticate = async (req, res, next) => {
-  const token = req.cookies.jwt
-  console.log(token)
+  const token = req.headers.authorization
   if (token) {
     jwt.verify(token, config.secrets.jwt, (err, decodedToken) => {
       if (err) {
         console.log(err)
+        return res.status(401).json({ message: 'Not authorized' })
+      } else if (decodedToken.username != 'commonplace') {
         return res.status(401).json({ message: 'Not authorized' })
       } else {
         next()

@@ -458,7 +458,6 @@ class Note extends React.Component {
                         pendingText: newText,
                         fetchingOcr: false,
                       })
-                      console.log('landed')
                       let input = document.querySelector('#text')
 
                       var event = new Event('input', { bubbles: true })
