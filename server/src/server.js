@@ -11,6 +11,8 @@ import workRouter from './resources/work/work.router'
 import pileRouter from './resources/pile/pile.router'
 import nickRouter from './resources/nick/nick.router'
 import userRouter from './resources/user/user.router'
+import { reqAuthenticate } from './resources/user/user.controllers.js'
+import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
 
 export const app = express()
@@ -28,13 +30,17 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
+app.use(cookieParser())
+
+app.use('/api/user', userRouter)
+app.all('*', reqAuthenticate) // TODO: Callback function
+
 app.use('/api/note', noteRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/idea', ideaRouter)
 app.use('/api/work', workRouter)
 app.use('/api/pile', pileRouter)
 app.use('/api/nick', nickRouter)
-app.use('/api/user', userRouter)
 
 export const start = async () => {
   try {
