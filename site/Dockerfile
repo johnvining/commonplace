@@ -8,7 +8,7 @@ COPY package*.json ./
 # --virtual: bundle packages, remove whole bundle at once, when done
 # https://github.com/nodejs/docker-node/issues/282
 RUN apk --no-cache --virtual build-dependencies add \
-    python \
+    python3 \
     make \
     g++ \
     && npm install \
