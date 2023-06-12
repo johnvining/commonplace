@@ -1,24 +1,17 @@
 import * as db from './Database'
 import { useState } from 'react'
 import React from 'react'
-import axios from 'axios'
+import { Redirect } from 'react-router-dom'
 
 function Login(props) {
   const [password, setPassword] = useState('')
-
-  const setAuthToken = (token) => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `${token}`
-    } else delete axios.defaults.headers.common['Authorization']
-  }
+  const [redirect, setRedirect] = useState(false)
 
   const handleSubmitPassword = async () => {
     db.getAuthentication(password)
       .then((response) => {
-        console.log(response)
         const token = response.data.token
-        localStorage.setItem('token', token)
-        axios.defaults.headers.common['Authorization'] = `${token}`
+        props.onTokenReceived(token)
       })
       .catch((error) => {
         console.error(error)

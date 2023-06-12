@@ -34,6 +34,7 @@ class App extends React.Component {
     this.setState({ viewMode: localStorage.viewMode })
     this.keyDownListener = this.handleKeyDown.bind(this)
     document.addEventListener('keydown', this.keyDownListener, false)
+    this.setAndValidateAuth()
   }
 
   componentWillUnmount() {
@@ -61,36 +62,39 @@ class App extends React.Component {
     document.title = title
   }
 
-  setAuthToken(token) {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `${token}`
-    } else {
-      delete axios.defaults.headers.common['Authorization']
+  setAndValidateAuth(token) {
+    if (!token || token == 'null' || this.tokenIsExpired(token)) {
+      token = localStorage.getItem('token')
     }
+
+    if (!token || token == 'null' || this.tokenIsExpired(token)) {
+      delete axios.defaults.headers.common['Authorization']
+      localStorage.removeItem('token')
+      this.setState({ authenticated: false })
+      return false
+    }
+
+    axios.defaults.headers.common['Authorization'] = `${token}`
+    localStorage.setItem('token', token)
+    this.setState({ authenticated: true })
+    return true
   }
 
   tokenIsExpired(token) {
-    if (!token) {
+    if (!token || token == null || token == 'null') {
       return true
     }
     var decodedToken = jwt.decode(token, { complete: true })
     var dateNow = new Date()
 
-    return decodedToken.exp < dateNow.getTime()
+    if (decodedToken) {
+      return decodedToken.exp < dateNow.getTime()
+    } else {
+      return false
+    }
   }
 
   render() {
-    const token = localStorage.getItem('token')
-    const expired = this.tokenIsExpired(token)
-    if (token && !expired) {
-      this.setAuthToken(token)
-    } else if (expired) {
-      this.setAuthToken(null)
-      return <Login />
-    } else {
-      return <Login />
-    }
-
     // eslint-disable-next-line no-undef
     let environment = process.env.NODE_ENV
     return (
@@ -243,10 +247,14 @@ class App extends React.Component {
           <Route
             path="/"
             element={
-              <RecentList
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
-              />
+              this.state.authenticated ? (
+                <RecentList
+                  viewMode={this.state.viewMode}
+                  setPageTitle={this.setPageTitle.bind(this)}
+                />
+              ) : (
+                <Login onTokenReceived={this.setAndValidateAuth.bind(this)} />
+              )
             }
           />
           <Route
