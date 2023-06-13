@@ -30,11 +30,17 @@ import * as constants from './constants'
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1, hasToken: false }
 
+  constructor(props) {
+    super(props)
+    axios.defaults.headers.common['Authorization'] =
+      localStorage.getItem('token')
+  }
+
   componentDidMount() {
     this.setState({ viewMode: localStorage.viewMode })
     this.keyDownListener = this.handleKeyDown.bind(this)
     document.addEventListener('keydown', this.keyDownListener, false)
-    this.setAndValidateAuth()
+    this.validateAuth()
   }
 
   componentWillUnmount() {
@@ -62,22 +68,29 @@ class App extends React.Component {
     document.title = title
   }
 
-  setAndValidateAuth(token) {
+  setNewToken(token) {
     if (!token || token == 'null' || this.tokenIsExpired(token)) {
-      token = localStorage.getItem('token')
+      this.setState({ authorized: false })
+    } else {
+      axios.defaults.headers.common['Authorization'] = `${token}`
+      this.setState({ authorized: true }, () => {
+        localStorage.setItem('token', token)
+      })
     }
+  }
 
+  validateAuth() {
+    let token = localStorage.getItem('token')
     if (!token || token == 'null' || this.tokenIsExpired(token)) {
-      delete axios.defaults.headers.common['Authorization']
-      localStorage.removeItem('token')
-      this.setState({ authenticated: false })
-      return false
+      this.setState({ authorized: false }, () => {
+        return false
+      })
+    } else {
+      axios.defaults.headers.common['Authorization'] = `${token}`
+      this.setState({ authorized: true }, () => {
+        return true
+      })
     }
-
-    axios.defaults.headers.common['Authorization'] = `${token}`
-    localStorage.setItem('token', token)
-    this.setState({ authenticated: true })
-    return true
   }
 
   tokenIsExpired(token) {
@@ -247,13 +260,13 @@ class App extends React.Component {
           <Route
             path="/"
             element={
-              this.state.authenticated ? (
+              this.state.authorized ? (
                 <RecentList
                   viewMode={this.state.viewMode}
                   setPageTitle={this.setPageTitle.bind(this)}
                 />
               ) : (
-                <Login onTokenReceived={this.setAndValidateAuth.bind(this)} />
+                <Login onTokenReceived={this.setNewToken.bind(this)} />
               )
             }
           />

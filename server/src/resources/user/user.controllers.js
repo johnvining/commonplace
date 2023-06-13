@@ -95,7 +95,7 @@ export const reqAuthenticate = async (req, res, next) => {
         console.log(err)
         return res.status(401).json({ message: 'Not authorized' })
       } else if (decodedToken.username != 'commonplace') {
-        return res.status(401).json({ message: 'Not authorized' })
+        return res.status(401).json({ message: 'Wrong username' })
       } else {
         next()
       }
