@@ -793,7 +793,7 @@ class Note extends React.Component {
                       <code style={{ verticalAlign: 'super', color: 'grey' }}>
                         <small>{this.state.nick}</small>
                       </code>
-                      <button
+                      {/* <button
                         className={'action-button'}
                         onClick={() => {
                           db.getNoteNick(this.props.id).then(() => {
@@ -809,7 +809,7 @@ class Note extends React.Component {
                         ) : (
                           <img src={clipboard}></img>
                         )}
-                      </button>
+                      </button> */}
                       <button
                         className={'action-button'}
                         onClick={() => {
