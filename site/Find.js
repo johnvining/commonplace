@@ -6,74 +6,51 @@ import NoteList from './NoteList'
 import PileList from './PileList'
 import React from 'react'
 import WorkList from './WorkList'
+import { useParams } from 'react-router-dom'
 
-class Find extends React.Component {
-  state = { search: '' }
+function Find(props) {
+  const { search } = useParams()
 
-  async getListOfNotes() {
-    return await db.searchNotes(this.state.search)
+  const getListOfNotes = async () => {
+    return await db.searchNotes(search)
   }
 
-  async getListOfWorks() {
-    return await db.getSuggestions(db.types.work, this.state.search, true)
+  const getListOfWorks = async () => {
+    return await db.getSuggestions(db.types.work, search, true)
   }
 
-  async getListOfIdeas() {
-    return await db.getSuggestions(db.types.idea, this.state.search, true)
+  const getListOfIdeas = async () => {
+    return await db.getSuggestions(db.types.idea, search, true)
   }
 
-  async getListOfAuthors() {
-    return await db.getSuggestions(db.types.auth, this.state.search, true)
+  const getListOfAuthors = async () => {
+    return await db.getSuggestions(db.types.auth, search, true)
   }
 
-  async getListOfPiles() {
-    return await db.getSuggestions(db.types.pile, this.state.search, false)
+  const getListOfPiles = async () => {
+    return await db.getSuggestions(db.types.pile, search, false)
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.search !== prevState.search) {
-      return { search: nextProps.search }
-    }
-
-    return null
-  }
-
-  render() {
-    const { notes } = this.state
-    const { search } = this.props
-
-    this.props.setPageTitle('Find: ' + search)
-
-    return (
+  props.setPageTitle('Find: ' + search)
+  return (
+    <div>
       <div>
-        <div>
-          <span className="title">{search}</span>
-        </div>
-        <PileList
-          key={'pileList' + this.state.search}
-          getListOfPiles={this.getListOfPiles.bind(this)}
-        />
-        <AuthorList
-          key={'authorList' + this.state.search}
-          getListOfAuthors={this.getListOfAuthors.bind(this)}
-        />
-        <WorkList
-          key={'workList' + this.state.search}
-          getListOfWorks={this.getListOfWorks.bind(this)}
-        />
-        <IdeaList
-          key={'ideaList' + this.state.search}
-          getListOfIdeas={this.getListOfIdeas.bind(this)}
-        />
-        <NoteList
-          key={'search-list-' + this.props.search}
-          notes={notes}
-          viewMode={constants.view_modes.RESULT}
-          getListOfNotes={this.getListOfNotes.bind(this)}
-        />
+        <span className="title">{search}</span>
       </div>
-    )
-  }
+      <PileList key={'pileList' + search} getListOfPiles={getListOfPiles} />
+      <AuthorList
+        key={'authorList' + search}
+        getListOfAuthors={getListOfAuthors}
+      />
+      <WorkList key={'workList' + search} getListOfWorks={getListOfWorks} />
+      <IdeaList key={'ideaList' + search} getListOfIdeas={getListOfIdeas} />
+      <NoteList
+        key={'search-list-' + props.search}
+        viewMode={constants.view_modes.RESULT}
+        getListOfNotes={getListOfNotes}
+      />
+    </div>
+  )
 }
 
 export default Find

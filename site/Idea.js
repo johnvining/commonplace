@@ -11,6 +11,7 @@ function Idea(props) {
   const [pendingName, setPendingName] = useState('')
   const [pendingStartYear, setPendingStartYear] = useState('')
   const [pendingEndYear, setPendingEndYear] = useState('')
+  const navigate = useNavigate()
 
   const fetchIdeaInfo = (ideaId) => {
     db.getInfo(db.types.idea, ideaId)
@@ -43,12 +44,11 @@ function Idea(props) {
   }
 
   const deleteIdea = async () => {
-    if (!confirm(`Do you want to permanently delete '${ideaName}'?`)) {
+    if (!confirm(`Do you want to permanently delete '${pendingName}'?`)) {
       return
     }
 
     await db.deleteRecord(db.types.idea, id)
-    const navigate = useNavigate()
     navigate('/')
   }
 
