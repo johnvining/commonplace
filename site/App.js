@@ -104,7 +104,7 @@ class App extends React.Component {
     var dateNow = new Date()
 
     if (decodedToken) {
-      return decodedToken.payload.exp < dateNow.getTime()
+      return decodedToken.payload.exp * 1000 < dateNow.getTime()
     } else {
       return false
     }
