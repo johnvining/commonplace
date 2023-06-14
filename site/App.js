@@ -82,8 +82,9 @@ class App extends React.Component {
 
   validateAuth() {
     let token = localStorage.getItem('token')
-    console.log('validate: ' + token)
     if (!token || token == 'null' || this.tokenIsExpired(token)) {
+      localStorage.removeItem('token')
+      delete axios.defaults.headers.common['Authorization']
       this.setState({ authorized: false }, () => {
         return false
       })
@@ -103,7 +104,7 @@ class App extends React.Component {
     var dateNow = new Date()
 
     if (decodedToken) {
-      return decodedToken.payload.exp > dateNow.getTime()
+      return decodedToken.payload.exp < dateNow.getTime()
     } else {
       return false
     }
