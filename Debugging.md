@@ -1,0 +1,2 @@
+# If `npm install` takes forever or fails with a `CERT_NOT_YET_VALID` error
+Check that the system date/time is correct by running `date` in the shell. If it isn't, update with `ntpdate ntp.ubuntu.com`.
