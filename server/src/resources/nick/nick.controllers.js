@@ -1,8 +1,4 @@
 import Nick from '../nick/nick.model.js'
-import Work from '../work/work.model.js'
-import Note from '../note/note.model.js'
-import Pile from '../pile/pile.model.js'
-import { defaultControllers } from '../../utils/default.controllers.js'
 
 export const reqGenerateNickForNote = async (req, res) => {
   return generateNickForType(req, res, 'note')
@@ -86,5 +82,3 @@ export const hashFunc = function hash(str) {
   }
   return hash
 }
-
-export default defaultControllers(Work)

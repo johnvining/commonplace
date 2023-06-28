@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
-import nickControllers from '../server/src/resources/nick/nick.controllers'
 
 function SearchBar(props) {
   const [modifier, setModifier] = useState('')
