@@ -5,16 +5,20 @@ const nickSchema = new mongoose.Schema(
     key: String,
     note: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'note'
+      ref: 'note',
     },
     idea: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'idea'
+      ref: 'idea',
     },
     work: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'work'
-    }
+      ref: 'work',
+    },
+    pile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'pile',
+    },
   },
   { timestamps: true }
 )
