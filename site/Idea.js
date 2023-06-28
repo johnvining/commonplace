@@ -11,6 +11,7 @@ function Idea(props) {
   const [pendingName, setPendingName] = useState('')
   const [pendingStartYear, setPendingStartYear] = useState('')
   const [pendingEndYear, setPendingEndYear] = useState('')
+  const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
   const fetchIdeaInfo = (ideaId) => {
@@ -23,6 +24,9 @@ function Idea(props) {
       .catch((error) => {
         console.error(error)
       })
+    db.getIdeaNick(ideaId).then((response) => {
+      setNick(response.data.data.key)
+    })
   }
 
   useEffect(() => {
@@ -122,20 +126,27 @@ function Idea(props) {
               </div>
             ) : null}
             <div>
+              <></>
               <button
-                className="top-level standard-button"
+                className="top-level standard-button left-right"
                 onClick={deleteIdea}
               >
                 Delete
               </button>
               <button
-                className="top-level standard-button"
+                className="top-level standard-button left-right"
                 onClick={() => {
                   setEdit(true)
                 }}
               >
                 Edit
               </button>
+
+              <div style={{ display: 'inline', marginLeft: '10px' }}>
+                <code style={{ color: 'grey' }}>
+                  <small>{nick}</small>
+                </code>
+              </div>
             </div>
           </>
         )}
