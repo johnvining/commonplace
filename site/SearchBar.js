@@ -115,7 +115,7 @@ function SearchBar(props) {
   const handleTextChange = (input) => {
     setTypedText(input.target.value)
     if (!modifier) {
-      var text = input.target.value
+      var text = input.target.value.toLowerCase()
       switch (text) {
         case constants.modifiers.auth:
         case constants.modifiers.find:
