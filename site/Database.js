@@ -200,7 +200,7 @@ export async function getIdeaNick(ideaID) {
 }
 
 export async function getPileNick(pileID) {
-  return axios.put(url_api + `nick/pile` + pileID)
+  return axios.put(url_api + `nick/pile/` + pileID)
 }
 
 export async function getNick(nick) {

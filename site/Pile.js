@@ -14,6 +14,7 @@ function Pile(props) {
   const [pendingName, setPendingName] = useState('')
   const [pendingStartYear, setPendingStartYear] = useState('')
   const [pendingEndYear, setPendingEndYear] = useState('')
+  const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
   const fetchPileInfo = (pileId) => {
@@ -26,6 +27,9 @@ function Pile(props) {
       .catch((error) => {
         console.error(error)
       })
+    db.getPileNick(pileId).then((response) => {
+      setNick(response.data.data.key)
+    })
   }
 
   useEffect(() => {
@@ -158,12 +162,17 @@ function Pile(props) {
                 <Link to={'/pile/' + id + '/notes'}>
                   <button
                     className="top-level standard-button"
-                    style={{ marginLeft: '4px' }} // Margins come from standard-button + standard-button which doesn't work becasue of the <a>
+                    style={{ marginLeft: '4px', userSelect: 'none' }} // Margins come from standard-button + standard-button which doesn't work becasue of the <a>
                   >
                     Notes
                   </button>
                 </Link>
               )}
+              <div style={{ display: 'inline', marginLeft: '10px' }}>
+                <code style={{ color: 'grey' }}>
+                  <small>{nick}</small>
+                </code>
+              </div>
             </div>
           </>
         )}
