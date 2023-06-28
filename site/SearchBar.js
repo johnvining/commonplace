@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
+import nickControllers from '../server/src/resources/nick/nick.controllers'
 
 function SearchBar(props) {
   const [modifier, setModifier] = useState('')
@@ -84,9 +85,23 @@ function SearchBar(props) {
       } else if (event.keyCode == constants.keyCodes.enter) {
         const nick = await db.getNick(typedText)
         if (nick) {
-          // TODO: this is assuming all nicks belong to notes
           props.beforeNavigate()
-          navigate('/note/' + nick.data.data.note)
+          switch (nick.data.data.key.charAt(0)) {
+            case 'n':
+              navigate('/note/' + nick.data.data.note)
+              break
+            case 'w':
+              navigate('/work/' + nick.data.data.work)
+              break
+            case 'i':
+              navigate('/idea/' + nick.data.data.idea)
+              break
+            case 'p':
+              navigate('/pile/' + nick.data.data.pile)
+              break
+            default:
+              break
+          }
         }
       }
     }
