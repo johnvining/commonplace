@@ -21,6 +21,7 @@ function Work(props) {
   const [pendingSummary, setPendingSummary] = useState('')
   const [pendingCitationInfo, setPendingCitationInfo] = useState('')
   const [piles, setPiles] = useState()
+  const [nick, setNick] = useState()
   const navigate = useNavigate()
 
   const fetchWorkInfo = (workId) => {
@@ -38,6 +39,9 @@ function Work(props) {
       .catch((error) => {
         console.error(error)
       })
+    db.getWorkNick(workId).then((response) => {
+      setNick(response.data.data.key)
+    })
   }
 
   useEffect(() => {
@@ -243,7 +247,9 @@ function Work(props) {
         </>
       ) : (
         <>
-          <span className="work-page title">{pendingWorkTitle}</span>
+          <span className="work-page title">
+            {pendingWorkTitle} {nick}
+          </span>
           <br />
           <span className="work-page title">
             <small>

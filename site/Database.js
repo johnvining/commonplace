@@ -191,6 +191,18 @@ export async function getNoteNick(noteID) {
   return axios.put(url_api + `nick/note/` + noteID)
 }
 
+export async function getWorkNick(workID) {
+  return axios.put(url_api + `nick/work/` + workID)
+}
+
+export async function getIdeaNick(ideaID) {
+  return axios.put(url_api + `nick/idea/` + ideaID)
+}
+
+export async function getPileNick(pileID) {
+  return axios.put(url_api + `nick/pile` + pileID)
+}
+
 export async function getNick(nick) {
   return axios.get(url_api + `nick/` + nick)
 }
