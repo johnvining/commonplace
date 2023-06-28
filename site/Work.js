@@ -334,12 +334,15 @@ function Work(props) {
             <button
               className="top-level standard-button left-right"
               onClick={createNoteForWork}
+              style={{ userSelect: 'none' }}
             >
               + Note
             </button>
-            <code style={{ color: 'grey' }}>
-              <small>{nick}</small>
-            </code>
+            <div style={{ display: 'inline', marginLeft: '10px' }}>
+              <code style={{ color: 'grey' }}>
+                <small>{nick}</small>
+              </code>
+            </div>
           </>
         )}
       </div>

@@ -70,7 +70,6 @@ class App extends React.Component {
 
   setNewToken(token) {
     if (!token || token == 'null' || this.tokenIsExpired(token)) {
-      console.log('expired')
       this.setState({ authorized: false })
     } else {
       axios.defaults.headers.common['Authorization'] = `${token}`

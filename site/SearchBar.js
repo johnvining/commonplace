@@ -86,7 +86,7 @@ function SearchBar(props) {
         const nick = await db.getNick(typedText)
         if (nick) {
           props.beforeNavigate()
-          switch (nick.data.data.key.charAt(0)) {
+          switch (nick.data.data.key?.charAt(0)) {
             case 'n':
               navigate('/note/' + nick.data.data.note)
               break
