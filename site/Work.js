@@ -247,34 +247,32 @@ function Work(props) {
         </>
       ) : (
         <>
-          <span className="work-page title">
-            {pendingWorkTitle} {nick}
-          </span>
-          <br />
-          <span className="work-page title">
-            <small>
-              {pendingCitationInfo}{' '}
-              {pendingYear ? (
-                <YearSpan year={pendingYear} spanStyle="work-page year" />
-              ) : (
-                ''
-              )}
-              {pendingUrl ? (
-                <>
-                  (<a href={pendingUrl}>link</a>)
-                </>
-              ) : (
-                ''
-              )}
-            </small>
-          </span>
-          <div className={'work-page author'}>
-            <Link to={'/auth/' + pendingAuthorId}>{pendingAuthorName}</Link>
-          </div>
+          {pendingAuthorName && (
+            <div className={'work-page author'}>
+              <Link to={'/auth/' + pendingAuthorId}>{pendingAuthorName}</Link>
+            </div>
+          )}
+          {pendingWorkTitle && (
+            <>
+              <span className="work-page title">{pendingWorkTitle}</span>
+            </>
+          )}
+          {(pendingCitationInfo || pendingYear || pendingUrl) && (
+            <>
+              <br />{' '}
+              <span className="work-page">
+                {pendingCitationInfo && pendingCitationInfo + ' '}
+                {pendingYear && <YearSpan year={pendingYear} />}
+                {pendingUrl && <a href={pendingUrl}> link</a>}
+              </span>
+            </>
+          )}
 
-          <span className="work-page url">
-            <small>{pendingSummary}</small>
-          </span>
+          {pendingSummary && (
+            <>
+              <br /> <span className="work-page">{pendingSummary}</span>
+            </>
+          )}
         </>
       )}
       {/* Buttons */}
@@ -339,6 +337,9 @@ function Work(props) {
             >
               + Note
             </button>
+            <code style={{ color: 'grey' }}>
+              <small>{nick}</small>
+            </code>
           </>
         )}
       </div>
