@@ -135,6 +135,7 @@ function Idea(props) {
               </button>
               <button
                 className="top-level standard-button left-right"
+                style={{ userSelect: 'none' }}
                 onClick={() => {
                   setEdit(true)
                 }}
