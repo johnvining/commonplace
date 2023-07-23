@@ -110,6 +110,10 @@ class App extends React.Component {
   }
 
   render() {
+    if (!this.state.authorized) {
+      return <Login onTokenReceived={this.setNewToken.bind(this)} />
+    }
+
     // eslint-disable-next-line no-undef
     let environment = process.env.NODE_ENV
     return (
@@ -262,14 +266,10 @@ class App extends React.Component {
           <Route
             path="/"
             element={
-              this.state.authorized ? (
-                <RecentList
-                  viewMode={this.state.viewMode}
-                  setPageTitle={this.setPageTitle.bind(this)}
-                />
-              ) : (
-                <Login onTokenReceived={this.setNewToken.bind(this)} />
-              )
+              <RecentList
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
             }
           />
           <Route
