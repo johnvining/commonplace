@@ -7,8 +7,10 @@ function Login(props) {
   const [password, setPassword] = useState('')
   const [redirect, setRedirect] = useState(false)
 
-  const handleSubmitPassword = async () => {
-    db.getAuthentication(password)
+  const handleSubmitPassword = async (e) => {
+    e.preventDefault() // Prevent navigating to new page on submit
+    await db
+      .getAuthentication(password)
       .then((response) => {
         const token = response.data.token
         props.onTokenReceived(token)
@@ -20,18 +22,17 @@ function Login(props) {
 
   return (
     <div>
-      <input
-        onChange={(e) => {
-          setPassword(e.target.value)
-        }}
-        type="password"
-      ></input>
-      <button
-        className="top-level standard-button left-right"
-        onClick={handleSubmitPassword}
-      >
-        Submit
-      </button>
+      <form onSubmit={handleSubmitPassword}>
+        <input
+          onChange={(e) => {
+            setPassword(e.target.value)
+          }}
+          type="password"
+        ></input>
+        <button className="top-level standard-button left-right" type="submit">
+          Submit
+        </button>
+      </form>
     </div>
   )
 }
