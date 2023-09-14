@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 import https from 'https'
-import parse from 'csv-parse'
+import { parse } from 'csv-parse'
 import config from '../config'
 import * as utils from '../utils' //TODO: Fix duplicate code
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
@@ -19,7 +19,7 @@ export async function importCSV(filePath, recordType) {
   var parser = parse({ delimiter: ',' })
   fs.createReadStream(filePath)
     .pipe(parser)
-    .on('data', async data => {
+    .on('data', async (data) => {
       entries.push(data)
     })
 
@@ -40,7 +40,7 @@ export async function importCSV(filePath, recordType) {
 
 function streamComplete(stream) {
   return new Promise(function c(res) {
-    stream.on('end', function() {
+    stream.on('end', function () {
       res()
     })
   })
@@ -88,14 +88,14 @@ export async function getImageFromURL(url, dest) {
   var file = fs.createWriteStream(dest)
   let htPromise = new Promise((resolve, reject) => {
     try {
-      https.get(url, function(response) {
+      https.get(url, function (response) {
         response.pipe(file)
-        file.on('finish', function() {
+        file.on('finish', function () {
           file.close()
           resolve()
         })
 
-        file.on('error', function(err) {
+        file.on('error', function (err) {
           resolve()
           console.error(err)
         })
@@ -121,8 +121,8 @@ async function createDirIfNeeded(path) {
 }
 
 function mkDirPromise(path, mask) {
-  return new Promise(function(resolve, reject) {
-    fs.mkdir(path, mask, function(err) {
+  return new Promise(function (resolve, reject) {
+    fs.mkdir(path, mask, function (err) {
       if (err && err.code !== 'EEXIST') return reject(err)
       resolve(path)
     })
@@ -159,12 +159,12 @@ async function importNote(importObject) {
   let workPromise = WorkControllers.findOrCreateWork(importObject.workName)
 
   var ideaPromises = []
-  importObject.ideas.map(idea => {
+  importObject.ideas.map((idea) => {
     ideaPromises.push(IdeaControllers.findOrCreateIdea(idea))
   })
 
   var pilePromises = []
-  importObject.piles.map(pile => {
+  importObject.piles.map((pile) => {
     pilePromises.push(PileControllers.findOrCreatePile(pile))
   })
 
@@ -176,14 +176,14 @@ async function importNote(importObject) {
   let newNote = {
     author: response[0][0]?._id,
     work: response[0][1]?._id,
-    ideas: response[1].filter(x => x),
-    piles: response[2].filter(x => x),
+    ideas: response[1].filter((x) => x),
+    piles: response[2].filter((x) => x),
     text: importObject.text,
     title: importObject.title,
     url: importObject.url,
     year: importObject.year,
     page: importObject.page,
-    take: importObject.take
+    take: importObject.take,
   }
 
   if (!isNaN(newNote.year) && newNote.url) {
@@ -210,7 +210,7 @@ async function importNote(importObject) {
 
   let imagePromiseResp = await Promise.all(imagePromises)
   await NoteControllers.updateNote(createdNote._id, {
-    images: imagePromiseResp
+    images: imagePromiseResp,
   })
 }
 
@@ -228,7 +228,7 @@ async function importWork(importObject) {
   if (!importObject.title) return
 
   let pilePromises = []
-  importObject.piles.map(pile => {
+  importObject.piles.map((pile) => {
     if (pile) pilePromises.push(PileControllers.findOrCreatePile(pile))
   })
 
@@ -251,8 +251,8 @@ async function importWork(importObject) {
   }
 
   updateObject.piles = []
-  await Promise.all(pilePromises).then(response => {
-    response.map(pile => updateObject.piles.push(pile))
+  await Promise.all(pilePromises).then((response) => {
+    response.map((pile) => updateObject.piles.push(pile))
   })
 
   let work = await WorkControllers.findOrCreateWork(importObject.title)
