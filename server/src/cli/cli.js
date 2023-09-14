@@ -11,27 +11,23 @@ import config from '../config'
 
 var context = {
   type: null,
-  item: null
+  item: null,
 }
 
 var oldContext = {
   type: null,
-  item: null
+  item: null,
 }
 
 // TODO move database functions to separate file
 // TODO implement last
 
 const connect = () => {
-  return mongoose.connect(config.dbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
-  })
+  return mongoose.connect(config.dbUrl, {})
 }
 
 connect()
-  .then(async connection => {
+  .then(async (connection) => {
     let go = true
     while (go) {
       console.log(writeContext())
@@ -87,7 +83,7 @@ connect()
       }
     }
   })
-  .catch(e => console.error(e))
+  .catch((e) => console.error(e))
 
 function writeContext() {
   let context_string = ''
@@ -268,7 +264,7 @@ function help(args) {
   if (args != '') {
     console.log(usertext.helpText[args])
   } else {
-    Object.keys(usertext.helpText).forEach(command => {
+    Object.keys(usertext.helpText).forEach((command) => {
       console.log(' | ' + command + ': ' + usertext.helpText[command])
     })
   }
