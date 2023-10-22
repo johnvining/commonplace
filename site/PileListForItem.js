@@ -7,21 +7,33 @@ function PileListForItem(props) {
   const navigate = useNavigate()
   return (
     <>
-      {props.piles?.map((pile) => (
-        <button
-          key={'/pile/' + pile._id}
-          className={props.remove ? 'pile label remove' : 'pile label'}
-          onClick={() => {
-            if (props.remove) {
-              props.onPileRemove(pile._id)
-            } else {
-              navigate('/pile/' + pile._id)
-            }
-          }}
-        >
-          {pile.name}
-        </button>
-      ))}
+      {props.piles?.map((pile) => {
+        let pileName = pile.name
+        let parts = pileName.split(':')
+        let pre = ''
+        if (parts.length > 1) {
+          pileName = parts[1]
+          pre = parts[0]
+        }
+        return (
+          <button
+            key={'/pile/' + pile._id}
+            className={props.remove ? 'pile label remove' : 'pile label'}
+            onClick={() => {
+              if (props.remove) {
+                props.onPileRemove(pile._id)
+              } else {
+                navigate('/pile/' + pile._id)
+              }
+            }}
+          >
+            <>
+              {pre ? <span className="pile pre">{pre}</span> : null}
+              {pileName}
+            </>
+          </button>
+        )
+      })}
       {props.edit ? (
         <Autocomplete
           className={props.mainClassName + ' pile-select'}

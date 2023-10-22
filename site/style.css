@@ -404,6 +404,12 @@ div .top-bar {
     background-color: #efefef; }
   .idea.label.idea, .pile.label.idea {
     background-color: #e8f4f8; }
+.idea.pre, .pile.pre {
+  font-size: 10px;
+  background-color: white;
+  text-transform: uppercase;
+  padding: 2px;
+  border-radius: 2px; }
 .idea.ul, .pile.ul {
   display: block;
   margin: 0px;
