@@ -13,6 +13,7 @@ import FlipList from './FlipList'
 import Find from './Find'
 import Idea from './Idea'
 import Login from './Login'
+import Load from './Load'
 import NoteView from './NoteView'
 import Pile from './Pile'
 import PileHome from './PileHome'
@@ -198,6 +199,10 @@ class App extends React.Component {
                 setPageTitle={this.setPageTitle.bind(this)}
               />
             }
+          />
+          <Route
+            path="/load"
+            element={<Load setPageTitle={this.setPageTitle.bind(this)} />}
           />
           <Route
             path="/find/:search"
