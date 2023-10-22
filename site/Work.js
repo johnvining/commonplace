@@ -119,8 +119,8 @@ function Work(props) {
   }
 
   const handleImport = async () => {
-    console.log
     let importText = pendingImportText
+    setPendingImportText('')
     db.importNotesForWork(importText, id).then(() => {
       fetchWorkInfo(id)
       setImportMode(false)
@@ -347,7 +347,7 @@ function Work(props) {
             <button
               className="top-level standard-button left-right"
               onClick={() => {
-                setImportMode(true)
+                setImportMode(!importMode)
               }}
             >
               Import
