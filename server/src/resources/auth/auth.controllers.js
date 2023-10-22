@@ -27,7 +27,7 @@ export const getAutoComplete = async (req, res, withCounts = false) => {
   return doc
 }
 
-export const findAuthorsByString = async function(str, withCounts) {
+export const findAuthorsByString = async function (str, withCounts) {
   let authors = await Auth.find({ name: new RegExp(str, 'i') })
     .lean()
     .exec()
@@ -36,17 +36,17 @@ export const findAuthorsByString = async function(str, withCounts) {
   } else {
     let notePromises = [],
       workPromises = []
-    authors.map(author => {
+    authors.map((author) => {
       notePromises.push(Note.find({ author: author._id }).countDocuments())
       workPromises.push(Work.find({ author: author._id }).countDocuments())
     })
 
-    let noteFiler = Promise.all(notePromises).then(result => {
+    let noteFiler = Promise.all(notePromises).then((result) => {
       result.map((val, idx) => {
         authors[idx] = { ...authors[idx], note_count: val }
       })
     })
-    let workFiler = Promise.all(workPromises).then(result => {
+    let workFiler = Promise.all(workPromises).then((result) => {
       result.map((val, idx) => {
         authors[idx] = { ...authors[idx], work_count: val }
       })
@@ -66,7 +66,7 @@ export const reqCreateAuthor = async (req, res) => {
 }
 
 export const reqGetWorksForAuthor = async (req, res) => {
-  const doc = await Work.find({ author: req.params.id })
+  const doc = await Work.find({ author: req.params.id }).sort({ year: 1 })
   if (!doc) {
     return res.status(400).end()
   }
@@ -77,15 +77,15 @@ export const reqDeleteAuthor = async (req, res) => {
   await deleteAuthor(req.params.id)
 }
 
-export const createAuthor = async function(name) {
+export const createAuthor = async function (name) {
   return await Auth.create({ name: name })
 }
 
-export const findAuthorByString = async function(str) {
+export const findAuthorByString = async function (str) {
   return await Auth.findOne({ name: str }).exec()
 }
 
-export const findOrCreateAuthor = async function(name) {
+export const findOrCreateAuthor = async function (name) {
   if (name == '') return
   // TODO: Can this be done with a single mongo call?
   const author = await findAuthorByString(name)
@@ -97,14 +97,14 @@ export const findOrCreateAuthor = async function(name) {
   return await createAuthor(name)
 }
 
-export const deleteAuthor = async function(id) {
+export const deleteAuthor = async function (id) {
   let notes = await findNotesAndPopulate(
     { author: id },
     { updatedAt: -1 },
     true
   )
   let deletionPromises = []
-  notes.map(note => {
+  notes.map((note) => {
     deletionPromises.push(updateNote(note._id, { author: null }))
   })
 
