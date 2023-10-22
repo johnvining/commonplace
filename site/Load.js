@@ -6,12 +6,14 @@ import autosize from 'autosize'
 
 function Load(props) {
   const [pendingImportText, setPendingImportText] = useState('')
+  const [notesImported, setNotesImported] = useState(-1)
   const navigate = useNavigate()
 
   const handleImport = async () => {
     let importText = pendingImportText
     setPendingImportText('')
-    await db.importNotesCsv(importText)
+    let imported = await db.importNotesCsv(importText)
+    setNotesImported(imported.data.data)
   }
 
   props.setPageTitle('Import Notes')
@@ -35,6 +37,9 @@ function Load(props) {
       >
         Import
       </button>
+      <span>
+        {notesImported > -1 ? notesImported + ' notes imported' : null}
+      </span>
     </div>
   )
 }
