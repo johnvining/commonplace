@@ -260,42 +260,44 @@ function Work(props) {
         </>
       ) : (
         <>
-          {pendingAuthorName && (
-            <span className={'work-page author'}>
-              <Link to={'/auth/' + pendingAuthorId}>{pendingAuthorName}</Link>
-            </span>
-          )}
-          {pendingWorkTitle && pendingAuthorName && (
-            <span className={'work-page author'}>, </span>
-          )}
-          {pendingWorkTitle && (
-            <>
-              <span className="work-page title">{pendingWorkTitle}</span>
-            </>
-          )}
+          <div className={'work-page work-header'}>
+            {pendingAuthorName && (
+              <span className={'work-page author'}>
+                <Link to={'/auth/' + pendingAuthorId}>{pendingAuthorName}</Link>
+              </span>
+            )}
+            {pendingWorkTitle && pendingAuthorName && (
+              <span className={'work-page author'}>, </span>
+            )}
+            {pendingWorkTitle && (
+              <>
+                <span className="work-page title">{pendingWorkTitle}</span>
+              </>
+            )}
 
-          {pendingYear && !pendingUrl && (
-            <span>
-              {' '}
-              (<YearSpan year={pendingYear} />)
-            </span>
-          )}
-          {pendingYear && pendingUrl && (
-            <span>
-              {' '}
-              (
-              <a href={pendingUrl}>
-                <YearSpan year={pendingYear} />
-              </a>
-              )
-            </span>
-          )}
-          {pendingUrl && !pendingYear && (
-            <span>
-              {' '}
-              (<a href={pendingUrl}>link</a>)
-            </span>
-          )}
+            {pendingYear && !pendingUrl && (
+              <span>
+                {' '}
+                (<YearSpan year={pendingYear} />)
+              </span>
+            )}
+            {pendingYear && pendingUrl && (
+              <span>
+                {' '}
+                (
+                <a href={pendingUrl}>
+                  <YearSpan year={pendingYear} />
+                </a>
+                )
+              </span>
+            )}
+            {pendingUrl && !pendingYear && (
+              <span>
+                {' '}
+                (<a href={pendingUrl}>link</a>)
+              </span>
+            )}
+          </div>
 
           {pendingSummary && (
             <>

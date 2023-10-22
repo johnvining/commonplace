@@ -879,6 +879,10 @@ a {
     }
   }
 
+  &.work-header {
+    padding: 8px 4px 8px 4px;
+  }
+
   &.input {
     background-color: $button_selected;
     padding: 4px;

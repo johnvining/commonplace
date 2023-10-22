@@ -872,6 +872,8 @@ a {
   padding: 4px; }
   .work-page.year.summary, .work-page.url.summary, .work-page.summary.summary, .work-page.citation-info.summary {
     font-size: 14px; }
+.work-page.work-header {
+  padding: 8px 4px 8px 4px; }
 .work-page.input {
   background-color: #c1e1ec;
   padding: 4px;
