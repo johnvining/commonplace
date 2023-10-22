@@ -261,24 +261,40 @@ function Work(props) {
       ) : (
         <>
           {pendingAuthorName && (
-            <div className={'work-page author'}>
+            <span className={'work-page author'}>
               <Link to={'/auth/' + pendingAuthorId}>{pendingAuthorName}</Link>
-            </div>
+            </span>
+          )}
+          {pendingWorkTitle && pendingAuthorName && (
+            <span className={'work-page author'}>, </span>
           )}
           {pendingWorkTitle && (
             <>
               <span className="work-page title">{pendingWorkTitle}</span>
             </>
           )}
-          {(pendingCitationInfo || pendingYear || pendingUrl) && (
-            <>
-              <br />{' '}
-              <span className="work-page">
-                {pendingCitationInfo && pendingCitationInfo + ' '}
-                {pendingYear && <YearSpan year={pendingYear} />}
-                {pendingUrl && <a href={pendingUrl}> link</a>}
-              </span>
-            </>
+
+          {pendingYear && !pendingUrl && (
+            <span>
+              {' '}
+              (<YearSpan year={pendingYear} />)
+            </span>
+          )}
+          {pendingYear && pendingUrl && (
+            <span>
+              {' '}
+              (
+              <a href={pendingUrl}>
+                <YearSpan year={pendingYear} />
+              </a>
+              )
+            </span>
+          )}
+          {pendingUrl && !pendingYear && (
+            <span>
+              {' '}
+              (<a href={pendingUrl}>link</a>)
+            </span>
           )}
 
           {pendingSummary && (
