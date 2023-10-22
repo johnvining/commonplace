@@ -476,7 +476,7 @@ class Note extends React.Component {
               <textarea
                 id="text"
                 className={'note-full note-text edit'}
-                onChange={this.handleImport}
+                onChange={this.handleTextChange}
                 value={this.state.pendingText}
               ></textarea>
             </div>
