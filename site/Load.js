@@ -11,10 +11,7 @@ function Load(props) {
   const handleImport = async () => {
     let importText = pendingImportText
     setPendingImportText('')
-    // db.importNotesForWork(importText, id).then(() => {
-    //   fetchWorkInfo(id)
-    //   setImportMode(false)
-    // })
+    await db.importNotesCsv(importText)
   }
 
   props.setPageTitle('Import Notes')

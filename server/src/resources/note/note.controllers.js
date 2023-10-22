@@ -1,6 +1,7 @@
 import Note from './note.model.js'
 import Pile from '../pile/pile.model.js'
 import Work from '../work/work.model.js'
+import { importCsvFromString } from '../../cli/import.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
@@ -246,6 +247,12 @@ export const reqBulkImportForWork = async (req, res) => {
 
   await Promise.all(notePromises)
   return null
+}
+
+export const reqBulkImportNotesCSV = async (req, res) => {
+  let csv = req.body.importList
+  let recordsImported = await importCsvFromString(csv, 1)
+  return recordsImported
 }
 
 // slim: don't need any population

@@ -4,6 +4,7 @@ import fs from 'fs'
 import https from 'https'
 import { parse } from 'csv-parse'
 import config from '../config'
+import Readable from 'stream'
 import * as utils from '../utils' //TODO: Fix duplicate code
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as WorkControllers from '../resources/work/work.controllers.js'
@@ -36,6 +37,38 @@ export async function importCSV(filePath, recordType) {
   }
 
   console.log('Imported records: ' + totalImports)
+}
+
+export async function importCsvFromString(string, recordType) {
+  if (recordType != 1) {
+    return null // Unsupported
+  }
+
+  const Readable = require('stream').Readable
+  let stream = Readable.from(string)
+
+  var entries = []
+  var parser = parse({ delimiter: ',' })
+  stream.pipe(parser).on('data', async (data) => {
+    entries.push(data)
+  })
+
+  await streamComplete(parser)
+
+  var totalImports = 0
+  const parseFunc = getParseFunction(recordType)
+  const importFunc = getImportFunction(recordType)
+
+  let notePromises = []
+  for (let i = 0; i < entries.length; i++) {
+    let parsedObject = parseFunc(entries[i])
+    notePromises.push(importFunc(parsedObject))
+    totalImports++
+  }
+
+  await Promise.all(notePromises)
+
+  return totalImports
 }
 
 function streamComplete(stream) {

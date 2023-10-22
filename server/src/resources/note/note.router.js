@@ -22,6 +22,7 @@ import controllers, {
   reqUpdateNote,
   getOcrForNote,
   reqBulkImportForWork,
+  reqBulkImportNotesCSV,
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
@@ -63,6 +64,8 @@ router.route('/:id/ideas/suggest').get(reqGetSuggestedIdeasForNote)
 router.route('/:id/ocr').get(asyncWrapper(getOcrForNote, 200))
 
 router.route('/import/work/:work').put(asyncWrapper(reqBulkImportForWork, 200))
+
+router.route('/import/csv').put(asyncWrapper(reqBulkImportNotesCSV, 200))
 
 router
   .route('/:id')

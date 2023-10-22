@@ -216,3 +216,8 @@ export async function importNotesForWork(notesText, workID) {
   const data = { notesText: notesText }
   return axios.put(url_api + 'note/import/work/' + workID, data)
 }
+
+export async function importNotesCsv(importList) {
+  const data = { importList: importList }
+  return axios.put(url_api + 'note/import/csv', data)
+}
