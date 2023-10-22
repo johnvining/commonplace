@@ -819,8 +819,8 @@ a {
   margin: auto;
   padding: 2px;
   resize: none;
-  white-space: pre-wrap;
-  width: 100%; }
+  width: 100%;
+  white-space: pre-wrap; }
 .work-page.author-select.search-box {
   display: inline-block;
   border: none;

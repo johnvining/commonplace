@@ -245,7 +245,7 @@ function Work(props) {
               setPendingYear(e.target.value)
             }}
           />
-          <label htmlFor="url" className="work-page form-label">
+          <label htmlFor="summary" className="work-page form-label">
             Summary
           </label>
           <textarea
@@ -283,7 +283,7 @@ function Work(props) {
 
           {pendingSummary && (
             <>
-              <br /> <span className="work-page">{pendingSummary}</span>
+              <br /> <div className="work-page summary">{pendingSummary}</div>
             </>
           )}
         </>
