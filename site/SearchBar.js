@@ -43,7 +43,8 @@ function SearchBar(props) {
         !modifier &&
         (typedText == constants.modifiers.flip ||
           typedText == constants.modifiers.file ||
-          typedText == constants.modifiers.home) &&
+          typedText == constants.modifiers.home ||
+          typedText == constants.modifiers.load) &&
         event.keyCode == constants.keyCodes.enter
       ) {
         var destination = typedText

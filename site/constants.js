@@ -35,6 +35,7 @@ export const modifiers = {
   slim: 'slim',
   grid: 'grid',
   full: 'full',
+  load: 'load',
 }
 
 export const keyCodes = {
