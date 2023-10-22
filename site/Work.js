@@ -11,6 +11,8 @@ import * as constants from './constants'
 function Work(props) {
   const { id } = useParams()
   const [edit, setEdit] = useState(false)
+  const [importMode, setImportMode] = useState(false)
+  const [pendingImportText, setPendingImportText] = useState('')
   const [editPiles, setEditPiles] = useState(false)
   // TODO: Create pending object
   const [pendingWorkTitle, setPendingWorkTitle] = useState('')
@@ -113,6 +115,15 @@ function Work(props) {
 
     db.updateRecord(db.types.work, id, updateObject)
     setEdit(false)
+  }
+
+  const handleImport = async () => {
+    console.log
+    let importText = pendingImportText
+    db.importNotesForWork(importText, id).then(() => {
+      fetchWorkInfo(id)
+      setImportMode(false)
+    })
   }
 
   const handleNewPile = async (pile) => {
@@ -333,6 +344,14 @@ function Work(props) {
             </button>
             <button
               className="top-level standard-button left-right"
+              onClick={() => {
+                setImportMode(true)
+              }}
+            >
+              Import
+            </button>
+            <button
+              className="top-level standard-button left-right"
               onClick={createNoteForWork}
               style={{ userSelect: 'none' }}
             >
@@ -346,11 +365,30 @@ function Work(props) {
           </>
         )}
       </div>
-      <NoteList
-        key={'work' + id}
-        viewMode={props.viewMode}
-        getListOfNotes={getListOfNotes}
-      />
+      {importMode ? (
+        <div>
+          <textarea
+            id="text"
+            className={'note-full note-text edit'}
+            value={pendingImportText}
+            onChange={(e) => {
+              setPendingImportText(e.target.value)
+            }}
+          ></textarea>
+          <button
+            className="top-level standard-button left-right"
+            onClick={handleImport}
+          >
+            Done
+          </button>
+        </div>
+      ) : (
+        <NoteList
+          key={'work' + id}
+          viewMode={props.viewMode}
+          getListOfNotes={getListOfNotes}
+        />
+      )}
     </>
   )
 }

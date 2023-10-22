@@ -7,8 +7,8 @@ import check_circle from './icons/check_circle.svg'
 import cross_circle from './icons/cross_circle.svg'
 import eye from './icons/eye.svg'
 import eye_closed from './icons/eye_closed.svg'
-import clipboard from './icons/clipboard.svg'
-import clipboard_check from './icons/clipboard_check.svg'
+// import clipboard from './icons/clipboard.svg'
+// import clipboard_check from './icons/clipboard_check.svg'
 import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
 import link from './icons/link.svg'
@@ -476,7 +476,7 @@ class Note extends React.Component {
               <textarea
                 id="text"
                 className={'note-full note-text edit'}
-                onChange={this.handleTextChange}
+                onChange={this.handleImport}
                 value={this.state.pendingText}
               ></textarea>
             </div>

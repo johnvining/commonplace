@@ -211,3 +211,8 @@ export async function getAuthentication(password) {
   const data = { username: 'commonplace', password: password }
   return axios.post(url_api + `user/auth`, data)
 }
+
+export async function importNotesForWork(notesText, workID) {
+  const data = { notesText: notesText }
+  return axios.put(url_api + 'note/import/work/' + workID, data)
+}

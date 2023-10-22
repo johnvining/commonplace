@@ -233,7 +233,7 @@ export const getOcrForNote = async (req, res) => {
 
 export const reqBulkImportForWork = async (req, res) => {
   // TODO: Validate work ID
-  let input = req.body.notes
+  let input = req.body.notesText
   let lines = input.split(/\r?\n/)
   let notePromises = []
   lines.map((line) => {
