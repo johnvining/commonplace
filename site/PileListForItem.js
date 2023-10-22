@@ -18,7 +18,7 @@ function PileListForItem(props) {
         return (
           <button
             key={'/pile/' + pile._id}
-            className={props.remove ? 'pile label remove' : 'pile label'}
+            className={props.remove ? 'pile label edit' : 'pile label'}
             onClick={() => {
               if (props.remove) {
                 props.onPileRemove(pile._id)
