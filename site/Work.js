@@ -247,7 +247,7 @@ function Work(props) {
           <label htmlFor="url" className="work-page form-label">
             Summary
           </label>
-          <input
+          <textarea
             defaultValue={pendingSummary}
             id="url"
             className="work-page summary input"
@@ -366,15 +366,17 @@ function Work(props) {
         )}
       </div>
       {importMode ? (
-        <div>
-          <textarea
-            id="text"
-            className={'note-full note-text edit'}
-            value={pendingImportText}
-            onChange={(e) => {
-              setPendingImportText(e.target.value)
-            }}
-          ></textarea>
+        <div className="full-width">
+          <div name="text" className="width-100">
+            <textarea
+              id="text"
+              className={'work-page importText input'}
+              value={pendingImportText}
+              onChange={(e) => {
+                setPendingImportText(e.target.value)
+              }}
+            ></textarea>
+          </div>
           <button
             className="top-level standard-button left-right"
             onClick={handleImport}

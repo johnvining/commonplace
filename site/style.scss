@@ -791,6 +791,20 @@ a {
     padding: 4px;
   }
 
+  &.summary,
+  &.importText {
+    border-radius: 4px;
+    border: none;
+    box-sizing: border-box;
+    display: block;
+    font-family: $main_font;
+    margin: auto;
+    padding: 2px;
+    resize: none;
+    white-space: pre-wrap;
+    width: 100%;
+  }
+
   &.author-select {
     &.search-box {
       display: inline-block;

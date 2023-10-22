@@ -810,6 +810,17 @@ a {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   background-color: transparent;
   padding: 4px; }
+.work-page.summary, .work-page.importText {
+  border-radius: 4px;
+  border: none;
+  box-sizing: border-box;
+  display: block;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  margin: auto;
+  padding: 2px;
+  resize: none;
+  white-space: pre-wrap;
+  width: 100%; }
 .work-page.author-select.search-box {
   display: inline-block;
   border: none;
