@@ -7,6 +7,7 @@ import YearSpan from './YearSpan'
 import React from 'react'
 import { useState, useEffect } from 'react'
 import * as constants from './constants'
+import autosize from 'autosize'
 
 function Work(props) {
   const { id } = useParams()
@@ -249,10 +250,11 @@ function Work(props) {
           </label>
           <textarea
             defaultValue={pendingSummary}
-            id="url"
+            id="summary"
             className="work-page summary input"
             onChange={(e) => {
               setPendingSummary(e.target.value)
+              autosize(document.querySelector('#summary'))
             }}
           />
         </>
@@ -369,11 +371,12 @@ function Work(props) {
         <div className="full-width">
           <div name="text" className="width-100">
             <textarea
-              id="text"
+              id="importText"
               className={'work-page importText input'}
               value={pendingImportText}
               onChange={(e) => {
                 setPendingImportText(e.target.value)
+                autosize(document.querySelector('#importText'))
               }}
             ></textarea>
           </div>
