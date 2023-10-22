@@ -166,24 +166,6 @@ function Work(props) {
 
   return (
     <>
-      {/* Piles */}
-      <div>
-        <PileListForItem
-          remove={edit}
-          edit={false}
-          piles={piles}
-          onSelect={handleNewPile}
-          getSuggestions={db.getSuggestions}
-          handleNewSelect={handleCreatePileAndAssign}
-          mainClassName="work-page"
-          onStartPileEdit={() => {
-            setEditPiles(true)
-          }}
-          allowAdd={true}
-          allowTabbing={true}
-          onPileRemove={handlePileRemove}
-        />
-      </div>
       {/* Main Content */}
       {edit ? (
         <>
@@ -306,6 +288,24 @@ function Work(props) {
           )}
         </>
       )}
+      {/* Piles */}
+      <div>
+        <PileListForItem
+          remove={edit}
+          edit={false}
+          piles={piles}
+          onSelect={handleNewPile}
+          getSuggestions={db.getSuggestions}
+          handleNewSelect={handleCreatePileAndAssign}
+          mainClassName="work-page"
+          onStartPileEdit={() => {
+            setEditPiles(true)
+          }}
+          allowAdd={true}
+          allowTabbing={true}
+          onPileRemove={handlePileRemove}
+        />
+      </div>
       {/* Buttons */}
       <div>
         {edit ? (
