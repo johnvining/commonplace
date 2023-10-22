@@ -1,5 +1,6 @@
 import Note from './note.model.js'
 import Pile from '../pile/pile.model.js'
+import Work from '../work/work.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
@@ -228,6 +229,23 @@ export const getOcrForNote = async (req, res) => {
   }
 
   return result
+}
+
+export const reqBulkImportForWork = async (req, res) => {
+  // TODO: Validate work ID
+  let input = req.body.notes
+  let lines = input.split(/\r?\n/)
+  let notePromises = []
+  lines.map((line) => {
+    if (line) {
+      notePromises.push(
+        Note.create({ title: '', work: req.params.work, text: line })
+      )
+    }
+  })
+
+  await Promise.all(notePromises)
+  return null
 }
 
 // slim: don't need any population
