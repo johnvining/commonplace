@@ -46,13 +46,11 @@ export async function importCsvFromString(string, recordType) {
 
   const Readable = require('stream').Readable
   let stream = Readable.from(string)
-
   var entries = []
-  var parser = parse({ delimiter: ',' })
+  var parser = parse({ delimiter: ',', relax_column_count: true })
   stream.pipe(parser).on('data', async (data) => {
     entries.push(data)
   })
-
   await streamComplete(parser)
 
   var totalImports = 0

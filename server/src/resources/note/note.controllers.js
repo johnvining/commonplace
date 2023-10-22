@@ -250,8 +250,15 @@ export const reqBulkImportForWork = async (req, res) => {
 }
 
 export const reqBulkImportNotesCSV = async (req, res) => {
-  let csv = req.body.importList
-  let recordsImported = await importCsvFromString(csv, 1)
+  let recordsImported = -2
+  try {
+    let csv = req.body.importList
+    recordsImported = await importCsvFromString(csv, 1)
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+
   return recordsImported
 }
 

@@ -14,6 +14,8 @@ function Load(props) {
     setPendingImportText('')
     let imported = await db.importNotesCsv(importText)
     setNotesImported(imported.data.data)
+    // TODO: Error handling on bad CSV
+    // TODO: Validate CSV then load all records, rather than erroring midway through
   }
 
   props.setPageTitle('Import Notes')
