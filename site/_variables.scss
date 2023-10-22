@@ -17,6 +17,7 @@ $theme_blue: #add8e6;
 $theme_mint: #F7FCF7;
 $theme_yellow: lightgoldenrodyellow;
 $theme_coral: lightcoral;
+$theme_purple: #f3e8f8;
 $highlight_blue: lighten($theme_blue, 15%);
 $highlight_blue_dark: lighten($theme_blue, 5%);
 
@@ -30,7 +31,7 @@ $white: white;
 
 
 $semantic_idea: $highlight_blue;
-$semantic_pile: $grey2;
+$semantic_pile: $theme_purple;
 $semantic_selection: $theme_yellow;
 $semantic_removal: $theme_coral;
 

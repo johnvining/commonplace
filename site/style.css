@@ -321,7 +321,7 @@ div .top-bar {
   border-width: 2px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   height: 42px;
-  margin: 0px;
+  margin: 4px 0px 4px 0px;
   padding: 6px; }
   .standard-button + .standard-button {
     margin-left: 4px; }
@@ -372,7 +372,7 @@ div .top-bar {
   .idea.search-box:focus, .pile.search-box:focus {
     outline: none; }
   .idea.search-box.pile, .pile.search-box.pile {
-    border-color: #efefef; }
+    border-color: #f3e8f8; }
   .idea.search-box.idea, .pile.search-box.idea {
     border-color: #e8f4f8; }
 .idea.label, .pile.label {
@@ -401,7 +401,7 @@ div .top-bar {
     height: 14px;
     content: ''; }
   .idea.label.pile, .pile.label.pile {
-    background-color: #efefef; }
+    background-color: #f3e8f8; }
   .idea.label.idea, .pile.label.idea {
     background-color: #e8f4f8; }
 .idea.pre, .pile.pre {
@@ -432,7 +432,7 @@ div .top-bar {
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
   .idea .option.pile, .pile .option.pile {
-    background-color: #efefef; }
+    background-color: #f3e8f8; }
   .idea .option.idea, .pile .option.idea {
     background-color: #e8f4f8; }
   .idea .option::after, .pile .option::after {
