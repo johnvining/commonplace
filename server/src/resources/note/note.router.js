@@ -20,10 +20,9 @@ import controllers, {
   reqRemoveImageFromNote,
   reqRemovePileFromNote,
   reqUpdateNote,
-  getOcrForNote,
+  reqOcrForNote,
   reqBulkImportForWork,
   reqBulkImportNotesCSV,
-  getOcrLlmForNote,
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
@@ -62,8 +61,7 @@ router.route('/:id/image/').delete(reqRemoveImageFromNote)
 router.route('/:id/title/suggest').get(reqGetSuggestionForNoteTitle)
 router.route('/:id/ideas/suggest').get(reqGetSuggestedIdeasForNote)
 
-router.route('/:id/ocr').get(asyncWrapper(getOcrForNote, 200))
-router.route('/:id/ocr_llm').get(asyncWrapper(getOcrLlmForNote, 200))
+router.route('/:id/ocr').get(asyncWrapper(reqOcrForNote, 200))
 
 router.route('/import/work/:work').put(asyncWrapper(reqBulkImportForWork, 200))
 

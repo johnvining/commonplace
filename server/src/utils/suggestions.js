@@ -56,20 +56,6 @@ export const getSuggestedIdeas = async function (note_title, note_text) {
   }
 }
 
-// TODO: Fix/update
-export const getLLMCorrectedText = async function (text) {
-  const completion = await openai.createCompletion({
-    model: 'text-davinci-003',
-    prompt:
-      'The following text is the output of an OCR program. Please correct any errors: ' +
-      text,
-    temperature: 0.2,
-    max_tokens: 200,
-  })
-
-  return completion.data.choices[0].text
-}
-
 // https://platform.openai.com/docs/guides/vision?lang=node
 export const getOpenAiOCR = async function (image_location) {
   var imageAsBase64 = fs.readFileSync(image_location, 'base64')
