@@ -372,6 +372,14 @@ function Work(props) {
             </button>
             <button
               className="top-level standard-button left-right"
+              onClick={() => {
+                navigate('/read/' + id)
+              }}
+            >
+              Read
+            </button>
+            <button
+              className="top-level standard-button left-right"
               onClick={createNoteForWork}
               style={{ userSelect: 'none' }}
             >
