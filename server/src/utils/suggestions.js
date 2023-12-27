@@ -1,4 +1,5 @@
 import config from '../config'
+import fs from 'fs'
 
 import OpenAI from 'openai'
 const openai = new OpenAI({
@@ -55,6 +56,7 @@ export const getSuggestedIdeas = async function (note_title, note_text) {
   }
 }
 
+// TODO: Fix/update
 export const getLLMCorrectedText = async function (text) {
   const completion = await openai.createCompletion({
     model: 'text-davinci-003',
@@ -66,4 +68,32 @@ export const getLLMCorrectedText = async function (text) {
   })
 
   return completion.data.choices[0].text
+}
+
+// https://platform.openai.com/docs/guides/vision?lang=node
+export const getOpenAiOCR = async function (image_location) {
+  var imageAsBase64 = fs.readFileSync(image_location, 'base64')
+  const chatCompletion = await openai.chat.completions.create({
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Transcribe the text in this image and only include semantically important line breaks:',
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: 'data:image/jpeg;base64,' + imageAsBase64,
+            },
+          },
+        ],
+      },
+    ],
+    model: 'gpt-4-vision-preview',
+    max_tokens: 1200,
+  })
+
+  return chatCompletion.choices[0].message.content
 }

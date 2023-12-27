@@ -8,6 +8,7 @@ import * as WorkControllers from '../work/work.controllers.js'
 import {
   getSuggestedIdeas,
   getSuggestedTitle,
+  getOpenAiOCR,
 } from '../../utils/suggestions.js'
 import config from '../../config'
 import fs from 'fs'
@@ -225,8 +226,23 @@ export const getOcrForNote = async (req, res) => {
   let note = await Note.findOne({ _id: req.params.id })
 
   var result = ''
+  // TODO: Serial await
   for (let i = 0; i < note.images.length; i++) {
     result += (await ocr(config.imageStorePath + '/' + note.images[i])) + '\n\n'
+  }
+
+  return result
+}
+
+export const getOcrLlmForNote = async (req, res) => {
+  let note = await Note.findOne({ _id: req.params.id })
+
+  var result = ''
+  // TODO: Serial await
+  for (let i = 0; i < note.images.length; i++) {
+    result +=
+      (await getOpenAiOCR(config.imageStorePath + '/' + note.images[i])) +
+      '\n\n'
   }
 
   return result
