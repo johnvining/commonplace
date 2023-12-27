@@ -60,6 +60,12 @@ export const generateNickForType = async (req, res, type) => {
         }
       } else {
         // If there's a duplicate, hash again and check on the next round
+        console.info(
+          'Duplicate nick found for hash: ' +
+            hash +
+            ' and hashstring: ' +
+            hashString
+        )
         hash = hashFunc(hash)
       }
     }
