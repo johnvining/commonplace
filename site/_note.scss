@@ -303,8 +303,11 @@
   border-radius: 4px;
   background-color: transparent;
 
+  height:40px;
+  width: 50px;
+
   &:hover {
-    background-color: $white;
+    background-color: $theme_mint;
   }
 
   &:focus {
