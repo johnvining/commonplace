@@ -24,6 +24,7 @@ import search from './icons/search.svg'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
+import Read from './Read'
 import jwt from 'jsonwebtoken'
 import axios from 'axios'
 import * as constants from './constants'
@@ -281,6 +282,15 @@ class App extends React.Component {
             path="/work/:id"
             element={
               <Work
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
+          />
+          <Route
+            path="/read/:id"
+            element={
+              <Read
                 viewMode={this.state.viewMode}
                 setPageTitle={this.setPageTitle.bind(this)}
               />

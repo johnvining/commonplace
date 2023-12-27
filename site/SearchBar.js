@@ -124,6 +124,7 @@ function SearchBar(props) {
         case constants.modifiers.note:
         case constants.modifiers.pile:
         case constants.modifiers.work:
+        case constants.modifiers.read:
           setModifier(text)
           setTypedText('')
           break
@@ -137,6 +138,7 @@ function SearchBar(props) {
       case constants.modifiers.idea:
       case constants.modifiers.work:
       case constants.modifiers.pile:
+      case constants.modifiers.read:
         props.beforeNavigate()
         navigate('/' + modifier + '/' + id)
         return
@@ -147,6 +149,7 @@ function SearchBar(props) {
 
   const getSuggestions = (type, val) => {
     var dbType = modifierToDbTypes(modifier)
+    console.log(dbType)
     if (dbType) {
       return db.getSuggestions(dbType, val)
     }
@@ -168,6 +171,7 @@ function SearchBar(props) {
       case constants.modifiers.idea:
         return db.types.idea
       case constants.modifiers.work:
+      case constants.modifiers.read:
         return db.types.work
       case constants.modifiers.pile:
         return db.types.pile
@@ -186,6 +190,7 @@ function SearchBar(props) {
       case constants.modifiers.auth:
       case constants.modifiers.idea:
       case constants.modifiers.work:
+      case constants.modifiers.read:
       case constants.modifiers.pile:
         return true
     }
