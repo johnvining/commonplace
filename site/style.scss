@@ -156,6 +156,13 @@ a {
   &.hidden {
     display: none;
   }
+
+  &.mondo {
+    height: 200px;
+    width: 300px;
+    margin: 40px;
+    font-size: 18px;
+  }
 }
 
 .idea,.pile {

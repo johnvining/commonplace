@@ -68,40 +68,49 @@ function Read(props) {
   return (
     <>
       <div className={'work-page work-header'}>
-        {authorName && (
-          <span className={'work-page author'}>
-            <Link to={'/auth/' + authorId}>{authorName}</Link>
-          </span>
-        )}
-        {workTitle && authorName && (
-          <span className={'work-page author'}>, </span>
-        )}
-        {workTitle && (
-          <>
-            <span className="work-page title">{workTitle}</span>
-          </>
-        )}
+        <center>
+          <big>READING</big>
+        </center>
+      </div>
+      <div className={'work-page work-header'}>
+        <center>
+          {authorName && (
+            <span className={'work-page author'}>
+              <Link to={'/auth/' + authorId}>{authorName}</Link>
+            </span>
+          )}
+          {workTitle && authorName && (
+            <span className={'work-page author'}>, </span>
+          )}
+          {workTitle && (
+            <>
+              <Link to={'/work/' + id}>
+                <span className="work-page title">{workTitle}</span>
+              </Link>
+            </>
+          )}
+          <br />
+          <code style={{ color: 'grey' }}> {nick}</code>
+        </center>
       </div>
       <div>
-        <button
-          className="top-level standard-button left-right"
-          onClick={createNoteForWork}
-          style={{ userSelect: 'none' }}
-        >
-          + Note
-        </button>
-        <button
-          className="top-level standard-button left-right"
-          onClick={createNoteForWork}
-          style={{ userSelect: 'none' }}
-        >
-          + Photo Note
-        </button>
-        <div style={{ display: 'inline', marginLeft: '10px' }}>
-          <code style={{ color: 'grey' }}>
-            <small>{nick}</small>
-          </code>
-        </div>
+        <center>
+          <button
+            className="top-level standard-button left-right mondo"
+            onClick={createNoteForWork}
+            style={{ userSelect: 'none' }}
+          >
+            + Note
+          </button>
+          <button
+            className="top-level standard-button left-right mondo"
+            onClick={createNoteForWork}
+            style={{ userSelect: 'none' }}
+          >
+            + Photo Note
+          </button>
+          <div style={{ display: 'inline', marginLeft: '10px' }}></div>
+        </center>
       </div>
     </>
   )

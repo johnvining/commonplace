@@ -354,6 +354,11 @@ div .top-bar {
     border-color: white; }
   .standard-button.hidden {
     display: none; }
+  .standard-button.mondo {
+    height: 200px;
+    width: 300px;
+    margin: 40px;
+    font-size: 18px; }
 
 .idea.container, .pile.container {
   background-color: transparent;
