@@ -1,0 +1,28 @@
+# First run
+- Clone the repository
+- Add config files (devconfig.js/prodconfig.js for server, .env* files for site)
+- Add any files you'd like to import, so that they can be copied in to the containers
+- If prod: docker-compose build, docker-compose up
+- If not prod:
+    - start mongo - `sudo mongod --dbpath /System/Volumes/Data/data/db`
+    - start the server - `cd server` and `npm run dev`
+    - start the site - `cd site` and `npm run dev`
+
+# Running the CLI from docker
+Copy the file in to the folder for server then run
+
+`sudo docker exec -it commonplace-server sh && npm run cli`
+`npm run cli`
+
+
+# Loading a new version on to rasp pi
+`git pull origin HEAD`
+`sudo docker-compose build`
+`sudo docker-compose up`
+
+# Problems
+## If `npm install` takes forever or fails with a `CERT_NOT_YET_VALID` error
+Check that the system date/time is correct by running `date` in the shell. If it isn't, update with `ntpdate ntp.ubuntu.com`.
+
+## If docker on pi has wrong version of a module
+Need to re-install the packages to get the correct version. Bring docker down, prune, build. [Link 1](https://www.reddit.com/r/docker/comments/tm3ojb/docker_not_updating_node_modules_with_new/), [Link 2](https://stackoverflow.com/questions/32612650/how-to-get-docker-compose-to-always-re-create-containers-from-fresh-images)
