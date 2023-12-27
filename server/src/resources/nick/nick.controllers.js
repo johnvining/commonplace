@@ -14,6 +14,8 @@ export const reqGenerateNickForPile = async (req, res) => {
 }
 
 export const generateNickForType = async (req, res, type) => {
+  console.log('get nick for type: ' + type)
+
   if (type == 'note') {
     var existingNick = await Nick.findOne({ note: req.params.id })
     var prefix = 'n'
@@ -30,12 +32,18 @@ export const generateNickForType = async (req, res, type) => {
     return null
   }
 
+  console.log('existing nick: ' + existingNick)
+  console.log('prefix: ' + prefix)
+
   if (!existingNick || existingNick._id == null) {
     var hash = hashFunc(req.params.id)
 
     while (true) {
       let hashString = ('000000' + hash).slice(-6)
       let dupe = await Nick.findOne({ key: prefix + hashString })
+
+      console.log('dupe: ' + dupe)
+
       if (!dupe) {
         if (type == 'note') {
           return await Nick.create({
@@ -60,7 +68,7 @@ export const generateNickForType = async (req, res, type) => {
         }
       } else {
         // If there's a duplicate, hash again and check on the next round
-        console.info(
+        console.log(
           'Duplicate nick found for hash: ' +
             hash +
             ' and hashstring: ' +
