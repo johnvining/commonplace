@@ -915,6 +915,20 @@ a {
   }
 }
 
+.file-drop {
+  display: inline-block;
+  padding: 12px 4px 12px 8px;
+  margin: 10px 10 px 10px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.drag-active {
+  border-radius: 4px;
+  background-color: $theme_blue;
+}
+
+
 input[type=file]::file-selector-button {
   background-color:$button_background;
   border-color: $white;

@@ -2,7 +2,12 @@ import React from 'react'
 import upload from './icons/upload.svg'
 
 class ImageUploader extends React.Component {
-  state = { selectedFile: '', ready: false, uploading: false }
+  state = {
+    selectedFile: '',
+    ready: false,
+    uploading: false,
+    dragActive: false,
+  }
 
   onFileSelect(event) {
     this.setState(
@@ -26,9 +31,46 @@ class ImageUploader extends React.Component {
     })
   }
 
+  handleDragEnter(e) {
+    this.setState({ dragActive: true })
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  handleDragLeave(e) {
+    this.setState({ dragActive: false })
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  handleDragOver(e) {
+    this.setState({ dragActive: true })
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  handleDrop(e) {
+    this.setState({ dragActive: false })
+    e.preventDefault()
+    e.stopPropagation()
+
+    const { files } = e.dataTransfer
+
+    if (files && files.length == 1) {
+      // TODO: Support for multi-file
+      this.setState({ selectedFile: files[0], ready: true }, () => {
+        this.onSubmit()
+      })
+    }
+  }
+
   render() {
+    console.log(this.state.dragActive)
     return (
-      <div className="inline">
+      <div
+        className={'file-drop' + (this.state.dragActive ? ' drag-active' : '')}
+        onDrop={this.handleDrop.bind(this)}
+        onDragOver={this.handleDragOver.bind(this)}
+        onDragEnter={this.handleDragEnter.bind(this)}
+        onDragLeave={this.handleDragLeave.bind(this)}
+      >
         <div className="inline">
           {this.state.ready ? (
             <button
@@ -39,7 +81,7 @@ class ImageUploader extends React.Component {
             </button>
           ) : null}
 
-          {this.state.uploading ? <em>Uploading...</em> : null}
+          {/* {this.state.uploading ? <em>Uploading...</em> : null} */}
         </div>
         <div className="inline">
           <form className="upload-form">

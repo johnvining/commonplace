@@ -899,6 +899,17 @@ a {
   font-family: "Avenir", "Candara", "Arial", sans-serif;
   display: block; }
 
+.file-drop {
+  display: inline-block;
+  padding: 12px 4px 12px 8px;
+  margin: 10px 10 px 10px;
+  border-radius: 4px;
+  width: 100%; }
+
+.drag-active {
+  border-radius: 4px;
+  background-color: lightblue; }
+
 input[type=file]::file-selector-button {
   background-color: #efefef;
   border-color: white;
