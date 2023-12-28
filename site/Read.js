@@ -60,7 +60,13 @@ function Read(props) {
   // }
 
   const createNoteWithImageForWork = async (image) => {
-    const response = await db.createNewNoteWithImageForWork(id, image)
+    let now = new Date()
+    let title =
+      'Quick Photo Note — ' +
+      now.toDateString() +
+      ' ' +
+      now.toLocaleTimeString('en-US')
+    const response = await db.createNewNoteWithImageForWork(id, image, title)
 
     // TODO: Navigate?
   }

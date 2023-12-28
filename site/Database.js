@@ -155,8 +155,8 @@ export async function createNewNoteForWork(workId) {
 }
 
 // TODO: Create a one-request version of this
-export async function createNewNoteWithImageForWork(workId, image) {
-  const data = { work: workId }
+export async function createNewNoteWithImageForWork(workId, image, title) {
+  const data = { title: title, work: workId }
   const createdNote = await axios.post(url_api + 'note', data)
   return addImageToNote(createdNote.data._id, image)
 }
