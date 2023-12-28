@@ -62,7 +62,6 @@ class ImageUploader extends React.Component {
   }
 
   render() {
-    console.log(this.state.dragActive)
     return (
       <div
         className={'file-drop' + (this.state.dragActive ? ' drag-active' : '')}
