@@ -703,12 +703,6 @@ class Note extends React.Component {
                   onChange={this.handleYearChange}
                 ></input>
               </div>
-              <div className={'width-20'}>
-                <label htmlFor="image" className="note-full form-label">
-                  Image
-                </label>
-                <ImageUploader onImageUpload={this.onImageUpload.bind(this)} />
-              </div>
             </>
           ) : null}
 
@@ -717,14 +711,20 @@ class Note extends React.Component {
             <div className="action-bar">
               {edit ? (
                 <>
-                  <div>
+                  <div className="left-div">
+                    <ImageUploader
+                      onImageUpload={this.onImageUpload.bind(this)}
+                      noMarginNoBorders={true}
+                    />
+                  </div>
+
+                  <div className="right-div">
                     <button
                       className={'action-button'}
                       onClick={this.handleAccept.bind(this)}
                     >
                       <img src={check_circle}></img>
                     </button>
-
                     <button
                       className={'action-button'}
                       onClick={() => {

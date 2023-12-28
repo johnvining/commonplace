@@ -912,6 +912,9 @@ a {
     visibility: hidden;
     display: none;
   }
+
+  display:inline;
+  
 }
 
 .file-drop {
@@ -930,12 +933,19 @@ a {
   display: inline-flex;
   align-items: center;
   margin-left: 4px;
+  width: 300px;
 
+  &.no-margin-no-border {
+    margin: 0px;
+    border-width: 0px;
+  }
 
   &:hover {
     @include button-hover($button_background_hover);
   }
 }
+
+
 
 .drag-active {
   @include button-hover($button_background_hover);
@@ -943,4 +953,12 @@ a {
 
 .upload-label {
   cursor: pointer;
+}
+
+.left-div {
+  float: left;
+}
+
+.right-div {
+  float: right;
 }

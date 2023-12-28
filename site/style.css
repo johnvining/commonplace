@@ -903,9 +903,11 @@ a {
   font-family: "Avenir", "Candara", "Arial", sans-serif;
   display: block; }
 
-.upload-form.hidden {
-  visibility: hidden;
-  display: none; }
+.upload-form {
+  display: inline; }
+  .upload-form.hidden {
+    visibility: hidden;
+    display: none; }
 
 .file-drop {
   display: inline-block;
@@ -922,7 +924,11 @@ a {
   padding: 6px;
   display: inline-flex;
   align-items: center;
-  margin-left: 4px; }
+  margin-left: 4px;
+  width: 300px; }
+  .file-drop.no-margin-no-border {
+    margin: 0px;
+    border-width: 0px; }
   .file-drop:hover {
     background-color: #e8f4f8;
     cursor: pointer;
@@ -937,3 +943,9 @@ a {
 
 .upload-label {
   cursor: pointer; }
+
+.left-div {
+  float: left; }
+
+.right-div {
+  float: right; }

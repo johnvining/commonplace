@@ -75,7 +75,9 @@ class ImageUploader extends React.Component {
         <label htmlFor="fileUploadInput" className="upload-label left-right">
           <div
             className={
-              'file-drop' + (this.state.dragActive ? ' drag-active' : '')
+              'file-drop' +
+              (this.state.dragActive ? ' drag-active' : '') +
+              (this.props.noMarginNoBorders ? ' no-margin-no-border' : '')
             }
             onDrop={this.handleDrop.bind(this)}
             onDragOver={this.handleDragOver.bind(this)}
