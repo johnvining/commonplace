@@ -696,12 +696,6 @@ a.grid-link {
   padding: 18px 4px 4px 4px;
   margin: 4px; }
 
-.upload-form {
-  display: inline;
-  margin: auto; }
-  .upload-form input {
-    border: none; }
-
 .inline {
   display: inline-flex; }
 
@@ -908,30 +902,21 @@ a {
   font-family: "Avenir", "Candara", "Arial", sans-serif;
   display: block; }
 
+.upload-form {
+  display: none; }
+  .upload-form.hidden {
+    visibility: hidden; }
+
 .file-drop {
   display: inline-block;
   padding: 12px 4px 12px 8px;
   margin: 10px 10 px 10px;
   border-radius: 4px;
-  width: 100%; }
+  background-color: #efefef; }
 
 .drag-active {
   border-radius: 4px;
   background-color: lightblue; }
 
-input[type=file]::file-selector-button {
-  background-color: #efefef;
-  border-color: white;
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 2px;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  height: 42px;
-  margin: 4px 8px 4px 8px;
-  padding: 6px; }
-
-input[type=file]::file-selector-button:hover {
-  background-color: #e8f4f8;
-  cursor: pointer;
-  outline: none;
-  border-color: white; }
+.upload-label {
+  display: block; }
