@@ -73,6 +73,11 @@ function Read(props) {
     window.location.reload()
   }
 
+  const createNoteForWork = async () => {
+    const response = await db.createNewNoteForWork(id)
+    navigate('/note/' + response.data._id + '/edit')
+  }
+
   props.setPageTitle(workTitle)
 
   return (
@@ -105,6 +110,13 @@ function Read(props) {
         </center>
       </div>
       <div className={'work-page work-header'}>
+        <button
+          className="top-level standard-button left-right"
+          onClick={createNoteForWork}
+          style={{ userSelect: 'none' }}
+        >
+          Add Note
+        </button>
         <ImageUploader onImageUpload={createNoteWithImageForWork} />
       </div>
       <NoteList

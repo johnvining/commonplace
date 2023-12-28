@@ -883,6 +883,7 @@ a {
 
   &.work-header {
     padding: 8px 4px 8px 4px;
+    display:flex;
   }
 
   &.input {
@@ -916,17 +917,29 @@ a {
 
 .file-drop {
   display: inline-block;
-  padding: 12px 4px 12px 8px;
-  margin: 10px 10 px 10px;
+  background-color:$button_background;
+  border-color: $white;
   border-radius: 4px;
-  background-color: $button_background;
+  border-style: solid;
+  border-width: 2px;
+  font-family: $main_font;
+  height: 42px;
+  width: 100%;
+  max-width: 180px;
+  font-size: 14px;
+  height: 42px;
+  margin: 4px 0px 4px 0px;
+  padding: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
 }
 
 .drag-active {
-  border-radius: 4px;
-  background-color: $theme_blue;
+  @include button-hover($button_background_hover);
 }
 
 .upload-label {
-  display: block;
+  // display: block
 }

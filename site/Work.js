@@ -383,7 +383,7 @@ function Work(props) {
               onClick={createNoteForWork}
               style={{ userSelect: 'none' }}
             >
-              + Note
+              Add Note
             </button>
             <div style={{ display: 'inline', marginLeft: '10px' }}>
               <code style={{ color: 'grey' }}>
