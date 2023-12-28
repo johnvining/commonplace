@@ -154,6 +154,13 @@ export async function createNewNoteForWork(workId) {
   return axios.post(url_api + 'note', data)
 }
 
+// TODO: Create a one-request version of this
+export async function createNewNoteWithImageForWork(workId, image) {
+  const data = { work: workId }
+  const createdNote = await axios.post(url_api + 'note', data)
+  return addImageToNote(createdNote.data._id, image)
+}
+
 export async function searchNotes(searchString) {
   const data = { searchString: searchString }
   return axios.put(url_api + 'note/find', data)
