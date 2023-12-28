@@ -15,9 +15,14 @@ Copy the file in to the folder for server then run:
 - `npm run cli`
 
 # Loading a new version on to rasp pi
+Run the following commands to take down the site, remove old copies of modules, get the latest version and launch the site:
+
+- `cd commonplace`
+- `docker-compose down`
+- `docker system prune`
 - `git pull origin HEAD`
-- `sudo docker-compose build`
-- `sudo docker-compose up`
+- `docker-compose build`
+- `docker-compose up`
 
 # Problems
 ## If `npm install` takes forever or fails with a `CERT_NOT_YET_VALID` error
