@@ -132,6 +132,7 @@ function Read(props) {
         key={'work' + id}
         viewMode={constants.view_modes.RESULT}
         getListOfNotes={getListOfNotes}
+        reverse={true}
       />
     </>
   )

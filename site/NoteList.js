@@ -33,7 +33,9 @@ class NoteList extends React.Component {
     )
     this.setState(
       {
-        notes: response.data.data,
+        notes: this.props.reverse
+          ? response.data.data.reverse()
+          : response.data.data,
       },
       () => {
         for (var i = 0; i < this.state.notes?.length; i++) {
