@@ -49,19 +49,12 @@
   }
 
   .idea-container,
-  .action-bar,
   .title,
   .year,
   .page,
   .url {
     margin: 2px;
     padding: 2px;
-  }
-
-  .action-bar,
-  .title {
-    margin: 2px;
-    padding: 0px;
   }
 
   .title,
@@ -209,7 +202,7 @@
       background-color: $note_input_background;
       border-radius: 4px;
       display: inline-block;
-      width: 40%;
+      width: 50%;
       border: none;
       font-family: $main_font;
       font-size: 18px;
@@ -301,6 +294,7 @@
 .action-bar {
   width: 100%;
   text-align: right;
+  margin-top: 4px;
 }
 
 .action-button {

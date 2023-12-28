@@ -33,17 +33,12 @@
   .note-full .full-width.full-width {
     width: 100%; }
 .note-full .idea-container,
-.note-full .action-bar,
 .note-full .title,
 .note-full .year,
 .note-full .page,
 .note-full .url {
   margin: 2px;
   padding: 2px; }
-.note-full .action-bar,
-.note-full .title {
-  margin: 2px;
-  padding: 0px; }
 .note-full .title,
 .note-full .year,
 .note-full .page,
@@ -155,7 +150,7 @@
   background-color: #f4f4f4;
   border-radius: 4px;
   display: inline-block;
-  width: 40%;
+  width: 50%;
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
@@ -229,7 +224,8 @@ input .note-full .edit-author, input
 
 .action-bar {
   width: 100%;
-  text-align: right; }
+  text-align: right;
+  margin-top: 4px; }
 
 .action-button {
   border-style: none;
