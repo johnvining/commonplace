@@ -385,19 +385,16 @@ class Note extends React.Component {
               <div className="width-100">
                 <label htmlFor="title" className="note-full form-label">
                   Title
-                  <button
-                    className={'action-button'}
-                    tabIndex="-1"
+                  <span
+                    className="note-full clickable-label-button"
                     onClick={() => {
                       this.generateTitleSuggestion()
                     }}
                   >
-                    {this.state.fetchingTitleSuggestion ? (
-                      <img src={loader}></img>
-                    ) : (
-                      <img src={lightbulb}></img>
-                    )}
-                  </button>
+                    {this.state.fetchingTitleSuggestion
+                      ? 'Fetching'
+                      : 'Suggest'}
+                  </span>
                 </label>
 
                 <input
@@ -447,9 +444,8 @@ class Note extends React.Component {
             <div name="text" className="width-100">
               <label htmlFor="text" className="note-full form-label">
                 Text
-                <button
-                  className={'action-button'}
-                  tabIndex="-1"
+                <span
+                  className="note-full clickable-label-button"
                   onClick={() => {
                     this.setState({ fetchingOcr: true })
                     db.getNoteTextOCR(this.props.id).then((response) => {
@@ -462,15 +458,12 @@ class Note extends React.Component {
 
                       var event = new Event('input', { bubbles: true })
                       input.dispatchEvent(event)
+                      this.handleTextChange
                     })
                   }}
                 >
-                  {this.state.fetchingOcr ? (
-                    <img src={eye_closed}></img>
-                  ) : (
-                    <img src={eye}></img>
-                  )}
-                </button>
+                  {this.state.fetchingOcr ? 'Fetching' : 'OCR'}
+                </span>
               </label>
 
               <textarea

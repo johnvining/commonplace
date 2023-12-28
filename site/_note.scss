@@ -283,7 +283,18 @@
     padding: 2px;
     text-transform: uppercase;
     font-family: $sans_font;
-    display: block;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  &.clickable-label-button {
+    display: inline;
+    padding: 2px;
+    margin-left: 4px;
+    border-radius: 2px;
+    font-size: 9px;
+    background-color: $button_background;
+    cursor: pointer;
   }
 }
 

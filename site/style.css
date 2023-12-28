@@ -216,7 +216,16 @@ input .note-full .edit-author, input
   padding: 2px;
   text-transform: uppercase;
   font-family: "Avenir", "Candara", "Arial", sans-serif;
-  display: block; }
+  display: flex;
+  align-items: flex-start; }
+.note-full.clickable-label-button {
+  display: inline;
+  padding: 2px;
+  margin-left: 4px;
+  border-radius: 2px;
+  font-size: 9px;
+  background-color: #efefef;
+  cursor: pointer; }
 
 .action-bar {
   width: 100%;
