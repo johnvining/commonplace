@@ -4,6 +4,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import * as constants from './constants'
 import ImageUploader from './ImageUploader'
+import NoteList from './NoteList'
 
 function Read(props) {
   const { id } = useParams()
@@ -45,19 +46,19 @@ function Read(props) {
     }
   })
 
-  // const getListOfNotes = async () => {
-  //   var notesResponse
-  //   await db
-  //     .getRecordsWithFilter(db.types.note, db.types.work, id)
-  //     .then((response) => {
-  //       notesResponse = response
-  //     })
-  //     .catch((error) => {
-  //       console.error(error)
-  //     })
+  const getListOfNotes = async () => {
+    var notesResponse
+    await db
+      .getRecordsWithFilter(db.types.note, db.types.work, id)
+      .then((response) => {
+        notesResponse = response
+      })
+      .catch((error) => {
+        console.error(error)
+      })
 
-  //   return notesResponse
-  // }
+    return notesResponse
+  }
 
   const createNoteWithImageForWork = async (image) => {
     let now = new Date()
@@ -68,7 +69,8 @@ function Read(props) {
       now.toLocaleTimeString('en-US')
     const response = await db.createNewNoteWithImageForWork(id, image, title)
 
-    // TODO: Navigate?
+    // TODO: Janky
+    window.location.reload()
   }
 
   const createNoteForWork = async () => {
@@ -126,6 +128,11 @@ function Read(props) {
           <div style={{ display: 'inline', marginLeft: '10px' }}></div>
         </center>
       </div>
+      <NoteList
+        key={'work' + id}
+        viewMode={constants.view_modes.RESULT}
+        getListOfNotes={getListOfNotes}
+      />
     </>
   )
 }
