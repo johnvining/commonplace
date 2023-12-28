@@ -72,7 +72,11 @@ class ImageUploader extends React.Component {
           onChange={this.onFileSelect.bind(this)}
           title="asdfsdf"
         />
-        <label htmlFor="fileUploadInput" className="upload-label left-right">
+        <label
+          htmlFor="fileUploadInput"
+          className="upload-label left-right"
+          onBlur={this.onFileSelect.bind(this)}
+        >
           <div
             className={
               'file-drop' +
