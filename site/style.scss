@@ -908,10 +908,9 @@ a {
 }
 
 .upload-form {
-  display: none;
-
   &.hidden {
     visibility: hidden;
+    display: none;
   }
 }
 
@@ -924,16 +923,18 @@ a {
   border-width: 2px;
   font-family: $main_font;
   height: 42px;
-  width: 100%;
-  max-width: 180px;
   font-size: 14px;
   height: 42px;
   margin: 4px 0px 4px 0px;
   padding: 6px;
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   margin-left: 4px;
+
+
+  &:hover {
+    @include button-hover($button_background_hover);
+  }
 }
 
 .drag-active {
@@ -941,5 +942,5 @@ a {
 }
 
 .upload-label {
-  // display: block
+  cursor: pointer;
 }

@@ -63,32 +63,33 @@ class ImageUploader extends React.Component {
 
   render() {
     return (
-      <div
-        className={'file-drop' + (this.state.dragActive ? ' drag-active' : '')}
-        onDrop={this.handleDrop.bind(this)}
-        onDragOver={this.handleDragOver.bind(this)}
-        onDragEnter={this.handleDragEnter.bind(this)}
-        onDragLeave={this.handleDragLeave.bind(this)}
-        // TODO: Onclick
-      >
-        <form className="upload-form">
-          <input
-            className="upload-form hidden"
-            type="file"
-            name="file"
-            id="fileUploadInput"
-            onChange={this.onFileSelect.bind(this)}
-            title="asdfsdf"
-          />
-        </form>
+      <form className="upload-form">
+        <input
+          className="upload-form hidden"
+          type="file"
+          name="file"
+          id="fileUploadInput"
+          onChange={this.onFileSelect.bind(this)}
+          title="asdfsdf"
+        />
         <label htmlFor="fileUploadInput" className="upload-label left-right">
-          {!this.state.dragActive
-            ? 'Upload Image'
-            : this.state.uploading
-            ? 'Uploading'
-            : 'Drop Image'}
+          <div
+            className={
+              'file-drop' + (this.state.dragActive ? ' drag-active' : '')
+            }
+            onDrop={this.handleDrop.bind(this)}
+            onDragOver={this.handleDragOver.bind(this)}
+            onDragEnter={this.handleDragEnter.bind(this)}
+            onDragLeave={this.handleDragLeave.bind(this)}
+          >
+            {!this.state.dragActive
+              ? 'Upload Image'
+              : this.state.uploading
+              ? 'Uploading'
+              : 'Drop Image'}
+          </div>
         </label>
-      </div>
+      </form>
     )
   }
 }
