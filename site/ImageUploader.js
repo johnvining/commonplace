@@ -5,10 +5,15 @@ class ImageUploader extends React.Component {
   state = { selectedFile: '', ready: false, uploading: false }
 
   onFileSelect(event) {
-    this.setState({
-      selectedFile: event.target.files[0],
-      ready: true,
-    })
+    this.setState(
+      {
+        selectedFile: event.target.files[0],
+        ready: true,
+      },
+      () => {
+        this.onSubmit() // yolo
+      }
+    )
   }
 
   onSubmit() {
