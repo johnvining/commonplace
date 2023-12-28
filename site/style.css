@@ -924,8 +924,7 @@ a {
   padding: 6px;
   display: inline-flex;
   align-items: center;
-  margin-left: 4px;
-  width: 300px; }
+  margin-left: 4px; }
   .file-drop.no-margin-no-border {
     margin: 0px;
     border-width: 0px; }

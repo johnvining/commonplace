@@ -11,6 +11,8 @@ import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
 import link from './icons/link.svg'
 import tags from './icons/tags.svg'
+import eye from './icons/eye.svg'
+import eye_closed from './icons/eye_closed.svg'
 import pile_img from './icons/stack.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
@@ -37,6 +39,7 @@ class Note extends React.Component {
     fetchNick: false,
     fetchingOcr: false,
     nick: '',
+    compactEdit: true,
   }
 
   componentDidMount() {
@@ -222,6 +225,10 @@ class Note extends React.Component {
       .catch((error) => {
         console.error(error)
       })
+  }
+
+  async toggleCompact() {
+    this.setState({ compactEdit: !this.state.compactEdit })
   }
 
   removeIdea(ideaId) {
@@ -478,7 +485,7 @@ class Note extends React.Component {
           ) : null}
 
           {/* Take */}
-          {edit ? (
+          {edit && !this.state.compactEdit ? (
             <div name="take" className="width-100">
               <label htmlFor="take" className="note-full form-label">
                 Take
@@ -613,7 +620,7 @@ class Note extends React.Component {
           ) : null}
 
           {/* Edit URL */}
-          {edit ? (
+          {edit && !this.state.compactEdit ? (
             <>
               <div className="width-100">
                 <label htmlFor="url" className="note-full form-label">
@@ -678,7 +685,7 @@ class Note extends React.Component {
             ''
           )}
 
-          {edit ? (
+          {edit && !this.state.compactEdit ? (
             <>
               <div className="width-20">
                 <label htmlFor="page" className="note-full form-label">
@@ -724,6 +731,14 @@ class Note extends React.Component {
                       onClick={this.handleAccept.bind(this)}
                     >
                       <img src={check_circle}></img>
+                    </button>
+                    <button
+                      className={'action-button'}
+                      onClick={this.toggleCompact.bind(this)}
+                    >
+                      <img
+                        src={this.state.compactEdit ? eye : eye_closed}
+                      ></img>
                     </button>
                     <button
                       className={'action-button'}
