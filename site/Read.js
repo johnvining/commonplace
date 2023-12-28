@@ -89,6 +89,7 @@ function Read(props) {
       </div>
       <div className={'work-page work-header'}>
         <center>
+          {/* TODO: Merge with the display on the work page */}
           {authorName && (
             <span className={'work-page author'}>
               <Link to={'/auth/' + authorId}>{authorName}</Link>
@@ -108,25 +109,15 @@ function Read(props) {
           <code style={{ color: 'grey' }}> {nick}</code>
         </center>
       </div>
-      <div>
-        <center>
-          <button
-            className="top-level standard-button left-right mondo"
-            onClick={createNoteForWork}
-            style={{ userSelect: 'none' }}
-          >
-            + Note
-          </button>
-          <button
-            className="top-level standard-button left-right mondo"
-            onClick={createNoteForWork}
-            style={{ userSelect: 'none' }}
-          >
-            + Photo Note
-          </button>
-          <ImageUploader onImageUpload={createNoteWithImageForWork} />
-          <div style={{ display: 'inline', marginLeft: '10px' }}></div>
-        </center>
+      <div className={'work-page work-header inline'}>
+        <button
+          className="top-level standard-button left-right"
+          onClick={createNoteForWork}
+          style={{ userSelect: 'none' }}
+        >
+          + Note
+        </button>
+        <ImageUploader onImageUpload={createNoteWithImageForWork} />
       </div>
       <NoteList
         key={'work' + id}

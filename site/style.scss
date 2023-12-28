@@ -156,13 +156,6 @@ a {
   &.hidden {
     display: none;
   }
-
-  &.mondo {
-    height: 200px;
-    width: 300px;
-    margin: 40px;
-    font-size: 18px;
-  }
 }
 
 .idea,.pile {
@@ -930,7 +923,7 @@ input[type=file]::file-selector-button {
   border-width: 2px;
   font-family: $main_font;
   height: 42px;
-  margin: 4px 8px 4px 0px;
+  margin: 4px 8px 4px 8px;
   padding: 6px;
 }
 
