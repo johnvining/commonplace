@@ -9,7 +9,10 @@ import { useState, useEffect } from 'react'
 import * as constants from './constants'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
-import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 import {
   TopLevelFormAutocomplete,
   TopLevelFormInput,
@@ -185,14 +188,6 @@ function Work(props) {
               setPendingWorkTitle(e.target.value)
             }}
           />
-          <TopLevelFormInput
-            name="Citation Information"
-            id="citation-info"
-            defaultValue={pendingCitationInfo}
-            onChange={(e) => {
-              setPendingCitationInfo(e.target.value)
-            }}
-          />
           <TopLevelFormAutocomplete
             name="Author"
             id="author"
@@ -204,6 +199,15 @@ function Work(props) {
             handleNewSelect={handleCreateAuthorAndAssign}
             onClearText={handleClearAuthor}
           />
+          <TopLevelFormInput
+            name="Citation Information"
+            id="citation-info"
+            defaultValue={pendingCitationInfo}
+            onChange={(e) => {
+              setPendingCitationInfo(e.target.value)
+            }}
+          />
+          {/* TODO: Create a mode for smaller input */}
           <TopLevelFormInput
             name="URL"
             id="url"
@@ -273,8 +277,9 @@ function Work(props) {
         {edit ? (
           <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
         ) : editPiles ? (
-          <>
+          <TopLevelStandardButtonContainer>
             <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
+            {/* TODO: Create Standard Button inline autocomplete with better margin/padding */}
             <Autocomplete
               inputName="work-work-pile"
               className={'work-page pile-select'}
@@ -287,9 +292,9 @@ function Work(props) {
               clearOnSelect={true}
               excludeIds={piles?.map((pile) => pile._id)}
             />
-          </>
+          </TopLevelStandardButtonContainer>
         ) : (
-          <>
+          <TopLevelStandardButtonContainer nick={nick}>
             <TopLevelStandardButton
               name="Edit"
               onClick={() => {
@@ -321,12 +326,7 @@ function Work(props) {
               name="Add Note"
               onClick={createNoteForWork}
             />
-            <div style={{ display: 'inline', marginLeft: '10px' }}>
-              <code style={{ color: 'grey' }}>
-                <small>{nick}</small>
-              </code>
-            </div>
-          </>
+          </TopLevelStandardButtonContainer>
         )}
       </div>
       {importMode ? (

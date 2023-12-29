@@ -6,7 +6,10 @@ import React from 'react'
 import ResultWork from './ResultWork'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
-import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
 function Author(props) {
@@ -142,7 +145,7 @@ function Author(props) {
               </div>
             ) : null}
 
-            <div>
+            <TopLevelStandardButtonContainer>
               <TopLevelStandardButton name="Delete" onClick={deleteAuthor} />
               <TopLevelStandardButton
                 name="Edit"
@@ -150,7 +153,7 @@ function Author(props) {
                   setEdit(true)
                 }}
               />
-            </div>
+            </TopLevelStandardButtonContainer>
           </>
         )}
       </div>

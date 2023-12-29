@@ -1,6 +1,6 @@
 import React from 'react'
 
-function TopLevelStandardButton(props) {
+export function TopLevelStandardButton(props) {
   return (
     <button
       className="top-level standard-button left-right"
@@ -13,4 +13,17 @@ function TopLevelStandardButton(props) {
   )
 }
 
-export default TopLevelStandardButton
+export function TopLevelStandardButtonContainer(props) {
+  return (
+    <div className="standard-button-container">
+      {props.children}{' '}
+      {props.nick ? (
+        <div style={{ display: 'inline', marginLeft: '10px' }}>
+          <code style={{ color: 'grey' }}>
+            <small>{props.nick}</small>
+          </code>
+        </div>
+      ) : null}
+    </div>
+  )
+}

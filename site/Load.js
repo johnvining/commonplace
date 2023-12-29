@@ -3,7 +3,10 @@ import * as db from './Database'
 import React from 'react'
 import { useState } from 'react'
 import autosize from 'autosize'
-import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 import { TopLevelFormTextArea } from './TopLevelFormItems'
 
 function Load(props) {
@@ -39,7 +42,9 @@ function Load(props) {
             autosize(document.querySelector('#import-text'))
           }}
         />
-        <TopLevelStandardButton name="Submit" onClick={handleImport} />
+        <TopLevelStandardButtonContainer>
+          <TopLevelStandardButton name="Submit" onClick={handleImport} />
+        </TopLevelStandardButtonContainer>
         <span>
           {notesImported > -1 ? notesImported + ' notes imported' : null}
         </span>

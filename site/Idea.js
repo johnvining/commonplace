@@ -4,7 +4,10 @@ import NoteList from './NoteList'
 import React from 'react'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
-import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 import { TopLevelFormContainer, TopLevelFormInput } from './TopLevelFormItems'
 
 function Idea(props) {
@@ -112,7 +115,7 @@ function Idea(props) {
                 {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
               </div>
             ) : null}
-            <div>
+            <TopLevelStandardButtonContainer nick={nick}>
               <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
               <TopLevelStandardButton
                 name="Edit"
@@ -120,12 +123,7 @@ function Idea(props) {
                   setEdit(true)
                 }}
               />
-              <div style={{ display: 'inline', marginLeft: '10px' }}>
-                <code style={{ color: 'grey' }}>
-                  <small>{nick}</small>
-                </code>
-              </div>
-            </div>
+            </TopLevelStandardButtonContainer>
           </>
         )}
       </div>

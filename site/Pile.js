@@ -6,7 +6,10 @@ import React from 'react'
 import WorkList from './WorkList'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
-import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
 function Pile(props) {
@@ -128,7 +131,7 @@ function Pile(props) {
                 {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
               </div>
             ) : null}
-            <div>
+            <TopLevelStandardButtonContainer nick={nick}>
               <TopLevelStandardButton
                 name="Delete"
                 onClick={handleDeletePile}
@@ -154,12 +157,7 @@ function Pile(props) {
                   }}
                 />
               )}
-              <div style={{ display: 'inline', marginLeft: '10px' }}>
-                <code style={{ color: 'grey' }}>
-                  <small>{nick}</small>
-                </code>
-              </div>
-            </div>
+            </TopLevelStandardButtonContainer>
           </>
         )}
       </div>

@@ -1,7 +1,10 @@
 import * as db from './Database'
 import { useState } from 'react'
 import React from 'react'
-import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
 function Login(props) {
@@ -33,7 +36,9 @@ function Login(props) {
             }}
             type="password"
           />
-          <TopLevelStandardButton name="Submit" type="submit" />
+          <TopLevelStandardButtonContainer>
+            <TopLevelStandardButton name="Submit" type="submit" />
+          </TopLevelStandardButtonContainer>
         </TopLevelFormContainer>
       </form>
     </div>

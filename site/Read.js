@@ -6,7 +6,10 @@ import * as constants from './constants'
 import ImageUploader from './ImageUploader'
 import NoteList from './NoteList'
 import WorkCitationSpan from './WorkCitationSpan'
-import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 
 function Read(props) {
   const { id } = useParams()
@@ -100,16 +103,10 @@ function Read(props) {
           />
         </center>
       </div>
-      <div className={'work-page work-header'}>
+      <TopLevelStandardButtonContainer nick={nick}>
         <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
         <ImageUploader onImageUpload={createNoteWithImageForWork} />
-        {/* TODO: Fix formatting */}
-        <div style={{ display: 'inline', marginLeft: '10px' }}>
-          <code style={{ color: 'grey' }}>
-            <small>{nick}</small>
-          </code>
-        </div>
-      </div>
+      </TopLevelStandardButtonContainer>
       <NoteList
         key={'work' + id}
         viewMode={constants.view_modes.RESULT}
