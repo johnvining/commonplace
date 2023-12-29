@@ -43,7 +43,16 @@ class NoteGrid extends React.Component {
           <Link to={'/note/' + this.props.id}>
             <div className="grid-author">{this.props.author}</div>
             <div className="grid-title">{this.props.title}</div>
-            <div className="grid-text">{this.props.text}</div>
+            <div className="grid-text">
+              {this.props.imageCount > 0
+                ? '[' +
+                  this.props.imageCount +
+                  ' image' +
+                  (this.props.imageCount == 1 ? '' : 's') +
+                  '] '
+                : null}
+              {this.props.text}
+            </div>
           </Link>
         </div>
       </div>
