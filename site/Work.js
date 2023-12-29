@@ -263,6 +263,12 @@ function Work(props) {
               onPileRemove={handlePileRemove}
             />
           </div>
+          <div className="top-level post-button-content">
+            {pendingCitationInfo}
+            {pendingCitationInfo && pendingSummary && <br />}
+            {pendingCitationInfo && pendingSummary && <br />}
+            {pendingSummary}
+          </div>
         </div>
       )}
       <div>
@@ -321,16 +327,6 @@ function Work(props) {
           </TopLevelStandardButtonContainer>
         )}
       </div>
-      {!edit && (pendingSummary || pendingCitationInfo) && (
-        <>
-          <div className="top-level post-button-content">
-            {pendingCitationInfo}
-            {pendingCitationInfo && pendingSummary && <br />}
-            {pendingCitationInfo && pendingSummary && <br />}
-            {pendingSummary}
-          </div>
-        </>
-      )}
       {importMode ? (
         <TopLevelFormContainer>
           <TopLevelFormTextArea
