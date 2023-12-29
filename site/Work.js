@@ -8,6 +8,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import * as constants from './constants'
 import autosize from 'autosize'
+import WorkCitationSpan from './WorkCitationSpan'
 
 function Work(props) {
   const { id } = useParams()
@@ -243,20 +244,13 @@ function Work(props) {
       ) : (
         <>
           <div className={'work-page work-header'}>
-            {pendingAuthorName && (
-              <span className={'work-page author'}>
-                <Link to={'/auth/' + pendingAuthorId}>{pendingAuthorName}</Link>
-              </span>
-            )}
-            {pendingWorkTitle && pendingAuthorName && (
-              <span className={'work-page author'}>, </span>
-            )}
-            {pendingWorkTitle && (
-              <>
-                <span className="work-page title">{pendingWorkTitle}</span>
-              </>
-            )}
-
+            <WorkCitationSpan
+              authorName={pendingAuthorName}
+              authorID={pendingAuthorId}
+              workTitle={pendingWorkTitle}
+              workID={null}
+              spaceAfter={pendingYear || pendingUrl}
+            />
             <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
           </div>
 

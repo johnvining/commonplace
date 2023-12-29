@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import * as constants from './constants'
 import ImageUploader from './ImageUploader'
 import NoteList from './NoteList'
+import WorkCitationSpan from './WorkCitationSpan'
 
 function Read(props) {
   const { id } = useParams()
@@ -89,22 +90,13 @@ function Read(props) {
       </div>
       <div className={'work-page work-header'}>
         <center>
-          {/* TODO: Merge with the display on the work page */}
-          {authorName && (
-            <span className={'work-page author'}>
-              <Link to={'/auth/' + authorId}>{authorName}</Link>
-            </span>
-          )}
-          {workTitle && authorName && (
-            <span className={'work-page author'}>, </span>
-          )}
-          {workTitle && (
-            <>
-              <Link to={'/work/' + id}>
-                <span className="work-page title">{workTitle}</span>
-              </Link>
-            </>
-          )}
+          <WorkCitationSpan
+            authorName={authorName}
+            authorID={authorId}
+            workTitle={workTitle}
+            workID={id}
+            spaceAfter={false}
+          />
           <br />
           <code style={{ color: 'grey' }}> {nick}</code>
         </center>

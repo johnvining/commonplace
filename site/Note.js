@@ -19,6 +19,7 @@ import PileListForItem from './PileListForItem'
 import * as constants from './constants'
 import autosize from 'autosize'
 import YearUrlComboSpan from './YearUrlComboSpan'
+import WorkCitationSpan from './WorkCitationSpan'
 
 class Note extends React.Component {
   state = {
@@ -546,40 +547,19 @@ class Note extends React.Component {
             this.state.pendingYear ? (
             <div name="work" className="width-100">
               <div className="citation">
-                {/* Author */}
-                {this.state.pendingAuthorId ? (
-                  <Link
-                    to={'/auth/' + this.state.pendingAuthorId}
-                    className={'note-full author label'}
-                  >
-                    {this.state.pendingAuthorName}
-                  </Link>
-                ) : this.props.note?.work?.author ? (
-                  <Link
-                    to={'/auth/' + this.props.note?.work?.author?._id}
-                    className={'note-full author label imputed'}
-                  >
-                    {this.props.note?.work?.author?.name}
-                  </Link>
-                ) : null}
-
-                {/* Work */}
-                {(this.state.pendingAuthorId ||
-                  this.props.note?.work?.author) &&
-                this.state.pendingWorkId ? (
-                  <>, </>
-                ) : null}
-                {this.state.pendingWorkId ? (
-                  <em>
-                    <Link
-                      to={'/work/' + this.state.pendingWorkId}
-                      className={'note work label'}
-                    >
-                      {this.state.pendingWorkName}
-                    </Link>
-                  </em>
-                ) : null}
-
+                <WorkCitationSpan
+                  authorName={
+                    this.state.pendingAuthorName ??
+                    this.props.note?.work?.author?.name
+                  }
+                  authorID={
+                    this.state.pendingAuthorId ??
+                    this.props.note?.work?.author?._id
+                  }
+                  workTitle={this.state.pendingWorkName}
+                  workID={this.state.pendingWorkId}
+                  spaceAfter={false}
+                />
                 <YearUrlComboSpan
                   year={this.state.pendingYear}
                   url={this.state.pendingUrl}
