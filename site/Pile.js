@@ -138,32 +138,32 @@ function Pile(props) {
               </div>
             ) : null}
             <div>
-              <button
-                className="top-level standard-button"
+              <TopLevelStandardButton
+                name="Delete"
                 onClick={handleDeletePile}
-              >
-                Delete
-              </button>
-              <button
-                className="top-level standard-button"
+              />
+              <TopLevelStandardButton
+                name="Edit"
                 onClick={() => {
                   setEdit(true)
                 }}
-              >
-                Edit
-              </button>
-              {props.showNotes ? (
-                ''
+              />
+              {!props.showNotes ? (
+                <TopLevelStandardButton
+                  name="View notes"
+                  onClick={() => {
+                    navigate('/pile/' + id + '/notes')
+                  }}
+                />
               ) : (
-                <Link to={'/pile/' + id + '/notes'}>
-                  <button
-                    className="top-level standard-button"
-                    style={{ marginLeft: '4px', userSelect: 'none' }} // Margins come from standard-button + standard-button which doesn't work becasue of the <a>
-                  >
-                    Notes
-                  </button>
-                </Link>
+                <TopLevelStandardButton
+                  name="View all"
+                  onClick={() => {
+                    navigate('/pile/' + id)
+                  }}
+                />
               )}
+
               <div style={{ display: 'inline', marginLeft: '10px' }}>
                 <code style={{ color: 'grey' }}>
                   <small>{nick}</small>
