@@ -7,7 +7,7 @@ import ResultWork from './ResultWork'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import TopLevelStandardButton from './TopLevelStandardButton'
-import TopLevelFormItem from './TopLevelFormItem'
+import { TopLevelFormInput } from './TopLevelFormItems'
 
 function Author(props) {
   const { id } = useParams()
@@ -98,7 +98,7 @@ function Author(props) {
       <div key="author-information">
         {edit ? (
           <>
-            <TopLevelFormItem
+            <TopLevelFormInput
               id="name"
               name="Name"
               defaultValue={pendingName}
@@ -106,7 +106,7 @@ function Author(props) {
                 setPendingName(e.target.value)
               }}
             />
-            <TopLevelFormItem
+            <TopLevelFormInput
               id="birth-year"
               name="Birth Year"
               defaultValue={pendingBirthYear}
@@ -114,7 +114,7 @@ function Author(props) {
                 setPendingBirthYear(e.target.value)
               }}
             />
-            <TopLevelFormItem
+            <TopLevelFormInput
               id="death-year"
               name="Death Year"
               defaultValue={pendingDeathYear}

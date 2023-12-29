@@ -4,6 +4,7 @@ import React from 'react'
 import { useState } from 'react'
 import autosize from 'autosize'
 import TopLevelStandardButton from './TopLevelStandardButton'
+import { TopLevelFormTextArea } from './TopLevelFormItems'
 
 function Load(props) {
   const [pendingImportText, setPendingImportText] = useState('')
@@ -29,17 +30,17 @@ function Load(props) {
         </pre>
       </div>
       <div name="text" className="width-100">
-        <textarea
-          id="importText"
-          className={'work-page importText input'}
-          value={pendingImportText}
+        <TopLevelFormTextArea
+          name="Import CSV"
+          id="import-text"
+          defaultValue={pendingImportText}
           onChange={(e) => {
             setPendingImportText(e.target.value)
-            autosize(document.querySelector('#importText'))
+            autosize(document.querySelector('#import-text'))
           }}
-        ></textarea>
+        />
       </div>
-      <TopLevelStandardButton name="Import" onClick={handleImport} />
+      <TopLevelStandardButton name="Submit" onClick={handleImport} />
       <span>
         {notesImported > -1 ? notesImported + ' notes imported' : null}
       </span>
