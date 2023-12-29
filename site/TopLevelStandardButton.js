@@ -2,10 +2,6 @@ import React from 'react'
 
 export function TopLevelStandardButton(props) {
   let className = 'standard-button'
-  if (props.multiSelect) {
-    className += ' multi-select'
-  }
-
   switch (props.position) {
     case 'left':
       className += ' left'

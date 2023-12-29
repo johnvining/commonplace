@@ -868,9 +868,6 @@ a {
   padding: 4px; }
   .work-page.year.summary, .work-page.url.summary, .work-page.summary.summary, .work-page.citation-info.summary {
     font-size: 14px; }
-.work-page.work-header {
-  padding: 8px 4px 8px 4px;
-  display: flex; }
 .work-page.input {
   background-color: #c1e1ec;
   padding: 4px;
@@ -885,6 +882,31 @@ a {
   text-transform: uppercase;
   font-family: "Avenir", "Candara", "Arial", sans-serif;
   display: block; }
+
+.top-level.container {
+  display: flex;
+  flex-direction: column; }
+.top-level.pre-title {
+  font-size: 18px;
+  align-self: center;
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
+  text-transform: uppercase; }
+.top-level.title {
+  font-size: 30px; }
+.top-level.sub-title {
+  font-size: 22px; }
+.top-level.post-button-content {
+  white-space: pre-wrap;
+  display: block;
+  background-color: white;
+  border-color: #efefef;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 4px;
+  margin: 0px 0px 4px 0px;
+  padding: 6px; }
+.top-level.italic {
+  font-style: italic; }
 
 .upload-form {
   display: inline; }

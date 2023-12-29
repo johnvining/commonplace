@@ -863,10 +863,7 @@ a {
     }
   }
 
-  &.work-header {
-    padding: 8px 4px 8px 4px;
-    display:flex;
-  }
+
 
   &.input {
     background-color: $button_selected;
@@ -888,6 +885,47 @@ a {
     display: block;
   }
 }
+
+.top-level {
+  &.container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  // Not used yet
+  &.pre-title {
+    font-size: 18px;
+    align-self: center;
+    font-family: $sans_font;
+    text-transform: uppercase;
+  }
+
+  &.title {
+    font-size: 30px;
+  }
+
+  &.sub-title {
+    font-size: 22px;
+  }
+
+  &.post-button-content {
+    white-space: pre-wrap;
+    display:block;
+    background-color: $white;
+    border-color: $note_border;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 4px;
+    margin: 0px 0px 4px 0px;
+    padding: 6px;
+  }
+
+  &.italic {
+    font-style: italic;
+  }
+}
+
+
 
 .upload-form {
   &.hidden {

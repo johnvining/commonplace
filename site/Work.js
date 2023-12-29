@@ -177,7 +177,6 @@ function Work(props) {
 
   return (
     <>
-      {/* Main Content */}
       {edit ? (
         <TopLevelFormContainer>
           <TopLevelFormInput
@@ -235,8 +234,9 @@ function Work(props) {
           />
         </TopLevelFormContainer>
       ) : (
-        <>
-          <div className={'work-page work-header'}>
+        <div className="top-level container">
+          <div className={'top-level pre-title'}>Work</div>
+          <div className={'top-level title italic'}>
             <WorkCitationSpan
               authorName={pendingAuthorName}
               authorID={pendingAuthorId}
@@ -246,33 +246,25 @@ function Work(props) {
             />
             <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
           </div>
-
-          {pendingSummary && (
-            <>
-              <br /> <div className="work-page summary">{pendingSummary}</div>
-            </>
-          )}
-        </>
+          <div>
+            <PileListForItem
+              remove={edit}
+              edit={false}
+              piles={piles}
+              onSelect={handleNewPile}
+              getSuggestions={db.getSuggestions}
+              handleNewSelect={handleCreatePileAndAssign}
+              mainClassName="work-page"
+              onStartPileEdit={() => {
+                setEditPiles(true)
+              }}
+              allowAdd={true}
+              allowTabbing={true}
+              onPileRemove={handlePileRemove}
+            />
+          </div>
+        </div>
       )}
-      {/* Piles */}
-      <div>
-        <PileListForItem
-          remove={edit}
-          edit={false}
-          piles={piles}
-          onSelect={handleNewPile}
-          getSuggestions={db.getSuggestions}
-          handleNewSelect={handleCreatePileAndAssign}
-          mainClassName="work-page"
-          onStartPileEdit={() => {
-            setEditPiles(true)
-          }}
-          allowAdd={true}
-          allowTabbing={true}
-          onPileRemove={handlePileRemove}
-        />
-      </div>
-      {/* Buttons */}
       <div>
         {edit ? (
           <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
@@ -329,6 +321,16 @@ function Work(props) {
           </TopLevelStandardButtonContainer>
         )}
       </div>
+      {!edit && (pendingSummary || pendingCitationInfo) && (
+        <>
+          <div className="top-level post-button-content">
+            {pendingCitationInfo}
+            {pendingCitationInfo && pendingSummary && <br />}
+            {pendingCitationInfo && pendingSummary && <br />}
+            {pendingSummary}
+          </div>
+        </>
+      )}
       {importMode ? (
         <TopLevelFormContainer>
           <TopLevelFormTextArea
