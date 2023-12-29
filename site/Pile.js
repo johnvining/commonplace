@@ -5,9 +5,9 @@ import NoteList from './NoteList'
 import React from 'react'
 import WorkList from './WorkList'
 import YearSpan from './YearSpan'
-import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import TopLevelStandardButton from './TopLevelStandardButton'
+import { TopLevelFormInput } from './TopLevelFormItems'
 
 function Pile(props) {
   const { id } = useParams()
@@ -92,33 +92,24 @@ function Pile(props) {
       <div key="pile-information">
         {edit ? (
           <>
-            <label htmlFor="title" className="work-page form-label">
-              Name
-            </label>
-            <input
-              className="work-page title input"
+            <TopLevelFormInput
+              name="Name"
               id="title"
               defaultValue={pendingName}
               onChange={(e) => {
                 setPendingName(e.target.value)
               }}
             />
-            <label htmlFor="startYear" className="work-page form-label">
-              Start Year
-            </label>
-            <input
-              className="work-page title input"
+            <TopLevelFormInput
+              name="Start Year"
               id="startYear"
               defaultValue={pendingStartYear}
               onChange={(e) => {
                 setPendingStartYear(e.target.value)
               }}
             />
-            <label htmlFor="endYear" className="work-page form-label">
-              End Year
-            </label>
-            <input
-              className="work-page title input"
+            <TopLevelFormInput
+              name="End Year"
               id="endYear"
               defaultValue={pendingEndYear}
               onChange={(e) => {
