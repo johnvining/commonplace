@@ -6,6 +6,7 @@ import React from 'react'
 import ResultWork from './ResultWork'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
+import TopLevelStandardButton from './TopLevelStandardButton'
 
 function Author(props) {
   const { id } = useParams()
@@ -129,12 +130,7 @@ function Author(props) {
                 setPendingDeathYear(e.target.value)
               }}
             />
-            <button
-              className="top-level standard-button left-right"
-              onClick={handleAcceptUpdates}
-            >
-              Done
-            </button>
+            <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </>
         ) : (
           <>
@@ -155,20 +151,13 @@ function Author(props) {
             ) : null}
 
             <div>
-              <button
-                className="top-level standard-button"
-                onClick={deleteAuthor}
-              >
-                Delete
-              </button>
-              <button
-                className="top-level standard-button"
+              <TopLevelStandardButton name="Delete" onClick={deleteAuthor} />
+              <TopLevelStandardButton
+                name="Edit"
                 onClick={() => {
                   setEdit(true)
                 }}
-              >
-                Edit
-              </button>
+              />
             </div>
           </>
         )}
