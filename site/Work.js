@@ -3,7 +3,7 @@ import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
 import PileListForItem from './PileListForItem'
-import YearSpan from './YearSpan'
+import YearUrlComboSpan from './YearUrlComboSpan'
 import React from 'react'
 import { useState, useEffect } from 'react'
 import * as constants from './constants'
@@ -257,28 +257,7 @@ function Work(props) {
               </>
             )}
 
-            {pendingYear && !pendingUrl && (
-              <span>
-                {' '}
-                (<YearSpan year={pendingYear} />)
-              </span>
-            )}
-            {pendingYear && pendingUrl && (
-              <span>
-                {' '}
-                (
-                <a href={pendingUrl}>
-                  <YearSpan year={pendingYear} />
-                </a>
-                )
-              </span>
-            )}
-            {pendingUrl && !pendingYear && (
-              <span>
-                {' '}
-                (<a href={pendingUrl}>link</a>)
-              </span>
-            )}
+            <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
           </div>
 
           {pendingSummary && (

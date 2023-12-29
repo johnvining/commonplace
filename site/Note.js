@@ -16,9 +16,9 @@ import pile_img from './icons/stack.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
 import PileListForItem from './PileListForItem'
-import YearSpan from './YearSpan'
 import * as constants from './constants'
 import autosize from 'autosize'
+import YearUrlComboSpan from './YearUrlComboSpan'
 
 class Note extends React.Component {
   state = {
@@ -580,35 +580,17 @@ class Note extends React.Component {
                   </em>
                 ) : null}
 
+                <YearUrlComboSpan
+                  year={this.state.pendingYear}
+                  url={this.state.pendingUrl}
+                />
+
                 {/* Page */}
                 {this.state.pendingPage ? (
                   <>, {this.state.pendingPage}</>
                 ) : this.props.note.work?.Page ? (
                   <>, ({this.props.note.work?.Page}</>
                 ) : null}
-
-                {this.state.pendingYear && !this.state.pendingUrl && (
-                  <span>
-                    {' '}
-                    (<YearSpan year={this.state.pendingYear} />)
-                  </span>
-                )}
-                {this.state.pendingYear && this.state.pendingUrl && (
-                  <span>
-                    {' '}
-                    (
-                    <a href={this.state.pendingUrl}>
-                      <YearSpan year={this.state.pendingYear} />
-                    </a>
-                    )
-                  </span>
-                )}
-                {this.state.pendingUrl && !this.state.pendingYear && (
-                  <span>
-                    {' '}
-                    (<a href={this.state.pendingUrl}>link</a>)
-                  </span>
-                )}
               </div>
             </div>
           ) : null}
