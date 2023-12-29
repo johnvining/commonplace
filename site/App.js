@@ -21,6 +21,7 @@ import plus from './icons/plus.svg'
 import React from 'react'
 import RecentList from './RecentList'
 import search from './icons/search.svg'
+import home_door from './icons/home_door.svg'
 import SearchBar from './SearchBar'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
@@ -146,7 +147,6 @@ class App extends React.Component {
                     this.setState({ barOpen: true })
                   }}
                 >
-                  {' '}
                   <img src={search} />{' '}
                 </button>
               </div>
@@ -154,12 +154,24 @@ class App extends React.Component {
                 <button
                   className="standard-button left-right"
                   onClick={async () => {
+                    // TODO: Fix react hook / Use navigate -- Hooks can only be called inside of the body of a function component.
+                    const navigate = useNavigate()
+                    navigate('/')
+                  }}
+                >
+                  <img src={home_door} />{' '}
+                </button>
+              </div>
+              <div className="tool-bar div">
+                <button
+                  className="standard-button left-right"
+                  onClick={async () => {
+                    // TODO: Fix react hook / Use navigate -- Hooks can only be called inside of the body of a function component.
                     const response = await createNewNoteFromTitle('')
                     const navigate = useNavigate()
                     navigate('/note/' + response.data._id + '/edit')
                   }}
                 >
-                  {' '}
                   <img src={plus} />{' '}
                 </button>
               </div>
