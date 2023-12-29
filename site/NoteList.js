@@ -9,6 +9,10 @@ import * as constants from './constants'
 import left from './icons/left.svg'
 import right from './icons/right.svg'
 import autosize from 'autosize'
+import {
+  TopLevelStandardButtonContainer,
+  TopLevelStandardButton,
+} from './TopLevelStandardButton'
 
 class NoteList extends React.Component {
   state = {
@@ -273,91 +277,82 @@ class NoteList extends React.Component {
                 apiType={this.state.toAdd}
               />
             ) : (
-              <div>
-                <button
+              <TopLevelStandardButtonContainer>
+                <TopLevelStandardButton
+                  name="Delete"
                   onClick={this.delete.bind(this)}
-                  className="multi-select standard-button left-right"
-                >
-                  Delete
-                </button>
-                <button
+                  multiSelect={true}
+                />
+                <TopLevelStandardButton
+                  name="Idea"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.idea })
                   }}
-                  className="multi-select standard-button left"
-                >
-                  Idea
-                </button>
-                <button
+                  multiSelect={true}
+                  position={'left'}
+                />
+                <TopLevelStandardButton
+                  name="Work"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.work })
                   }}
-                  className="multi-select standard-button middle"
-                >
-                  Work
-                </button>
-                <button
+                  multiSelect={true}
+                  position={'middle'}
+                />
+                <TopLevelStandardButton
+                  name="Author"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.auth })
                   }}
-                  className="multi-select standard-button middle"
-                >
-                  Author
-                </button>
-                <button
+                  multiSelect={true}
+                  position={'middle'}
+                />
+                <TopLevelStandardButton
+                  name="Pile"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.pile })
                   }}
-                  className="multi-select standard-button right"
-                >
-                  Pile
-                </button>
-                <button
+                  multiSelect={true}
+                  position={'right'}
+                />
+                <TopLevelStandardButton
+                  name="Unselect All"
                   onClick={() => {
                     this.setState({ selected: [], lastSelectedIndex: 0 })
                   }}
-                  className="multi-select standard-button left-right"
-                >
-                  Unselect All
-                </button>
-              </div>
+                  multiSelect={true}
+                />
+              </TopLevelStandardButtonContainer>
             )}
           </div>
         ) : (
           <div className="multi-select-top-bar">
-            <div>
-              <button
+            <TopLevelStandardButtonContainer>
+              <TopLevelStandardButton
+                name="Select All"
                 onClick={this.selectAll.bind(this)}
-                className="multi-select standard-button"
-              >
-                Select All
-              </button>
-            </div>
-            <div>p. {this.state.page}</div>
-            <div>
-              <button
-                className={
-                  this.state.page == 1
-                    ? 'multi-select standard-button hidden'
-                    : 'multi-select standard-button left'
-                }
-                onClick={this.decPage.bind(this)}
-              >
-                {' '}
-                <img src={left} />
-              </button>
+                multiSelect={true}
+              />
+            </TopLevelStandardButtonContainer>
 
-              <button
-                className={
-                  this.state.page == 1
-                    ? 'multi-select standard-button left-right'
-                    : 'multi-select standard-button right'
-                }
+            <div>p. {this.state.page}</div>
+
+            <TopLevelStandardButtonContainer>
+              <TopLevelStandardButton
+                onClick={this.decPage.bind(this)}
+                multiSelect={true}
+                position={this.state.page == 1 ? 'hidden' : 'left'}
+              >
+                <img src={left} />
+              </TopLevelStandardButton>
+              <TopLevelStandardButton
                 onClick={this.incPage.bind(this)}
+                multiSelect={true}
+                position={this.state.page == 1 ? 'left-right' : 'right'}
               >
                 <img src={right} />
-              </button>
-            </div>
+              </TopLevelStandardButton>
+            </TopLevelStandardButtonContainer>
           </div>
         )}
         {this.state.notes === undefined ? null : (
