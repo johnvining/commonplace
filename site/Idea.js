@@ -4,6 +4,7 @@ import NoteList from './NoteList'
 import React from 'react'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
+import TopLevelStandardButton from './TopLevelStandardButton'
 
 function Idea(props) {
   const { id } = useParams()
@@ -108,12 +109,7 @@ function Idea(props) {
                 setPendingEndYear(e.target.value)
               }}
             />
-            <button
-              className="top-level standard-button left-right"
-              onClick={handleAcceptUpdates}
-            >
-              Done
-            </button>
+            <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </>
         ) : (
           <>
@@ -126,23 +122,13 @@ function Idea(props) {
               </div>
             ) : null}
             <div>
-              <></>
-              <button
-                className="top-level standard-button left-right"
-                onClick={deleteIdea}
-              >
-                Delete
-              </button>
-              <button
-                className="top-level standard-button left-right"
-                style={{ userSelect: 'none' }}
+              <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
+              <TopLevelStandardButton
+                name="Edit"
                 onClick={() => {
                   setEdit(true)
                 }}
-              >
-                Edit
-              </button>
-
+              />
               <div style={{ display: 'inline', marginLeft: '10px' }}>
                 <code style={{ color: 'grey' }}>
                   <small>{nick}</small>
