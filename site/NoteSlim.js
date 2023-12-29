@@ -58,6 +58,13 @@ class NoteSlim extends React.Component {
                 </b>
               </div>
               <div className="slim-inner-container">
+                {this.props.note.images?.length > 0
+                  ? '[' +
+                    this.props.note.images?.length +
+                    ' image' +
+                    (this.props.note.images?.length == 1 ? '' : 's') +
+                    '] '
+                  : null}
                 {this.props.note.text?.length ? (
                   <>{this.props.note.text}</>
                 ) : null}
