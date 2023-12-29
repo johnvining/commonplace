@@ -7,6 +7,7 @@ import WorkList from './WorkList'
 import YearSpan from './YearSpan'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import TopLevelStandardButton from './TopLevelStandardButton'
 
 function Pile(props) {
   const { id } = useParams()
@@ -124,12 +125,7 @@ function Pile(props) {
                 setPendingEndYear(e.target.value)
               }}
             />
-            <button
-              className="top-level standard-button left-right"
-              onClick={handleAcceptUpdates}
-            >
-              Done
-            </button>
+            <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </>
         ) : (
           <>
