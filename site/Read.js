@@ -6,6 +6,7 @@ import * as constants from './constants'
 import ImageUploader from './ImageUploader'
 import NoteList from './NoteList'
 import WorkCitationSpan from './WorkCitationSpan'
+import TopLevelStandardButton from './TopLevelStandardButton'
 
 function Read(props) {
   const { id } = useParams()
@@ -97,19 +98,17 @@ function Read(props) {
             workID={id}
             spaceAfter={false}
           />
-          <br />
-          <code style={{ color: 'grey' }}> {nick}</code>
         </center>
       </div>
       <div className={'work-page work-header'}>
-        <button
-          className="top-level standard-button left-right"
-          onClick={createNoteForWork}
-          style={{ userSelect: 'none' }}
-        >
-          Add Note
-        </button>
+        <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
         <ImageUploader onImageUpload={createNoteWithImageForWork} />
+        {/* TODO: Fix formatting */}
+        <div style={{ display: 'inline', marginLeft: '10px' }}>
+          <code style={{ color: 'grey' }}>
+            <small>{nick}</small>
+          </code>
+        </div>
       </div>
       <NoteList
         key={'work' + id}
