@@ -330,20 +330,20 @@ function Work(props) {
         )}
       </div>
       {importMode ? (
-        <div className="full-width">
-          <div name="text" className="width-100">
-            <textarea
-              id="importText"
-              className={'work-page importText input'}
-              value={pendingImportText}
-              onChange={(e) => {
-                setPendingImportText(e.target.value)
-                autosize(document.querySelector('#importText'))
-              }}
-            ></textarea>
-          </div>
-          <TopLevelStandardButton name="Done" onClick={handleImport} />
-        </div>
+        <TopLevelFormContainer>
+          <TopLevelFormTextArea
+            name="Import Notes"
+            id="import-text"
+            value={pendingImportText}
+            onChange={(e) => {
+              setPendingImportText(e.target.value)
+              autosize(document.querySelector('#import-text'))
+            }}
+          />
+          <TopLevelStandardButtonContainer>
+            <TopLevelStandardButton name="Done" onClick={handleImport} />
+          </TopLevelStandardButtonContainer>
+        </TopLevelFormContainer>
       ) : (
         <NoteList
           key={'work' + id}
