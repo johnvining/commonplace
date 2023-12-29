@@ -532,8 +532,6 @@ a.grid-link {
 }
 
 .multi-select {
-  font-size: 14px;
-  font-family: $main_font;
   position: relative;
 
   &.search-box {
@@ -585,8 +583,6 @@ a.grid-link {
     height: 13px;
     content: '';
   }
-
-
 }
 
 .multi-select-top-bar {
@@ -599,21 +595,7 @@ a.grid-link {
   background: $background_color;
   padding-bottom: 4px;
   padding-top: 4px;
-  min-height: 52px;
-}
-
-.flex-end {
-  align-self: flex-end;
-}
-
-.section-header {
-  font-size: 18px;
-  padding: 18px 4px 4px 4px;
-  margin: 4px;
-}
-
-.inline {
-  display: inline-flex;
+  min-height: 60px;
 }
 
 .image-row {
@@ -943,8 +925,6 @@ a {
     @include button-hover($button_background_hover);
   }
 }
-
-
 
 .drag-active {
   @include button-hover($button_background_hover);

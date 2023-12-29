@@ -633,8 +633,6 @@ a.grid-link {
   border-style: none; }
 
 .multi-select {
-  font-size: 14px;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   position: relative; }
   .multi-select.search-box {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -682,18 +680,7 @@ a.grid-link {
   background: #f7fcf7;
   padding-bottom: 4px;
   padding-top: 4px;
-  min-height: 52px; }
-
-.flex-end {
-  align-self: flex-end; }
-
-.section-header {
-  font-size: 18px;
-  padding: 18px 4px 4px 4px;
-  margin: 4px; }
-
-.inline {
-  display: inline-flex; }
+  min-height: 60px; }
 
 div .image-row {
   display: flex;
