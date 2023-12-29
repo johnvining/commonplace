@@ -12,6 +12,7 @@ export function TopLevelFormInput(props) {
         id={props.id}
         defaultValue={props.defaultValue}
         onChange={props.onChange}
+        type={props.type}
       />
     </>
   )

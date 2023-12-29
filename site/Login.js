@@ -1,8 +1,8 @@
 import * as db from './Database'
 import { useState } from 'react'
 import React from 'react'
-import { Redirect } from 'react-router-dom'
 import TopLevelStandardButton from './TopLevelStandardButton'
+import { TopLevelFormInput } from './TopLevelFormItems'
 
 function Login(props) {
   const [password, setPassword] = useState('')
@@ -24,12 +24,14 @@ function Login(props) {
   return (
     <div>
       <form onSubmit={handleSubmitPassword}>
-        <input
+        <TopLevelFormInput
+          name="Password"
+          id="password"
           onChange={(e) => {
             setPassword(e.target.value)
           }}
           type="password"
-        ></input>
+        />
         <TopLevelStandardButton name="Submit" type="submit" />
       </form>
     </div>
