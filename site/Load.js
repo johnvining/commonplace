@@ -23,6 +23,11 @@ function Load(props) {
   return (
     <div className="full-width">
       <div name="text" className="width-100">
+        <pre>
+          author,title,text,workName,url,ideas,externalImageUrls,piles,year,page,take
+        </pre>
+      </div>
+      <div name="text" className="width-100">
         <textarea
           id="importText"
           className={'work-page importText input'}
