@@ -1,4 +1,5 @@
 import React from 'react'
+import Autocomplete from './Autocomplete'
 
 export function TopLevelFormInput(props) {
   return (
@@ -28,6 +29,28 @@ export function TopLevelFormTextArea(props) {
         value={props.value}
         onChange={props.onChange}
       ></textarea>
+    </>
+  )
+}
+
+export function TopLevelFormAutocomplete(props) {
+  return (
+    <>
+      <label htmlFor={props.id} className="work-page form-label">
+        {props.name}
+      </label>
+      {/* TODO: Generalize classname */}
+      <Autocomplete
+        inputName={props.id}
+        className="work-page author-select"
+        dontAutofocus={props.dontAutofocus}
+        defaultValue={props.defaultValue}
+        onSelect={props.onSelect}
+        getSuggestions={props.getSuggestions}
+        apiType={props.apiType}
+        handleNewSelect={props.handleNewSelect}
+        onClearText={props.onClearText}
+      />
     </>
   )
 }

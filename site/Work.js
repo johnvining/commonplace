@@ -10,6 +10,11 @@ import * as constants from './constants'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import TopLevelStandardButton from './TopLevelStandardButton'
+import {
+  TopLevelFormAutocomplete,
+  TopLevelFormInput,
+  TopLevelFormTextArea,
+} from './TopLevelFormItems'
 
 function Work(props) {
   const { id } = useParams()
@@ -171,35 +176,26 @@ function Work(props) {
       {/* Main Content */}
       {edit ? (
         <>
-          <label htmlFor="title" className="work-page form-label">
-            Title
-          </label>
-          <input
-            className="work-page title input"
+          <TopLevelFormInput
+            name="Title"
             id="title"
             defaultValue={pendingWorkTitle}
             onChange={(e) => {
               setPendingWorkTitle(e.target.value)
             }}
           />
-          <label htmlFor="citation-info" className="work-page form-label">
-            Citation Information
-          </label>
-          <input
-            defaultValue={pendingCitationInfo}
+          <TopLevelFormInput
+            name="Citation Information"
             id="citation-info"
-            className="work-page citation-info input"
+            defaultValue={pendingCitationInfo}
             onChange={(e) => {
               setPendingCitationInfo(e.target.value)
             }}
           />
-          <label htmlFor="work-author" className="work-page form-label">
-            Author
-          </label>
-          <Autocomplete
-            inputName="work-author"
-            className={'work-page author-select'}
-            dontAutofocus={true}
+          <TopLevelFormAutocomplete
+            name="Author"
+            id="author"
+            ontAutofocus={true}
             defaultValue={pendingAuthorName || ''}
             onSelect={handleUpdateAuthor}
             getSuggestions={db.getSuggestions}
@@ -207,35 +203,26 @@ function Work(props) {
             handleNewSelect={handleCreateAuthorAndAssign}
             onClearText={handleClearAuthor}
           />
-
-          <label htmlFor="url" className="work-page form-label">
-            URL
-          </label>
-          <input
-            defaultValue={pendingUrl}
+          <TopLevelFormInput
+            name="URL"
             id="url"
-            className="work-page url input"
+            defaultValue={pendingUrl}
             onChange={(e) => {
               setPendingUrl(e.target.value)
             }}
           />
-          <label htmlFor="year" className="work-page form-label">
-            Year
-          </label>
-          <input
+          <TopLevelFormInput
+            name="Year"
+            id="year"
             defaultValue={pendingYear}
-            className="work-page year input"
             onChange={(e) => {
               setPendingYear(e.target.value)
             }}
           />
-          <label htmlFor="summary" className="work-page form-label">
-            Summary
-          </label>
-          <textarea
-            defaultValue={pendingSummary}
+          <TopLevelFormTextArea
+            name="Summary"
             id="summary"
-            className="work-page summary input"
+            value={pendingSummary}
             onChange={(e) => {
               setPendingSummary(e.target.value)
               autosize(document.querySelector('#summary'))
