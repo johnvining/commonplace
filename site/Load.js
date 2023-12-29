@@ -39,11 +39,11 @@ function Load(props) {
             autosize(document.querySelector('#import-text'))
           }}
         />
+        <TopLevelStandardButton name="Submit" onClick={handleImport} />
+        <span>
+          {notesImported > -1 ? notesImported + ' notes imported' : null}
+        </span>
       </div>
-      <TopLevelStandardButton name="Submit" onClick={handleImport} />
-      <span>
-        {notesImported > -1 ? notesImported + ' notes imported' : null}
-      </span>
     </div>
   )
 }
