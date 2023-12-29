@@ -633,7 +633,9 @@ a.grid-link {
   border-style: none; }
 
 .multi-select {
-  position: relative; }
+  position: relative;
+  font-size: 14px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
   .multi-select.search-box {
     font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
     padding: 8px;
@@ -680,7 +682,7 @@ a.grid-link {
   background: #f7fcf7;
   padding-bottom: 4px;
   padding-top: 4px;
-  min-height: 60px; }
+  min-height: 52px; }
 
 div .image-row {
   display: flex;

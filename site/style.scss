@@ -533,6 +533,8 @@ a.grid-link {
 
 .multi-select {
   position: relative;
+  font-size: 14px;
+  font-family: $main_font;
 
   &.search-box {
     font-family: $main_font;
@@ -595,7 +597,7 @@ a.grid-link {
   background: $background_color;
   padding-bottom: 4px;
   padding-top: 4px;
-  min-height: 60px;
+  min-height: 52px;
 }
 
 .image-row {
