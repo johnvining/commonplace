@@ -9,7 +9,6 @@ import cross_circle from './icons/cross_circle.svg'
 // import clipboard_check from './icons/clipboard_check.svg'
 import document_image from './icons/document.svg'
 import ImageUploader from './ImageUploader'
-import link from './icons/link.svg'
 import tags from './icons/tags.svg'
 import eye from './icons/eye.svg'
 import eye_closed from './icons/eye_closed.svg'
@@ -588,33 +587,28 @@ class Note extends React.Component {
                   <>, ({this.props.note.work?.Page}</>
                 ) : null}
 
-                {/* Year */}
-                {this.state.pendingYear ? (
-                  <>
+                {this.state.pendingYear && !this.state.pendingUrl && (
+                  <span>
                     {' '}
-                    <YearSpan year={this.state.pendingYear} parens={true} />
-                  </>
-                ) : this.props.note.work?.year ? (
-                  <>
+                    (<YearSpan year={this.state.pendingYear} />)
+                  </span>
+                )}
+                {this.state.pendingYear && this.state.pendingUrl && (
+                  <span>
                     {' '}
-                    <YearSpan year={this.props.note.work?.year} parens={true} />
-                  </>
-                ) : null}
-
-                {/* URL */}
-                {this.state.pendingUrl ? (
-                  <>
-                    <a
-                      href={this.state.pendingUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <button className={'action-button'}>
-                        <img src={link}></img>
-                      </button>
+                    (
+                    <a href={this.state.pendingUrl}>
+                      <YearSpan year={this.state.pendingYear} />
                     </a>
-                  </>
-                ) : null}
+                    )
+                  </span>
+                )}
+                {this.state.pendingUrl && !this.state.pendingYear && (
+                  <span>
+                    {' '}
+                    (<a href={this.state.pendingUrl}>link</a>)
+                  </span>
+                )}
               </div>
             </div>
           ) : null}
