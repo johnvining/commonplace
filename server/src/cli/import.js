@@ -57,14 +57,11 @@ export async function importCsvFromString(string, recordType) {
   const parseFunc = getParseFunction(recordType)
   const importFunc = getImportFunction(recordType)
 
-  let notePromises = []
   for (let i = 0; i < entries.length; i++) {
     let parsedObject = parseFunc(entries[i])
-    notePromises.push(importFunc(parsedObject))
+    await importFunc(parsedObject)
     totalImports++
   }
-
-  await Promise.all(notePromises)
 
   return totalImports
 }
