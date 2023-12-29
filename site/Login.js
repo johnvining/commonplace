@@ -2,7 +2,7 @@ import * as db from './Database'
 import { useState } from 'react'
 import React from 'react'
 import TopLevelStandardButton from './TopLevelStandardButton'
-import { TopLevelFormInput } from './TopLevelFormItems'
+import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
 function Login(props) {
   const [password, setPassword] = useState('')
@@ -24,15 +24,17 @@ function Login(props) {
   return (
     <div>
       <form onSubmit={handleSubmitPassword}>
-        <TopLevelFormInput
-          name="Password"
-          id="password"
-          onChange={(e) => {
-            setPassword(e.target.value)
-          }}
-          type="password"
-        />
-        <TopLevelStandardButton name="Submit" type="submit" />
+        <TopLevelFormContainer>
+          <TopLevelFormInput
+            name="Password"
+            id="password"
+            onChange={(e) => {
+              setPassword(e.target.value)
+            }}
+            type="password"
+          />
+          <TopLevelStandardButton name="Submit" type="submit" />
+        </TopLevelFormContainer>
       </form>
     </div>
   )

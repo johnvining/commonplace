@@ -14,6 +14,7 @@ import {
   TopLevelFormAutocomplete,
   TopLevelFormInput,
   TopLevelFormTextArea,
+  TopLevelFormContainer,
 } from './TopLevelFormItems'
 
 function Work(props) {
@@ -175,7 +176,7 @@ function Work(props) {
     <>
       {/* Main Content */}
       {edit ? (
-        <>
+        <TopLevelFormContainer>
           <TopLevelFormInput
             name="Title"
             id="title"
@@ -228,7 +229,7 @@ function Work(props) {
               autosize(document.querySelector('#summary'))
             }}
           />
-        </>
+        </TopLevelFormContainer>
       ) : (
         <>
           <div className={'work-page work-header'}>

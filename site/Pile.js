@@ -7,7 +7,7 @@ import WorkList from './WorkList'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import TopLevelStandardButton from './TopLevelStandardButton'
-import { TopLevelFormInput } from './TopLevelFormItems'
+import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
 function Pile(props) {
   const { id } = useParams()
@@ -91,7 +91,7 @@ function Pile(props) {
       {/* Header and Edit */}
       <div key="pile-information">
         {edit ? (
-          <>
+          <TopLevelFormContainer>
             <TopLevelFormInput
               name="Name"
               id="title"
@@ -117,7 +117,7 @@ function Pile(props) {
               }}
             />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
-          </>
+          </TopLevelFormContainer>
         ) : (
           <>
             <div className="page-title">{pendingName}</div>

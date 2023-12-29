@@ -5,7 +5,7 @@ import React from 'react'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import TopLevelStandardButton from './TopLevelStandardButton'
-import { TopLevelFormInput } from './TopLevelFormItems'
+import { TopLevelFormContainer, TopLevelFormInput } from './TopLevelFormItems'
 
 function Idea(props) {
   const { id } = useParams()
@@ -75,7 +75,7 @@ function Idea(props) {
     <div>
       <div key="idea-information">
         {edit ? (
-          <>
+          <TopLevelFormContainer>
             <TopLevelFormInput
               name="Name"
               id="title"
@@ -101,7 +101,7 @@ function Idea(props) {
               }}
             />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
-          </>
+          </TopLevelFormContainer>
         ) : (
           <>
             <div className="page-title">{pendingName}</div>

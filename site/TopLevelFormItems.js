@@ -2,6 +2,7 @@ import React from 'react'
 import Autocomplete from './Autocomplete'
 
 export function TopLevelFormInput(props) {
+  // TODO: These are all italic because of the title
   return (
     <>
       <label htmlFor={props.id} className="work-page form-label">
@@ -54,4 +55,8 @@ export function TopLevelFormAutocomplete(props) {
       />
     </>
   )
+}
+
+export function TopLevelFormContainer(props) {
+  return <div className="top-level-form">{props.children}</div>
 }

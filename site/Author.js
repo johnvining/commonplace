@@ -7,7 +7,7 @@ import ResultWork from './ResultWork'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import TopLevelStandardButton from './TopLevelStandardButton'
-import { TopLevelFormInput } from './TopLevelFormItems'
+import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
 function Author(props) {
   const { id } = useParams()
@@ -97,7 +97,7 @@ function Author(props) {
       {/* Header and Edit */}
       <div key="author-information">
         {edit ? (
-          <>
+          <TopLevelFormContainer>
             <TopLevelFormInput
               id="name"
               name="Name"
@@ -123,7 +123,7 @@ function Author(props) {
               }}
             />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
-          </>
+          </TopLevelFormContainer>
         ) : (
           <>
             <div className="page-title">{pendingName}</div>
