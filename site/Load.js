@@ -3,6 +3,7 @@ import * as db from './Database'
 import React from 'react'
 import { useState } from 'react'
 import autosize from 'autosize'
+import TopLevelStandardButton from './TopLevelStandardButton'
 
 function Load(props) {
   const [pendingImportText, setPendingImportText] = useState('')
@@ -38,12 +39,7 @@ function Load(props) {
           }}
         ></textarea>
       </div>
-      <button
-        className="top-level standard-button left-right"
-        onClick={handleImport}
-      >
-        Import
-      </button>
+      <TopLevelStandardButton name="Import" onClick={handleImport} />
       <span>
         {notesImported > -1 ? notesImported + ' notes imported' : null}
       </span>

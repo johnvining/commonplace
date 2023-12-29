@@ -6,6 +6,7 @@ function TopLevelStandardButton(props) {
       className="top-level standard-button left-right"
       onClick={props.onClick}
       style={{ userSelect: 'none' }} // Avoids accidentally clicking button text when selecting other text
+      type={props.type}
     >
       {props.name}
     </button>

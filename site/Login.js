@@ -2,6 +2,7 @@ import * as db from './Database'
 import { useState } from 'react'
 import React from 'react'
 import { Redirect } from 'react-router-dom'
+import TopLevelStandardButton from './TopLevelStandardButton'
 
 function Login(props) {
   const [password, setPassword] = useState('')
@@ -29,9 +30,7 @@ function Login(props) {
           }}
           type="password"
         ></input>
-        <button className="top-level standard-button left-right" type="submit">
-          Submit
-        </button>
+        <TopLevelStandardButton name="Submit" type="submit" />
       </form>
     </div>
   )
