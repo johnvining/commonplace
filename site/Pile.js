@@ -163,7 +163,6 @@ function Pile(props) {
                   }}
                 />
               )}
-
               <div style={{ display: 'inline', marginLeft: '10px' }}>
                 <code style={{ color: 'grey' }}>
                   <small>{nick}</small>

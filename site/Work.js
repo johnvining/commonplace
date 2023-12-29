@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import * as constants from './constants'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
+import TopLevelStandardButton from './TopLevelStandardButton'
 
 function Work(props) {
   const { id } = useParams()
@@ -282,20 +283,10 @@ function Work(props) {
       {/* Buttons */}
       <div>
         {edit ? (
-          <button
-            className="top-level standard-button left-right"
-            onClick={handleAcceptUpdates}
-          >
-            Done
-          </button>
+          <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
         ) : editPiles ? (
           <>
-            <button
-              className="top-level standard-button left-right"
-              onClick={handleFinishEditing}
-            >
-              Done
-            </button>
+            <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
             <Autocomplete
               inputName="work-work-pile"
               className={'work-page pile-select'}
@@ -311,53 +302,37 @@ function Work(props) {
           </>
         ) : (
           <>
-            <button
-              className="top-level standard-button left-right"
+            <TopLevelStandardButton
+              name="Edit"
               onClick={() => {
                 setEdit(true)
                 setEditPiles(false)
               }}
-            >
-              Edit
-            </button>
-            <button
-              className="top-level standard-button left-right"
+            />
+            <TopLevelStandardButton
+              name="Piles"
               onClick={() => {
                 setEdit(false)
                 setEditPiles(true)
               }}
-            >
-              Piles
-            </button>
-            <button
-              className="top-level standard-button left-right"
-              onClick={deleteWork}
-            >
-              Delete
-            </button>
-            <button
-              className="top-level standard-button left-right"
+            />
+            <TopLevelStandardButton name="Delete" onClick={deleteWork} />
+            <TopLevelStandardButton
+              name="Import"
               onClick={() => {
                 setImportMode(!importMode)
               }}
-            >
-              Import
-            </button>
-            <button
-              className="top-level standard-button left-right"
+            />
+            <TopLevelStandardButton
+              name="Read"
               onClick={() => {
                 navigate('/read/' + id)
               }}
-            >
-              Read
-            </button>
-            <button
-              className="top-level standard-button left-right"
+            />
+            <TopLevelStandardButton
+              name="Add Note"
               onClick={createNoteForWork}
-              style={{ userSelect: 'none' }}
-            >
-              Add Note
-            </button>
+            />
             <div style={{ display: 'inline', marginLeft: '10px' }}>
               <code style={{ color: 'grey' }}>
                 <small>{nick}</small>
@@ -379,12 +354,7 @@ function Work(props) {
               }}
             ></textarea>
           </div>
-          <button
-            className="top-level standard-button left-right"
-            onClick={handleImport}
-          >
-            Done
-          </button>
+          <TopLevelStandardButton name="Done" onClick={handleImport} />
         </div>
       ) : (
         <NoteList
