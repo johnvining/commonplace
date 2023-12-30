@@ -651,7 +651,7 @@ class Note extends React.Component {
                     <button
                       className="idea label"
                       key={'idea-button' + idea._id}
-                      tabIndex="-1"
+                      tabIndex={selected || edit_ideas ? null : '-1'}
                     >
                       {idea.name}
                     </button>
