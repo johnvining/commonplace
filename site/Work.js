@@ -19,6 +19,12 @@ import {
   TopLevelFormTextArea,
   TopLevelFormContainer,
 } from './TopLevelFormItems'
+import {
+  TopLevelPreTitle,
+  TopLevelTitleContainer,
+  TopLevelTitle,
+  TopLevelPostButtonContent,
+} from './TopLevelHeadings'
 
 function Work(props) {
   const { id } = useParams()
@@ -234,9 +240,9 @@ function Work(props) {
           />
         </TopLevelFormContainer>
       ) : (
-        <div className="top-level container">
-          <div className={'top-level pre-title'}>Work</div>
-          <div className={'top-level title italic'}>
+        <TopLevelTitleContainer>
+          <TopLevelPreTitle>Work</TopLevelPreTitle>
+          <TopLevelTitle>
             <WorkCitationSpan
               authorName={pendingAuthorName}
               authorID={pendingAuthorId}
@@ -245,7 +251,7 @@ function Work(props) {
               spaceAfter={pendingYear || pendingUrl}
             />
             <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
-          </div>
+          </TopLevelTitle>
           <div>
             <PileListForItem
               remove={edit}
@@ -263,13 +269,13 @@ function Work(props) {
               onPileRemove={handlePileRemove}
             />
           </div>
-          <div className="top-level post-button-content">
+          <TopLevelPostButtonContent>
             {pendingCitationInfo}
             {pendingCitationInfo && pendingSummary && <br />}
             {pendingCitationInfo && pendingSummary && <br />}
             {pendingSummary}
-          </div>
-        </div>
+          </TopLevelPostButtonContent>
+        </TopLevelTitleContainer>
       )}
       <div>
         {edit ? (
