@@ -281,8 +281,6 @@ class Note extends React.Component {
 
   async onImageUpload(image) {
     await db.addImageToNote(this.props.id, image)
-
-    // TODO: Don't fetch all the images if we don't need to, e.g. views that won't show them
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
@@ -444,7 +442,7 @@ class Note extends React.Component {
           ) : null}
 
           {/* Images */}
-          {this.props.note?.images?.length > 0 && this.props.note?.imageUrls ? (
+          {this.props.note?.images?.length > 0 ? (
             <div className="note-full image-row width-100">
               {this.props.note?.images?.map((image, index) => (
                 <div
@@ -459,12 +457,14 @@ class Note extends React.Component {
                   onClick={this.handleFocusImage.bind(this)}
                   id={index}
                 >
-                  <img
-                    key={this.props.id + index + 'img'}
-                    src={this.props.note.imageUrls[index]}
-                    className="image-row"
-                    id={index}
-                  />
+                  {this.props.note.imageUrls ? (
+                    <img
+                      key={this.props.id + index + 'img'}
+                      src={this.props.note.imageUrls[index]}
+                      className="image-row"
+                      id={index}
+                    />
+                  ) : null}
                 </div>
               ))}
             </div>
