@@ -289,12 +289,14 @@ function Work(props) {
               onPileRemove={handlePileRemove}
             />
           </div>
-          <TopLevelPostButtonContent>
-            {pendingCitationInfo}
-            {pendingCitationInfo && pendingSummary && <br />}
-            {pendingCitationInfo && pendingSummary && <br />}
-            {pendingSummary}
-          </TopLevelPostButtonContent>
+          {pendingCitationInfo || pendingSummary ? (
+            <TopLevelPostButtonContent>
+              {pendingCitationInfo}
+              {pendingCitationInfo && pendingSummary && <br />}
+              {pendingCitationInfo && pendingSummary && <br />}
+              {pendingSummary}
+            </TopLevelPostButtonContent>
+          ) : null}
         </TopLevelTitleContainer>
       )}
       {edit ? (
