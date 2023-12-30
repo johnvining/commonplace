@@ -11,6 +11,12 @@ import {
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
+import {
+  TopLevelPreTitle,
+  TopLevelSubTitle,
+  TopLevelTitle,
+  TopLevelTitleContainer,
+} from './TopLevelHeadings'
 
 function Pile(props) {
   const { id } = useParams()
@@ -123,14 +129,19 @@ function Pile(props) {
           </TopLevelFormContainer>
         ) : (
           <>
-            <div className="page-title">{pendingName}</div>
-            {pendingStartYear || pendingEndYear ? (
-              <div className="page-sub-title">
-                {pendingStartYear ? <YearSpan year={pendingStartYear} /> : null}
-                {pendingStartYear && pendingEndYear ? ' to ' : null}
-                {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
-              </div>
-            ) : null}
+            <TopLevelTitleContainer>
+              <TopLevelPreTitle>Pile</TopLevelPreTitle>
+              <TopLevelTitle>{pendingName}</TopLevelTitle>
+              {pendingStartYear || pendingEndYear ? (
+                <TopLevelSubTitle>
+                  {pendingStartYear ? (
+                    <YearSpan year={pendingStartYear} />
+                  ) : null}
+                  {pendingStartYear && pendingEndYear ? ' to ' : null}
+                  {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
+                </TopLevelSubTitle>
+              ) : null}
+            </TopLevelTitleContainer>
             <TopLevelStandardButtonContainer nick={nick}>
               <TopLevelStandardButton
                 name="Delete"
