@@ -1,7 +1,8 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 import React from 'react'
 import { useState, useEffect } from 'react'
+import YearUrlComboSpan from './YearUrlComboSpan'
 import * as constants from './constants'
 import ImageUploader from './ImageUploader'
 import NoteList from './NoteList'
@@ -10,6 +11,11 @@ import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
+import {
+  TopLevelPreTitle,
+  TopLevelTitle,
+  TopLevelTitleContainer,
+} from './TopLevelHeadings'
 
 function Read(props) {
   const { id } = useParams()
@@ -17,6 +23,8 @@ function Read(props) {
   const [authorName, setAuthorName] = useState('')
   const [authorId, setAuthorId] = useState(null)
   const [nick, setNick] = useState()
+  const [url, setUrl] = useState('')
+  const [year, setYear] = useState('')
   const navigate = useNavigate()
 
   const fetchWorkInfo = (workId) => {
@@ -25,6 +33,8 @@ function Read(props) {
         setWorkTitle(response.data.data.name)
         setAuthorName(response.data.data.author?.name)
         setAuthorId(response.data.data.author?._id)
+        setUrl(response.data.data.url)
+        setYear(response.data.data.year)
       })
       .catch((error) => {
         console.error(error)
@@ -87,22 +97,19 @@ function Read(props) {
 
   return (
     <>
-      <div className={'work-page work-header'}>
-        <center>
-          <big>READING</big>
-        </center>
-      </div>
-      <div className={'work-page work-header'}>
-        <center>
+      <TopLevelTitleContainer>
+        <TopLevelPreTitle>Reading</TopLevelPreTitle>
+        <TopLevelTitle>
           <WorkCitationSpan
             authorName={authorName}
             authorID={authorId}
             workTitle={workTitle}
             workID={id}
-            spaceAfter={false}
+            spaceAfter={year || url}
           />
-        </center>
-      </div>
+          <YearUrlComboSpan year={year} url={url} />
+        </TopLevelTitle>
+      </TopLevelTitleContainer>
       <TopLevelStandardButtonContainer nick={nick}>
         <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
         <ImageUploader onImageUpload={createNoteWithImageForWork} />
