@@ -9,6 +9,12 @@ import {
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
 import { TopLevelFormContainer, TopLevelFormInput } from './TopLevelFormItems'
+import {
+  TopLevelPreTitle,
+  TopLevelSubTitle,
+  TopLevelTitle,
+  TopLevelTitleContainer,
+} from './TopLevelHeadings'
 
 function Idea(props) {
   const { id } = useParams()
@@ -107,14 +113,19 @@ function Idea(props) {
           </TopLevelFormContainer>
         ) : (
           <>
-            <div className="page-title">{pendingName}</div>
-            {pendingStartYear || pendingEndYear ? (
-              <div className="page-sub-title">
-                {pendingStartYear ? <YearSpan year={pendingStartYear} /> : null}
-                {pendingStartYear && pendingEndYear ? ' to ' : null}
-                {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
-              </div>
-            ) : null}
+            <TopLevelTitleContainer>
+              <TopLevelPreTitle>Idea</TopLevelPreTitle>
+              <TopLevelTitle>{pendingName}</TopLevelTitle>
+              {pendingStartYear || pendingEndYear ? (
+                <TopLevelSubTitle>
+                  {pendingStartYear ? (
+                    <YearSpan year={pendingStartYear} />
+                  ) : null}
+                  {pendingStartYear && pendingEndYear ? ' to ' : null}
+                  {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
+                </TopLevelSubTitle>
+              ) : null}
+            </TopLevelTitleContainer>
             <TopLevelStandardButtonContainer nick={nick}>
               <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
               <TopLevelStandardButton
