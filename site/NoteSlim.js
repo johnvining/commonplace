@@ -58,9 +58,10 @@ class NoteSlim extends React.Component {
                   workID={null}
                   spaceAfter={false}
                 />
-                {(this.props.note.author?.name ??
-                  this.props.note.work?.author?.name) ||
-                  (this.props.note.work?.name && ': ')}
+                {(this.props.note.author?.name ||
+                  this.props.note.work?.author?.name ||
+                  this.props.note.work?.name) &&
+                  ': '}
                 <b>
                   {this.props.note.title?.length
                     ? this.props.note.title + '. '
