@@ -57,7 +57,7 @@ export const reqDeletePile = async (req, res) => {
 }
 
 // TODO: Duplicative of whats in work.controllers.js
-export const filePilesByString = async function(string, withCounts) {
+export const filePilesByString = async function (string, withCounts) {
   let piles = await Pile.find({ name: new RegExp(string, 'i') })
     .lean()
     .exec()
@@ -66,17 +66,17 @@ export const filePilesByString = async function(string, withCounts) {
   } else {
     let notePromises = [],
       workPromises = []
-    piles.map(pile => {
+    piles.map((pile) => {
       notePromises.push(Note.find({ piles: pile._id }).countDocuments())
       workPromises.push(Work.find({ piles: pile._id }).countDocuments())
     })
 
-    let noteFiler = Promise.all(notePromises).then(result => {
+    let noteFiler = Promise.all(notePromises).then((result) => {
       result.map((val, idx) => {
         piles[idx] = { ...piles[idx], note_count: val }
       })
     })
-    let workFiler = Promise.all(workPromises).then(result => {
+    let workFiler = Promise.all(workPromises).then((result) => {
       result.map((val, idx) => {
         piles[idx] = { ...piles[idx], work_count: val }
       })
@@ -87,7 +87,7 @@ export const filePilesByString = async function(string, withCounts) {
   }
 }
 
-export const deletePile = async function(pileId) {
+export const deletePile = async function (pileId) {
   // TODO: Parallel
   let notes = await findNotesAndPopulate(
     { piles: pileId },
@@ -96,11 +96,11 @@ export const deletePile = async function(pileId) {
   )
   let works = await getWorksForPile(pileId)
   let deletionPromises = []
-  notes.map(note => {
+  notes.map((note) => {
     deletionPromises.push(updateNote(note._id, { $pull: { piles: pileId } }))
   })
 
-  works.map(work => {
+  works.map((work) => {
     deletionPromises.push(removePileFromWork(work._id, pileId))
   })
 
@@ -108,12 +108,12 @@ export const deletePile = async function(pileId) {
   await Pile.findOneAndDelete({ _id: pileId })
 }
 
-export const findOrCreatePile = async name => {
+export const findOrCreatePile = async (name) => {
   if (!name) return
   return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
 }
 
-export const findPiles = async function(
+export const findPiles = async function (
   searchObject,
   sortObject,
   skip = 0,
@@ -127,9 +127,10 @@ export const findPiles = async function(
     .exec()
 }
 
-export const getWorksForPile = async function(pileId) {
+export const getWorksForPile = async function (pileId) {
   return Work.find({ piles: pileId })
     .populate('author')
+    .populate('piles')
     .lean()
     .exec()
 }

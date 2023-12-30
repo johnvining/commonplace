@@ -2,12 +2,20 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import work_img from './icons/work.svg'
 import note_img from './icons/write.svg'
+import PileListForItem from './PileListForItem'
 
 class ResultWork extends React.Component {
   state = {}
 
   render() {
     var work = this.props.work
+    var pilesToShow = this.props.work.piles
+      ?.filter(
+        (pile) =>
+          pile.name?.includes('Location: ') || pile.name?.includes('Status: ')
+      )
+      .sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
+
     return (
       <Link to={`/work/${work._id}`}>
         <div className="result-box">
@@ -25,6 +33,13 @@ class ResultWork extends React.Component {
               {work.note_count}
             </div>
           ) : null}
+          <PileListForItem
+            remove={false}
+            allowTabbing={false}
+            allowAdd={false}
+            edit={false}
+            piles={pilesToShow}
+          />
         </div>
       </Link>
     )
