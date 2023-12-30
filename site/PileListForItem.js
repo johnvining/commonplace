@@ -26,6 +26,7 @@ function PileListForItem(props) {
                 navigate('/pile/' + pile._id)
               }
             }}
+            tabIndex={!props.allowTabbing ? '-1' : null}
           >
             <>
               {pre ? <span className="pile pre">{pre}</span> : null}
