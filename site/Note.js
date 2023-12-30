@@ -800,7 +800,7 @@ class Note extends React.Component {
                             constants.note_modes.EDIT_PILES
                           )
                         }}
-                        tabIndex="-1"
+                        tabIndex={selected ? null : '-1'}
                       >
                         <img src={pile_img}></img>
                       </button>
@@ -812,12 +812,15 @@ class Note extends React.Component {
                             constants.note_modes.EDIT_IDEAS
                           )
                         }}
-                        tabIndex="-1"
+                        tabIndex={selected ? null : '-1'}
                       >
                         <img src={tags}></img>
                       </button>
                       <Link to={'/note/' + this.props.id}>
-                        <button className={'action-button'} tabIndex="-1">
+                        <button
+                          className={'action-button'}
+                          tabIndex={selected ? null : '-1'}
+                        >
                           <img src={document_image}></img>
                         </button>
                       </Link>
@@ -829,14 +832,14 @@ class Note extends React.Component {
                             constants.note_modes.EDIT
                           )
                         }}
-                        tabIndex="-1"
+                        tabIndex={selected ? null : '-1'}
                       >
                         <img src={write}></img>
                       </button>
                       <button
                         onClick={this.handleDelete.bind(this)}
                         className={'action-button'}
-                        tabIndex="-1"
+                        tabIndex={selected ? null : '-1'}
                       >
                         <img src={trash}></img>
                       </button>
