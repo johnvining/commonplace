@@ -89,20 +89,22 @@ class Note extends React.Component {
       }
     }
 
-    if (this.props.mode == constants.note_modes.EDIT && event.ctrlKey) {
-      switch (event.keyCode) {
-        case constants.keyCodes.format:
-          this.formatMainText()
-          return
-        case constants.keyCodes.suggest:
-          this.generateTitleSuggestion()
-          return
-        case constants.keyCodes.ocr:
-          this.runOCROnText()
-          return
-        default:
-          break
-      }
+    if (!this.props.mode == constants.note_modes.EDIT || !event.ctrlKey) {
+      return
+    }
+
+    switch (event.keyCode) {
+      case constants.keyCodes.format:
+        this.formatMainText()
+        return
+      case constants.keyCodes.suggest:
+        this.generateTitleSuggestion()
+        return
+      case constants.keyCodes.ocr:
+        this.runOCROnText()
+        return
+      default:
+        break
     }
   }
 

@@ -70,11 +70,32 @@ function Work(props) {
 
   useEffect(() => {
     const onKeyDown = async (event) => {
-      if (event.ctrlKey && event.keyCode == constants.keyCodes.new) {
-        createNoteForWork()
-      } else if (event.keyCode == constants.keyCodes.esc) {
+      console.log(event)
+      if (event.keyCode == constants.keyCodes.esc) {
         // TODO: This crashes because of a failure in NoteList
         handleFinishEditing()
+        return
+      }
+
+      if (!event.ctrlKey) {
+        return
+      }
+
+      switch (event.keyCode) {
+        case constants.keyCodes.new:
+          createNoteForWork()
+          return
+        case constants.keyCodes.accept:
+          edit && handleAcceptUpdates()
+          return
+        case constants.keyCodes.piles:
+          setEdit(false)
+          setEditPiles(true)
+          return
+        case constants.keyCodes.edit:
+          setEdit(true)
+          setEditPiles(false)
+          return
       }
     }
 
