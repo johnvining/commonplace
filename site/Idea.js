@@ -15,6 +15,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
+import * as constants from './constants'
 
 function Idea(props) {
   const { id } = useParams()
@@ -43,6 +44,34 @@ function Idea(props) {
   useEffect(() => {
     fetchIdeaInfo(id)
   }, [id])
+
+  useEffect(() => {
+    const onKeyDown = async (event) => {
+      console.log(event)
+      if (event.keyCode == constants.keyCodes.esc) {
+        setEdit(false)
+        return
+      }
+
+      if (!event.ctrlKey) {
+        return
+      }
+
+      switch (event.keyCode) {
+        case constants.keyCodes.accept:
+          edit && handleAcceptUpdates()
+          return
+        case constants.keyCodes.edit:
+          setEdit(true)
+          return
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  })
 
   const getListOfNotes = async () => {
     var notesResponse
