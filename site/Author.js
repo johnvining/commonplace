@@ -11,6 +11,12 @@ import {
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
+import {
+  TopLevelPreTitle,
+  TopLevelSubTitle,
+  TopLevelTitle,
+  TopLevelTitleContainer,
+} from './TopLevelHeadings'
 
 function Author(props) {
   const { id } = useParams()
@@ -129,22 +135,25 @@ function Author(props) {
           </TopLevelFormContainer>
         ) : (
           <>
-            <div className="page-title">{pendingName}</div>
-            {pendingBirthYear || pendingDeathYear ? (
-              <div className="page-sub-title">
-                {pendingBirthYear ? (
-                  <>
-                    {'b. '} <YearSpan year={pendingBirthYear} />
-                  </>
-                ) : null}
-                {pendingDeathYear ? (
-                  <>
-                    {' d. '} <YearSpan year={pendingDeathYear} />
-                  </>
-                ) : null}
-              </div>
-            ) : null}
-
+            <TopLevelTitleContainer>
+              <TopLevelPreTitle>Author</TopLevelPreTitle>
+              <TopLevelTitle>{pendingName}</TopLevelTitle>
+              {pendingBirthYear || pendingDeathYear ? (
+                <TopLevelSubTitle>
+                  {' '}
+                  {pendingBirthYear ? (
+                    <>
+                      {'b. '} <YearSpan year={pendingBirthYear} />
+                    </>
+                  ) : null}
+                  {pendingDeathYear ? (
+                    <>
+                      {' d. '} <YearSpan year={pendingDeathYear} />
+                    </>
+                  ) : null}
+                </TopLevelSubTitle>
+              ) : null}
+            </TopLevelTitleContainer>
             <TopLevelStandardButtonContainer>
               <TopLevelStandardButton name="Delete" onClick={deleteAuthor} />
               <TopLevelStandardButton

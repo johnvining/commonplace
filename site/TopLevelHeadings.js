@@ -9,7 +9,7 @@ export function TopLevelPreTitle(props) {
 }
 
 export function TopLevelTitle(props) {
-  return <div className={'top-level title italic'}>{props.children}</div>
+  return <div className={'top-level title'}>{props.children}</div>
 }
 
 export function TopLevelSubTitle(props) {

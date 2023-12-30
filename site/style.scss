@@ -922,12 +922,11 @@ a {
     padding: 6px;
   }
 
-  &.italic {
-    font-style: italic;
-  }
 }
 
-
+.italic {
+  font-style: italic;
+}
 
 .upload-form {
   &.hidden {

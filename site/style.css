@@ -907,7 +907,8 @@ a {
   border-radius: 4px;
   margin: 0px 0px 4px 0px;
   padding: 6px; }
-.top-level.italic {
+
+.italic {
   font-style: italic; }
 
 .upload-form {

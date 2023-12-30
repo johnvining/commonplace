@@ -11,11 +11,13 @@ function WorkCitationSpan(props) {
       )}
       {props.workTitle && props.authorName && <span>,&nbsp;</span>}
       {props.workTitle && props.workID && (
-        <span>
+        <span className="italic">
           <Link to={'/work/' + props.workID}>{props.workTitle}</Link>
         </span>
       )}
-      {props.workTitle && !props.workID && <span>{props.workTitle}</span>}
+      {props.workTitle && !props.workID && (
+        <span className="italic">{props.workTitle}</span>
+      )}
       {props.spaceAfter && <>&nbsp;</>}
     </>
   )
