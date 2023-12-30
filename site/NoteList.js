@@ -20,9 +20,10 @@ class NoteList extends React.Component {
     focusType: constants.note_modes.NO_SELECTION,
     selectedNote: '',
     notes: [],
-    selected: [],
+    selectedArray: [],
     deleted: [],
-    lastSelectedIndex: 0,
+    anchorIndex: 0,
+    lastTouchedIndex: 0,
     useGridView: 1,
     page: 1,
   }
@@ -35,6 +36,7 @@ class NoteList extends React.Component {
       this.props.index,
       this.state.page
     )
+
     this.setState(
       {
         notes: this.props.reverse
@@ -45,6 +47,8 @@ class NoteList extends React.Component {
         for (var i = 0; i < this.state.notes?.length; i++) {
           this.getImagesForNoteAtIndex(i, false)
         }
+
+        this.clearSelection()
       }
     )
 
@@ -67,7 +71,7 @@ class NoteList extends React.Component {
     this.setState({
       notes: response.data.data,
       page: this.state.page + 1,
-      selected: [],
+      selectedArray: [],
     })
   }
 
@@ -79,7 +83,7 @@ class NoteList extends React.Component {
     this.setState({
       notes: response.data.data,
       page: this.state.page - 1,
-      selected: [],
+      selectedArray: [],
     })
   }
 
@@ -162,7 +166,7 @@ class NoteList extends React.Component {
           }
 
           this.setNoteMode('', constants.note_modes.NO_SELECTION)
-          this.setState({ selected: [] })
+          this.setState({ selectedArray: [] })
           break
       }
     }
@@ -183,70 +187,92 @@ class NoteList extends React.Component {
     this.setNoteMode(noteId, constants.note_modes.EDIT_PILES)
   }
 
-  markChecked(noteIndex) {
-    var tempArray
-    if (this.state.selected.includes(noteIndex)) {
-      tempArray = this.state.selected
-      const index = tempArray.indexOf(noteIndex)
-      if (index > -1) {
-        tempArray.splice(index, 1)
-      }
-      this.setState({ selected: tempArray })
-    } else {
-      tempArray = this.state.selected
-      tempArray.push(noteIndex)
-      this.setState({ selected: tempArray, lastSelectedIndex: noteIndex })
+  clearSelection() {
+    let tempSelectedArray = []
+    for (var i = 0; i < this.state.notes.length; i++) {
+      tempSelectedArray[i] = false
     }
+    this.setState({ selectedArray: tempSelectedArray, anchorIndex: 0 })
   }
 
-  markShiftChecked(id) {
-    var start = Math.min(this.state.lastSelectedIndex, id)
-    var end = Math.max(this.state.lastSelectedIndex, id)
-    var tempArray = this.state.selected
-    for (var i = start; i <= end; i++) {
-      if (!this.state.selected.includes(i) && !this.state.deleted.includes(i)) {
-        tempArray.push(i)
+  markChecked(noteIndex) {
+    let tempSelectedArray = this.state.selectedArray
+    tempSelectedArray[noteIndex] = !tempSelectedArray[noteIndex] ?? false
+    this.setState({ selectedArray: tempSelectedArray, anchorIndex: noteIndex })
+  }
+
+  markShiftChecked(noteIndex) {
+    let tempSelectedArray = this.state.selectedArray
+    if (noteIndex > this.state.anchorIndex) {
+      if (noteIndex > this.state.lastTouchedIndex) {
+        for (let i = this.state.anchorIndex; i <= noteIndex; i++) {
+          tempSelectedArray[i] = true
+        }
+      } else {
+        for (let i = noteIndex; i <= this.state.lastTouchedIndex; i++) {
+          tempSelectedArray[i] = false
+        }
       }
+    } else {
+      // TODO: Support selecting above the anchor
     }
-    this.setState({ selected: tempArray })
+
+    this.setState({
+      selectedArray: tempSelectedArray,
+      lastTouchedIndex: noteIndex,
+    })
   }
 
   selectAll() {
     var selected = []
     for (var i = 0; i < this.state.notes.length; i++) {
-      selected.push(i)
+      selected[i] = true
     }
-    this.setState({ selected: selected })
+    this.setState({ selectedArray: selected })
+  }
+
+  getSelectedIndices() {
+    var selectedIndices = []
+    for (let i = 0; i < this.state.selectedArray.length; i++) {
+      if (this.state.selectedArray[i]) {
+        selectedIndices.push(i)
+      }
+    }
+
+    return selectedIndices
   }
 
   delete() {
+    let indicesToBeDeleted = this.getSelectedIndices()
+
     if (
       !confirm(
-        `Do you want to permanently delete ${this.state.selected.length} notes?`
+        `Do you want to permanently delete ${indicesToBeDeleted.length} notes?`
       )
     ) {
       return
     }
 
-    for (var i = 0; i < this.state.selected.length; i++) {
-      var noteId = this.state.notes[this.state.selected[i]]._id
+    for (var i = 0; i < indicesToBeDeleted.length; i++) {
+      var noteId = this.state.notes[indicesToBeDeleted[i]]._id
       db.deleteRecord(db.types.note, noteId)
     }
 
-    this.setState({ deleted: this.state.selected, selected: [] })
+    this.setState({ deleted: indicesToBeDeleted })
+    this.clearSelection()
   }
 
   handleAddNew(idToAdd) {
     var linkType = this.state.toAdd
 
-    // TODO: Single API call for multiple changes
-    for (let i = 0; i < this.state.selected.length; i++) {
-      var noteId = this.state.notes[this.state.selected[i]]._id
+    let indicesToBeModified = this.getSelectedIndices()
+    for (let i = 0; i < indicesToBeModified.length; i++) {
+      var noteId = this.state.notes[indicesToBeModified[i]]._id
       db.addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
         (response) => {
           var tempNotes = this.state.notes
           const note = response.data.data
-          tempNotes[this.state.selected[i]] = note
+          tempNotes[indicesToBeModified[i]] = note
           this.setState({ notes: tempNotes })
         }
       )
@@ -254,7 +280,6 @@ class NoteList extends React.Component {
   }
 
   async handleCreateAndAdd(name) {
-    // TODO: Create single API call
     var newIdToAssign = await db.createRecord(this.state.toAdd, name)
     this.handleAddNew(newIdToAssign.data.data._id)
   }
@@ -265,7 +290,7 @@ class NoteList extends React.Component {
       this.props.viewMode == constants.view_modes.RESULT
     return (
       <div className="multi-select">
-        {showMultiselect ? null : this.state.selected.length ? (
+        {showMultiselect ? null : this.state.selectedArray.some((x) => x) ? (
           <div className="multi-select-top-bar">
             {this.state.addSomething ? (
               <Autocomplete
@@ -321,9 +346,7 @@ class NoteList extends React.Component {
                 />
                 <TopLevelStandardButton
                   name="Unselect All"
-                  onClick={() => {
-                    this.setState({ selected: [], lastSelectedIndex: 0 })
-                  }}
+                  onClick={this.clearSelection.bind(this)}
                   multiSelect={true}
                 />
               </TopLevelStandardButtonContainer>
@@ -372,7 +395,7 @@ class NoteList extends React.Component {
                           : note.work?.author?.name
                       }
                       index={index}
-                      selected={this.state.selected.includes(index)}
+                      selected={this.state.selectedArray[index]}
                       deleted={this.state.deleted.includes(index)}
                       authorId={note.author?._id}
                       id={note._id}
@@ -397,7 +420,7 @@ class NoteList extends React.Component {
                       markChecked={this.markChecked.bind(this)}
                       markShiftChecked={this.markShiftChecked.bind(this)}
                       note={note}
-                      selected={this.state.selected.includes(index)}
+                      selected={this.state.selectedArray[index]}
                       tabIndex={index + 1}
                     />
                   ) : this.props.viewMode == constants.view_modes.RESULT ? (
