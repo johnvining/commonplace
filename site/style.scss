@@ -28,6 +28,11 @@ body {
 
 a {
   color: $link_color;
+  text-decoration: none;
+}
+
+.italic {
+  font-style: italic;
 }
 
 .url {
@@ -79,22 +84,6 @@ a {
       margin: 0px 0px 0px 10px;
       align-self: center;
     
-  }
-}
-
-.page-title {
-  font-size: 20px;
-  padding: 8px 8px 8px 0px;
-  @include tablet-plus {
-    font-size: 30px;
-  }
-}
-
-.page-sub-title {
-  font-size: 14px;
-  padding: 8px 8px 8px 0px;
-  @include tablet-plus {
-    font-size: 14px;
   }
 }
 
@@ -370,10 +359,6 @@ a {
   }
 }
 
-.top-right {
-  text-align: right;
-}
-
 .search-bar {
   &.container {
     border: 2px;
@@ -459,7 +444,6 @@ a {
 }
 
 // TODO: Sassify Slim
-
 .note-slim-outer {
   color: $grey2;
   display: flex;
@@ -474,6 +458,44 @@ a {
 
   a {
     text-decoration: none;
+  }
+}
+
+.slim-inner-container {
+  margin: 4px;
+
+  .pile,
+  .idea {
+    border-radius: 4px;
+    border-style: none;
+    color: $black;
+    font-size: 13px;
+    margin: 4px;
+    padding: 2px;
+    text-decoration: none;
+    font-family: $main_font;
+  }
+
+  .pile {
+    background-color: $white;
+  }
+
+  .pile::before {
+    background-image: url($image_stack_background);
+    background-size: 13px 15px;
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    content: '';
+  }
+
+  .idea::before {
+    background-image: url($image_tags_background);
+    background-size: 13px 13px;
+    display: inline-block;
+    width: 14px;
+    height: 13px;
+    content: '';
   }
 }
 
@@ -666,44 +688,6 @@ a.grid-link {
   }
 }
 
-.slim-inner-container {
-  margin: 4px;
-
-  .pile,
-  .idea {
-    border-radius: 4px;
-    border-style: none;
-    color: $black;
-    font-size: 13px;
-    margin: 4px;
-    padding: 2px;
-    text-decoration: none;
-    font-family: $main_font;
-  }
-
-  .pile {
-    background-color: $white;
-  }
-
-  .pile::before {
-    background-image: url($image_stack_background);
-    background-size: 13px 15px;
-    display: inline-block;
-    width: 13px;
-    height: 13px;
-    content: '';
-  }
-
-  .idea::before {
-    background-image: url($image_tags_background);
-    background-size: 13px 13px;
-    display: inline-block;
-    width: 14px;
-    height: 13px;
-    content: '';
-  }
-}
-
 .result-box {
   padding: 8px;
   margin: 8px;
@@ -754,43 +738,73 @@ a.grid-link {
   }
 }
 
-a {
-  text-decoration: none;
-}
+.top-level {
+  &.container {
+    display: flex;
+    flex-direction: column;
+  }
 
-.work-page {
+  &.pre-title {
+    font-size: 18px;
+    align-self: center;
+    font-family: $sans_font;
+    text-transform: uppercase;
+  }
+
   &.title {
+    font-size: 30px;
+  }
+
+  &.sub-title {
+    font-size: 22px;
+  }
+
+  &.post-button-content {
+    white-space: pre-wrap;
+    display:block;
+    background-color: $white;
+    border-color: $note_border;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 4px;
+    margin: 0px 0px 4px 0px;
+    padding: 6px;
+  }
+
+  &.form-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-family: $sans_font;
+    display: block;
+  }
+
+  &.form-container {
+    padding: 4px;
+  }
+
+  &.input {
     background-color: transparent;
     border-color: $white;
     font-family: $main_font;
-    font-size: 24px;
-    font-style: italic;
-    margin: 0px;
-    padding: 0px;
+    font-size: 20px;
     width: 100%;
-  }
-
-  &.author {
-    font-size: 24px;
-    font-family: $main_font;
-    background-color: transparent;
-    padding: 0px;
-  }
-
-  &.summary,
-  &.importText {
+    background-color: $button_selected;
+    padding: 4px;
     border-radius: 4px;
-    border: none;
-    box-sizing: border-box;
-    display: block;
-    font-family: $main_font;
-    margin: auto;
-    padding: 2px;
-    resize: none;
-    width: 100%;
-    white-space: pre-wrap;
+    border-style: solid;
+    border-color: $white;
+    border-width: 1px;
+
+    &.textarea {
+      box-sizing: border-box;
+      display: block;
+      margin: auto;
+      resize: none;
+      white-space: pre-wrap;
+    }
   }
 
+  // TODO: Clean up
   &.author-select {
     &.search-box {
       display: inline-block;
@@ -845,87 +859,6 @@ a {
       }
     }
   }
-
-  &.year,
-  &.url,
-  &.summary,
-  &.citation-info {
-    background-color: transparent;
-    border-color: $white;
-    border-radius: 4px;
-    border-style: solid;
-    border-width: 1px;
-    font-family: $main_font;
-    font-size: 20px;
-    margin: 0px;
-    padding: 4px;
-    
-    &.summary {
-      font-size: 14px;
-    }
-  }
-
-
-
-  &.input {
-    background-color: $button_selected;
-    padding: 4px;
-    border-radius: 4px;
-    border-style: solid;
-    border-color: $white;
-    border-width: 1px;
-  }
-
-  &.form-container {
-    padding: 4px;
-  }
-
-  &.form-label {
-    font-size: 12px;
-    text-transform: uppercase;
-    font-family: $sans_font;
-    display: block;
-  }
-}
-
-.top-level {
-  &.container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  // Not used yet
-  &.pre-title {
-    font-size: 18px;
-    align-self: center;
-    font-family: $sans_font;
-    text-transform: uppercase;
-  }
-
-  &.title {
-    font-size: 30px;
-  }
-
-  &.sub-title {
-    font-size: 22px;
-  }
-
-  &.post-button-content {
-    white-space: pre-wrap;
-    display:block;
-    background-color: $white;
-    border-color: $note_border;
-    border-style: solid;
-    border-width: 2px;
-    border-radius: 4px;
-    margin: 0px 0px 4px 0px;
-    padding: 6px;
-  }
-
-}
-
-.italic {
-  font-style: italic;
 }
 
 .upload-form {
@@ -971,12 +904,4 @@ a {
 
 .upload-label {
   cursor: pointer;
-}
-
-.left-div {
-  float: left;
-}
-
-.right-div {
-  float: right;
 }

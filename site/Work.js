@@ -260,7 +260,7 @@ function Work(props) {
               onSelect={handleNewPile}
               getSuggestions={db.getSuggestions}
               handleNewSelect={handleCreatePileAndAssign}
-              mainClassName="work-page"
+              mainClassName="top-level"
               onStartPileEdit={() => {
                 setEditPiles(true)
               }}
@@ -286,7 +286,7 @@ function Work(props) {
             {/* TODO: Create Standard Button inline autocomplete with better margin/padding */}
             <Autocomplete
               inputName="work-work-pile"
-              className={'work-page pile-select'}
+              className={'top-level pile-select'}
               dontAutofocus={false}
               defaultValue={''}
               onSelect={handleNewPile}

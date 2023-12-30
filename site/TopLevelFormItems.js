@@ -2,14 +2,13 @@ import React from 'react'
 import Autocomplete from './Autocomplete'
 
 export function TopLevelFormInput(props) {
-  // TODO: These are all italic because of the title
   return (
     <>
-      <label htmlFor={props.id} className="work-page form-label">
+      <label htmlFor={props.id} className="top-level form-label">
         {props.name}
       </label>
       <input
-        className="work-page title input"
+        className="top-level input"
         id={props.id}
         defaultValue={props.defaultValue}
         onChange={props.onChange}
@@ -22,12 +21,12 @@ export function TopLevelFormInput(props) {
 export function TopLevelFormTextArea(props) {
   return (
     <>
-      <label htmlFor={props.id} className="work-page form-label">
+      <label htmlFor={props.id} className="top-level form-label">
         {props.name}
       </label>
       <textarea
         id={props.id}
-        className={'work-page importText input'}
+        className={'top-level textarea input'}
         value={props.value}
         onChange={props.onChange}
       ></textarea>
@@ -38,13 +37,13 @@ export function TopLevelFormTextArea(props) {
 export function TopLevelFormAutocomplete(props) {
   return (
     <>
-      <label htmlFor={props.id} className="work-page form-label">
+      <label htmlFor={props.id} className="top-level form-label">
         {props.name}
       </label>
       {/* TODO: Generalize classname */}
       <Autocomplete
         inputName={props.id}
-        className="work-page author-select"
+        className="top-level author-select"
         dontAutofocus={props.dontAutofocus}
         defaultValue={props.defaultValue}
         onSelect={props.onSelect}
@@ -58,5 +57,5 @@ export function TopLevelFormAutocomplete(props) {
 }
 
 export function TopLevelFormContainer(props) {
-  return <div className="top-level-form">{props.children}</div>
+  return <div>{props.children}</div>
 }
