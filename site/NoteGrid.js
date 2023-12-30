@@ -2,9 +2,16 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import circle from './icons/circle.svg'
 import check_circle from './icons/check_circle.svg'
+import * as db from './Database'
 
 class NoteGrid extends React.Component {
   state = {}
+
+  componentDidMount() {
+    db.getNoteNick(this.props.id).then((response) => {
+      this.setState({ nick: response.data.data.key })
+    })
+  }
 
   markChecked(e) {
     if (e.shiftKey) {
@@ -41,8 +48,18 @@ class NoteGrid extends React.Component {
 
         <div className="grid-link">
           <Link to={'/note/' + this.props.id}>
-            <div className="grid-author">{this.props.author}</div>
-            <div className="grid-title">{this.props.title}</div>
+            <div className="grid-nick">
+              {this.state.nick}
+              <span className="grid-unprintable">|</span>
+            </div>
+            <div className="grid-author">
+              {this.props.author}
+              <span className="grid-unprintable">|</span>
+            </div>
+            <div className="grid-title">
+              {this.props.title}
+              <span className="grid-unprintable">|</span>
+            </div>
             <div className="grid-text">
               {this.props.imageCount > 0
                 ? '[' +

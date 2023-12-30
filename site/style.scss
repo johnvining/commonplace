@@ -483,14 +483,33 @@ a.grid-link {
   text-overflow: ellipsis;
   vertical-align: middle;
   padding: 2px;
+  font-size: 12px;
+}
+
+.grid-nick{
+  width: 8%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  padding: 2px;
+  font-family:'Courier New', Courier, monospace;
+  font-size: 12px;
 }
 
 .grid-title {
   width: 22%;
+  font-size: 12px;
 }
 
 .grid-text {
-  width: 60%;
+  width: 40%;
+  font-size: 12px;
+}
+
+.grid-unprintable {
+  color: $background_color;
 }
 
 .grid-button {
