@@ -11,7 +11,7 @@ class SearchBar extends React.Component {
   }
 
   handleKeyDown(event) {
-    if (event.ctrlKey) {
+    if (event.ctrlKey && event.shiftKey) {
       switch (event.keyCode) {
         case constants.keyCodes.full:
           this.props.setView(constants.view_modes.FULL)

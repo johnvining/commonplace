@@ -51,8 +51,8 @@ export const keyCodes = {
   piles: 80, // p
   enter: 13, //enter
   open: 79, // o
-  full: 50, // 2
-  slim: 51, // 3
-  grid: 52, // 4
+  full: 49, // 1
+  slim: 50, // 2
+  grid: 51, // 3
   ocr: 67, // c (oCr)
 }
