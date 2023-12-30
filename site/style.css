@@ -262,6 +262,12 @@ input .note-full .edit-author, input
     background-color: lightgoldenrodyellow; }
 .note-slim.inner {
   margin: 4px; }
+  .note-slim.inner.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; }
   .note-slim.inner .pile,
   .note-slim.inner .idea {
     border-radius: 4px;

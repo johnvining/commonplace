@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import circle from './icons/circle.svg'
 import check_circle from './icons/check_circle.svg'
 import NoteAuthorSpan from './NoteAuthorSpan'
+import WorkCitationSpan from './WorkCitationSpan'
 
 class NoteSlim extends React.Component {
   state = {}
@@ -43,21 +44,29 @@ class NoteSlim extends React.Component {
             </button>
           )}
         </div>
-        <div className="note-slim text">
+        <div className="note-slim">
           <Link to={'/note/' + this.props.id} className="note-slim">
             <div tabIndex={this.props.tabIndex} className="note-slim">
-              <div className="note-slim inner">
-                <NoteAuthorSpan note={this.props.note} separator=": " />
-
+              <div className="note-slim inner truncate">
+                <WorkCitationSpan
+                  authorName={
+                    this.props.note.author?.name ??
+                    this.props.note.work?.author?.name
+                  }
+                  authorID={null}
+                  workTitle={this.props.note.work?.name}
+                  workID={null}
+                  spaceAfter={false}
+                />
+                {(this.props.note.author?.name ??
+                  this.props.note.work?.author?.name) ||
+                  (this.props.note.work?.name && ': ')}
                 <b>
-                  {this.props.note.title?.length ? (
-                    this.props.note.title
-                  ) : (
-                    <em>no title</em>
-                  )}
+                  {this.props.note.title?.length
+                    ? this.props.note.title + '. '
+                    : 'no title. '}
                 </b>
-              </div>
-              <div className="note-slim inner">
+
                 {this.props.note.images?.length > 0
                   ? '[' +
                     this.props.note.images?.length +
@@ -67,9 +76,6 @@ class NoteSlim extends React.Component {
                   : null}
                 {this.props.note.text?.length ? (
                   <>{this.props.note.text}</>
-                ) : null}
-                {this.props.note.work?.name.length ? (
-                  <em>&nbsp;&nbsp;{this.props.note.work.name}</em>
                 ) : null}
               </div>
 
