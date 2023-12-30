@@ -69,34 +69,40 @@ class Note extends React.Component {
   }
 
   handleKeyDown(event) {
-    if (
-      (this.props.mode == constants.note_modes.EDIT ||
-        this.props.mode == constants.note_modes.EDIT_IDEAS ||
-        this.props.mode == constants.note_modes.EDIT_PILES) &&
-      event.ctrlKey &&
-      event.keyCode == constants.keyCodes.accept
-    ) {
-      this.handleAccept()
-    } else if (this.state.edit && event.keyCode == constants.keyCodes.esc) {
+    let anyEditMode =
+      this.props.mode == constants.note_modes.EDIT ||
+      this.props.mode == constants.note_modes.EDIT_IDEAS ||
+      this.props.mode == constants.note_modes.EDIT_PILES
+
+    if (anyEditMode && event.keyCode == constants.keyCodes.esc) {
       this.props.setNoteMode('', '')
-    } else if (
-      this.props.mode == constants.note_modes.EDIT &&
-      event.ctrlKey &&
-      event.keyCode == constants.keyCodes.format
-    ) {
-      this.formatMainText()
-    } else if (
-      this.props.mode == constants.note_modes.EDIT &&
-      event.ctrlKey &&
-      event.keyCode == constants.keyCodes.suggest
-    ) {
-      this.generateTitleSuggestion()
-    } else if (
-      this.props.mode == constants.note_modes.EDIT &&
-      event.ctrlKey &&
-      event.keyCode == constants.keyCodes.ocr
-    ) {
-      this.runOCROnText()
+      return
+    }
+
+    if (anyEditMode && event.ctrlKey) {
+      switch (event.keyCode) {
+        case constants.keyCodes.accept:
+          this.handleAccept()
+          return
+        default:
+          break
+      }
+    }
+
+    if (this.props.mode == constants.note_modes.EDIT && event.ctrlKey) {
+      switch (event.keyCode) {
+        case constants.keyCodes.format:
+          this.formatMainText()
+          return
+        case constants.keyCodes.suggest:
+          this.generateTitleSuggestion()
+          return
+        case constants.keyCodes.ocr:
+          this.runOCROnText()
+          return
+        default:
+          break
+      }
     }
   }
 
