@@ -117,7 +117,6 @@ class App extends React.Component {
       return <Login onTokenReceived={this.setNewToken.bind(this)} />
     }
 
-    // eslint-disable-next-line no-undef
     let environment = process.env.NODE_ENV
     return (
       <div className="main">
