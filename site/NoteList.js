@@ -156,9 +156,13 @@ class NoteList extends React.Component {
 
           break
         case constants.keyCodes.esc:
-          var divToFocus = document.getElementById(this.state.selectedNote)
+          if (this.state.selectedNote) {
+            var divToFocus = document.getElementById(this.state.selectedNote)
+            divToFocus.focus()
+          }
+
           this.setNoteMode('', constants.note_modes.NO_SELECTION)
-          divToFocus.focus()
+          this.setState({ selected: [] })
           break
       }
     }
