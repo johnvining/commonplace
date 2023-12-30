@@ -84,16 +84,20 @@ class Note extends React.Component {
       event.ctrlKey &&
       event.keyCode == constants.keyCodes.format
     ) {
-      // Ctrl F to format text
       this.formatMainText()
     } else if (
       this.props.mode == constants.note_modes.EDIT &&
       event.ctrlKey &&
-      event.keyCode == constants.keyCodes.save
+      event.keyCode == constants.keyCodes.suggest
     ) {
-      // Ctrl S for suggestion
       this.generateTitleSuggestion()
-    } // TODO: Add suggestion keyboard shortcut in autocmplete
+    } else if (
+      this.props.mode == constants.note_modes.EDIT &&
+      event.ctrlKey &&
+      event.keyCode == constants.keyCodes.ocr
+    ) {
+      this.runOCROnText()
+    }
   }
 
   formatMainText() {
@@ -244,6 +248,22 @@ class Note extends React.Component {
         pendingTitle: response.data.suggested_title,
         fetchingTitleSuggestion: false,
       })
+    })
+  }
+
+  async runOCROnText() {
+    this.setState({ fetchingOcr: true })
+    db.getNoteTextOCR(this.props.id).then((response) => {
+      const newText = response.data.data
+      this.setState({
+        pendingText: newText,
+        fetchingOcr: false,
+      })
+      let input = document.querySelector('#text')
+
+      var event = new Event('input', { bubbles: true })
+      input.dispatchEvent(event)
+      this.handleTextChange
     })
   }
 
@@ -450,22 +470,18 @@ class Note extends React.Component {
                 <span
                   className="note-full clickable-label-button"
                   onClick={() => {
-                    this.setState({ fetchingOcr: true })
-                    db.getNoteTextOCR(this.props.id).then((response) => {
-                      const newText = response.data.data
-                      this.setState({
-                        pendingText: newText,
-                        fetchingOcr: false,
-                      })
-                      let input = document.querySelector('#text')
-
-                      var event = new Event('input', { bubbles: true })
-                      input.dispatchEvent(event)
-                      this.handleTextChange
-                    })
+                    this.runOCROnText()
                   }}
                 >
                   {this.state.fetchingOcr ? 'Fetching' : 'OCR'}
+                </span>
+                <span
+                  className="note-full clickable-label-button"
+                  onClick={() => {
+                    this.formatMainText()
+                  }}
+                >
+                  Format
                 </span>
               </label>
 
@@ -592,8 +608,6 @@ class Note extends React.Component {
               </div>
             </>
           ) : null}
-
-          {/* Piles and Ideas*/}
           {note.piles?.length > 0 || note.ideas?.length > 0 ? (
             <div className={'note-full container width-100'}>
               <PileListForItem

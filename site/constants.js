@@ -44,7 +44,7 @@ export const keyCodes = {
   new: 78, // n
   esc: 27, // escape
   format: 70, // f
-  save: 83, // s
+  suggest: 83, // s
   accept: 65, // a
   edit: 69, // e
   ideas: 84, // t (tags)
@@ -54,4 +54,5 @@ export const keyCodes = {
   full: 50, // 2
   slim: 51, // 3
   grid: 52, // 4
+  ocr: 67, // c (oCr)
 }
