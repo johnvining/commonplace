@@ -585,8 +585,8 @@ class Note extends React.Component {
                   spaceAfter={false}
                 />
                 <YearUrlComboSpan
-                  year={this.state.pendingYear}
-                  url={this.state.pendingUrl}
+                  year={this.state.pendingYear ?? this.props.note.work?.year}
+                  url={this.state.pendingUrl ?? this.props.note.work?.url}
                 />
 
                 {/* Page */}
