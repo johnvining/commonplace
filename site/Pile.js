@@ -43,6 +43,33 @@ function Pile(props) {
   }
 
   useEffect(() => {
+    const onKeyDown = async (event) => {
+      if (event.keyCode == constants.keyCodes.esc) {
+        setEdit(false)
+        return
+      }
+
+      if (!event.ctrlKey) {
+        return
+      }
+
+      switch (event.keyCode) {
+        case constants.keyCodes.accept:
+          edit && handleAcceptUpdates()
+          return
+        case constants.keyCodes.edit:
+          setEdit(true)
+          return
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  })
+
+  useEffect(() => {
     fetchPileInfo(id)
   }, [id])
 

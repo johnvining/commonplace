@@ -70,7 +70,6 @@ function Work(props) {
 
   useEffect(() => {
     const onKeyDown = async (event) => {
-      console.log(event)
       if (event.keyCode == constants.keyCodes.esc) {
         // TODO: This crashes because of a failure in NoteList
         handleFinishEditing()

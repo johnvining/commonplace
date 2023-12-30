@@ -47,7 +47,6 @@ function Idea(props) {
 
   useEffect(() => {
     const onKeyDown = async (event) => {
-      console.log(event)
       if (event.keyCode == constants.keyCodes.esc) {
         setEdit(false)
         return

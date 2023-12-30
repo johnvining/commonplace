@@ -149,7 +149,6 @@ function SearchBar(props) {
 
   const getSuggestions = (type, val) => {
     var dbType = modifierToDbTypes(modifier)
-    console.log(dbType)
     if (dbType) {
       return db.getSuggestions(dbType, val)
     }
