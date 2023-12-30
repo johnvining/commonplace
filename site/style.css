@@ -251,6 +251,42 @@ input .note-full .edit-author, input
 .right-div {
   float: right; }
 
+.note-slim.outer {
+  color: #efefef;
+  display: flex;
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  background-color: transparent; }
+  .note-slim.outer.selected {
+    background-color: lightgoldenrodyellow; }
+.note-slim.inner {
+  margin: 4px; }
+  .note-slim.inner .pile,
+  .note-slim.inner .idea {
+    border-radius: 4px;
+    border-style: none;
+    color: black;
+    font-size: 13px;
+    margin: 4px;
+    padding: 2px;
+    text-decoration: none;
+    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
+  .note-slim.inner .pile::before {
+    background-image: url("/icons/stack.svg");
+    background-size: 13px 15px;
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    content: ''; }
+  .note-slim.inner .idea::before {
+    background-image: url("/icons/tags.svg");
+    background-size: 13px 13px;
+    display: inline-block;
+    width: 14px;
+    height: 13px;
+    content: ''; }
+
 html {
   box-sizing: border-box; }
 
@@ -566,47 +602,6 @@ div .top-bar {
     display: inline-block;
     width: 22px;
     height: 22px;
-    content: ''; }
-
-.note-slim-outer {
-  color: #efefef;
-  display: flex;
-  padding: 8px;
-  margin: 8px;
-  border-radius: 4px;
-  background-color: transparent; }
-  .note-slim-outer.selected {
-    background-color: lightgoldenrodyellow; }
-  .note-slim-outer a {
-    text-decoration: none; }
-
-.slim-inner-container {
-  margin: 4px; }
-  .slim-inner-container .pile,
-  .slim-inner-container .idea {
-    border-radius: 4px;
-    border-style: none;
-    color: black;
-    font-size: 13px;
-    margin: 4px;
-    padding: 2px;
-    text-decoration: none;
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif; }
-  .slim-inner-container .pile {
-    background-color: white; }
-  .slim-inner-container .pile::before {
-    background-image: url("/icons/stack.svg");
-    background-size: 13px 15px;
-    display: inline-block;
-    width: 13px;
-    height: 13px;
-    content: ''; }
-  .slim-inner-container .idea::before {
-    background-image: url("/icons/tags.svg");
-    background-size: 13px 13px;
-    display: inline-block;
-    width: 14px;
-    height: 13px;
     content: ''; }
 
 .grid {

@@ -23,7 +23,7 @@ class NoteSlim extends React.Component {
     return (
       <div
         className={
-          this.props.selected ? 'note-slim-outer selected' : 'note-slim-outer'
+          this.props.selected ? 'note-slim outer selected' : 'note-slim outer'
         }
       >
         <div className="note-slim button">
@@ -46,7 +46,7 @@ class NoteSlim extends React.Component {
         <div className="note-slim text">
           <Link to={'/note/' + this.props.id} className="note-slim">
             <div tabIndex={this.props.tabIndex} className="note-slim">
-              <div className="slim-inner-container">
+              <div className="note-slim inner">
                 <NoteAuthorSpan note={this.props.note} separator=": " />
 
                 <b>
@@ -57,7 +57,7 @@ class NoteSlim extends React.Component {
                   )}
                 </b>
               </div>
-              <div className="slim-inner-container">
+              <div className="note-slim inner">
                 {this.props.note.images?.length > 0
                   ? '[' +
                     this.props.note.images?.length +
@@ -73,7 +73,7 @@ class NoteSlim extends React.Component {
                 ) : null}
               </div>
 
-              <div className="slim-inner-container">
+              <div className="note-slim inner">
                 {this.props.note.piles?.map((pile, idx) => (
                   <span className="pile" key={'pile-' + this.props.id + idx}>
                     {pile.name}
