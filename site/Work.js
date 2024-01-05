@@ -274,7 +274,7 @@ function Work(props) {
           </TopLevelTitle>
           <div>
             <PileListForItem
-              remove={edit}
+              remove={editPiles}
               edit={false}
               piles={piles}
               onSelect={handleNewPile}
@@ -284,7 +284,7 @@ function Work(props) {
               onStartPileEdit={() => {
                 setEditPiles(true)
               }}
-              allowAdd={true}
+              allowAdd={false}
               allowTabbing={true}
               onPileRemove={handlePileRemove}
             />
