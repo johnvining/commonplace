@@ -751,7 +751,7 @@ div .image-row {
   vertical-align: center;
   display: flex; }
   .image-row.image-frame.selected {
-    background-color: white; }
+    background-color: #e8f4f8; }
   .image-row.image-frame:hover {
     background-color: lightgoldenrodyellow;
     cursor: pointer; }

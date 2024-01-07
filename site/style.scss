@@ -603,7 +603,7 @@ a.grid-link {
     display: flex;
 
     &.selected {
-      background-color: $white;
+      background-color: $highlight_blue;
     }
 
     &:hover {

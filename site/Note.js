@@ -498,7 +498,7 @@ class Note extends React.Component {
                     <img
                       key={this.props.id + index + 'img'}
                       src={this.props.note.imageUrls[index]}
-                      className="image-row"
+                      className={'image-row'}
                       id={index}
                     />
                   ) : null}
