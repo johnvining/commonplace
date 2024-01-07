@@ -19,7 +19,7 @@
   .note-full.outer.not-selected {
     background-color: #f4f4f4; }
   .note-full.outer.show-full-image {
-    height: 90%; }
+    min-height: 90%; }
 .note-full .half-width,
 .note-full .full-width {
   display: flex;
@@ -31,11 +31,11 @@
   .note-full .half-width.half-width,
   .note-full .full-width.half-width {
     width: 50%;
-    height: 100%;
     align-content: start; }
     .note-full .half-width.half-width.image-div,
     .note-full .full-width.half-width.image-div {
-      align-content: center; }
+      align-content: center;
+      min-height: 100%; }
   .note-full .half-width.full-width,
   .note-full .full-width.full-width {
     width: 100%; }

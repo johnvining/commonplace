@@ -30,7 +30,7 @@
     }
 
     &.show-full-image {
-      height: 90%;
+      min-height: 90%;
     }
   }
 
@@ -45,11 +45,12 @@
 
     &.half-width {
       width: 50%;
-      height: 100%;
       align-content: start;
 
       &.image-div {
         align-content: center;
+        min-height: 100%;
+
       }
     }
 
