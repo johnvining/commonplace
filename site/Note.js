@@ -69,6 +69,7 @@ class Note extends React.Component {
   }
 
   handleKeyDown(event) {
+    let selected = this.props.mode == constants.note_modes.SELECTED
     let anyEditMode =
       this.props.mode == constants.note_modes.EDIT ||
       this.props.mode == constants.note_modes.EDIT_IDEAS ||
@@ -79,11 +80,8 @@ class Note extends React.Component {
       return
     }
 
-    if (anyEditMode && event.ctrlKey) {
+    if ((anyEditMode || selected) && event.ctrlKey) {
       switch (event.keyCode) {
-        case constants.keyCodes.accept:
-          this.handleAccept()
-          return
         case constants.keyCodes.image:
           this.toggleFocusImage()
           return
@@ -92,6 +90,14 @@ class Note extends React.Component {
           return
         case constants.keyCodes.nextImage:
           this.moveFocusedImage(1)
+          return
+      }
+    }
+
+    if (anyEditMode && event.ctrlKey) {
+      switch (event.keyCode) {
+        case constants.keyCodes.accept:
+          this.handleAccept()
           return
         default:
           break
