@@ -728,8 +728,8 @@ div .image-row {
   display: flex;
   flex-wrap: wrap; }
 .image-row.image-frame {
-  height: 180px;
-  width: 130px;
+  height: 120px;
+  width: 80px;
   background-color: #f7fcf7;
   padding: 4px;
   margin: 4px;
@@ -744,8 +744,8 @@ div .image-row {
   .image-row.image-frame.remove:hover {
     background-color: lightcoral; }
 .image-row img {
-  max-height: 170px;
-  max-width: 120px;
+  max-height: 110px;
+  max-width: 70px;
   margin: auto;
   display: block; }
 
