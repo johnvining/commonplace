@@ -46,6 +46,11 @@
     &.half-width {
       width: 50%;
       height: 100%;
+      align-content: start;
+
+      &.image-div {
+        align-content: center;
+      }
     }
 
     &.full-width {

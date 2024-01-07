@@ -398,7 +398,7 @@ class Note extends React.Component {
       >
         {this.state.largeImage >= 0 ? (
           <div
-            className="half-width"
+            className="half-width image-div"
             onClick={() => {
               this.setState({ largeImage: -1 })
             }}
