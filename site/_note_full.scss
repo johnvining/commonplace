@@ -28,6 +28,10 @@
     &.not-selected {
       background-color: $note_background_not_selected;
     }
+
+    &.show-full-image {
+      height: 90%;
+    }
   }
 
   .half-width,
@@ -41,6 +45,7 @@
 
     &.half-width {
       width: 50%;
+      height: 100%;
     }
 
     &.full-width {

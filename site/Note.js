@@ -387,7 +387,11 @@ class Note extends React.Component {
 
     return (
       <div
-        className={class_name + 'outer'}
+        className={
+          class_name +
+          'outer' +
+          (this.state.largeImage >= 0 ? ' show-full-image' : '')
+        }
         key={this.props.id}
         id={this.props.id}
         tabIndex={no_selection ? this.props.tabIndex : '-1'}

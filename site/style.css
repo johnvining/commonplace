@@ -18,6 +18,8 @@
     border-color: #e8f4f8; }
   .note-full.outer.not-selected {
     background-color: #f4f4f4; }
+  .note-full.outer.show-full-image {
+    height: 90%; }
 .note-full .half-width,
 .note-full .full-width {
   display: flex;
@@ -28,7 +30,8 @@
   vertical-align: top; }
   .note-full .half-width.half-width,
   .note-full .full-width.half-width {
-    width: 50%; }
+    width: 50%;
+    height: 100%; }
   .note-full .half-width.full-width,
   .note-full .full-width.full-width {
     width: 100%; }
@@ -750,8 +753,9 @@ div .image-row {
   display: block; }
 
 .large-image {
-  max-width: 97%;
-  margin: auto; }
+  max-width: 98%;
+  margin: auto;
+  max-height: 98%; }
 
 .work-list a {
   text-decoration: none; }
