@@ -506,7 +506,14 @@ class Note extends React.Component {
             </div>
           ) : this.state.pendingText ? (
             <div name="text" className="width-100">
-              <div className={'note-full note-text'}>
+              <div
+                className={
+                  'note-full note-text' +
+                  (this.state.largeImage >= 0 && (edit_ideas || edit_piles)
+                    ? ' abbreviate'
+                    : '')
+                }
+              >
                 {this.state.pendingText}
               </div>
             </div>

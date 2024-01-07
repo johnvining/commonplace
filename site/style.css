@@ -123,6 +123,13 @@
     background-color: #e8f4f8;
     outline: none;
     border-radius: 2px; }
+  .note-full .note-text.abbreviate,
+  .note-full .note-take.abbreviate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; }
 .note-full .title,
 .note-full .url {
   width: 100%;
