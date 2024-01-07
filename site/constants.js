@@ -56,4 +56,6 @@ export const keyCodes = {
   grid: 51, // 3
   ocr: 67, // c (oCr)
   image: 73, // i
+  nextImage: 75, //k
+  prevImage: 74, //j
 }

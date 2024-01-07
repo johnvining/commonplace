@@ -87,6 +87,12 @@ class Note extends React.Component {
         case constants.keyCodes.image:
           this.toggleFocusImage()
           return
+        case constants.keyCodes.prevImage:
+          this.moveFocusedImage(-1)
+          return
+        case constants.keyCodes.nextImage:
+          this.moveFocusedImage(1)
+          return
         default:
           break
       }
@@ -310,12 +316,27 @@ class Note extends React.Component {
   }
 
   toggleFocusImage() {
-    console.log('toggle focus')
     if (this.state.largeImage >= 0) {
       this.setState({ largeImage: -1 })
     } else if (this.props.note.imageUrls?.length > 0) {
       this.setState({ largeImage: 0 })
     }
+  }
+
+  moveFocusedImage(val) {
+    if (this.state.largeImage < 0 || this.props.note.imageUrls?.length <= 0) {
+      return
+    }
+
+    let max = this.props.note.imageUrls?.length + 1
+    let current = this.state.largeImage
+    let newVal = current + val
+
+    if (newVal < 0 || newVal > max) {
+      return
+    }
+
+    this.setState({ largeImage: newVal })
   }
 
   handleNewPile = (pileId) => {
