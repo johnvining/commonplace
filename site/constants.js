@@ -55,4 +55,5 @@ export const keyCodes = {
   slim: 50, // 2
   grid: 51, // 3
   ocr: 67, // c (oCr)
+  image: 73, // i
 }

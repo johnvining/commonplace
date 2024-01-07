@@ -84,6 +84,9 @@ class Note extends React.Component {
         case constants.keyCodes.accept:
           this.handleAccept()
           return
+        case constants.keyCodes.image:
+          this.toggleFocusImage()
+          return
         default:
           break
       }
@@ -303,6 +306,15 @@ class Note extends React.Component {
       this.setState({
         largeImage: click.target.id,
       })
+    }
+  }
+
+  toggleFocusImage() {
+    console.log('toggle focus')
+    if (this.state.largeImage >= 0) {
+      this.setState({ largeImage: -1 })
+    } else if (this.props.note.imageUrls?.length > 0) {
+      this.setState({ largeImage: 0 })
     }
   }
 
