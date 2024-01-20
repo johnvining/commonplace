@@ -11,6 +11,13 @@ export const reqRegisterUser = async (req, res) => {
     })
   }
 
+  let existingUser = await User.findOne({ username: username }).exec()
+  if (existingUser != null) {
+    res.status(401).json({
+      message: 'User already exists',
+    })
+    return
+  }
   try {
     bcrypt.hash(password, 10).then(async (hash) => {
       await User.create({
