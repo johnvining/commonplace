@@ -88,7 +88,7 @@ export const reqAuthorizeUser = async (req, res) => {
 }
 
 export const reqAuthenticate = async (req, res, next) => {
-  const token = req.headers.authorization
+  const token = req.headers.authorization.replace('Bearer ', '')
   if (token) {
     jwt.verify(token, config.secrets.jwt, (err, decodedToken) => {
       if (err) {
