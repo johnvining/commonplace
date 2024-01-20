@@ -13,11 +13,11 @@ export const reqRegisterUser = async (req, res) => {
 
   let existingUser = await User.findOne({ username: username }).exec()
   if (existingUser != null) {
-    res.status(401).json({
+    return res.status(401).json({
       message: 'User already exists',
     })
-    return
   }
+
   try {
     bcrypt.hash(password, 10).then(async (hash) => {
       await User.create({
@@ -112,4 +112,38 @@ export const reqAuthenticate = async (req, res, next) => {
       .status(401)
       .json({ message: 'Not authorized, token not available' })
   }
+}
+
+export const reqChangePassword = async (req, res) => {
+  const { username, oldPassword, newPassword } = req.body
+  let existingUser = await User.findOne({ username: username }).exec()
+  if (
+    !username ||
+    !oldPassword ||
+    !newPassword ||
+    existingUser == null ||
+    username != 'commonplace'
+  ) {
+    return res.status(400).json({
+      message: 'Incorrect parameters',
+    })
+  }
+
+  let oldPasswordIsRight = await bcrypt.compare(
+    oldPassword,
+    existingUser.password
+  )
+  if (!oldPasswordIsRight) {
+    return res.status(400).json({ message: 'Error' })
+  }
+
+  let newPasswordHash = await bcrypt.hash(newPassword, 10)
+  await User.findOneAndUpdate(
+    { _id: existingUser._id },
+    { password: newPasswordHash }
+  )
+
+  return res.status(201).json({
+    message: 'User successfully updated',
+  })
 }
