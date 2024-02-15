@@ -99,12 +99,7 @@ a {
     height: 42px;
     margin: 4px 0px 4px 0px;
     padding: 6px;
-
-    img {
-      -webkit-filter: invert(100%);
-      filter: invert(100%);
-    }
-
+    @include button-invert-icon();
 
   +.standard-button {
     margin-left: 4px;
@@ -139,10 +134,7 @@ a {
 
   &.button-selected {
     background-color: $button_selected;
-    img {
-      -webkit-filter: invert(0%);
-      filter: invert(0%);
-    }
+    @include button-uninvert-icon();
   }
 
   &:focus {
@@ -152,10 +144,6 @@ a {
 
   &:hover {
     @include button-hover($button_background_hover);
-    img {
-      -webkit-filter: invert(0%);
-      filter: invert(0%);
-    }
   }
 
   &.hidden {

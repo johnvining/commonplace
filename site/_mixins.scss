@@ -1,8 +1,23 @@
+@mixin button-invert-icon() {
+  img {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
+
+@mixin button-uninvert-icon() {
+  img {
+    -webkit-filter: invert(0%);
+    filter: invert(0%);
+  }
+}
+
 @mixin button-hover($background_color) {
   background-color: $background_color;
   cursor: pointer;
   outline: none; // TODO: Fix -- accessibility
   border-color: white;
+  @include button-uninvert-icon()
 }
 
 @mixin note-edit-focus() {
