@@ -3,6 +3,7 @@
   --note_background: white;
   --font-color: black;
   --link-color: black;
+  --button-background: #efefef;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -10,6 +11,7 @@
     --note-background: black;
     --font-color: white;
     --link-color: white;
+    --button-background: black;
   }
 }
 
@@ -470,7 +472,7 @@ div .top-bar {
 }
 
 .standard-button {
-  background-color: #efefef;
+  background-color: var(--button-background);
   border-color: white;
   border-radius: 4px;
   border-style: solid;
@@ -479,6 +481,10 @@ div .top-bar {
   height: 42px;
   margin: 4px 0px 4px 0px;
   padding: 6px;
+}
+.standard-button img {
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
 }
 .standard-button + .standard-button {
   margin-left: 4px;
@@ -508,6 +514,10 @@ div .top-bar {
 .standard-button.button-selected {
   background-color: #c1e1ec;
 }
+.standard-button.button-selected img {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
 .standard-button:focus {
   border-color: #c1e1ec;
   outline: none;
@@ -517,6 +527,10 @@ div .top-bar {
   cursor: pointer;
   outline: none;
   border-color: white;
+}
+.standard-button:hover img {
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
 }
 .standard-button.hidden {
   display: none;

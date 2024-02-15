@@ -50,11 +50,13 @@ $button_shadow_color: $grey5;
     --note_background: white;
     --font-color: black;
     --link-color: black;
+    --button-background: #{$grey2};
   
      @media (prefers-color-scheme: dark) {
       --background-color: black;
       --note-background: black;
       --font-color: white;
       --link-color: white;
+      --button-background: black;
     }
   }
