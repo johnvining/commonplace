@@ -3,9 +3,6 @@ $monospace: 'Courier New', Courier, monospace;
 $main_font: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
 $sans_font: 'Avenir', 'Candara', 'Arial', sans-serif;
 
-// $standard_button_border: 2px;
-// $standard_button_border-radius: 4px;
-
 // Images
 $image_add_background: '/icons/plus.svg';
 $image_remove_background: '/icons/cross.svg';
@@ -52,3 +49,11 @@ $button_background: $grey2;
 $button_background_hover: $highlight_blue;
 $button_selected: $highlight_blue_dark;
 $button_shadow_color: $grey5;
+
+:root {
+    --background-color: #{$background_color};
+  
+     @media (prefers-color-scheme: dark) {
+      --background-color: black;
+    }
+  }

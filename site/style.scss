@@ -14,13 +14,13 @@ html {
 }
 
 .main {
-  max-width: 68em;
+  max-width: 68em; 
   padding: 0px;
   margin: auto;
 }
 
 body {
-  background: $background_color;
+  background: var(--background-color);
   font-family: $main_font;
   margin-left: 8px;
   margin-right: 8px;
