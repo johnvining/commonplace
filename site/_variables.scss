@@ -52,8 +52,12 @@ $button_shadow_color: $grey5;
 
 :root {
     --background-color: #{$background_color};
+    --no-e_background: #{$note_background};
+    --font-color: black;
   
      @media (prefers-color-scheme: dark) {
       --background-color: black;
+      --note-background: black;
+      --font-color: white;
     }
   }

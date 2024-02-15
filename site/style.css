@@ -1,14 +1,18 @@
 :root {
   --background-color: #F7FCF7;
+  --no-e_background: white;
+  --font-color: black;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: black;
+    --note-background: black;
+    --font-color: white;
   }
 }
 
 .note-full.outer {
-  background-color: white;
+  background-color: var(--note-background);
   border-color: #efefef;
   border-style: solid;
   border-width: 2px;
@@ -393,6 +397,7 @@ html {
   max-width: 68em;
   padding: 0px;
   margin: auto;
+  color: var(--font-color);
 }
 
 body {
