@@ -430,7 +430,7 @@ div .top-bar {
   height: 60px;
   position: sticky;
   top: 0;
-  background: #F7FCF7;
+  background: var(--background-color);
   z-index: 1;
 }
 .top-bar .title-bar {

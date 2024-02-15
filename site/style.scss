@@ -49,7 +49,7 @@ a {
     height: 60px;
     position: sticky;
     top: 0;
-    background: $background_color;
+    background: var(--background-color);
     z-index: 1;
   }
 
