@@ -29,7 +29,7 @@ body {
 }
 
 a {
-  color: $link_color;
+  color: var(--link-color);
   text-decoration: none;
 }
 

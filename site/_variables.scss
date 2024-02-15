@@ -19,6 +19,8 @@ $highlight_blue: lighten($theme_blue, 15%);
 $highlight_blue_dark: lighten($theme_blue, 5%);
 $grey1: #f4f4f4;
 $grey2: #efefef;
+// $grey3: #d3d3d3;
+// $grey4: #dadada;
 $grey5: darkgray;
 $black: black;
 $white: white;
@@ -29,11 +31,11 @@ $semantic_pile: $theme_purple;
 $semantic_selection: $theme_yellow;
 $semantic_removal: $theme_coral;
 
-// To move to dynamic variables
+// To move to CSS colors
 $background_color: $theme_mint;
-$link_color: black;
 $note_background_edit: $white;
 $note_background_not_selected: $grey1;
+$note_background: $white;
 $note_border_edit: $highlight_blue;
 $note_border_focused: $grey5;
 $note_border_selected: $black;
@@ -47,12 +49,14 @@ $button_shadow_color: $grey5;
 
 :root {
     --background-color: #{$background_color};
-    --note_background: #{$note_background};
+    --note_background: white;
     --font-color: black;
+    --link-color: black;
   
      @media (prefers-color-scheme: dark) {
       --background-color: black;
       --note-background: black;
       --font-color: white;
+      --link-color: white;
     }
   }
