@@ -27,12 +27,12 @@ $white: white;
 :root {
   // Background Colors
   --background-color: #{$theme_mint};
-  --semantic-idea: #{lighten($theme_blue, 5%)};
+  --semantic-idea: #{lighten($theme_blue, 15%)};
   --semantic-pile: #{$theme_purple};
   --semantic-selection: #{$theme_yellow};
   --semantic-removal: #{$theme_coral};
-  --input-background-focus: #{lighten($theme_blue, 0%)};
-  --input-background: #{lighten($theme_blue, 10%)};
+  --input-background-focus: #{lighten($theme_blue, 15%)};
+  --input-background: #{$grey2};
 
   --note-background-edit: #{$white};
   --note-background-not-selected: #{$grey1};

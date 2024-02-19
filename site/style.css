@@ -1,11 +1,11 @@
 :root {
   --background-color: #F7FCF7;
-  --semantic-idea: #c1e1ec;
+  --semantic-idea: #e8f4f8;
   --semantic-pile: #f3e8f8;
   --semantic-selection: lightgoldenrodyellow;
   --semantic-removal: lightcoral;
-  --input-background-focus: lightblue;
-  --input-background: #d4ebf2;
+  --input-background-focus: #e8f4f8;
+  --input-background: #efefef;
   --note-background-edit: white;
   --note-background-not-selected: #f4f4f4;
   --note-background: white;
