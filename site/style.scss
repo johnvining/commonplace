@@ -399,12 +399,12 @@ a {
   &.search-box {
     background: transparent;
     border-style: none;
-    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+    color: $font_color;
+    font-family: $main_font;
     font-size: 28px;
     margin: 4px auto;
     padding: 6px;
     width: 100%;
-    color: $font_color;
 
     &:focus {
       outline: none; // TODO: Fix a11y
@@ -423,10 +423,11 @@ a {
 
   &.option {
     background-color: $button_background;
-    border-color: $white;
+    border-color: $low_intensity_border;
     border-radius: 4px;
     border-style: solid;
     border-width: 2px;
+    color: $font_color;
     font-family: $main_font;
     font-size: 28px;
     margin: 4px;
@@ -435,6 +436,7 @@ a {
 
     &:focus {
       background-color: $button-background-hover;
+      color: $inverse_font_color;
       border-color: $black;
       outline: none;
     }
