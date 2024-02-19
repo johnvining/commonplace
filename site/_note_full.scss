@@ -75,6 +75,7 @@
     font-family: $main_font;
     border-style: none;
     display: inline-block;
+    color:$font_color;
 
     &:focus {
       background-color: $note_input_background_focus;
@@ -147,6 +148,7 @@
     white-space: pre-wrap;
     width: 100%;
     overflow-x:hidden;
+    color:$font_color;
 
     &.note-take {
       color: black;
@@ -158,6 +160,7 @@
 
     &.edit {
       background-color: $note_input_background;
+      color:$font_color;
     }
 
     &:focus {
@@ -180,6 +183,7 @@
     width: 100%;
     text-align: left;
     border-radius: 4px;
+    color:$font_color;
 
     &.edit {
       background-color: $note_input_background;
@@ -227,8 +231,8 @@
       font-size: 18px;
       padding: 4px 4px 4px 8px;
       margin: 0px;
-
       text-decoration: none;
+      color:$font_color;
 
       &:focus {
         background-color: $note_input_background_focus;
@@ -326,17 +330,22 @@
   text-decoration: none;
   border-radius: 4px;
   background-color: transparent;
-
   height:40px;
   width: 50px;
 
+  @media (prefers-color-scheme: dark) {
+    @include button-invert-icon();
+  }
+
   &:hover {
     background-color: $theme_mint;
+    @include button-uninvert-icon();
   }
 
   &:focus {
     box-shadow: 0px 0px 4px 4px $button_shadow_color;
     outline: none;
+    @include button-uninvert-icon();
   }
 }
 

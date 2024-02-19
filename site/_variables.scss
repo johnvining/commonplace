@@ -59,16 +59,16 @@ $semantic_removal: $theme_coral;
       --button-background: #{$black};
       --font-color: #{$white};
       --link-color: #{$white};
-      --note-background-edit: #{$white};
+      --note-background-edit: #{color.scale($highlight_blue, $lightness: -93%)};
       --note-background-not-selected: #{$grey1};
-      --note-background: #{$white};
-      --note-border-edit: #{$highlight_blue};
+      --note-background: #{color.scale($theme_mint, $lightness: -97%)};
+      --note-border-edit: #{color.scale($highlight_blue, $lightness: -90%)};
       --note-border-focused: #{$grey5};
-      --note-border-selected: #{$black};
-      --note-border: #{$grey2};
-      --note-input-background-focus: #{$highlight_blue};
+      --note-border-selected: #{$white};
+      --note-border: #{color.scale($theme_mint, $lightness: -90%)};
+      --note-input-background-focus: #{color.scale($highlight_blue, $lightness: -90%)};
       --note-background: #{$black};
-      --note-input-background: #{$grey5};
+      --note-input-background: #{color.scale($theme_mint, $lightness: -95%)};
     }
   }
 
