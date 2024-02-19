@@ -1,6 +1,6 @@
 .note-full {
   &.outer {
-    background-color: var(--note-background);
+    background-color: $note_background;
     border-color: $note_border;
     border-style: solid;
     border-width: 2px;
