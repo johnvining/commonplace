@@ -11,6 +11,7 @@
   --note-input-background: #($grey1);
   --font-color: black;
   --link-color: black;
+  --font-color-ignores-theme: black;
   --inverse-background-color: #071207;
   --inverse-font-color: white;
   --low-intensity-border: white;
@@ -19,7 +20,6 @@
   --note-border-selected: black;
   --note-border: #efefef;
   --button-background-hover: #e8f4f8;
-  --button-background: #efefef;
   --button-background: #efefef;
   --button-selected: #c1e1ec;
   --button-shadow-color: darkgray;
@@ -38,6 +38,7 @@
     --note-input-background: #071207;
     --link-color: white;
     --font-color: white;
+    --font-color-ignores-theme: black;
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
     --low-intensity-border: #040b04;
@@ -47,7 +48,6 @@
     --note-border: #0e240e;
     --button-background-hover: #e8f4f8;
     --button-background: black;
-    --button-background: #efefef;
     --button-selected: #c1e1ec;
     --button-shadow-color: darkgray;
   }
@@ -530,11 +530,11 @@ div .top-bar {
 
 .standard-button {
   background-color: var(--button-background);
-  color: var(--font-color);
-  border-color: white;
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
   border-width: 2px;
+  color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   height: 42px;
   margin: 4px 0px 4px 0px;
@@ -584,7 +584,7 @@ div .top-bar {
 }
 .standard-button:hover {
   background-color: var(--button-background-hover);
-  color: black;
+  color: var(--font-color-ignores-theme);
   cursor: pointer;
   outline: none;
   border-color: white;
@@ -714,7 +714,7 @@ div .top-bar {
 
 .pile-select.search-box {
   background-color: var(--note-background-edit);
-  border-color: white;
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
   color: black;
@@ -725,7 +725,8 @@ div .top-bar {
   text-decoration: none;
 }
 .pile-select.button {
-  border-color: white;
+  background-color: var(--button-background);
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
   color: black;
@@ -734,7 +735,6 @@ div .top-bar {
   margin: 0px;
   padding: 4px;
   text-decoration: none;
-  background-color: #efefef;
 }
 .pile-select.button:hover {
   cursor: pointer;
@@ -837,7 +837,7 @@ div .top-bar {
 }
 .search-bar.option:focus {
   background-color: var(--button-background-hover);
-  color: var(--inverse-font-color);
+  color: var(--font-color-ignores-theme);
   border-color: black;
   outline: none;
 }
@@ -1141,16 +1141,16 @@ div .image-row {
   white-space: pre-wrap;
 }
 .top-level.author-select.search-box {
-  display: inline-block;
-  border: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 20px;
   background-color: var(--button-selected);
-  padding: 4px;
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-color: white;
   border-width: 1px;
+  border: none;
+  display: inline-block;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 20px;
+  padding: 4px;
 }
 .top-level.author-select.autocomplete-div {
   display: inline-block;
@@ -1196,21 +1196,19 @@ div .image-row {
 }
 
 .file-drop {
-  display: inline-block;
+  align-items: center;
   background-color: var(--button-background);
-  border-color: white;
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
   border-width: 2px;
+  display: inline-flex;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  height: 42px;
   font-size: 14px;
   height: 42px;
+  margin-left: 4px;
   margin: 4px 0px 4px 0px;
   padding: 6px;
-  display: inline-flex;
-  align-items: center;
-  margin-left: 4px;
 }
 .file-drop.no-margin-no-border {
   margin: 0px;
@@ -1218,7 +1216,7 @@ div .image-row {
 }
 .file-drop:hover {
   background-color: var(--button-background-hover);
-  color: black;
+  color: var(--font-color-ignores-theme);
   cursor: pointer;
   outline: none;
   border-color: white;
@@ -1230,7 +1228,7 @@ div .image-row {
 
 .drag-active {
   background-color: var(--button-background-hover);
-  color: black;
+  color: var(--font-color-ignores-theme);
   cursor: pointer;
   outline: none;
   border-color: white;

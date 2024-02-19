@@ -91,15 +91,16 @@ a {
 
 .standard-button {
     background-color: $button_background;
-    color: $font_color;
-    border-color: $white;
+    border-color: $low_intensity_border;
     border-radius: 4px;
     border-style: solid;
     border-width: 2px;
+    color: $font_color;
     font-family: $main_font;
     height: 42px;
     margin: 4px 0px 4px 0px;
     padding: 6px;
+
     @media (prefers-color-scheme: dark) {
       @include button-invert-icon();
     }
@@ -296,7 +297,7 @@ a {
 .pile-select {
   &.search-box {
     background-color: $note_background_edit;
-    border-color: $white;
+    border-color: $low_intensity_border;
     border-radius: 4px;
     border-style: solid;
     color: $black;
@@ -308,7 +309,8 @@ a {
   }
 
   &.button {
-    border-color: $white;
+    background-color: $button_background;
+    border-color: $low_intensity_border;
     border-radius: 4px;
     border-style: solid;
     color: $black;
@@ -317,7 +319,6 @@ a {
     margin: 0px;
     padding: 4px;
     text-decoration: none;
-    background-color: $grey2;
 
     &:hover {
       cursor: pointer;
@@ -435,8 +436,8 @@ a {
     text-align: left;
 
     &:focus {
-      background-color: $button-background-hover;
-      color: $inverse_font_color;
+      background-color: $button_background_hover;
+      color: $font_color_ignores_theme;
       border-color: $black;
       outline: none;
     }
@@ -786,16 +787,16 @@ a.grid-link {
   // TODO: Clean up
   &.author-select {
     &.search-box {
-      display: inline-block;
-      border: none;
-      font-family: $main_font;
-      font-size: 20px;
       background-color: $button_selected;
-      padding: 4px;
+      border-color: $low_intensity_border;
       border-radius: 4px;
       border-style: solid;
-      border-color: $white;
       border-width: 1px;
+      border: none;
+      display: inline-block;
+      font-family: $main_font;
+      font-size: 20px;
+      padding: 4px;
     }
 
     &.autocomplete-div {
@@ -851,21 +852,19 @@ a.grid-link {
 }
 
 .file-drop {
-  display: inline-block;
+  align-items: center;
   background-color:$button_background;
-  border-color: $white;
+  border-color: $low_intensity_border;
   border-radius: 4px;
   border-style: solid;
   border-width: 2px;
+  display: inline-flex;
   font-family: $main_font;
-  height: 42px;
   font-size: 14px;
   height: 42px;
+  margin-left: 4px;
   margin: 4px 0px 4px 0px;
   padding: 6px;
-  display: inline-flex;
-  align-items: center;
-  margin-left: 4px;
 
   &.no-margin-no-border {
     margin: 0px;

@@ -40,6 +40,7 @@ $white: white;
   // Font Colors
   --font-color: #{$black};
   --link-color: #{$black};
+  --font-color-ignores-theme: #{$black};
 
   // Inverted
   --inverse-background-color: #{color.scale($theme_mint, $lightness: -95%)};
@@ -52,9 +53,8 @@ $white: white;
   --note-border-selected: #{$black};
   --note-border: #{$grey2};
 
-  // To Sort
+  // Buttons
   --button-background-hover: #{lighten($theme_blue, 15%)};
-  --button-background: #{$grey2};
   --button-background: #{$grey2};
   --button-selected: #{lighten($theme_blue, 5%)};
   --button-shadow-color: #{$grey3};
@@ -75,6 +75,7 @@ $white: white;
       // Font Colors
       --link-color: #{$white};
       --font-color: #{$white};
+      --font-color-ignores-theme: #{$black};
 
       // Inverted
       --inverse-background-color: #{$theme_mint};
@@ -87,10 +88,9 @@ $white: white;
       --note-border-selected: #{$grey2};
       --note-border: #{color.scale($theme_mint, $lightness: -90%)};
       
-      // To Sort 
+      // Buttons
       --button-background-hover: #{lighten($theme_blue, 15%)};
       --button-background: #{$black};
-      --button-background: #{$grey2};
       --button-selected: #{lighten($theme_blue, 5%)};
       --button-shadow-color: #{$grey3};
     }
@@ -112,6 +112,7 @@ $note_input_background: var(--note-input-background);
 // Font Colors
 $font_color: var(--font-color);
 $link_color: var(--link-color);
+$font_color_ignores_theme: var(--font-color-ignores-theme);
 
 // Inverted
 $inverse_background_color: var(--inverse-background-color);
@@ -124,7 +125,7 @@ $note_border_focused: var(--noteborder-focused);
 $note_border_selected: var(--note-border-selected);
 $note_border: var(--note-border);
 
-// To Sort
+// Buttons
 $button_background_hover: var(--button-background-hover);
 $button_background: var(--button-background);
 $button_selected: var(--button-selected);
