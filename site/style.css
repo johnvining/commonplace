@@ -1179,14 +1179,23 @@ div .image-row {
   padding: 0px;
 }
 .top-level.author-select.option {
-  background: transparent;
+  background-color: var(--button-background);
+  border-color: var(--low-intensity-border);
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 2px;
   border: none;
-  color: darkgray;
+  color: var(--font-color);
   display: inline;
-  margin: 0px;
-  padding: 4px;
-  font-size: 20px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 20px;
+  margin: 0px 4px 0px 4px;
+  padding: 4px;
+}
+.top-level.author-select.option:focus {
+  outline: none;
+  background-color: var(--button-background-hover);
+  border-color: var(--low-intensity-border);
 }
 .top-level.author-select.option::after {
   content: "? ";
