@@ -701,7 +701,9 @@ class Note extends React.Component {
               </div>
             </>
           ) : null}
-          {note.piles?.length > 0 || note.ideas?.length > 0 ? (
+          {note.piles?.length > 0 ||
+          note.ideas?.length > 0 ||
+          Object.keys(this.state.linkedNotes).length > 0 ? (
             <div className={'note-full container width-100'}>
               <PileListForItem
                 remove={edit_piles}
