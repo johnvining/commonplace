@@ -104,7 +104,6 @@ a {
     @media (prefers-color-scheme: dark) {
       @include button-invert-icon();
     }
-    
 
   +.standard-button {
     margin-left: 4px;
@@ -444,7 +443,7 @@ a {
 
     &:focus {
       background-color: $button_input_background_selected;
-      color: $font_color_ignores_theme;
+      color: $font_color;
       border-color: $high_intensity_border;
       outline: none;
     }
@@ -535,12 +534,16 @@ a.grid-link {
 .grid-button {
   background: transparent;
   border-style: none;
+  @media (prefers-color-scheme: dark) {
+    @include button-invert-icon();
+  }
 }
 
 .multi-select {
   position: relative;
   font-size: 14px;
   font-family: $main_font;
+  color: $font_color;
 
   &.search-box {
     font-family: $main_font;

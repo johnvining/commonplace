@@ -14,7 +14,7 @@
 
 @mixin button-hover($background_color) {
   background-color: $background_color;
-  color: $font_color_ignores_theme;
+  color: $font_color;
   cursor: pointer;
   outline: none; // TODO: Fix -- accessibility
   border-color: white;

@@ -44,7 +44,6 @@ $white: white;
   // Font Colors
   --font-color: #{$black};
   --link-color: #{$black};
-  --font-color-ignores-theme: #{$black};
 
   // Inverted
   --inverse-background-color: #{color.scale($theme_mint, $lightness: -95%)};
@@ -68,7 +67,7 @@ $white: white;
       --background-color: #{$dark_theme_blue};
       --semantic-idea: #{color.scale($theme_blue, $lightness: -85%)};
       --semantic-pile: #{color.scale($theme_purple, $lightness: -85%)};
-      --semantic-selection: #{color.scale($theme_yellow, $lightness: -85%)};
+      --semantic-selection: #{color.scale($theme_yellow, $lightness: -90%)};
       --semantic-removal: #{color.scale($theme_coral, $lightness: -85%)};
       --button-input-background-selected: #{color.scale($dark_theme_blue, $lightness: 5%)};
       --button-selected: #{lighten($dark_theme_blue, 30%)};
@@ -81,7 +80,6 @@ $white: white;
       // Font Colors
       --link-color: #{color.scale($white, $lightness: -20%)};
       --font-color: #{color.scale($white, $lightness: -20%)};
-      --font-color-ignores-theme: #{$black};
 
       // Inverted
       --inverse-background-color: #{$theme_mint};
@@ -119,7 +117,6 @@ $note_background: var(--note-background);
 // Font Colors
 $font_color: var(--font-color);
 $link_color: var(--link-color);
-$font_color_ignores_theme: var(--font-color-ignores-theme);
 
 // Inverted
 $inverse_background_color: var(--inverse-background-color);

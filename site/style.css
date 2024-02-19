@@ -12,7 +12,6 @@
   --note-background: white;
   --font-color: black;
   --link-color: black;
-  --font-color-ignores-theme: black;
   --inverse-background-color: #071207;
   --inverse-font-color: white;
   --low-intensity-border: white;
@@ -30,7 +29,7 @@
     --background-color: #010d12;
     --semantic-idea: #0e262e;
     --semantic-pile: #2b1137;
-    --semantic-selection: #3e3e07;
+    --semantic-selection: #292905;
     --semantic-removal: #310606;
     --button-input-background-selected: #021e29;
     --button-selected: #0976a3;
@@ -40,7 +39,6 @@
     --note-background: #000001;
     --link-color: #cccccc;
     --font-color: #cccccc;
-    --font-color-ignores-theme: black;
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
     --low-intensity-border: #042f41;
@@ -581,7 +579,7 @@ div .top-bar {
 }
 .standard-button:hover {
   background-color: var(--button-input-background-selected);
-  color: var(--font-color-ignores-theme);
+  color: var(--font-color);
   cursor: pointer;
   outline: none;
   border-color: white;
@@ -599,7 +597,7 @@ div .top-bar {
 }
 .standard-button.button-selected:hover {
   background-color: var(--button-input-background-selected);
-  color: var(--font-color-ignores-theme);
+  color: var(--font-color);
   cursor: pointer;
   outline: none;
   border-color: white;
@@ -854,7 +852,7 @@ div .top-bar {
 }
 .search-bar.option:focus {
   background-color: var(--button-input-background-selected);
-  color: var(--font-color-ignores-theme);
+  color: var(--font-color);
   border-color: var(--high-intensity-border);
   outline: none;
 }
@@ -941,11 +939,18 @@ a.grid-link {
   background: transparent;
   border-style: none;
 }
+@media (prefers-color-scheme: dark) {
+  .grid-button img {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
 
 .multi-select {
   position: relative;
   font-size: 14px;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  color: var(--font-color);
 }
 .multi-select.search-box {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
@@ -1252,7 +1257,7 @@ div .image-row {
 }
 .file-drop:hover {
   background-color: var(--button-input-background-selected);
-  color: var(--font-color-ignores-theme);
+  color: var(--font-color);
   cursor: pointer;
   outline: none;
   border-color: white;
@@ -1260,7 +1265,7 @@ div .image-row {
 
 .drag-active {
   background-color: var(--button-input-background-selected);
-  color: var(--font-color-ignores-theme);
+  color: var(--font-color);
   cursor: pointer;
   outline: none;
   border-color: white;
