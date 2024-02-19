@@ -627,7 +627,7 @@ div .top-bar {
   display: none;
 }
 
-.idea.container, .pile.container {
+.idea.container, .pile.container, .link.container {
   background-color: transparent;
   width: 60%;
   border: none;
@@ -635,7 +635,7 @@ div .top-bar {
   margin: 0px;
   padding: 2px;
 }
-.idea.search-box, .pile.search-box {
+.idea.search-box, .pile.search-box, .link.search-box {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   border: solid;
   border-radius: 4px;
@@ -643,16 +643,16 @@ div .top-bar {
   margin: 4px;
   padding: 4px;
 }
-.idea.search-box:focus, .pile.search-box:focus {
+.idea.search-box:focus, .pile.search-box:focus, .link.search-box:focus {
   outline: none;
 }
-.idea.search-box.pile, .pile.search-box.pile {
+.idea.search-box.pile, .pile.search-box.pile, .link.search-box.pile {
   border-color: var(--semantic-pile);
 }
-.idea.search-box.idea, .pile.search-box.idea {
+.idea.search-box.idea, .pile.search-box.idea, .link.search-box.idea {
   border-color: var(--semantic-idea);
 }
-.idea.label, .pile.label {
+.idea.label, .pile.label, .link.label {
   border-radius: 4px;
   border-style: none;
   color: var(--font-color);
@@ -662,17 +662,17 @@ div .top-bar {
   padding: 4px;
   text-decoration: none;
 }
-.idea.label:focus, .pile.label:focus {
+.idea.label:focus, .pile.label:focus, .link.label:focus {
   border-color: var(--high-intensity-border);
 }
-.idea.label:hover, .pile.label:hover {
+.idea.label:hover, .pile.label:hover, .link.label:hover {
   background-color: var(--semantic-selection);
   cursor: pointer;
 }
-.idea.label.edit:hover, .pile.label.edit:hover {
+.idea.label.edit:hover, .pile.label.edit:hover, .link.label.edit:hover {
   background-color: var(--semantic-removal);
 }
-.idea.label.edit::after, .pile.label.edit::after {
+.idea.label.edit::after, .pile.label.edit::after, .link.label.edit::after {
   background-image: url("/icons/cross.svg");
   background-size: 15px 15px;
   display: inline-block;
@@ -680,13 +680,18 @@ div .top-bar {
   height: 14px;
   content: "";
 }
-.idea.label.pile, .pile.label.pile {
+.idea.label.pile, .pile.label.pile, .link.label.pile {
   background-color: var(--semantic-pile);
 }
-.idea.label.idea, .pile.label.idea {
+.idea.label.idea, .pile.label.idea, .link.label.idea {
   background-color: var(--semantic-idea);
 }
-.idea.pre, .pile.pre {
+.idea.label.link, .pile.label.link, .link.label.link {
+  background-color: var(--button-background);
+  font-family: "Courier New", Courier, monospace;
+  vertical-align: bottom;
+}
+.idea.pre, .pile.pre, .link.pre {
   font-size: 10px;
   background-color: var(--note-background);
   text-transform: uppercase;
@@ -695,20 +700,20 @@ div .top-bar {
   display: inline-block;
   vertical-align: bottom;
 }
-.idea.ul, .pile.ul {
+.idea.ul, .pile.ul, .link.ul {
   display: block;
   margin: 0px;
   padding: 0px;
 }
-.idea.li, .pile.li {
+.idea.li, .pile.li, .link.li {
   display: inline;
   margin: 0px;
   padding: 0px;
 }
-.idea.autocomplete-div, .pile.autocomplete-div {
+.idea.autocomplete-div, .pile.autocomplete-div, .link.autocomplete-div {
   text-align: right;
 }
-.idea .option, .pile .option {
+.idea .option, .pile .option, .link .option {
   border-radius: 4px;
   border-style: none;
   border-width: 0px;
@@ -721,16 +726,16 @@ div .top-bar {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   color: var(--font-color);
 }
-.idea .option.pile, .pile .option.pile {
+.idea .option.pile, .pile .option.pile, .link .option.pile {
   background-color: var(--semantic-pile);
 }
-.idea .option.idea, .pile .option.idea {
+.idea .option.idea, .pile .option.idea, .link .option.idea {
   background-color: var(--semantic-idea);
 }
-.idea .option::after, .pile .option::after {
+.idea .option::after, .pile .option::after, .link .option::after {
   content: "? ";
 }
-.idea .option.new::before, .pile .option.new::before {
+.idea .option.new::before, .pile .option.new::before, .link .option.new::before {
   background-image: url("/icons/plus.svg");
   background-size: 17px 17px;
   display: inline-block;

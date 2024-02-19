@@ -162,7 +162,7 @@ a {
   }
 }
 
-.idea,.pile {
+.idea,.pile,.link {
   &.container {
     background-color: transparent;
     width: 60%;
@@ -232,6 +232,12 @@ a {
   
     &.idea {
       background-color: $semantic_idea;
+    }
+
+    &.link {
+      background-color: $button_background;
+      font-family: $monospace;
+      vertical-align: bottom;
     }
   }
 
