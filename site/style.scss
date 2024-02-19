@@ -370,7 +370,7 @@ a {
     border-style: solid;
     border-radius: 4px;
     width: 100%;
-    background-color: $background_color;
+    background-color: var(--background-color);;
     display: flex;
   }
 
@@ -513,7 +513,7 @@ a.grid-link {
 }
 
 .grid-unprintable {
-  color: $background_color;
+  color: var(--background-color);;
 }
 
 .grid-button {
@@ -584,7 +584,7 @@ a.grid-link {
   justify-content: space-between;
   position: sticky;
   top: 4em;
-  background: $background_color;
+  background: var(--background-color);;
   padding-bottom: 4px;
   padding-top: 4px;
   min-height: 52px;
@@ -599,7 +599,7 @@ a.grid-link {
   &.image-frame {
     height: 120px;
     width: 80px;
-    background-color: $background_color;
+    background-color: var(--background-color);;
     padding: 4px;
     margin: 4px;
     border-radius: 4px;

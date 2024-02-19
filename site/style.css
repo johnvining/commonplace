@@ -722,7 +722,7 @@ div .top-bar {
   border-style: solid;
   border-radius: 4px;
   width: 100%;
-  background-color: #F7FCF7;
+  background-color: var(--background-color);
   display: flex;
 }
 .search-bar.autocomplete-div {
@@ -853,7 +853,7 @@ a.grid-link {
 }
 
 .grid-unprintable {
-  color: #F7FCF7;
+  color: var(--background-color);
 }
 
 .grid-button {
@@ -915,7 +915,7 @@ a.grid-link {
   justify-content: space-between;
   position: sticky;
   top: 4em;
-  background: #F7FCF7;
+  background: var(--background-color);
   padding-bottom: 4px;
   padding-top: 4px;
   min-height: 52px;
@@ -928,7 +928,7 @@ div .image-row {
 .image-row.image-frame {
   height: 120px;
   width: 80px;
-  background-color: #F7FCF7;
+  background-color: var(--background-color);
   padding: 4px;
   margin: 4px;
   border-radius: 4px;
