@@ -25,82 +25,107 @@ $white: white;
 
 // Mapping from component colors to specific colors
 :root {
+  // Background Colors
   --background-color: #{$theme_mint};
-  --inverse-background-color: #{color.scale($theme_mint, $lightness: -95%)};
-  --font-color: #{$black};
-  --link-color: #{$black};
-  --inverse-font-color: #{$white};
-
-  --button-background-hover: #{lighten($theme_blue, 15%)};
-  --button-background: #{$grey2};
-  --button-selected: #{lighten($theme_blue, 5%)};
-  --button-shadow-color: #{$grey3};
-  --button-background: #{$grey2};
-  --note-background-edit: #{$white};
-  --note-background-not-selected: #{$grey1};
-  --note-background:  #{$white};
-  --note-border-edit: #{lighten($theme_blue, 5%)};
-  --note-border-focused: #{$grey3};
-  --note-border-selected: #{$black};
-  --note-border: #{$grey2};
-  --note-input-background-focus: #{lighten($theme_blue, 5%)};
-  --note-input-background: #($grey1);
   --semantic-idea: #{lighten($theme_blue, 5%)};
   --semantic-pile: #{$theme_purple};
   --semantic-selection: #{$theme_yellow};
   --semantic-removal: #{$theme_coral};
+  --note-background-edit: #{$white};
+  --note-background-not-selected: #{$grey1};
+  --note-background:  #{$white};
+  --note-input-background-focus: #{lighten($theme_blue, 5%)};
+  --note-input-background: #($grey1);
+
+  // Font Colors
+  --font-color: #{$black};
+  --link-color: #{$black};
+
+  // Inverted
+  --inverse-background-color: #{color.scale($theme_mint, $lightness: -95%)};
+  --inverse-font-color: #{$white};
+
+  // Borders
+  --low-intensity-border: #{$white};
+  --note-border-edit: #{lighten($theme_blue, 5%)};
+  --note-border-focused: #{$grey3};
+  --note-border-selected: #{$black};
+  --note-border: #{$grey2};
+
+  // To Sort
+  --button-background-hover: #{lighten($theme_blue, 15%)};
+  --button-background: #{$grey2};
+  --button-background: #{$grey2};
+  --button-selected: #{lighten($theme_blue, 5%)};
+  --button-shadow-color: #{$grey3};
   
      @media (prefers-color-scheme: dark) {
+      // Background Colors
       --background-color: #{color.scale($theme_mint, $lightness: -95%)};
-      --inverse-background-color: #{$theme_mint};
-      --link-color: #{$white};
-      --font-color: #{$white};
-      --inverse-font-color: #{$black};
-
-      --button-background-hover: #{lighten($theme_blue, 15%)};
-      --button-background: #{$grey2};
-      --button-selected: #{lighten($theme_blue, 5%)};
-      --button-shadow-color: #{$grey3};
-      --button-background: #{$black};
-      --note-background-edit: #{color.scale($theme_blue, $lightness: -93%)};
-      --note-background-not-selected: #{$grey1};
-      --note-background: #{color.scale($theme_mint, $lightness: -97%)};
-      --note-border-edit: #{color.scale($theme_blue, $lightness: -90%)};
-      --note-border-focused: #{$grey3};
-      --note-border-selected: #{$grey2};
-      --note-border: #{color.scale($theme_mint, $lightness: -90%)};
-      --note-input-background-focus: #{color.scale($theme_blue, $lightness: -90%)};
-      --note-background: #{$black};
-      --note-input-background: #{color.scale($theme_mint, $lightness: -95%)};
       --semantic-idea: #{color.scale($theme_blue, $lightness: -85%)};
       --semantic-pile: #{color.scale($theme_purple, $lightness: -85%)};
       --semantic-selection: #{color.scale($theme_yellow, $lightness: -85%)};
       --semantic-removal: #{color.scale($theme_coral, $lightness: -85%)};
+      --note-background-edit: #{color.scale($theme_blue, $lightness: -93%)};
+      --note-background-not-selected: #{$grey1};
+      --note-background: #{color.scale($theme_mint, $lightness: -97%)};
+      --note-input-background-focus: #{color.scale($theme_blue, $lightness: -90%)};
+      --note-input-background: #{color.scale($theme_mint, $lightness: -95%)};
+
+      // Font Colors
+      --link-color: #{$white};
+      --font-color: #{$white};
+
+      // Inverted
+      --inverse-background-color: #{$theme_mint};
+      --inverse-font-color: #{$black};
+
+      // Borders
+      --low-intensity-border: #{color.scale($theme_mint, $lightness: -97%)};
+      --note-border-edit: #{color.scale($theme_blue, $lightness: -90%)};
+      --note-border-focused: #{$grey3};
+      --note-border-selected: #{$grey2};
+      --note-border: #{color.scale($theme_mint, $lightness: -90%)};
+      
+      // To Sort 
+      --button-background-hover: #{lighten($theme_blue, 15%)};
+      --button-background: #{$black};
+      --button-background: #{$grey2};
+      --button-selected: #{lighten($theme_blue, 5%)};
+      --button-shadow-color: #{$grey3};
     }
   }
 
 // Component colors, which change based on theme
+// Background Colors
 $background_color: var(--background-color);
-$inverse_background_color: var(--inverse-background-color);
-$font_color: var(--font-color);
-$inverse_font_color: var(--inverse-font-color);
-$link_color: var(--link-color);
-
-$button_background_hover: var(--button-background-hover);
-$button_background: var(--button-background);
-$button_selected: var(--button-selected);
-$button_shadow_color: var(--button-shadow-color);
-$note_background_edit: var(--note-background-edit);
-$note_background_not_selected: var(--note_background-not-selected);
-$note_background: var(--note-background);
-$note_border_edit: var(--note-border-edit);
-$note_border_focused: var(--noteborder-focused);
-$note_border_selected: var(--note-border-selected);
-$note_border: var(--note-border);
-$note_input_background_focus: var(--note-input-background-focus);
-$note_input_background: var(--note-input-background);
-$low_intensity_border: var(--note-background);
 $semantic_idea: var(--semantic-idea);
 $semantic_pile: var(--semantic-pile);
 $semantic_selection: var(--semantic-selection);
 $semantic_removal: var(--semantic-removal);
+$note_background_edit: var(--note-background-edit);
+$note_background_not_selected: var(--note_background-not-selected);
+$note_background: var(--note-background);
+$note_input_background_focus: var(--note-input-background-focus);
+$note_input_background: var(--note-input-background);
+
+// Font Colors
+$font_color: var(--font-color);
+$link_color: var(--link-color);
+
+// Inverted
+$inverse_background_color: var(--inverse-background-color);
+$inverse_font_color: var(--inverse-font-color);
+
+// Borders
+$low_intensity_border: var(--low-intensity-border);
+$note_border_edit: var(--note-border-edit);
+$note_border_focused: var(--noteborder-focused);
+$note_border_selected: var(--note-border-selected);
+$note_border: var(--note-border);
+
+// To Sort
+$button_background_hover: var(--button-background-hover);
+$button_background: var(--button-background);
+$button_selected: var(--button-selected);
+$button_shadow_color: var(--button-shadow-color);

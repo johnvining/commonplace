@@ -1,54 +1,55 @@
 :root {
   --background-color: #F7FCF7;
-  --inverse-background-color: #071207;
-  --font-color: black;
-  --link-color: black;
-  --inverse-font-color: white;
-  --button-background-hover: #e8f4f8;
-  --button-background: #efefef;
-  --button-selected: #c1e1ec;
-  --button-shadow-color: darkgray;
-  --button-background: #efefef;
-  --note-background-edit: white;
-  --note-background-not-selected: #f4f4f4;
-  --note-background: white;
-  --note-border-edit: #c1e1ec;
-  --note-border-focused: darkgray;
-  --note-border-selected: black;
-  --note-border: #efefef;
-  --note-input-background-focus: #c1e1ec;
-  --note-input-background: #($grey1);
   --semantic-idea: #c1e1ec;
   --semantic-pile: #f3e8f8;
   --semantic-selection: lightgoldenrodyellow;
   --semantic-removal: lightcoral;
+  --note-background-edit: white;
+  --note-background-not-selected: #f4f4f4;
+  --note-background: white;
+  --note-input-background-focus: #c1e1ec;
+  --note-input-background: #($grey1);
+  --font-color: black;
+  --link-color: black;
+  --inverse-background-color: #071207;
+  --inverse-font-color: white;
+  --low-intensity-border: white;
+  --note-border-edit: #c1e1ec;
+  --note-border-focused: darkgray;
+  --note-border-selected: black;
+  --note-border: #efefef;
+  --button-background-hover: #e8f4f8;
+  --button-background: #efefef;
+  --button-background: #efefef;
+  --button-selected: #c1e1ec;
+  --button-shadow-color: darkgray;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #071207;
-    --inverse-background-color: #F7FCF7;
-    --link-color: white;
-    --font-color: white;
-    --inverse-font-color: black;
-    --button-background-hover: #e8f4f8;
-    --button-background: #efefef;
-    --button-selected: #c1e1ec;
-    --button-shadow-color: darkgray;
-    --button-background: black;
-    --note-background-edit: #071216;
-    --note-background-not-selected: #f4f4f4;
-    --note-background: #040b04;
-    --note-border-edit: #091a1f;
-    --note-border-focused: darkgray;
-    --note-border-selected: #efefef;
-    --note-border: #0e240e;
-    --note-input-background-focus: #091a1f;
-    --note-background: black;
-    --note-input-background: #071207;
     --semantic-idea: #0e262e;
     --semantic-pile: #2b1137;
     --semantic-selection: #3e3e07;
     --semantic-removal: #310606;
+    --note-background-edit: #071216;
+    --note-background-not-selected: #f4f4f4;
+    --note-background: #040b04;
+    --note-input-background-focus: #091a1f;
+    --note-input-background: #071207;
+    --link-color: white;
+    --font-color: white;
+    --inverse-background-color: #F7FCF7;
+    --inverse-font-color: black;
+    --low-intensity-border: #040b04;
+    --note-border-edit: #091a1f;
+    --note-border-focused: darkgray;
+    --note-border-selected: #efefef;
+    --note-border: #0e240e;
+    --button-background-hover: #e8f4f8;
+    --button-background: black;
+    --button-background: #efefef;
+    --button-selected: #c1e1ec;
+    --button-shadow-color: darkgray;
   }
 }
 
@@ -823,7 +824,7 @@ div .top-bar {
 }
 .search-bar.option {
   background-color: var(--button-background);
-  border-color: var(--note-background);
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
   border-width: 2px;
