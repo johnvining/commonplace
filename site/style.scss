@@ -685,6 +685,10 @@ a.grid-link {
   border-radius: 4px;
   font-size: 18px;
 
+  @media (prefers-color-scheme: dark) {
+    @include button-invert-icon();
+  }
+
   &.header {
     padding: 0px;
     margin: 0px;
