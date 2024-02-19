@@ -25,27 +25,27 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color: #071207;
+    --background-color: #010d12;
     --semantic-idea: #0e262e;
     --semantic-pile: #2b1137;
     --semantic-selection: #3e3e07;
     --semantic-removal: #310606;
-    --button-input-background-selected: #091a1f;
-    --button-selected: #c1e1ec;
-    --input-background: #071207;
-    --note-background-edit: #071216;
+    --button-input-background-selected: #021e29;
+    --button-selected: #0976a3;
+    --input-background: #02141b;
+    --note-background-edit: #000101;
     --note-background-not-selected: #f4f4f4;
-    --note-background: #040b04;
+    --note-background: #000001;
     --link-color: white;
     --font-color: white;
     --font-color-ignores-theme: black;
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
-    --low-intensity-border: #040b04;
-    --note-border-edit: #091a1f;
+    --low-intensity-border: #042f41;
+    --note-border-edit: #06506f;
     --note-border-focused: darkgray;
     --note-border-selected: #efefef;
-    --note-border: #0e240e;
+    --note-border: #042f41;
     --button-background: black;
     --button-shadow-color: darkgray;
   }
@@ -63,7 +63,7 @@
   flex-wrap: wrap;
 }
 .note-full.outer:focus {
-  border-color: var(--noteborder-focused);
+  border-color: var(--note-border-focused);
   outline: none;
 }
 .note-full.outer.selected {

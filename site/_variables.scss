@@ -13,6 +13,7 @@ $image_tags_background: '/icons/tags.svg';
 
 // Palette
 $theme_blue: #add8e6;
+$dark_theme_blue: #010d12;
 $theme_mint: #F7FCF7;
 $theme_yellow: lightgoldenrodyellow;
 $theme_coral: lightcoral;
@@ -62,18 +63,18 @@ $white: white;
   
      @media (prefers-color-scheme: dark) {
       // Background Colors
-      --background-color: #{color.scale($theme_mint, $lightness: -95%)};
+      --background-color: #{$dark_theme_blue};
       --semantic-idea: #{color.scale($theme_blue, $lightness: -85%)};
       --semantic-pile: #{color.scale($theme_purple, $lightness: -85%)};
       --semantic-selection: #{color.scale($theme_yellow, $lightness: -85%)};
       --semantic-removal: #{color.scale($theme_coral, $lightness: -85%)};
-      --button-input-background-selected: #{color.scale($theme_blue, $lightness: -90%)};
-      --button-selected: #{lighten($theme_blue, 5%)};
-      --input-background: #{color.scale($theme_mint, $lightness: -95%)};
+      --button-input-background-selected: #{color.scale($dark_theme_blue, $lightness: 5%)};
+      --button-selected: #{lighten($dark_theme_blue, 30%)};
+      --input-background: #{color.scale($dark_theme_blue, $lightness: 2%)};
 
-      --note-background-edit: #{color.scale($theme_blue, $lightness: -93%)};
+      --note-background-edit: #{color.scale($dark_theme_blue, $lightness: -93%)};
       --note-background-not-selected: #{$grey1};
-      --note-background: #{color.scale($theme_mint, $lightness: -97%)};
+      --note-background: #{color.scale($dark_theme_blue, $lightness: -97%)};
   
       // Font Colors
       --link-color: #{$white};
@@ -85,11 +86,11 @@ $white: white;
       --inverse-font-color: #{$black};
 
       // Borders
-      --low-intensity-border: #{color.scale($theme_mint, $lightness: -97%)};
-      --note-border-edit: #{color.scale($theme_blue, $lightness: -90%)};
+      --low-intensity-border: #{color.scale($dark_theme_blue, $lightness: 10%)};
+      --note-border-edit: #{color.scale($dark_theme_blue, $lightness: 20%)};
       --note-border-focused: #{$grey3};
       --note-border-selected: #{$grey2};
-      --note-border: #{color.scale($theme_mint, $lightness: -90%)};
+      --note-border: #{color.scale($dark_theme_blue, $lightness: 10%)};
       
       // Buttons
       --button-background: #{$black};
@@ -124,7 +125,7 @@ $inverse_font_color: var(--inverse-font-color);
 // Borders
 $low_intensity_border: var(--low-intensity-border);
 $note_border_edit: var(--note-border-edit);
-$note_border_focused: var(--noteborder-focused);
+$note_border_focused: var(--note-border-focused);
 $note_border_selected: var(--note-border-selected);
 $note_border: var(--note-border);
 
