@@ -4,20 +4,46 @@
   --font-color: black;
   --link-color: black;
   --button-background: #efefef;
+  --note-input-background: #($grey1);
+  --note_background_edit: white;
+  --note_background_not_selected: #f4f4f4;
+  --note_background: white;
+  --note_border_edit: #e8f4f8;
+  --note_border_focused: darkgray;
+  --note_border_selected: black;
+  --note_border: #efefef;
+  --note_input_background_focus: #e8f4f8;
+  --button_background: #efefef;
+  --button_background_hover: #e8f4f8;
+  --button_selected: #c1e1ec;
+  --button_shadow_color: darkgray;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: black;
-    --note-background: black;
+    --button_background_hover: #e8f4f8;
+    --button_background: #efefef;
+    --button_selected: #c1e1ec;
+    --button_shadow_color: darkgray;
+    --button-background: black;
     --font-color: white;
     --link-color: white;
-    --button-background: black;
+    --note_background_edit: white;
+    --note_background_not_selected: #f4f4f4;
+    --note_background: white;
+    --note_border_edit: #e8f4f8;
+    --note_border_focused: darkgray;
+    --note_border_selected: black;
+    --note_border: #efefef;
+    --note_input_background_focus: #e8f4f8;
+    --note-background: black;
+    --note-input-background: darkgray;
   }
 }
 
 .note-full.outer {
   background-color: var(--note-background);
-  border-color: #efefef;
+  border-color: var(--note-border);
   border-style: solid;
   border-width: 2px;
   border-radius: 4px;
@@ -27,18 +53,18 @@
   flex-wrap: wrap;
 }
 .note-full.outer:focus {
-  border-color: darkgray;
+  border-color: var(--noteborder-focused);
   outline: none;
 }
 .note-full.outer.selected {
-  border-color: black;
+  border-color: var(--note-border-selected);
 }
 .note-full.outer.edit-note, .note-full.outer.edit-idea {
-  background-color: white;
-  border-color: #e8f4f8;
+  background-color: var(--note-background-edit);
+  border-color: var(--note-border-edit);
 }
 .note-full.outer.not-selected {
-  background-color: #f4f4f4;
+  background-color: var(--note_background-not-selected);
 }
 .note-full.outer.show-full-image {
   min-height: 90%;
@@ -86,7 +112,7 @@
 .note-full .year:focus,
 .note-full .page:focus,
 .note-full .url:focus {
-  background-color: #e8f4f8;
+  background-color: var(--note-input-background-focus);
   outline: none;
   border-radius: 2px;
 }
@@ -126,7 +152,7 @@
 }
 .note-full .year.edit,
 .note-full .page.edit {
-  background-color: #f4f4f4;
+  background-color: var(--note-input-background);
 }
 .note-full .year.input,
 .note-full .page.input {
@@ -154,18 +180,18 @@
 .note-full .note-text.note-take,
 .note-full .note-take.note-take {
   color: black;
-  background-color: #F7FCF7;
+  background-color: var(--background-color);
   font-style: italic;
   font-size: 12px;
   padding: 4px;
 }
 .note-full .note-text.edit,
 .note-full .note-take.edit {
-  background-color: #f4f4f4;
+  background-color: var(--note-input-background);
 }
 .note-full .note-text:focus,
 .note-full .note-take:focus {
-  background-color: #e8f4f8;
+  background-color: var(--note-input-background-focus);
   outline: none;
   border-radius: 2px;
 }
@@ -185,7 +211,7 @@
 }
 .note-full .title.edit,
 .note-full .url.edit {
-  background-color: #f4f4f4;
+  background-color: var(--note-input-background);
 }
 .note-full .title.input,
 .note-full .url.input {
@@ -212,11 +238,11 @@ input .note-full .note-text,
 input .note-full .note-take {
   width: 100%;
   text-align: left;
-  background-color: #f4f4f4;
+  background-color: var(--note-input-background);
 }
 .note-full .edit-author.search-box,
 .note-full .edit-work.search-box {
-  background-color: #f4f4f4;
+  background-color: var(--note-input-background);
   border-radius: 4px;
   display: inline-block;
   width: 50%;
@@ -229,7 +255,7 @@ input .note-full .note-take {
 }
 .note-full .edit-author.search-box:focus,
 .note-full .edit-work.search-box:focus {
-  background-color: #e8f4f8;
+  background-color: var(--note-input-background-focus);
   outline: none;
   border-radius: 2px;
 }
@@ -237,7 +263,7 @@ input .note-full .edit-author,
 input .note-full .edit-work {
   width: 100%;
   text-align: left;
-  background-color: #f4f4f4;
+  background-color: var(--note-input-background);
 }
 .note-full .edit-author.imputed, .note-full .edit-author.work,
 .note-full .edit-work.imputed,
@@ -299,7 +325,7 @@ input .note-full .edit-work {
   margin-left: 4px;
   border-radius: 2px;
   font-size: 9px;
-  background-color: #efefef;
+  background-color: var(--button-background);
   cursor: pointer;
 }
 
@@ -326,7 +352,7 @@ input .note-full .edit-work {
   background-color: #F7FCF7;
 }
 .action-button:focus {
-  box-shadow: 0px 0px 4px 4px darkgray;
+  box-shadow: 0px 0px 4px 4px var(--button-shadow-color);
   outline: none;
 }
 
@@ -483,9 +509,11 @@ div .top-bar {
   margin: 4px 0px 4px 0px;
   padding: 6px;
 }
-.standard-button img {
-  -webkit-filter: invert(100%);
-  filter: invert(100%);
+@media (prefers-color-scheme: dark) {
+  .standard-button img {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
 }
 .standard-button + .standard-button {
   margin-left: 4px;
@@ -509,22 +537,22 @@ div .top-bar {
   margin-left: 0px;
 }
 .standard-button.button-selected:focus {
-  border-color: #c1e1ec;
+  border-color: var(--button-selected);
   outline: none;
 }
 .standard-button.button-selected {
-  background-color: #c1e1ec;
+  background-color: var(--button-selected);
 }
 .standard-button.button-selected img {
   -webkit-filter: invert(0%);
   filter: invert(0%);
 }
 .standard-button:focus {
-  border-color: #c1e1ec;
+  border-color: var(--button-selected);
   outline: none;
 }
 .standard-button:hover {
-  background-color: #e8f4f8;
+  background-color: var(--button-background-hover);
   color: black;
   cursor: pointer;
   outline: none;
@@ -652,7 +680,7 @@ div .top-bar {
 }
 
 .pile-select.search-box {
-  background-color: white;
+  background-color: var(--note-background-edit);
   border-color: white;
   border-radius: 4px;
   border-style: solid;
@@ -761,7 +789,7 @@ div .top-bar {
   display: inline;
 }
 .search-bar.option {
-  background-color: #efefef;
+  background-color: var(--button-background);
   border-color: white;
   border-radius: 4px;
   border-style: solid;
@@ -890,7 +918,7 @@ a.grid-link {
   padding: 8px;
   margin: 2px;
   border-width: 2px;
-  border-color: #efefef;
+  border-color: var(--button-background);
   border-radius: 4px;
   border-style: solid;
   background: white;
@@ -1001,7 +1029,7 @@ div .image-row {
   align-items: flex-start;
 }
 .result-box:hover {
-  background-color: white;
+  background-color: var(--note-background-edit);
 }
 .result-box.parent {
   display: block;
@@ -1039,7 +1067,7 @@ div .image-row {
   white-space: pre-wrap;
   display: block;
   background-color: white;
-  border-color: #efefef;
+  border-color: var(--note-border);
   border-style: solid;
   border-width: 2px;
   border-radius: 4px;
@@ -1062,7 +1090,7 @@ div .image-row {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 20px;
   width: 100%;
-  background-color: #c1e1ec;
+  background-color: var(--button-selected);
   padding: 4px;
   border-radius: 4px;
   border-style: solid;
@@ -1081,7 +1109,7 @@ div .image-row {
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 20px;
-  background-color: #c1e1ec;
+  background-color: var(--button-selected);
   padding: 4px;
   border-radius: 4px;
   border-style: solid;
@@ -1133,7 +1161,7 @@ div .image-row {
 
 .file-drop {
   display: inline-block;
-  background-color: #efefef;
+  background-color: var(--button-background);
   border-color: white;
   border-radius: 4px;
   border-style: solid;
@@ -1153,7 +1181,7 @@ div .image-row {
   border-width: 0px;
 }
 .file-drop:hover {
-  background-color: #e8f4f8;
+  background-color: var(--button-background-hover);
   color: black;
   cursor: pointer;
   outline: none;
@@ -1165,7 +1193,7 @@ div .image-row {
 }
 
 .drag-active {
-  background-color: #e8f4f8;
+  background-color: var(--button-background-hover);
   color: black;
   cursor: pointer;
   outline: none;

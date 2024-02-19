@@ -29,34 +29,60 @@ $semantic_pile: $theme_purple;
 $semantic_selection: $theme_yellow;
 $semantic_removal: $theme_coral;
 
-// To move to CSS colors
-$background_color: $theme_mint;
-$note_background_edit: $white;
-$note_background_not_selected: $grey1;
-$note_background: $white;
-$note_border_edit: $highlight_blue;
-$note_border_focused: $grey5;
-$note_border_selected: $black;
-$note_border: $grey2;
-$note_input_background: $grey1;
-$note_input_background_focus: $highlight_blue;
-$button_background: $grey2;
-$button_background_hover: $highlight_blue;
-$button_selected: $highlight_blue_dark;
-$button_shadow_color: $grey5;
+$background_color: var(--background-color);
+$note_input_background: var(--note-input-background);
+$note_background_edit: var(--note-background-edit);
+$note_background_not_selected: var(--note_background-not-selected);
+$note_background: var(--note-background);
+$note_border_edit: var(--note-border-edit);
+$note_border_focused: var(--noteborder-focused);
+$note_border_selected: var(--note-border-selected);
+$note_border: var(--note-border);
+$note_input_background_focus: var(--note-input-background-focus);
+$button_background: var(--button-background);
+$button_background_hover: var(--button-background-hover);
+$button_selected: var(--button-selected);
+$button_shadow_color: var(--button-shadow-color);
+
 
 :root {
-    --background-color: #{$background_color};
+    --background-color: #{$theme_mint};
     --note_background: white;
     --font-color: black;
     --link-color: black;
     --button-background: #{$grey2};
+    --note-input-background: #($grey1);
+    --note_background_edit: #{$white};
+    --note_background_not_selected: #{$grey1};
+    --note_background: #{$white};
+    --note_border_edit: #{$highlight_blue};
+    --note_border_focused: #{$grey5};
+    --note_border_selected: #{$black};
+    --note_border: #{$grey2};
+    --note_input_background_focus: #{$highlight_blue};
+    --button_background: #{$grey2};
+    --button_background_hover: #{$highlight_blue};
+    --button_selected: #{$highlight_blue_dark};
+    --button_shadow_color: #{$grey5};
   
      @media (prefers-color-scheme: dark) {
       --background-color: black;
-      --note-background: black;
+      --button_background_hover: #{$highlight_blue};
+      --button_background: #{$grey2};
+      --button_selected: #{$highlight_blue_dark};
+      --button_shadow_color: #{$grey5};
+      --button-background: black;
       --font-color: white;
       --link-color: white;
-      --button-background: black;
+      --note_background_edit: #{$white};
+      --note_background_not_selected: #{$grey1};
+      --note_background: #{$white};
+      --note_border_edit: #{$highlight_blue};
+      --note_border_focused: #{$grey5};
+      --note_border_selected: #{$black};
+      --note_border: #{$grey2};
+      --note_input_background_focus: #{$highlight_blue};
+      --note-background: black;
+      --note-input-background: #{$grey5};
     }
   }

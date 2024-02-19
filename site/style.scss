@@ -100,7 +100,10 @@ a {
     height: 42px;
     margin: 4px 0px 4px 0px;
     padding: 6px;
-    @include button-invert-icon();
+    @media (prefers-color-scheme: dark) {
+      @include button-invert-icon();
+    }
+    
 
   +.standard-button {
     margin-left: 4px;
