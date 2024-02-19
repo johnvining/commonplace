@@ -1,26 +1,26 @@
 :root {
   --background-color: #F7FCF7;
-  --note_background: white;
+  --button_background_hover: #e8f4f8;
+  --button_background: #efefef;
+  --button_selected: #c1e1ec;
+  --button_shadow_color: darkgray;
+  --button-background: #efefef;
   --font-color: black;
   --link-color: black;
-  --button-background: #efefef;
-  --note-input-background: #($grey1);
   --note_background_edit: white;
   --note_background_not_selected: #f4f4f4;
+  --note_background: white;
   --note_background: white;
   --note_border_edit: #e8f4f8;
   --note_border_focused: darkgray;
   --note_border_selected: black;
   --note_border: #efefef;
   --note_input_background_focus: #e8f4f8;
-  --button_background: #efefef;
-  --button_background_hover: #e8f4f8;
-  --button_selected: #c1e1ec;
-  --button_shadow_color: darkgray;
+  --note-input-background: #($grey1);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color: black;
+    --background-color: #071207;
     --button_background_hover: #e8f4f8;
     --button_background: #efefef;
     --button_selected: #c1e1ec;

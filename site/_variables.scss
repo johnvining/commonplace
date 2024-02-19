@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // Fonts
 $monospace: 'Courier New', Courier, monospace;
 $main_font: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
@@ -9,7 +11,7 @@ $image_remove_background: '/icons/cross.svg';
 $image_stack_background: '/icons/stack.svg';
 $image_tags_background: '/icons/tags.svg';
 
-// Actual Colors
+// Palette
 $theme_blue: #add8e6;
 $theme_mint: #F7FCF7;
 $theme_yellow: lightgoldenrodyellow;
@@ -22,60 +24,41 @@ $grey2: #efefef;
 $grey5: darkgray;
 $black: black;
 $white: white;
-
-// Semantic Colors
 $semantic_idea: $highlight_blue;
 $semantic_pile: $theme_purple;
 $semantic_selection: $theme_yellow;
 $semantic_removal: $theme_coral;
 
-$background_color: var(--background-color);
-$note_input_background: var(--note-input-background);
-$note_background_edit: var(--note-background-edit);
-$note_background_not_selected: var(--note_background-not-selected);
-$note_background: var(--note-background);
-$note_border_edit: var(--note-border-edit);
-$note_border_focused: var(--noteborder-focused);
-$note_border_selected: var(--note-border-selected);
-$note_border: var(--note-border);
-$note_input_background_focus: var(--note-input-background-focus);
-$button_background: var(--button-background);
-$button_background_hover: var(--button-background-hover);
-$button_selected: var(--button-selected);
-$button_shadow_color: var(--button-shadow-color);
-$font_color: var(--font-color);
-$link_color: var(--link-color);
-
-
+// Mapping from component colors to specific colors
 :root {
     --background-color: #{$theme_mint};
-    --note_background: white;
-    --font-color: black;
-    --link-color: black;
+    --button_background_hover: #{$highlight_blue};
+    --button_background: #{$grey2};
+    --button_selected: #{$highlight_blue_dark};
+    --button_shadow_color: #{$grey5};
     --button-background: #{$grey2};
-    --note-input-background: #($grey1);
+    --font-color: #{$black};
+    --link-color: #{$black};
     --note_background_edit: #{$white};
     --note_background_not_selected: #{$grey1};
+    --note_background:  #{$white};
     --note_background: #{$white};
     --note_border_edit: #{$highlight_blue};
     --note_border_focused: #{$grey5};
     --note_border_selected: #{$black};
     --note_border: #{$grey2};
     --note_input_background_focus: #{$highlight_blue};
-    --button_background: #{$grey2};
-    --button_background_hover: #{$highlight_blue};
-    --button_selected: #{$highlight_blue_dark};
-    --button_shadow_color: #{$grey5};
+    --note-input-background: #($grey1);
   
      @media (prefers-color-scheme: dark) {
-      --background-color: black;
+      --background-color: #{color.scale($theme_mint, $lightness: -95%)};
       --button_background_hover: #{$highlight_blue};
       --button_background: #{$grey2};
       --button_selected: #{$highlight_blue_dark};
       --button_shadow_color: #{$grey5};
-      --button-background: black;
-      --font-color: white;
-      --link-color: white;
+      --button-background: #{$black};
+      --font-color: #{$white};
+      --link-color: #{$white};
       --note_background_edit: #{$white};
       --note_background_not_selected: #{$grey1};
       --note_background: #{$white};
@@ -84,7 +67,25 @@ $link_color: var(--link-color);
       --note_border_selected: #{$black};
       --note_border: #{$grey2};
       --note_input_background_focus: #{$highlight_blue};
-      --note-background: black;
+      --note-background: #{$black};
       --note-input-background: #{$grey5};
     }
   }
+
+// Component colors, which change based on theme
+$background_color: var(--background-color);
+$button_background_hover: var(--button-background-hover);
+$button_background: var(--button-background);
+$button_selected: var(--button-selected);
+$button_shadow_color: var(--button-shadow-color);
+$font_color: var(--font-color);
+$link_color: var(--link-color);
+$note_background_edit: var(--note-background-edit);
+$note_background_not_selected: var(--note_background-not-selected);
+$note_background: var(--note-background);
+$note_border_edit: var(--note-border-edit);
+$note_border_focused: var(--noteborder-focused);
+$note_border_selected: var(--note-border-selected);
+$note_border: var(--note-border);
+$note_input_background_focus: var(--note-input-background-focus);
+$note_input_background: var(--note-input-background);
