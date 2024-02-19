@@ -36,8 +36,8 @@
     --note-background-edit: #000101;
     --note-background-not-selected: #f4f4f4;
     --note-background: #000001;
-    --link-color: white;
-    --font-color: white;
+    --link-color: #cccccc;
+    --font-color: #cccccc;
     --font-color-ignores-theme: black;
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
@@ -665,7 +665,7 @@ div .top-bar {
 }
 .idea.pre, .pile.pre {
   font-size: 10px;
-  background-color: white;
+  background-color: var(--note-background);
   text-transform: uppercase;
   padding: 2px;
   border-radius: 2px;
@@ -961,7 +961,7 @@ a.grid-link {
   border-color: var(--button-background);
   border-radius: 4px;
   border-style: solid;
-  background: white;
+  background: var(--note-background);
   text-align: left;
 }
 .multi-select.option:focus, .multi-select.option-new:focus {

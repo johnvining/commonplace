@@ -77,8 +77,8 @@ $white: white;
       --note-background: #{color.scale($dark_theme_blue, $lightness: -97%)};
   
       // Font Colors
-      --link-color: #{$white};
-      --font-color: #{$white};
+      --link-color: #{color.scale($white, $lightness: -20%)};
+      --font-color: #{color.scale($white, $lightness: -20%)};
       --font-color-ignores-theme: #{$black};
 
       // Inverted
