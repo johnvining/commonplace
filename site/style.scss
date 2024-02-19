@@ -784,6 +784,7 @@ a.grid-link {
 
     &:focus { 
       background-color: $input_background_focus;
+      outline: none;
     }
   }
 
@@ -800,6 +801,11 @@ a.grid-link {
       font-family: $main_font;
       font-size: 20px;
       padding: 4px;
+      
+      &:focus { 
+        background-color: $input_background_focus;
+        outline: none;
+      }
     }
 
     &.autocomplete-div {

@@ -1147,6 +1147,7 @@ div .image-row {
 }
 .top-level.input:focus {
   background-color: var(--input-background-focus);
+  outline: none;
 }
 .top-level.author-select.search-box {
   background-color: var(--input-background);
@@ -1159,6 +1160,10 @@ div .image-row {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 20px;
   padding: 4px;
+}
+.top-level.author-select.search-box:focus {
+  background-color: var(--input-background-focus);
+  outline: none;
 }
 .top-level.author-select.autocomplete-div {
   display: inline-block;
