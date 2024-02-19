@@ -10,13 +10,13 @@
   --note-background-edit: white;
   --note-background-not-selected: #f4f4f4;
   --note-background: white;
-  --note-border-edit: #e8f4f8;
+  --note-border-edit: #c1e1ec;
   --note-border-focused: darkgray;
   --note-border-selected: black;
   --note-border: #efefef;
-  --note-input-background-focus: #e8f4f8;
+  --note-input-background-focus: #c1e1ec;
   --note-input-background: #($grey1);
-  --semantic-idea: #e8f4f8;
+  --semantic-idea: #c1e1ec;
   --semantic-pile: #f3e8f8;
   --semantic-selection: lightgoldenrodyellow;
   --semantic-removal: lightcoral;
@@ -31,17 +31,17 @@
     --button-background: black;
     --font-color: white;
     --link-color: white;
-    --note-background-edit: #08151a;
+    --note-background-edit: #071216;
     --note-background-not-selected: #f4f4f4;
     --note-background: #040b04;
-    --note-border-edit: #0b1e25;
+    --note-border-edit: #091a1f;
     --note-border-focused: darkgray;
     --note-border-selected: #efefef;
     --note-border: #0e240e;
-    --note-input-background-focus: #0b1e25;
+    --note-input-background-focus: #091a1f;
     --note-background: black;
     --note-input-background: #071207;
-    --semantic-idea: #112e37;
+    --semantic-idea: #0e262e;
     --semantic-pile: #2b1137;
     --semantic-selection: #3e3e07;
     --semantic-removal: #310606;
@@ -829,7 +829,7 @@ div .top-bar {
   text-align: left;
 }
 .search-bar.option:focus {
-  background-color: #e8f4f8;
+  background-color: var(--button-background-hover);
   border-color: black;
   outline: none;
 }
@@ -992,7 +992,7 @@ div .image-row {
   display: flex;
 }
 .image-row.image-frame.selected {
-  background-color: #e8f4f8;
+  background-color: var(--button-background-hover);
 }
 .image-row.image-frame:hover {
   background-color: var(--semantic-selection);

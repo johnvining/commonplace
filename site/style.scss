@@ -433,7 +433,7 @@ a {
     text-align: left;
 
     &:focus {
-      background-color: $highlight_blue;
+      background-color: $button-background-hover;
       border-color: $black;
       outline: none;
     }
@@ -612,7 +612,7 @@ a.grid-link {
     display: flex;
 
     &.selected {
-      background-color: $highlight_blue;
+      background-color: $button-background-hover;
     }
 
     &:hover {
