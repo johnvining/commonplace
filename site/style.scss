@@ -235,9 +235,9 @@ a {
     }
 
     &.link {
-      background-color: $button_background;
+      background-color: transparent;
       font-family: $monospace;
-      vertical-align: bottom;
+      font-size: 12px;
     }
   }
 

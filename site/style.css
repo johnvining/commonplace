@@ -687,9 +687,9 @@ div .top-bar {
   background-color: var(--semantic-idea);
 }
 .idea.label.link, .pile.label.link, .link.label.link {
-  background-color: var(--button-background);
+  background-color: transparent;
   font-family: "Courier New", Courier, monospace;
-  vertical-align: bottom;
+  font-size: 12px;
 }
 .idea.pre, .pile.pre, .link.pre {
   font-size: 10px;
