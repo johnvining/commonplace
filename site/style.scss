@@ -347,7 +347,7 @@ a {
   &.option {
     background: transparent;
     border: none;
-    color: $grey5;
+    color: $grey3;
     display: inline;
     margin: 0px;
     padding: 4px;
@@ -384,10 +384,10 @@ a {
   }
 
   &.current-modifier {
-    background: $black;
+    background: $inverse_background_color;
     border-radius: 4px;
     border-style: none;
-    color: $white;
+    color: $inverse_font_color;
     display: inline-block;
     font-family: $main_font;
     font-size: 28px;
@@ -404,6 +404,7 @@ a {
     margin: 4px auto;
     padding: 6px;
     width: 100%;
+    color: $font_color;
 
     &:focus {
       outline: none; // TODO: Fix a11y
@@ -814,7 +815,7 @@ a.grid-link {
     &.option {
       background: transparent;
       border: none;
-      color: $grey5;
+      color: $grey3;
       display: inline;
       margin: 0px;
       padding: 4px;

@@ -1,12 +1,14 @@
 :root {
   --background-color: #F7FCF7;
+  --inverse-background-color: #071207;
+  --font-color: black;
+  --link-color: black;
+  --inverse-font-color: white;
   --button-background-hover: #e8f4f8;
   --button-background: #efefef;
   --button-selected: #c1e1ec;
   --button-shadow-color: darkgray;
   --button-background: #efefef;
-  --font-color: black;
-  --link-color: black;
   --note-background-edit: white;
   --note-background-not-selected: #f4f4f4;
   --note-background: white;
@@ -24,13 +26,15 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #071207;
+    --inverse-background-color: #F7FCF7;
+    --link-color: white;
+    --font-color: white;
+    --inverse-font-color: black;
     --button-background-hover: #e8f4f8;
     --button-background: #efefef;
     --button-selected: #c1e1ec;
     --button-shadow-color: darkgray;
     --button-background: black;
-    --font-color: white;
-    --link-color: white;
     --note-background-edit: #071216;
     --note-background-not-selected: #f4f4f4;
     --note-background: #040b04;
@@ -785,10 +789,10 @@ div .top-bar {
   display: inline-block;
 }
 .search-bar.current-modifier {
-  background: black;
+  background: var(--inverse-background-color);
   border-radius: 4px;
   border-style: none;
-  color: white;
+  color: var(--inverse-font-color);
   display: inline-block;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 28px;
@@ -804,6 +808,7 @@ div .top-bar {
   margin: 4px auto;
   padding: 6px;
   width: 100%;
+  color: var(--font-color);
 }
 .search-bar.search-box:focus {
   outline: none;

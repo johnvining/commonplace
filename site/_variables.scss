@@ -19,25 +19,28 @@ $theme_coral: lightcoral;
 $theme_purple: #f3e8f8;
 $grey1: #f4f4f4;
 $grey2: #efefef;
-$grey5: darkgray;
+$grey3: darkgray;
 $black: black;
 $white: white;
 
 // Mapping from component colors to specific colors
 :root {
   --background-color: #{$theme_mint};
+  --inverse-background-color: #{color.scale($theme_mint, $lightness: -95%)};
+  --font-color: #{$black};
+  --link-color: #{$black};
+  --inverse-font-color: #{$white};
+
   --button-background-hover: #{lighten($theme_blue, 15%)};
   --button-background: #{$grey2};
   --button-selected: #{lighten($theme_blue, 5%)};
-  --button-shadow-color: #{$grey5};
+  --button-shadow-color: #{$grey3};
   --button-background: #{$grey2};
-  --font-color: #{$black};
-  --link-color: #{$black};
   --note-background-edit: #{$white};
   --note-background-not-selected: #{$grey1};
   --note-background:  #{$white};
   --note-border-edit: #{lighten($theme_blue, 5%)};
-  --note-border-focused: #{$grey5};
+  --note-border-focused: #{$grey3};
   --note-border-selected: #{$black};
   --note-border: #{$grey2};
   --note-input-background-focus: #{lighten($theme_blue, 5%)};
@@ -49,18 +52,21 @@ $white: white;
   
      @media (prefers-color-scheme: dark) {
       --background-color: #{color.scale($theme_mint, $lightness: -95%)};
+      --inverse-background-color: #{$theme_mint};
+      --link-color: #{$white};
+      --font-color: #{$white};
+      --inverse-font-color: #{$black};
+
       --button-background-hover: #{lighten($theme_blue, 15%)};
       --button-background: #{$grey2};
       --button-selected: #{lighten($theme_blue, 5%)};
-      --button-shadow-color: #{$grey5};
+      --button-shadow-color: #{$grey3};
       --button-background: #{$black};
-      --font-color: #{$white};
-      --link-color: #{$white};
       --note-background-edit: #{color.scale($theme_blue, $lightness: -93%)};
       --note-background-not-selected: #{$grey1};
       --note-background: #{color.scale($theme_mint, $lightness: -97%)};
       --note-border-edit: #{color.scale($theme_blue, $lightness: -90%)};
-      --note-border-focused: #{$grey5};
+      --note-border-focused: #{$grey3};
       --note-border-selected: #{$grey2};
       --note-border: #{color.scale($theme_mint, $lightness: -90%)};
       --note-input-background-focus: #{color.scale($theme_blue, $lightness: -90%)};
@@ -75,12 +81,15 @@ $white: white;
 
 // Component colors, which change based on theme
 $background_color: var(--background-color);
+$inverse_background_color: var(--inverse-background-color);
+$font_color: var(--font-color);
+$inverse_font_color: var(--inverse-font-color);
+$link_color: var(--link-color);
+
 $button_background_hover: var(--button-background-hover);
 $button_background: var(--button-background);
 $button_selected: var(--button-selected);
 $button_shadow_color: var(--button-shadow-color);
-$font_color: var(--font-color);
-$link_color: var(--link-color);
 $note_background_edit: var(--note-background-edit);
 $note_background_not_selected: var(--note_background-not-selected);
 $note_background: var(--note-background);
