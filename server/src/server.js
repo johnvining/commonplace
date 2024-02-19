@@ -10,6 +10,7 @@ import ideaRouter from './resources/idea/idea.router'
 import workRouter from './resources/work/work.router'
 import pileRouter from './resources/pile/pile.router'
 import nickRouter from './resources/nick/nick.router'
+import linkRouter from './resources/link/link.router'
 import userRouter from './resources/user/user.router'
 import { reqAuthenticate } from './resources/user/user.controllers.js'
 import cookieParser from 'cookie-parser'
@@ -41,6 +42,7 @@ app.use('/api/idea', ideaRouter)
 app.use('/api/work', workRouter)
 app.use('/api/pile', pileRouter)
 app.use('/api/nick', nickRouter)
+app.use('/api/link', linkRouter)
 
 export const start = async () => {
   try {
