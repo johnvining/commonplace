@@ -1,41 +1,41 @@
 :root {
   --background-color: #F7FCF7;
-  --button_background_hover: #e8f4f8;
-  --button_background: #efefef;
-  --button_selected: #c1e1ec;
-  --button_shadow_color: darkgray;
+  --button-background-hover: #e8f4f8;
+  --button-background: #efefef;
+  --button-selected: #c1e1ec;
+  --button-shadow-color: darkgray;
   --button-background: #efefef;
   --font-color: black;
   --link-color: black;
-  --note_background_edit: white;
-  --note_background_not_selected: #f4f4f4;
-  --note_background: white;
-  --note_background: white;
-  --note_border_edit: #e8f4f8;
-  --note_border_focused: darkgray;
-  --note_border_selected: black;
-  --note_border: #efefef;
-  --note_input_background_focus: #e8f4f8;
+  --note-background-edit: white;
+  --note-background-not-selected: #f4f4f4;
+  --note-background: white;
+  --note-background: white;
+  --note-border-edit: #e8f4f8;
+  --note-border-focused: darkgray;
+  --note-border-selected: black;
+  --note-border: #efefef;
+  --note-input-background-focus: #e8f4f8;
   --note-input-background: #($grey1);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #071207;
-    --button_background_hover: #e8f4f8;
-    --button_background: #efefef;
-    --button_selected: #c1e1ec;
-    --button_shadow_color: darkgray;
+    --button-background-hover: #e8f4f8;
+    --button-background: #efefef;
+    --button-selected: #c1e1ec;
+    --button-shadow-color: darkgray;
     --button-background: black;
     --font-color: white;
     --link-color: white;
-    --note_background_edit: white;
-    --note_background_not_selected: #f4f4f4;
-    --note_background: white;
-    --note_border_edit: #e8f4f8;
-    --note_border_focused: darkgray;
-    --note_border_selected: black;
-    --note_border: #efefef;
-    --note_input_background_focus: #e8f4f8;
+    --note-background-edit: white;
+    --note-background-not-selected: #f4f4f4;
+    --note-background: white;
+    --note-border-edit: #e8f4f8;
+    --note-border-focused: darkgray;
+    --note-border-selected: black;
+    --note-border: #efefef;
+    --note-input-background-focus: #e8f4f8;
     --note-background: black;
     --note-input-background: darkgray;
   }
