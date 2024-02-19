@@ -31,7 +31,8 @@ $white: white;
   --semantic-pile: #{$theme_purple};
   --semantic-selection: #{$theme_yellow};
   --semantic-removal: #{$theme_coral};
-  --input-background-focus: #{lighten($theme_blue, 15%)};
+  --button-input-background-selected: #{lighten($theme_blue, 15%)};
+  --button-selected: #{lighten($theme_blue, 5%)};
   --input-background: #{$grey2};
 
   --note-background-edit: #{$white};
@@ -56,9 +57,7 @@ $white: white;
   --note-border: #{$grey2};
 
   // Buttons
-  --button-background-hover: #{lighten($theme_blue, 15%)};
   --button-background: #{$grey2};
-  --button-selected: #{lighten($theme_blue, 5%)};
   --button-shadow-color: #{$grey3};
   
      @media (prefers-color-scheme: dark) {
@@ -68,7 +67,8 @@ $white: white;
       --semantic-pile: #{color.scale($theme_purple, $lightness: -85%)};
       --semantic-selection: #{color.scale($theme_yellow, $lightness: -85%)};
       --semantic-removal: #{color.scale($theme_coral, $lightness: -85%)};
-      --input-background-focus: #{color.scale($theme_blue, $lightness: -90%)};
+      --button-input-background-selected: #{color.scale($theme_blue, $lightness: -90%)};
+      --button-selected: #{lighten($theme_blue, 5%)};
       --input-background: #{color.scale($theme_mint, $lightness: -95%)};
 
       --note-background-edit: #{color.scale($theme_blue, $lightness: -93%)};
@@ -92,9 +92,7 @@ $white: white;
       --note-border: #{color.scale($theme_mint, $lightness: -90%)};
       
       // Buttons
-      --button-background-hover: #{lighten($theme_blue, 15%)};
       --button-background: #{$black};
-      --button-selected: #{lighten($theme_blue, 5%)};
       --button-shadow-color: #{$grey3};
     }
   }
@@ -106,8 +104,8 @@ $semantic_idea: var(--semantic-idea);
 $semantic_pile: var(--semantic-pile);
 $semantic_selection: var(--semantic-selection);
 $semantic_removal: var(--semantic-removal);
-$input_background_focus: var(--input-background-focus);
 $input_background: var(--input-background);
+$button_input_background_selected: var(--button-input-background-selected);
 
 $note_background_edit: var(--note-background-edit);
 $note_background_not_selected: var(--note_background-not-selected);
@@ -131,7 +129,6 @@ $note_border_selected: var(--note-border-selected);
 $note_border: var(--note-border);
 
 // Buttons
-$button_background_hover: var(--button-background-hover);
 $button_background: var(--button-background);
 $button_selected: var(--button-selected);
 $button_shadow_color: var(--button-shadow-color);

@@ -4,7 +4,8 @@
   --semantic-pile: #f3e8f8;
   --semantic-selection: lightgoldenrodyellow;
   --semantic-removal: lightcoral;
-  --input-background-focus: #e8f4f8;
+  --button-input-background-selected: #e8f4f8;
+  --button-selected: #c1e1ec;
   --input-background: #efefef;
   --note-background-edit: white;
   --note-background-not-selected: #f4f4f4;
@@ -19,9 +20,7 @@
   --note-border-focused: darkgray;
   --note-border-selected: black;
   --note-border: #efefef;
-  --button-background-hover: #e8f4f8;
   --button-background: #efefef;
-  --button-selected: #c1e1ec;
   --button-shadow-color: darkgray;
 }
 @media (prefers-color-scheme: dark) {
@@ -31,7 +30,8 @@
     --semantic-pile: #2b1137;
     --semantic-selection: #3e3e07;
     --semantic-removal: #310606;
-    --input-background-focus: #091a1f;
+    --button-input-background-selected: #091a1f;
+    --button-selected: #c1e1ec;
     --input-background: #071207;
     --note-background-edit: #071216;
     --note-background-not-selected: #f4f4f4;
@@ -46,9 +46,7 @@
     --note-border-focused: darkgray;
     --note-border-selected: #efefef;
     --note-border: #0e240e;
-    --button-background-hover: #e8f4f8;
     --button-background: black;
-    --button-selected: #c1e1ec;
     --button-shadow-color: darkgray;
   }
 }
@@ -167,7 +165,7 @@
 }
 .note-full .year:focus,
 .note-full .page:focus {
-  background-color: var(--input-background-focus);
+  background-color: var(--button-input-background-selected);
   outline: none;
   border-radius: 2px;
 }
@@ -205,7 +203,7 @@
 }
 .note-full .note-text:focus,
 .note-full .note-take:focus {
-  background-color: var(--input-background-focus);
+  background-color: var(--button-input-background-selected);
   outline: none;
   border-radius: 2px;
 }
@@ -236,7 +234,7 @@
 }
 .note-full .title:focus,
 .note-full .url:focus {
-  background-color: var(--input-background-focus);
+  background-color: var(--button-input-background-selected);
   outline: none;
   border-radius: 2px;
 }
@@ -278,7 +276,7 @@ input .note-full .note-take {
 }
 .note-full .edit-author.search-box:focus,
 .note-full .edit-work.search-box:focus {
-  background-color: var(--input-background-focus);
+  background-color: var(--button-input-background-selected);
   outline: none;
   border-radius: 2px;
 }
@@ -589,7 +587,7 @@ div .top-bar {
   outline: none;
 }
 .standard-button:hover {
-  background-color: var(--button-background-hover);
+  background-color: var(--button-input-background-selected);
   color: var(--font-color-ignores-theme);
   cursor: pointer;
   outline: none;
@@ -842,7 +840,7 @@ div .top-bar {
   text-align: left;
 }
 .search-bar.option:focus {
-  background-color: var(--button-background-hover);
+  background-color: var(--button-input-background-selected);
   color: var(--font-color-ignores-theme);
   border-color: black;
   outline: none;
@@ -1006,7 +1004,7 @@ div .image-row {
   display: flex;
 }
 .image-row.image-frame.selected {
-  background-color: var(--button-background-hover);
+  background-color: var(--button-input-background-selected);
 }
 .image-row.image-frame:hover {
   background-color: var(--semantic-selection);
@@ -1146,7 +1144,7 @@ div .image-row {
   white-space: pre-wrap;
 }
 .top-level.input:focus {
-  background-color: var(--input-background-focus);
+  background-color: var(--button-input-background-selected);
   outline: none;
 }
 .top-level.author-select.search-box {
@@ -1162,7 +1160,7 @@ div .image-row {
   padding: 4px;
 }
 .top-level.author-select.search-box:focus {
-  background-color: var(--input-background-focus);
+  background-color: var(--button-input-background-selected);
   outline: none;
 }
 .top-level.author-select.autocomplete-div {
@@ -1189,12 +1187,12 @@ div .image-row {
   display: inline;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 20px;
-  margin: 0px 4px 0px 4px;
+  margin: 4px 0px 4px 0px;
   padding: 4px;
 }
 .top-level.author-select.option:focus {
   outline: none;
-  background-color: var(--button-background-hover);
+  background-color: var(--button-input-background-selected);
   border-color: var(--low-intensity-border);
 }
 .top-level.author-select.option::after {
@@ -1237,7 +1235,7 @@ div .image-row {
   border-width: 0px;
 }
 .file-drop:hover {
-  background-color: var(--button-background-hover);
+  background-color: var(--button-input-background-selected);
   color: var(--font-color-ignores-theme);
   cursor: pointer;
   outline: none;
@@ -1249,7 +1247,7 @@ div .image-row {
 }
 
 .drag-active {
-  background-color: var(--button-background-hover);
+  background-color: var(--button-input-background-selected);
   color: var(--font-color-ignores-theme);
   cursor: pointer;
   outline: none;

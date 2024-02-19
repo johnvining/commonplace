@@ -148,7 +148,7 @@ a {
   }
 
   &:hover {
-    @include button-hover($button_background_hover);
+    @include button-hover($button_input_background_selected);
   }
 
   &.hidden {
@@ -436,7 +436,7 @@ a {
     text-align: left;
 
     &:focus {
-      background-color: $button_background_hover;
+      background-color: $button_input_background_selected;
       color: $font_color_ignores_theme;
       border-color: $black;
       outline: none;
@@ -616,7 +616,7 @@ a.grid-link {
     display: flex;
 
     &.selected {
-      background-color: $button-background-hover;
+      background-color: $button_input_background_selected;
     }
 
     &:hover {
@@ -783,7 +783,7 @@ a.grid-link {
     }
 
     &:focus { 
-      background-color: $input_background_focus;
+      background-color: $button_input_background_selected;
       outline: none;
     }
   }
@@ -803,7 +803,7 @@ a.grid-link {
       padding: 4px;
       
       &:focus { 
-        background-color: $input_background_focus;
+        background-color: $button_input_background_selected;
         outline: none;
       }
     }
@@ -824,6 +824,7 @@ a.grid-link {
       padding: 0px;
     }
 
+    // Needs to be improved
     &.option {
       background-color: $button_background;
       border-color: $low_intensity_border;
@@ -835,13 +836,13 @@ a.grid-link {
       display: inline;
       font-family: $main_font;
       font-size: 20px;
-      margin: 0px 4px 0px 4px;
+      margin: 4px 0px 4px 0px;
       padding: 4px;
       
 
       &:focus {
         outline: none;
-        background-color: $button_background_hover;
+        background-color: $button_input_background_selected;
         border-color: $low_intensity_border;
       }
 
@@ -892,12 +893,12 @@ a.grid-link {
   }
 
   &:hover {
-    @include button-hover($button_background_hover);
+    @include button-hover($button_input_background_selected);
   }
 }
 
 .drag-active {
-  @include button-hover($button_background_hover);
+  @include button-hover($button_input_background_selected);
 }
 
 .upload-label {
