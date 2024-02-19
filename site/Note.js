@@ -42,6 +42,7 @@ class Note extends React.Component {
     nick: '',
     compactEdit: true,
     linkToAdd: '',
+    linkedNotes: {},
   }
 
   componentDidMount() {
@@ -50,6 +51,17 @@ class Note extends React.Component {
 
     db.getNoteNick(this.props.id).then((response) => {
       this.setState({ nick: response.data.data.key })
+    })
+
+    db.getLinkedNotes(this.props.id).then((response) => {
+      let dict = {}
+      console.log(response.data.data)
+      response.data.data.forEach(async (element) => {
+        console.log('running', element)
+        dict[element._id] = (await db.getNoteNick(element._id)).data.data.key
+        console.log(dict)
+        this.setState({ linkedNotes: dict })
+      })
     })
 
     this.setState({
@@ -405,6 +417,8 @@ class Note extends React.Component {
   }
 
   render() {
+    console.log(Object.keys(this.state.linkedNotes))
+
     const { deleted } = this.state
     const { note } = this.props
 
@@ -765,6 +779,12 @@ class Note extends React.Component {
               </div>
             </>
           ) : null}
+
+          {Object.keys(this.state.linkedNotes).map((note) => (
+            <Link key={note} to={'/note/' + note}>
+              {this.state.linkedNotes[note]}
+            </Link>
+          ))}
 
           {/* Action Bar */}
           <div className="note-full container width-100">

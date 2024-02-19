@@ -233,3 +233,7 @@ export async function addNoteLinkToNote(leftNick, rightNick) {
   const data = { leftNoteNick: leftNick, rightNoteNick: rightNick }
   return axios.put(url_api + 'link/', data)
 }
+
+export async function getLinkedNotes(noteId) {
+  return axios.get(url_api + 'link/note/' + noteId)
+}
