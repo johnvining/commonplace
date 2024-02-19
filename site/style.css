@@ -638,17 +638,14 @@ div .top-bar {
   border-color: var(--semantic-idea);
 }
 .idea.label, .pile.label {
-  border-style: solid;
   border-radius: 4px;
-  border-style: solid;
-  border-color: var(--low-intensity-border);
-  color: black;
+  border-style: none;
+  color: var(--font-color);
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 15px;
-  margin: 2px 0px 2px 0px;
+  margin: 2px;
   padding: 4px;
   text-decoration: none;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  color: var(--font-color);
 }
 .idea.label:focus, .pile.label:focus {
   border-color: var(--high-intensity-border);
