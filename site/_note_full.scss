@@ -149,10 +149,10 @@
     white-space: pre-wrap;
     width: 100%;
     overflow-x:hidden;
-    color:$font_color;
+    color: $font_color;
 
     &.note-take {
-      color: black;
+      color: $font_color;
       background-color: $background_color;
       font-style: italic;
       font-size: 12px;
