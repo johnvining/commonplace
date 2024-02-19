@@ -15,6 +15,7 @@ import eye_closed from './icons/eye_closed.svg'
 import pile_img from './icons/stack.svg'
 import trash from './icons/trash.svg'
 import write from './icons/write.svg'
+import link from './icons/link.svg'
 import PileListForItem from './PileListForItem'
 import * as constants from './constants'
 import autosize from 'autosize'
@@ -40,6 +41,7 @@ class Note extends React.Component {
     fetchingOcr: false,
     nick: '',
     compactEdit: true,
+    linkToAdd: '',
   }
 
   componentDidMount() {
@@ -62,6 +64,10 @@ class Note extends React.Component {
       pendingWorkName: this.props.note.work?.name,
       pendingYear: this.props.note.year,
     })
+
+    if (this.props.mode == constants.note_modes.EDIT_LINKS) {
+      document.getElementById('linkInput').focus()
+    }
   }
 
   componentWillUnmount() {
@@ -73,11 +79,19 @@ class Note extends React.Component {
     let anyEditMode =
       this.props.mode == constants.note_modes.EDIT ||
       this.props.mode == constants.note_modes.EDIT_IDEAS ||
-      this.props.mode == constants.note_modes.EDIT_PILES
+      this.props.mode == constants.note_modes.EDIT_PILES ||
+      this.props.mode == constants.note_modes.EDIT_LINKS
 
     if (anyEditMode && event.keyCode == constants.keyCodes.esc) {
       this.props.setNoteMode('', '')
       return
+    }
+
+    if (
+      this.props.mode == constants.note_modes.EDIT_LINKS &&
+      event.code == 'Enter'
+    ) {
+      this.handleNewNoteLink()
     }
 
     if ((anyEditMode || selected) && event.ctrlKey) {
@@ -254,6 +268,12 @@ class Note extends React.Component {
       })
   }
 
+  async handleNewNoteLink() {
+    // TODO: Add refetching
+    await db.addNoteLinkToNote(this.state.nick, this.state.linkToAdd)
+    this.setState({ linkToAdd: '' })
+  }
+
   async toggleCompact() {
     this.setState({ compactEdit: !this.state.compactEdit })
   }
@@ -396,7 +416,8 @@ class Note extends React.Component {
       edit_ideas = false,
       edit_piles = false,
       selected = false,
-      no_selection = false
+      no_selection = false,
+      edit_links = false
 
     var class_name = 'note-full '
     switch (this.props.mode) {
@@ -421,6 +442,10 @@ class Note extends React.Component {
       case constants.note_modes.EDIT_PILES:
         class_name = 'note-full edit-note '
         edit_piles = true
+        break
+      case constants.note_modes.EDIT_LINKS:
+        class_name = 'note-full edit-note '
+        edit_links = true
         break
     }
 
@@ -778,54 +803,61 @@ class Note extends React.Component {
                     </button>
                   </div>
                 </>
-              ) : (
+              ) : edit_ideas || edit_piles ? (
                 <>
-                  {edit_ideas || edit_piles ? (
-                    <>
-                      <Autocomplete
-                        inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
-                        className={edit_ideas ? 'idea' : 'pile'}
-                        clearOnSelect={true}
-                        showSuggestedIdeas={edit_ideas}
-                        getIdeaSuggestions={this.handleSuggestedIdeas.bind(
-                          this
-                        )}
-                        escape={() => {
-                          edit_ideas
-                            ? this.setState({ edit_ideas: false })
-                            : this.setState({ edit_piles: false })
-                        }}
-                        onSelect={
-                          edit_ideas
-                            ? this.handleNewIdea.bind(this)
-                            : this.handleNewPile.bind(this)
-                        }
-                        handleNewSelect={
-                          edit_ideas
-                            ? this.handleCreateIdeaAndAddToNote.bind(this)
-                            : this.handleCreatePileAndAssign.bind(this)
-                        }
-                        getSuggestions={db.getSuggestions}
-                        apiType={edit_ideas ? db.types.idea : db.types.pile}
-                        excludeIds={
-                          edit_ideas
-                            ? note.ideas?.map((idea) => idea._id)
-                            : note.piles?.map((pile) => pile._id)
-                        }
-                        excludeNames={
-                          edit_ideas
-                            ? note.ideas?.map((idea) => idea.name)
-                            : null
-                        }
-                      />
-                    </>
-                  ) : (
-                    // Neither editing whole note nor ideas
-                    <span>
-                      <code style={{ verticalAlign: 'super', color: 'grey' }}>
-                        <small>{this.state.nick}</small>
-                      </code>
-                      {/* <button
+                  <Autocomplete
+                    inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
+                    className={edit_ideas ? 'idea' : 'pile'}
+                    clearOnSelect={true}
+                    showSuggestedIdeas={edit_ideas}
+                    getIdeaSuggestions={this.handleSuggestedIdeas.bind(this)}
+                    escape={() => {
+                      edit_ideas
+                        ? this.setState({ edit_ideas: false })
+                        : this.setState({ edit_piles: false })
+                    }}
+                    onSelect={
+                      edit_ideas
+                        ? this.handleNewIdea.bind(this)
+                        : this.handleNewPile.bind(this)
+                    }
+                    handleNewSelect={
+                      edit_ideas
+                        ? this.handleCreateIdeaAndAddToNote.bind(this)
+                        : this.handleCreatePileAndAssign.bind(this)
+                    }
+                    getSuggestions={db.getSuggestions}
+                    apiType={edit_ideas ? db.types.idea : db.types.pile}
+                    excludeIds={
+                      edit_ideas
+                        ? note.ideas?.map((idea) => idea._id)
+                        : note.piles?.map((pile) => pile._id)
+                    }
+                    excludeNames={
+                      edit_ideas ? note.ideas?.map((idea) => idea.name) : null
+                    }
+                  />
+                </>
+              ) : edit_links ? (
+                <div className="right-div">
+                  <input
+                    className="note-link-input"
+                    autoFocus
+                    value={this.state.linkToAdd}
+                    onChange={(e) => {
+                      this.setState({
+                        linkToAdd: e.target.value,
+                      })
+                    }}
+                  ></input>
+                </div>
+              ) : (
+                // Neither editing whole note nor ideas
+                <span>
+                  <code style={{ verticalAlign: 'super', color: 'grey' }}>
+                    <small>{this.state.nick}</small>
+                  </code>
+                  {/* <button
                         className={'action-button'}
                         onClick={() => {
                           db.getNoteNick(this.props.id).then(() => {
@@ -842,60 +874,70 @@ class Note extends React.Component {
                           <img src={clipboard}></img>
                         )}
                       </button> */}
-                      <button
-                        className={'action-button'}
-                        onClick={() => {
-                          this.props.setNoteMode(
-                            this.props.id,
-                            constants.note_modes.EDIT_PILES
-                          )
-                        }}
-                        tabIndex={selected ? null : '-1'}
-                      >
-                        <img src={pile_img}></img>
-                      </button>
-                      <button
-                        className={'action-button'}
-                        onClick={() => {
-                          this.props.setNoteMode(
-                            this.props.id,
-                            constants.note_modes.EDIT_IDEAS
-                          )
-                        }}
-                        tabIndex={selected ? null : '-1'}
-                      >
-                        <img src={tags}></img>
-                      </button>
-                      <Link to={'/note/' + this.props.id}>
-                        <button
-                          className={'action-button'}
-                          tabIndex={selected ? null : '-1'}
-                        >
-                          <img src={document_image}></img>
-                        </button>
-                      </Link>
-                      <button
-                        className={'action-button'}
-                        onClick={() => {
-                          this.props.setNoteMode(
-                            this.props.id,
-                            constants.note_modes.EDIT
-                          )
-                        }}
-                        tabIndex={selected ? null : '-1'}
-                      >
-                        <img src={write}></img>
-                      </button>
-                      <button
-                        onClick={this.handleDelete.bind(this)}
-                        className={'action-button'}
-                        tabIndex={selected ? null : '-1'}
-                      >
-                        <img src={trash}></img>
-                      </button>
-                    </span>
-                  )}
-                </>
+                  <button
+                    className={'action-button'}
+                    onClick={() => {
+                      this.props.setNoteMode(
+                        this.props.id,
+                        constants.note_modes.EDIT_PILES
+                      )
+                    }}
+                    tabIndex={selected ? null : '-1'}
+                  >
+                    <img src={pile_img}></img>
+                  </button>
+                  <button
+                    className={'action-button'}
+                    onClick={() => {
+                      this.props.setNoteMode(
+                        this.props.id,
+                        constants.note_modes.EDIT_IDEAS
+                      )
+                    }}
+                    tabIndex={selected ? null : '-1'}
+                  >
+                    <img src={tags}></img>
+                  </button>
+                  <Link to={'/note/' + this.props.id}>
+                    <button
+                      className={'action-button'}
+                      tabIndex={selected ? null : '-1'}
+                    >
+                      <img src={document_image}></img>
+                    </button>
+                  </Link>
+                  <button
+                    className={'action-button'}
+                    onClick={() => {
+                      this.props.setNoteMode(
+                        this.props.id,
+                        constants.note_modes.EDIT_LINKS
+                      )
+                    }}
+                    tabIndex={selected ? null : '-1'}
+                  >
+                    <img src={link}></img>
+                  </button>
+                  <button
+                    className={'action-button'}
+                    onClick={() => {
+                      this.props.setNoteMode(
+                        this.props.id,
+                        constants.note_modes.EDIT
+                      )
+                    }}
+                    tabIndex={selected ? null : '-1'}
+                  >
+                    <img src={write}></img>
+                  </button>
+                  <button
+                    onClick={this.handleDelete.bind(this)}
+                    className={'action-button'}
+                    tabIndex={selected ? null : '-1'}
+                  >
+                    <img src={trash}></img>
+                  </button>
+                </span>
               )}
             </div>
           </div>

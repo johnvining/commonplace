@@ -227,6 +227,23 @@
     }
   }
 
+  .note-link-input {
+    background-color: $button_input_background_selected;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    border: none;
+    font-family: $main_font;
+    font-size: 18px;
+    padding: 4px 4px 4px 8px;
+    margin: 0px;
+    color:$font_color;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
   .edit-author,
   .edit-work {
     &.search-box {

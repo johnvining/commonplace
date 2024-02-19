@@ -262,6 +262,21 @@ input .note-full .note-take {
   text-align: left;
   background-color: var(--input-background);
 }
+.note-full .note-link-input {
+  background-color: var(--button-input-background-selected);
+  border-radius: 4px;
+  display: inline-block;
+  width: 100%;
+  border: none;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 18px;
+  padding: 4px 4px 4px 8px;
+  margin: 0px;
+  color: var(--font-color);
+}
+.note-full .note-link-input:focus {
+  outline: none;
+}
 .note-full .edit-author.search-box,
 .note-full .edit-work.search-box {
   background-color: var(--input-background);

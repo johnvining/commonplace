@@ -18,6 +18,7 @@ export const note_modes = {
   EDIT: 'Editing',
   EDIT_IDEAS: 'Editing Ideas',
   EDIT_PILES: 'Editing Piles',
+  EDIT_LINKS: 'Editing Links',
 }
 
 export const modifiers = {
