@@ -16,7 +16,7 @@
   --inverse-background-color: #071207;
   --inverse-font-color: white;
   --low-intensity-border: white;
-  --note-border-edit: #c1e1ec;
+  --note-border-edit: white;
   --note-border-focused: darkgray;
   --note-border-selected: black;
   --note-border: #efefef;
@@ -42,7 +42,7 @@
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
     --low-intensity-border: #042f41;
-    --note-border-edit: #06506f;
+    --note-border-edit: #000101;
     --note-border-focused: darkgray;
     --note-border-selected: #efefef;
     --note-border: #042f41;

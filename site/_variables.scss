@@ -52,7 +52,7 @@ $white: white;
 
   // Borders
   --low-intensity-border: #{$white};
-  --note-border-edit: #{lighten($theme_blue, 5%)};
+  --note-border-edit: #{$white};
   --note-border-focused: #{$grey3};
   --note-border-selected: #{$black};
   --note-border: #{$grey2};
@@ -87,7 +87,7 @@ $white: white;
 
       // Borders
       --low-intensity-border: #{color.scale($dark_theme_blue, $lightness: 10%)};
-      --note-border-edit: #{color.scale($dark_theme_blue, $lightness: 20%)};
+      --note-border-edit: #{color.scale($dark_theme_blue, $lightness: -93%)};
       --note-border-focused: #{$grey3};
       --note-border-selected: #{$grey2};
       --note-border: #{color.scale($dark_theme_blue, $lightness: 10%)};
