@@ -10,13 +10,16 @@
   --note-background-edit: white;
   --note-background-not-selected: #f4f4f4;
   --note-background: white;
-  --note-background: white;
   --note-border-edit: #e8f4f8;
   --note-border-focused: darkgray;
   --note-border-selected: black;
   --note-border: #efefef;
   --note-input-background-focus: #e8f4f8;
   --note-input-background: #($grey1);
+  --semantic-idea: #e8f4f8;
+  --semantic-pile: #f3e8f8;
+  --semantic-selection: lightgoldenrodyellow;
+  --semantic-removal: lightcoral;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -33,11 +36,15 @@
     --note-background: #040b04;
     --note-border-edit: #0b1e25;
     --note-border-focused: darkgray;
-    --note-border-selected: white;
+    --note-border-selected: #efefef;
     --note-border: #0e240e;
     --note-input-background-focus: #0b1e25;
     --note-background: black;
     --note-input-background: #071207;
+    --semantic-idea: #112e37;
+    --semantic-pile: #2b1137;
+    --semantic-selection: #3e3e07;
+    --semantic-removal: #310606;
   }
 }
 
@@ -392,7 +399,7 @@ input .note-full .edit-work {
   background-color: transparent;
 }
 .note-slim.outer.selected {
-  background-color: lightgoldenrodyellow;
+  background-color: var(--semantic-selection);
 }
 .note-slim.inner {
   margin: 4px;
@@ -605,32 +612,33 @@ div .top-bar {
   outline: none;
 }
 .idea.search-box.pile, .pile.search-box.pile {
-  border-color: #f3e8f8;
+  border-color: var(--semantic-pile);
 }
 .idea.search-box.idea, .pile.search-box.idea {
-  border-color: #e8f4f8;
+  border-color: var(--semantic-idea);
 }
 .idea.label, .pile.label {
   border-style: solid;
   border-radius: 4px;
   border-style: solid;
-  border-color: white;
+  border-color: var(--note-background);
   color: black;
   font-size: 15px;
   margin: 2px 0px 2px 0px;
   padding: 4px;
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  color: var(--font-color);
 }
 .idea.label:focus, .pile.label:focus {
   border-color: black;
 }
 .idea.label:hover, .pile.label:hover {
-  background-color: lightgoldenrodyellow;
+  background-color: var(--semantic-selection);
   cursor: pointer;
 }
 .idea.label.edit:hover, .pile.label.edit:hover {
-  background-color: lightcoral;
+  background-color: var(--semantic-removal);
 }
 .idea.label.edit::after, .pile.label.edit::after {
   background-image: url("/icons/cross.svg");
@@ -641,10 +649,10 @@ div .top-bar {
   content: "";
 }
 .idea.label.pile, .pile.label.pile {
-  background-color: #f3e8f8;
+  background-color: var(--semantic-pile);
 }
 .idea.label.idea, .pile.label.idea {
-  background-color: #e8f4f8;
+  background-color: var(--semantic-idea);
 }
 .idea.pre, .pile.pre {
   font-size: 10px;
@@ -679,12 +687,13 @@ div .top-bar {
   padding: 4px;
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  color: var(--font-color);
 }
 .idea .option.pile, .pile .option.pile {
-  background-color: #f3e8f8;
+  background-color: var(--semantic-pile);
 }
 .idea .option.idea, .pile .option.idea {
-  background-color: #e8f4f8;
+  background-color: var(--semantic-idea);
 }
 .idea .option::after, .pile .option::after {
   content: "? ";
@@ -724,7 +733,7 @@ div .top-bar {
 }
 .pile-select.button:hover {
   cursor: pointer;
-  background-color: lightgoldenrodyellow;
+  background-color: var(--semantic-selection);
   outline: none;
 }
 .pile-select.autocomplete-div {
@@ -846,7 +855,7 @@ div .top-bar {
   display: inline-block;
   vertical-align: middle;
   width: 100%;
-  background: lightgoldenrodyellow;
+  background: var(--semantic-selection);
   align-items: center;
 }
 
@@ -986,11 +995,11 @@ div .image-row {
   background-color: #e8f4f8;
 }
 .image-row.image-frame:hover {
-  background-color: lightgoldenrodyellow;
+  background-color: var(--semantic-selection);
   cursor: pointer;
 }
 .image-row.image-frame.remove:hover {
-  background-color: lightcoral;
+  background-color: var(--semantic-removal);
 }
 .image-row img {
   max-height: 110px;

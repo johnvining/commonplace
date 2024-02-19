@@ -24,10 +24,7 @@ $grey2: #efefef;
 $grey5: darkgray;
 $black: black;
 $white: white;
-$semantic_idea: $highlight_blue;
-$semantic_pile: $theme_purple;
-$semantic_selection: $theme_yellow;
-$semantic_removal: $theme_coral;
+
 
 // Mapping from component colors to specific colors
 :root {
@@ -42,13 +39,16 @@ $semantic_removal: $theme_coral;
   --note-background-edit: #{$white};
   --note-background-not-selected: #{$grey1};
   --note-background:  #{$white};
-  --note-background: #{$white};
   --note-border-edit: #{$highlight_blue};
   --note-border-focused: #{$grey5};
   --note-border-selected: #{$black};
   --note-border: #{$grey2};
   --note-input-background-focus: #{$highlight_blue};
   --note-input-background: #($grey1);
+  --semantic-idea: #{$highlight_blue};
+  --semantic-pile: #{$theme_purple};
+  --semantic-selection: #{$theme_yellow};
+  --semantic-removal: #{$theme_coral};
   
      @media (prefers-color-scheme: dark) {
       --background-color: #{color.scale($theme_mint, $lightness: -95%)};
@@ -64,11 +64,15 @@ $semantic_removal: $theme_coral;
       --note-background: #{color.scale($theme_mint, $lightness: -97%)};
       --note-border-edit: #{color.scale($highlight_blue, $lightness: -90%)};
       --note-border-focused: #{$grey5};
-      --note-border-selected: #{$white};
+      --note-border-selected: #{$grey2};
       --note-border: #{color.scale($theme_mint, $lightness: -90%)};
       --note-input-background-focus: #{color.scale($highlight_blue, $lightness: -90%)};
       --note-background: #{$black};
       --note-input-background: #{color.scale($theme_mint, $lightness: -95%)};
+      --semantic-idea: #{color.scale($highlight_blue, $lightness: -85%)};
+      --semantic-pile: #{color.scale($theme_purple, $lightness: -85%)};
+      --semantic-selection: #{color.scale($theme_yellow, $lightness: -85%)};
+      --semantic-removal: #{color.scale($theme_coral, $lightness: -85%)};
     }
   }
 
@@ -89,3 +93,7 @@ $note_border_selected: var(--note-border-selected);
 $note_border: var(--note-border);
 $note_input_background_focus: var(--note-input-background-focus);
 $note_input_background: var(--note-input-background);
+$semantic_idea: var(--semantic-idea);
+$semantic_pile: var(--semantic-pile);
+$semantic_selection: var(--semantic-selection);
+$semantic_removal: var(--semantic-removal);
