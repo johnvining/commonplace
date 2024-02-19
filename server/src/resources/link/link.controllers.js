@@ -1,7 +1,8 @@
 import Link from '../link/link.model.js'
 import Nick from '../nick/nick.model.js'
+import Note from '../note/note.model.js'
 
-export const reqLinkNoteToNote = async (req, res, type) => {
+export const reqLinkNoteToNote = async (req, res) => {
   const leftNoteNick = await Nick.findOne({ key: req.body.leftNoteNick })
   const rightNoteNick = await Nick.findOne({
     key: req.body.rightNoteNick,
@@ -28,4 +29,18 @@ export const reqLinkNoteToNote = async (req, res, type) => {
   })
 
   return new_link
+}
+
+export const reqGetLinksForNote = async (req, res) => {
+  const noteId = req.params.id
+  const findFromLeft = await Link.find({ left_note: noteId })
+  const findFromRight = await Link.find({ right_note: noteId })
+  let combinedResults = findFromLeft.concat(findFromRight)
+  combinedResults = combinedResults
+    .map((result) => [result.left_note, result.right_note])
+    .flat()
+    .filter((result) => result != noteId)
+
+  let resultsToReturn = await Note.find({ _id: { $in: combinedResults } })
+  return resultsToReturn
 }
