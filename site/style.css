@@ -4,11 +4,11 @@
   --semantic-pile: #f3e8f8;
   --semantic-selection: lightgoldenrodyellow;
   --semantic-removal: lightcoral;
+  --input-background-focus: lightblue;
+  --input-background: #d4ebf2;
   --note-background-edit: white;
   --note-background-not-selected: #f4f4f4;
   --note-background: white;
-  --note-input-background-focus: #c1e1ec;
-  --note-input-background: #($grey1);
   --font-color: black;
   --link-color: black;
   --font-color-ignores-theme: black;
@@ -31,11 +31,11 @@
     --semantic-pile: #2b1137;
     --semantic-selection: #3e3e07;
     --semantic-removal: #310606;
+    --input-background-focus: #091a1f;
+    --input-background: #071207;
     --note-background-edit: #071216;
     --note-background-not-selected: #f4f4f4;
     --note-background: #040b04;
-    --note-input-background-focus: #091a1f;
-    --note-input-background: #071207;
     --link-color: white;
     --font-color: white;
     --font-color-ignores-theme: black;
@@ -125,7 +125,7 @@
 .note-full .year:focus,
 .note-full .page:focus,
 .note-full .url:focus {
-  background-color: var(--note-input-background-focus);
+  background-color: var(--input-background-focus);
   outline: none;
   border-radius: 2px;
 }
@@ -165,7 +165,7 @@
 }
 .note-full .year.edit,
 .note-full .page.edit {
-  background-color: var(--note-input-background);
+  background-color: var(--input-background);
 }
 .note-full .year.input,
 .note-full .page.input {
@@ -201,12 +201,12 @@
 }
 .note-full .note-text.edit,
 .note-full .note-take.edit {
-  background-color: var(--note-input-background);
+  background-color: var(--input-background);
   color: var(--font-color);
 }
 .note-full .note-text:focus,
 .note-full .note-take:focus {
-  background-color: var(--note-input-background-focus);
+  background-color: var(--input-background-focus);
   outline: none;
   border-radius: 2px;
 }
@@ -227,7 +227,7 @@
 }
 .note-full .title.edit,
 .note-full .url.edit {
-  background-color: var(--note-input-background);
+  background-color: var(--input-background);
 }
 .note-full .title.input,
 .note-full .url.input {
@@ -254,11 +254,11 @@ input .note-full .note-text,
 input .note-full .note-take {
   width: 100%;
   text-align: left;
-  background-color: var(--note-input-background);
+  background-color: var(--input-background);
 }
 .note-full .edit-author.search-box,
 .note-full .edit-work.search-box {
-  background-color: var(--note-input-background);
+  background-color: var(--input-background);
   border-radius: 4px;
   display: inline-block;
   width: 50%;
@@ -272,7 +272,7 @@ input .note-full .note-take {
 }
 .note-full .edit-author.search-box:focus,
 .note-full .edit-work.search-box:focus {
-  background-color: var(--note-input-background-focus);
+  background-color: var(--input-background-focus);
   outline: none;
   border-radius: 2px;
 }
@@ -280,7 +280,7 @@ input .note-full .edit-author,
 input .note-full .edit-work {
   width: 100%;
   text-align: left;
-  background-color: var(--note-input-background);
+  background-color: var(--input-background);
 }
 .note-full .edit-author.imputed, .note-full .edit-author.work,
 .note-full .edit-work.imputed,
@@ -1121,17 +1121,16 @@ div .image-row {
   padding: 4px;
 }
 .top-level.input {
-  background-color: transparent;
-  border-color: white;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 20px;
-  width: 100%;
-  background-color: var(--button-selected);
-  padding: 4px;
+  background-color: var(--input-background);
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-color: white;
   border-width: 1px;
+  color: var(--font-color);
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 20px;
+  padding: 4px;
+  width: 100%;
 }
 .top-level.input.textarea {
   box-sizing: border-box;
@@ -1140,13 +1139,16 @@ div .image-row {
   resize: none;
   white-space: pre-wrap;
 }
+.top-level.input:focus {
+  background-color: var(--input-background-focus);
+}
 .top-level.author-select.search-box {
-  background-color: var(--button-selected);
+  background-color: var(--input-background);
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
   border-width: 1px;
-  border: none;
+  color: var(--font-color);
   display: inline-block;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 20px;

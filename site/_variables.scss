@@ -31,11 +31,13 @@ $white: white;
   --semantic-pile: #{$theme_purple};
   --semantic-selection: #{$theme_yellow};
   --semantic-removal: #{$theme_coral};
+  --input-background-focus: #{lighten($theme_blue, 0%)};
+  --input-background: #{lighten($theme_blue, 10%)};
+
   --note-background-edit: #{$white};
   --note-background-not-selected: #{$grey1};
   --note-background:  #{$white};
-  --note-input-background-focus: #{lighten($theme_blue, 5%)};
-  --note-input-background: #($grey1);
+
 
   // Font Colors
   --font-color: #{$black};
@@ -66,12 +68,13 @@ $white: white;
       --semantic-pile: #{color.scale($theme_purple, $lightness: -85%)};
       --semantic-selection: #{color.scale($theme_yellow, $lightness: -85%)};
       --semantic-removal: #{color.scale($theme_coral, $lightness: -85%)};
+      --input-background-focus: #{color.scale($theme_blue, $lightness: -90%)};
+      --input-background: #{color.scale($theme_mint, $lightness: -95%)};
+
       --note-background-edit: #{color.scale($theme_blue, $lightness: -93%)};
       --note-background-not-selected: #{$grey1};
       --note-background: #{color.scale($theme_mint, $lightness: -97%)};
-      --note-input-background-focus: #{color.scale($theme_blue, $lightness: -90%)};
-      --note-input-background: #{color.scale($theme_mint, $lightness: -95%)};
-
+  
       // Font Colors
       --link-color: #{$white};
       --font-color: #{$white};
@@ -103,11 +106,13 @@ $semantic_idea: var(--semantic-idea);
 $semantic_pile: var(--semantic-pile);
 $semantic_selection: var(--semantic-selection);
 $semantic_removal: var(--semantic-removal);
+$input_background_focus: var(--input-background-focus);
+$input_background: var(--input-background);
+
 $note_background_edit: var(--note-background-edit);
 $note_background_not_selected: var(--note_background-not-selected);
 $note_background: var(--note-background);
-$note_input_background_focus: var(--note-input-background-focus);
-$note_input_background: var(--note-input-background);
+
 
 // Font Colors
 $font_color: var(--font-color);

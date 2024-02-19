@@ -762,17 +762,16 @@ a.grid-link {
   }
 
   &.input {
-    background-color: transparent;
-    border-color: $white;
-    font-family: $main_font;
-    font-size: 20px;
-    width: 100%;
-    background-color: $button_selected;
-    padding: 4px;
+    background-color: $input_background;
+    border-color: $low_intensity_border;
     border-radius: 4px;
     border-style: solid;
-    border-color: $white;
     border-width: 1px;
+    color: $font_color;
+    font-family: $main_font;
+    font-size: 20px;
+    padding: 4px;
+    width: 100%;
 
 
     &.textarea {
@@ -782,17 +781,21 @@ a.grid-link {
       resize: none;
       white-space: pre-wrap;
     }
+
+    &:focus { 
+      background-color: $input_background_focus;
+    }
   }
 
   // TODO: Clean up
   &.author-select {
     &.search-box {
-      background-color: $button_selected;
+      background-color: $input_background;
       border-color: $low_intensity_border;
       border-radius: 4px;
       border-style: solid;
       border-width: 1px;
-      border: none;
+      color: $font_color;
       display: inline-block;
       font-family: $main_font;
       font-size: 20px;
@@ -853,7 +856,7 @@ a.grid-link {
 
 .file-drop {
   align-items: center;
-  background-color:$button_background;
+  background-color: $button_background;
   border-color: $low_intensity_border;
   border-radius: 4px;
   border-style: solid;

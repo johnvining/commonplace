@@ -78,7 +78,7 @@
     color:$font_color;
 
     &:focus {
-      background-color: $note_input_background_focus;
+      background-color: $input_background_focus;
       outline: none;
       border-radius: 2px;
     }
@@ -121,7 +121,7 @@
     border-radius: 4px;
 
     &.edit {
-      background-color: $note_input_background;
+      background-color: $input_background;
     }
 
     &.input {
@@ -159,12 +159,12 @@
     }
 
     &.edit {
-      background-color: $note_input_background;
+      background-color: $input_background;
       color:$font_color;
     }
 
     &:focus {
-      background-color: $note_input_background_focus;
+      background-color: $input_background_focus;
       outline: none;
       border-radius: 2px;
     }
@@ -186,7 +186,7 @@
     color:$font_color;
 
     &.edit {
-      background-color: $note_input_background;
+      background-color: $input_background;
     }
 
     &.input {
@@ -215,14 +215,14 @@
     input & {
       width: 100%;
       text-align: left;
-      background-color: $note_input_background;
+      background-color: $input_background;
     }
   }
 
   .edit-author,
   .edit-work {
     &.search-box {
-      background-color: $note_input_background;
+      background-color: $input_background;
       border-radius: 4px;
       display: inline-block;
       width: 50%;
@@ -235,7 +235,7 @@
       color:$font_color;
 
       &:focus {
-        background-color: $note_input_background_focus;
+        background-color: $input_background_focus;
         outline: none;
         border-radius: 2px;
       }
@@ -244,7 +244,7 @@
     input & {
       width: 100%;
       text-align: left;
-      background-color: $note_input_background;
+      background-color: $input_background;
     }
 
     &.imputed,
