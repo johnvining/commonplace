@@ -121,14 +121,6 @@
   display: inline-block;
   color: var(--font-color);
 }
-.note-full .title:focus,
-.note-full .year:focus,
-.note-full .page:focus,
-.note-full .url:focus {
-  background-color: var(--input-background-focus);
-  outline: none;
-  border-radius: 2px;
-}
 .note-full .url {
   font-family: "Courier New", Courier, monospace;
 }
@@ -163,14 +155,21 @@
   text-align: left;
   border-radius: 4px;
 }
-.note-full .year.edit,
-.note-full .page.edit {
-  background-color: var(--input-background);
-}
 .note-full .year.input,
 .note-full .page.input {
   width: 100%;
   text-align: left;
+}
+.note-full .year.edit,
+.note-full .page.edit {
+  background-color: var(--input-background);
+  color: var(--font-color);
+}
+.note-full .year:focus,
+.note-full .page:focus {
+  background-color: var(--input-background-focus);
+  outline: none;
+  border-radius: 2px;
 }
 .note-full .citation {
   padding: 2px;
@@ -225,14 +224,21 @@
   border-radius: 4px;
   color: var(--font-color);
 }
-.note-full .title.edit,
-.note-full .url.edit {
-  background-color: var(--input-background);
-}
 .note-full .title.input,
 .note-full .url.input {
   width: 100%;
   text-align: left;
+}
+.note-full .title.edit,
+.note-full .url.edit {
+  background-color: var(--input-background);
+  color: var(--font-color);
+}
+.note-full .title:focus,
+.note-full .url:focus {
+  background-color: var(--input-background-focus);
+  outline: none;
+  border-radius: 2px;
 }
 .note-full .title {
   font-size: 18px;

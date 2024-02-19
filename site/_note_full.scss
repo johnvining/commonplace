@@ -75,13 +75,7 @@
     font-family: $main_font;
     border-style: none;
     display: inline-block;
-    color:$font_color;
-
-    &:focus {
-      background-color: $input_background_focus;
-      outline: none;
-      border-radius: 2px;
-    }
+    color: $font_color;
   }
 
   .url {
@@ -120,13 +114,20 @@
     text-align: left;
     border-radius: 4px;
 
-    &.edit {
-      background-color: $input_background;
-    }
-
     &.input {
       width: 100%;
       text-align: left;
+    }
+
+    &.edit {
+      background-color: $input_background;
+      color:$font_color;
+    }
+
+    &:focus {
+      background-color: $input_background_focus;
+      outline: none;
+      border-radius: 2px;
     }
   }
 
@@ -185,13 +186,20 @@
     border-radius: 4px;
     color:$font_color;
 
-    &.edit {
-      background-color: $input_background;
-    }
-
     &.input {
       width: 100%;
       text-align: left;
+    }
+
+    &.edit {
+      background-color: $input_background;
+      color:$font_color;
+    }
+
+    &:focus {
+      background-color: $input_background_focus;
+      outline: none;
+      border-radius: 2px;
     }
   }
 
