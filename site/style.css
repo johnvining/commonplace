@@ -16,10 +16,12 @@
   --inverse-background-color: #071207;
   --inverse-font-color: white;
   --low-intensity-border: white;
+  --high-intensity-border: black;
   --note-border-edit: white;
   --note-border-focused: darkgray;
   --note-border-selected: black;
   --note-border: #efefef;
+  --button-border: white;
   --button-background: #efefef;
   --button-shadow-color: darkgray;
 }
@@ -42,10 +44,12 @@
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
     --low-intensity-border: #042f41;
+    --high-intensity-border: #cccccc;
     --note-border-edit: #000101;
     --note-border-focused: darkgray;
     --note-border-selected: #efefef;
     --note-border: #042f41;
+    --button-border: #042f41;
     --button-background: black;
     --button-shadow-color: darkgray;
   }
@@ -571,19 +575,8 @@ div .top-bar {
   border-right: 0px;
   margin-left: 0px;
 }
-.standard-button.button-selected:focus {
-  border-color: var(--button-selected);
-  outline: none;
-}
-.standard-button.button-selected {
-  background-color: var(--button-selected);
-}
-.standard-button.button-selected img {
-  -webkit-filter: invert(0%);
-  filter: invert(0%);
-}
 .standard-button:focus {
-  border-color: var(--button-selected);
+  border-color: var(--button-border);
   outline: none;
 }
 .standard-button:hover {
@@ -593,9 +586,29 @@ div .top-bar {
   outline: none;
   border-color: white;
 }
-.standard-button:hover img {
+.standard-button.button-selected {
+  background-color: var(--button-selected);
+}
+.standard-button.button-selected img {
   -webkit-filter: invert(0%);
   filter: invert(0%);
+}
+.standard-button.button-selected:focus {
+  border-color: var(--button-border);
+  outline: none;
+}
+.standard-button.button-selected:hover {
+  background-color: var(--button-input-background-selected);
+  color: var(--font-color-ignores-theme);
+  cursor: pointer;
+  outline: none;
+  border-color: white;
+}
+@media (prefers-color-scheme: dark) {
+  .standard-button.button-selected:hover img {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
 }
 .standard-button.hidden {
   display: none;
@@ -630,7 +643,7 @@ div .top-bar {
   border-style: solid;
   border-radius: 4px;
   border-style: solid;
-  border-color: var(--note-background);
+  border-color: var(--low-intensity-border);
   color: black;
   font-size: 15px;
   margin: 2px 0px 2px 0px;
@@ -640,7 +653,7 @@ div .top-bar {
   color: var(--font-color);
 }
 .idea.label:focus, .pile.label:focus {
-  border-color: black;
+  border-color: var(--high-intensity-border);
 }
 .idea.label:hover, .pile.label:hover {
   background-color: var(--semantic-selection);
@@ -842,7 +855,7 @@ div .top-bar {
 .search-bar.option:focus {
   background-color: var(--button-input-background-selected);
   color: var(--font-color-ignores-theme);
-  border-color: black;
+  border-color: var(--high-intensity-border);
   outline: none;
 }
 .search-bar.option:not(.new)::after {
@@ -939,7 +952,10 @@ a.grid-link {
   padding: 8px;
   margin: 2px;
   border-width: 2px;
-  border-color: black;
+  border-color: var(--low-intensity-border);
+  background-color: var(--button-input-background-selected);
+  color: var(--font-color);
+  outline: none;
   border-radius: 4px;
   border-style: solid;
 }
@@ -958,14 +974,14 @@ a.grid-link {
   padding: 8px;
   margin: 2px;
   border-width: 2px;
-  border-color: var(--button-background);
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
   background: var(--note-background);
   text-align: left;
 }
 .multi-select.option:focus, .multi-select.option-new:focus {
-  border-color: black;
+  border-color: var(--high-intensity-border);
 }
 .multi-select.option-new::before {
   background-image: url("/icons/plus.svg");
@@ -1104,15 +1120,15 @@ div .image-row {
   font-size: 22px;
 }
 .top-level.post-button-content {
-  white-space: pre-wrap;
-  display: block;
   background-color: var(--note-background);
   border-color: var(--note-border);
+  border-radius: 4px;
   border-style: solid;
   border-width: 2px;
-  border-radius: 4px;
+  display: block;
   margin: 0px 0px 4px 0px;
   padding: 6px;
+  white-space: pre-wrap;
 }
 .top-level.form-label {
   font-size: 12px;
@@ -1241,10 +1257,6 @@ div .image-row {
   outline: none;
   border-color: white;
 }
-.file-drop:hover img {
-  -webkit-filter: invert(0%);
-  filter: invert(0%);
-}
 
 .drag-active {
   background-color: var(--button-input-background-selected);
@@ -1252,10 +1264,6 @@ div .image-row {
   cursor: pointer;
   outline: none;
   border-color: white;
-}
-.drag-active img {
-  -webkit-filter: invert(0%);
-  filter: invert(0%);
 }
 
 .upload-label {

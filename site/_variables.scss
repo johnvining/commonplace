@@ -52,10 +52,12 @@ $white: white;
 
   // Borders
   --low-intensity-border: #{$white};
+  --high-intensity-border: #{$black};
   --note-border-edit: #{$white};
   --note-border-focused: #{$grey3};
   --note-border-selected: #{$black};
   --note-border: #{$grey2};
+  --button-border: #{$white};
 
   // Buttons
   --button-background: #{$grey2};
@@ -87,10 +89,12 @@ $white: white;
 
       // Borders
       --low-intensity-border: #{color.scale($dark_theme_blue, $lightness: 10%)};
+      --high-intensity-border: #{color.scale($white, $lightness: -20%)};
       --note-border-edit: #{color.scale($dark_theme_blue, $lightness: -93%)};
       --note-border-focused: #{$grey3};
       --note-border-selected: #{$grey2};
       --note-border: #{color.scale($dark_theme_blue, $lightness: 10%)};
+      --button-border: #{color.scale($dark_theme_blue, $lightness: 10%)};
       
       // Buttons
       --button-background: #{$black};
@@ -112,7 +116,6 @@ $note_background_edit: var(--note-background-edit);
 $note_background_not_selected: var(--note_background-not-selected);
 $note_background: var(--note-background);
 
-
 // Font Colors
 $font_color: var(--font-color);
 $link_color: var(--link-color);
@@ -124,10 +127,12 @@ $inverse_font_color: var(--inverse-font-color);
 
 // Borders
 $low_intensity_border: var(--low-intensity-border);
+$high_intensity_border: var(--high-intensity-border);
 $note_border_edit: var(--note-border-edit);
 $note_border_focused: var(--note-border-focused);
 $note_border_selected: var(--note-border-selected);
 $note_border: var(--note-border);
+$button_border: var(--button-border);
 
 // Buttons
 $button_background: var(--button-background);
