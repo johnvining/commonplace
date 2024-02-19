@@ -53,14 +53,7 @@ class Note extends React.Component {
       this.setState({ nick: response.data.data.key })
     })
 
-    db.getLinkedNotes(this.props.id).then((response) => {
-      let dict = {}
-      response.data.data.forEach(async (element) => {
-        dict[element._id] = (await db.getNoteNick(element._id)).data.data.key
-        // TODO: Smarter way of doing this
-        this.setState({ linkedNotes: dict })
-      })
-    })
+    this.fetchLinkedNotes()
 
     this.setState({
       pendingAuthorId: this.props.note.author?._id,
@@ -195,6 +188,18 @@ class Note extends React.Component {
       this.setState({ pendingUrl: val.target.value })
     }
   }
+
+  fetchLinkedNotes() {
+    db.getLinkedNotes(this.props.id).then((response) => {
+      let dict = {}
+      response.data.data.forEach(async (element) => {
+        dict[element._id] = (await db.getNoteNick(element._id)).data.data.key
+        // TODO: Smarter way of doing this
+        this.setState({ linkedNotes: dict })
+      })
+    })
+  }
+
   // TODO: Clear entry after assignment
   handleCreateIdeaAndAddToNote = (ideaName) => {
     db.createAndLinkToRecord(
@@ -281,6 +286,7 @@ class Note extends React.Component {
   async handleNewNoteLink() {
     // TODO: Add refetching
     await db.addNoteLinkToNote(this.state.nick, this.state.linkToAdd)
+    this.fetchLinkedNotes()
     this.setState({ linkToAdd: '' })
   }
 
