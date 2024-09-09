@@ -47,6 +47,19 @@ app.use('/api/link', linkRouter)
 export const start = async () => {
   try {
     await connect()
+
+    if (!config.isDev) {
+      console.log('Startning ngrok...')
+      const url = await ngrok.connect({
+        proto: 'http',
+        authtoken: config.secrets.ngrokAuth,
+        hostname: config.ngrokUrl,
+        addr: config.port,
+      })
+
+      console.log(`Listening on url ${url}`)
+    }
+
     app.listen(config.port, () => {
       console.log(`REST API on http://localhost:${config.port}/api`)
     })
