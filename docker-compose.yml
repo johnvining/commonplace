@@ -1,12 +1,28 @@
 version: '3.7'
 
 services:
-  server:
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: commonplace-ngrok
+    network_mode: "host"
+    # restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--log=stdout"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+    depends_on:
+      - commonplace-site
+  commonplace-server:
     build:
       context: ./server
       dockerfile: Dockerfile
     image: commonplace-server-image
-    container_name: commonplace-server
     volumes:
       - ./server/:/usr/src/app
       - image-store:/usr/src/app/image-store
@@ -21,36 +37,34 @@ services:
       - app-network
   mongo:
     image: mongo:4.4.8
-    container_name: commonplace-db
     volumes:
       - mongo-data:/data/db
     ports:
       - "27017:27017"
     networks:
       - app-network
-  site:
+  commonplace-site:
     build:
       context: ./site
       dockerfile: Dockerfile
-    image: commonplace-site-image 
-    container_name: commonplace-site
+    image: commonplace-site-image
     volumes:
       - ./client/:/usr/app
       - /usr/app/node_modules
     depends_on:
-      - server
+      - commonplace-server
     ports:
       - "8080:80"
     networks:
       - app-network
 
 networks:
-    app-network:
-        driver: bridge
+  app-network:
+    driver: bridge
 
 volumes:
-    image-store:
-    mongo-data:
-    node_modules:
-    web-root:
-      driver: local
+  image-store:
+  mongo-data:
+  node_modules:
+  web-root:
+    driver: local
