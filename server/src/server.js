@@ -15,6 +15,7 @@ import userRouter from './resources/user/user.router'
 import { reqAuthenticate } from './resources/user/user.controllers.js'
 import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
+import ngrok from 'ngrok'
 
 export const app = express()
 
