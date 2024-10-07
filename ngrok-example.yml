@@ -1,0 +1,10 @@
+---
+version: 3
+agent:
+  authtoken: <TOKEN>
+endpoints:
+  - name: commonplace-nginx
+    url: <URL>
+    upstream:
+      url: 8080
+      protocol: http1
