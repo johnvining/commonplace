@@ -77,7 +77,7 @@ export const getOpenAiOCR = async function (image_location) {
         ],
       },
     ],
-    model: 'gpt-4-vision-preview',
+    model: 'gpt-4o',
     max_tokens: 1200,
   })
 
