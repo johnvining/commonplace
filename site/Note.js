@@ -806,10 +806,6 @@ class Note extends React.Component {
               {edit ? (
                 <>
                   <div className="left-div">
-                    <ClickToCopyNick
-                      nick={this.state.nick}
-                      style={{ verticalAlign: 'super', marginRight: '10px' }}
-                    />
                     <ImageUploader
                       onImageUpload={this.onImageUpload.bind(this)}
                       noMarginNoBorders={true}
@@ -843,10 +839,6 @@ class Note extends React.Component {
                 </>
               ) : edit_ideas || edit_piles ? (
                 <>
-                  <ClickToCopyNick
-                    nick={this.state.nick}
-                    style={{ verticalAlign: 'super', marginRight: '10px' }}
-                  />
                   <Autocomplete
                     inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
                     className={edit_ideas ? 'idea' : 'pile'}
@@ -882,10 +874,6 @@ class Note extends React.Component {
                 </>
               ) : edit_links ? (
                 <>
-                  <ClickToCopyNick
-                    nick={this.state.nick}
-                    style={{ verticalAlign: 'super', marginRight: '10px' }}
-                  />
                   <div className="right-div">
                     <input
                       className="note-link-input"
