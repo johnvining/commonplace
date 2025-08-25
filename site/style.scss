@@ -922,3 +922,10 @@ a.grid-link {
 .upload-label {
   cursor: pointer;
 }
+
+// Click to copy nick styles
+.click-to-copy-nick {
+  &:not(.disabled):hover code {
+    text-decoration: underline;
+  }
+}

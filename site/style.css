@@ -1297,4 +1297,8 @@ div .image-row {
   cursor: pointer;
 }
 
+.click-to-copy-nick:not(.disabled):hover code {
+  text-decoration: underline;
+}
+
 /*# sourceMappingURL=style.css.map */

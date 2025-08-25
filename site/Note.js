@@ -21,6 +21,7 @@ import * as constants from './constants'
 import autosize from 'autosize'
 import YearUrlComboSpan from './YearUrlComboSpan'
 import WorkCitationSpan from './WorkCitationSpan'
+import ClickToCopyNick from './ClickToCopyNick'
 
 class Note extends React.Component {
   state = {
@@ -805,6 +806,10 @@ class Note extends React.Component {
               {edit ? (
                 <>
                   <div className="left-div">
+                    <ClickToCopyNick
+                      nick={this.state.nick}
+                      style={{ verticalAlign: 'super', marginRight: '10px' }}
+                    />
                     <ImageUploader
                       onImageUpload={this.onImageUpload.bind(this)}
                       noMarginNoBorders={true}
@@ -838,6 +843,10 @@ class Note extends React.Component {
                 </>
               ) : edit_ideas || edit_piles ? (
                 <>
+                  <ClickToCopyNick
+                    nick={this.state.nick}
+                    style={{ verticalAlign: 'super', marginRight: '10px' }}
+                  />
                   <Autocomplete
                     inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
                     className={edit_ideas ? 'idea' : 'pile'}
@@ -872,41 +881,31 @@ class Note extends React.Component {
                   />
                 </>
               ) : edit_links ? (
-                <div className="right-div">
-                  <input
-                    className="note-link-input"
-                    autoFocus
-                    value={this.state.linkToAdd}
-                    onChange={(e) => {
-                      this.setState({
-                        linkToAdd: e.target.value,
-                      })
-                    }}
-                  ></input>
-                </div>
+                <>
+                  <ClickToCopyNick
+                    nick={this.state.nick}
+                    style={{ verticalAlign: 'super', marginRight: '10px' }}
+                  />
+                  <div className="right-div">
+                    <input
+                      className="note-link-input"
+                      autoFocus
+                      value={this.state.linkToAdd}
+                      onChange={(e) => {
+                        this.setState({
+                          linkToAdd: e.target.value,
+                        })
+                      }}
+                    ></input>
+                  </div>
+                </>
               ) : (
                 // Neither editing whole note nor ideas
                 <span>
-                  <code style={{ verticalAlign: 'super', color: 'grey' }}>
-                    <small>{this.state.nick}</small>
-                  </code>
-                  {/* <button
-                        className={'action-button'}
-                        onClick={() => {
-                          db.getNoteNick(this.props.id).then(() => {
-                            // navigator.clipboard.writeText(
-                            //   response.data.data.key
-                            // )
-                          })
-                        }}
-                        tabIndex="-1"
-                      >
-                        {this.state.fetchNick ? (
-                          <img src={clipboard_check}></img>
-                        ) : (
-                          <img src={clipboard}></img>
-                        )}
-                      </button> */}
+                  <ClickToCopyNick
+                    nick={this.state.nick}
+                    style={{ verticalAlign: 'super' }}
+                  />
                   <button
                     className={'action-button'}
                     onClick={() => {

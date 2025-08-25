@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import circle from './icons/circle.svg'
 import check_circle from './icons/check_circle.svg'
 import * as db from './Database'
+import ClickToCopyNick from './ClickToCopyNick'
 
 class NoteGrid extends React.Component {
   state = {}
@@ -49,7 +50,7 @@ class NoteGrid extends React.Component {
         <div className="grid-link">
           <Link to={'/note/' + this.props.id}>
             <div className="grid-nick">
-              {this.state.nick}
+              <ClickToCopyNick nick={this.state.nick} disableClick={true} />
               <span className="grid-unprintable">|</span>
             </div>
             <div className="grid-author">

@@ -1,4 +1,5 @@
 import React from 'react'
+import ClickToCopyNick from './ClickToCopyNick'
 
 export function TopLevelStandardButton(props) {
   let className = 'standard-button'
@@ -36,11 +37,7 @@ export function TopLevelStandardButtonContainer(props) {
     <div>
       {props.children}{' '}
       {props.nick ? (
-        <div style={{ display: 'inline', marginLeft: '10px' }}>
-          <code style={{ color: 'grey' }}>
-            <small>{props.nick}</small>
-          </code>
-        </div>
+        <ClickToCopyNick nick={props.nick} style={{ marginLeft: '10px' }} />
       ) : null}
     </div>
   )
