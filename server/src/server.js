@@ -15,7 +15,6 @@ import userRouter from './resources/user/user.router'
 import { reqAuthenticate } from './resources/user/user.controllers.js'
 import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
-import ngrok from 'ngrok'
 
 export const app = express()
 
@@ -47,25 +46,6 @@ app.use('/api/link', linkRouter)
 
 export const start = async () => {
   try {
-    // if (!config.isDev) {
-    //   console.log('Startning ngrok...')
-    //   try {
-    //     const url = await ngrok.connect({
-    //       proto: 'http',
-    //       authtoken: config.secrets.ngrokAuth,
-    //       hostname: config.ngrokUrl,
-    //       addr: config.port,
-    //     })
-    //   } catch (e) {
-    //     console.log('error connecitng to ngrok')
-    //     console.log(config.ngrokUrl)
-    //     console.log(config.port)
-    //     console.error(e)
-    //   }
-
-    //   console.log(`Listening on url ${url}`)
-    // }
-
     console.log('Connecting to Mongo...')
     await connect()
 
