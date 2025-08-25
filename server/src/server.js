@@ -47,20 +47,29 @@ app.use('/api/link', linkRouter)
 
 export const start = async () => {
   try {
+    // if (!config.isDev) {
+    //   console.log('Startning ngrok...')
+    //   try {
+    //     const url = await ngrok.connect({
+    //       proto: 'http',
+    //       authtoken: config.secrets.ngrokAuth,
+    //       hostname: config.ngrokUrl,
+    //       addr: config.port,
+    //     })
+    //   } catch (e) {
+    //     console.log('error connecitng to ngrok')
+    //     console.log(config.ngrokUrl)
+    //     console.log(config.port)
+    //     console.error(e)
+    //   }
+
+    //   console.log(`Listening on url ${url}`)
+    // }
+
+    console.log('Connecting to Mongo...')
     await connect()
 
-    if (!config.isDev) {
-      console.log('Startning ngrok...')
-      const url = await ngrok.connect({
-        proto: 'http',
-        authtoken: config.secrets.ngrokAuth,
-        hostname: config.ngrokUrl,
-        addr: config.port,
-      })
-
-      console.log(`Listening on url ${url}`)
-    }
-
+    console.log('Listening...')
     app.listen(config.port, () => {
       console.log(`REST API on http://localhost:${config.port}/api`)
     })

@@ -1,12 +1,6 @@
 import { createNewNoteFromTitle } from './Database'
-import { render } from 'react-dom'
-import {
-  Routes,
-  Route,
-  useNavigate,
-  Link,
-  BrowserRouter,
-} from 'react-router-dom'
+import { createRoot } from 'react-dom/client'
+import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
 import Author from './Author'
 import FileList from './FileList'
 import FlipList from './FlipList'
@@ -153,9 +147,7 @@ class App extends React.Component {
                 <button
                   className="standard-button left-right"
                   onClick={async () => {
-                    // TODO: Fix react hook / Use navigate -- Hooks can only be called inside of the body of a function component.
-                    const navigate = useNavigate()
-                    navigate('/')
+                    window.location.href = '/'
                   }}
                 >
                   <img src={home_door} />{' '}
@@ -165,10 +157,9 @@ class App extends React.Component {
                 <button
                   className="standard-button left-right"
                   onClick={async () => {
-                    // TODO: Fix react hook / Use navigate -- Hooks can only be called inside of the body of a function component.
                     const response = await createNewNoteFromTitle('')
-                    const navigate = useNavigate()
-                    navigate('/note/' + response.data._id + '/edit')
+                    window.location.href =
+                      '/note/' + response.data._id + '/edit'
                   }}
                 >
                   <img src={plus} />{' '}
@@ -313,9 +304,9 @@ class App extends React.Component {
   }
 }
 
-render(
+const root = createRoot(document.getElementById('root'))
+root.render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>,
-  document.getElementById('root')
+  </BrowserRouter>
 )
