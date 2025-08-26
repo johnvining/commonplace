@@ -56,7 +56,6 @@ export const getSuggestedIdeas = async function (note_title, note_text) {
   }
 }
 
-// https://platform.openai.com/docs/guides/vision?lang=node
 export const getOpenAiOCR = async function (image_location) {
   var imageAsBase64 = fs.readFileSync(image_location, 'base64')
   const chatCompletion = await openai.chat.completions.create({
@@ -66,7 +65,7 @@ export const getOpenAiOCR = async function (image_location) {
         content: [
           {
             type: 'text',
-            text: 'Transcribe the text in this image and only include semantically important line breaks:',
+            text: 'Transcribe the text in this image and only include semantically important line breaks. Return just the text without any additional punctuation or markdown.',
           },
           {
             type: 'image_url',

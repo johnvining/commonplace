@@ -284,6 +284,54 @@ class NoteList extends React.Component {
     this.handleAddNew(newIdToAssign.data.data._id)
   }
 
+  async bulkOcr() {
+    let indicesToBeProcessed = this.getSelectedIndices()
+
+    if (indicesToBeProcessed.length === 0) {
+      alert('No notes selected for OCR processing')
+      return
+    }
+
+    if (
+      !confirm(
+        `Process ${indicesToBeProcessed.length} notes with OCR? This will update notes that have no text.`
+      )
+    ) {
+      return
+    }
+
+    let noteIds = indicesToBeProcessed.map(
+      (index) => this.state.notes[index]._id
+    )
+
+    try {
+      const response = await db.bulkOcrForNotes(noteIds)
+      const results = response.data.data
+
+      let updatedNotes = [...this.state.notes]
+      let updatedCount = 0
+
+      results.forEach((result) => {
+        if (result.success && result.textUpdated) {
+          const noteIndex = updatedNotes.findIndex(
+            (note) => note._id === result.noteId
+          )
+          if (noteIndex !== -1) {
+            updatedNotes[noteIndex].text = result.ocrText
+            updatedCount++
+          }
+        }
+      })
+
+      this.setState({ notes: updatedNotes })
+    } catch (error) {
+      console.error('Bulk OCR error:', error)
+      alert('Error processing OCR. Please try again.')
+    }
+
+    this.clearSelection()
+  }
+
   render() {
     var showMultiselect =
       this.props.viewMode == constants.view_modes.FULL ||
@@ -343,6 +391,11 @@ class NoteList extends React.Component {
                   }}
                   multiSelect={true}
                   position={'right'}
+                />
+                <TopLevelStandardButton
+                  name="OCR"
+                  onClick={this.bulkOcr.bind(this)}
+                  multiSelect={true}
                 />
                 <TopLevelStandardButton
                   name="Unselect All"

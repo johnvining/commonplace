@@ -265,6 +265,53 @@ export const reqBulkImportNotesCSV = async (req, res) => {
   return recordsImported
 }
 
+export const reqBulkOcrForNotes = async (req, res) => {
+  const noteIds = req.body.noteIds
+
+  const notePromises = noteIds.map(async (noteId) => {
+    try {
+      let note = await Note.findOne({ _id: noteId })
+
+      // Only run OCR if note has no text and has images
+      if (!note.text && note.images && note.images.length > 0) {
+        // Process all images for this note in parallel
+        const imagePromises = note.images.map((imagePath) =>
+          getOpenAiOCR(config.imageStorePath + '/' + imagePath)
+        )
+
+        const imageResults = await Promise.all(imagePromises)
+        const ocrText = imageResults.join('\n\n').trim()
+
+        // Update the note with OCR text
+        await Note.updateOne({ _id: noteId }, { $set: { text: ocrText } })
+
+        return {
+          noteId: noteId,
+          success: true,
+          textUpdated: true,
+          ocrText: ocrText,
+        }
+      } else {
+        return {
+          noteId: noteId,
+          success: true,
+          textUpdated: false,
+          reason: note.text ? 'Note already has text' : 'No images to process',
+        }
+      }
+    } catch (error) {
+      return {
+        noteId: noteId,
+        success: false,
+        error: error.message,
+      }
+    }
+  })
+
+  const results = await Promise.all(notePromises)
+  return results
+}
+
 // slim: don't need any population
 export const findNotesAndPopulate = async function (
   searchObject,

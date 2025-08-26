@@ -194,6 +194,11 @@ export async function getNoteTextOCR(noteID) {
   return axios.get(url_api + `note/` + noteID + `/ocr`)
 }
 
+export async function bulkOcrForNotes(noteIds) {
+  const data = { noteIds: noteIds }
+  return axios.post(url_api + 'note/bulk-ocr', data)
+}
+
 export async function getNoteNick(noteID) {
   return axios.put(url_api + `nick/note/` + noteID)
 }
