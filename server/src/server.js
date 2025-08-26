@@ -12,6 +12,7 @@ import pileRouter from './resources/pile/pile.router'
 import nickRouter from './resources/nick/nick.router'
 import linkRouter from './resources/link/link.router'
 import userRouter from './resources/user/user.router'
+import statsRouter from './resources/stats/stats.router'
 import { reqAuthenticate } from './resources/user/user.controllers.js'
 import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
@@ -43,6 +44,7 @@ app.use('/api/work', workRouter)
 app.use('/api/pile', pileRouter)
 app.use('/api/nick', nickRouter)
 app.use('/api/link', linkRouter)
+app.use('/api/stats', statsRouter)
 
 export const start = async () => {
   try {

@@ -18,6 +18,7 @@ import RecentList from './RecentList'
 import search from './icons/search.svg'
 import home_door from './icons/home_door.svg'
 import SearchBar from './SearchBar'
+import Stats from './Stats'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
 import Read from './Read'
@@ -132,6 +133,9 @@ class App extends React.Component {
                   <div className="title">commonplace </div>
                 )}
               </Link>
+            </div>
+            <div className="stats-center">
+              <Stats />
             </div>
             <div className="top-action-bar">
               <div className="tool-bar div">

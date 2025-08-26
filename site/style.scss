@@ -55,7 +55,7 @@ a {
 
   .title-bar {
     display: none;
-    width: 50%;
+    width: 33%;
     align-self: flex-start;
 
     @include tablet-plus {
@@ -72,13 +72,24 @@ a {
     }
   }
 
+  .stats-center {
+    display: none;
+    width: 34%;
+    align-self: center;
+    justify-content: center;
+
+    @include tablet-plus {
+      display: flex;
+    }
+  }
+
   .top-action-bar {
     display: inline-flex;
     justify-content: flex-end;
     width: 100%;
     min-height: 4em;
     @include tablet-plus {
-      width: 50%;
+      width: 33%;
     }
   }
 
@@ -87,6 +98,30 @@ a {
       align-self: center;
     
   }
+}
+
+.stats-display {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  color: $font_color;
+  opacity: 0.6;
+  
+  .stat-item {
+    margin-right: 8px;
+    white-space: nowrap;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+.stats-loading {
+  font-size: 10px;
+  color: $font_color;
+  opacity: 0.4;
+  margin: 0 8px;
 }
 
 .standard-button {

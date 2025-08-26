@@ -515,7 +515,7 @@ div .top-bar {
 }
 .top-bar .title-bar {
   display: none;
-  width: 50%;
+  width: 33%;
   align-self: flex-start;
 }
 @media (min-width: 768px) {
@@ -533,6 +533,17 @@ div .top-bar {
     font-size: 34px;
   }
 }
+.top-bar .stats-center {
+  display: none;
+  width: 34%;
+  align-self: center;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .top-bar .stats-center {
+    display: flex;
+  }
+}
 .top-bar .top-action-bar {
   display: inline-flex;
   justify-content: flex-end;
@@ -541,12 +552,34 @@ div .top-bar {
 }
 @media (min-width: 768px) {
   .top-bar .top-action-bar {
-    width: 50%;
+    width: 33%;
   }
 }
 .top-bar .tool-bar.div {
   margin: 0px 0px 0px 10px;
   align-self: center;
+}
+
+.stats-display {
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  color: var(--font-color);
+  opacity: 0.6;
+}
+.stats-display .stat-item {
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.stats-display .stat-item:last-child {
+  margin-right: 0;
+}
+
+.stats-loading {
+  font-size: 10px;
+  color: var(--font-color);
+  opacity: 0.4;
+  margin: 0 8px;
 }
 
 .standard-button {
@@ -1024,7 +1057,6 @@ a.grid-link {
   padding-bottom: 4px;
   padding-top: 4px;
   min-height: 52px;
-  z-index: 2;
 }
 
 div .image-row {
