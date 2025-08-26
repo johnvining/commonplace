@@ -27,6 +27,11 @@ export async function getInfo(type, Id) {
   return axios.get(url_api + type + `/${Id}`)
 }
 
+// Get note by nick in a single request
+export async function getNoteByNick(nick) {
+  return axios.get(url_api + 'note/nick/' + nick)
+}
+
 // Supported types: idea, auth, work, pile
 export async function createRecord(type, name) {
   const data = { name: name }

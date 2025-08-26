@@ -9,9 +9,13 @@ class NoteGrid extends React.Component {
   state = {}
 
   componentDidMount() {
-    db.getNoteNick(this.props.id).then((response) => {
-      this.setState({ nick: response.data.data.key })
-    })
+    if (this.props.note && this.props.note.nick) {
+      this.setState({ nick: this.props.note.nick })
+    } else {
+      db.getNoteNick(this.props.id).then((response) => {
+        this.setState({ nick: response.data.data.key })
+      })
+    }
   }
 
   markChecked(e) {

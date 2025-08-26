@@ -558,6 +558,7 @@ class NoteList extends React.Component {
                       markChecked={this.markChecked.bind(this)}
                       markShiftChecked={this.markShiftChecked.bind(this)}
                       imageCount={note.images?.length ?? 0}
+                      note={note}
                     />
                   ) : this.props.viewMode == constants.view_modes.SLIM ? (
                     <NoteSlim

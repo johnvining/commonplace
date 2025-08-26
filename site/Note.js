@@ -50,9 +50,13 @@ class Note extends React.Component {
     this.keyDownListener = this.handleKeyDown.bind(this)
     document.addEventListener('keydown', this.keyDownListener, false)
 
-    db.getNoteNick(this.props.id).then((response) => {
-      this.setState({ nick: response.data.data.key })
-    })
+    if (this.props.note.nick) {
+      this.setState({ nick: this.props.note.nick })
+    } else {
+      db.getNoteNick(this.props.id).then((response) => {
+        this.setState({ nick: response.data.data.key })
+      })
+    }
 
     this.fetchLinkedNotes()
 

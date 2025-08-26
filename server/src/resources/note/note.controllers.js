@@ -397,7 +397,6 @@ export const reqBulkGetNotesForMarkdown = async (req, res) => {
   return results
 }
 
-// slim: don't need any population
 export const findNotesAndPopulate = async function (
   searchObject,
   sortObject,
@@ -405,15 +404,16 @@ export const findNotesAndPopulate = async function (
   skip = null,
   limit = null
 ) {
+  let notes
   if (slim) {
-    return await Note.find(searchObject)
+    notes = await Note.find(searchObject)
       .sort(sortObject)
       .skip(skip)
       .limit(limit)
       .lean()
       .exec()
   } else {
-    return await Note.find(searchObject)
+    notes = await Note.find(searchObject)
       .sort(sortObject)
       .skip(skip)
       .limit(limit)
@@ -429,6 +429,22 @@ export const findNotesAndPopulate = async function (
       .lean()
       .exec()
   }
+
+  const noteIds = notes.map((note) => note._id)
+  const nicks = await Nick.find({ note: { $in: noteIds } })
+    .lean()
+    .exec()
+
+  const nickMap = {}
+  nicks.forEach((nick) => {
+    nickMap[nick.note] = nick.key
+  })
+
+  notes.forEach((note) => {
+    note.nick = nickMap[note._id] || null
+  })
+
+  return notes
 }
 
 export const findRandomNotesAndPopulate = async function (
@@ -442,12 +458,28 @@ export const findRandomNotesAndPopulate = async function (
   await Note.populate(random_notes, { path: 'author' })
   await Note.populate(random_notes, { path: 'ideas' })
   await Note.populate(random_notes, { path: 'piles' })
-  return await Note.populate(random_notes, {
+  const populated_notes = await Note.populate(random_notes, {
     path: 'work',
     populate: {
       path: 'author',
     },
   })
+
+  const noteIds = populated_notes.map((note) => note._id)
+  const nicks = await Nick.find({ note: { $in: noteIds } })
+    .lean()
+    .exec()
+
+  const nickMap = {}
+  nicks.forEach((nick) => {
+    nickMap[nick.note] = nick.key
+  })
+
+  populated_notes.forEach((note) => {
+    note.nick = nickMap[note._id] || null
+  })
+
+  return populated_notes
 }
 
 export default defaultControllers(Note)

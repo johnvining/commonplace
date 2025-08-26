@@ -9,22 +9,28 @@ function NoteView(props) {
 
   const getListOfOneNote = async () => {
     var notesResponse
-    var noteId
+    
     if (!id) {
-      const nickResponse = await db.getNick(nick)
-      noteId = nickResponse.data.data.note
+      // Access by nick - use single request
+      await db
+        .getNoteByNick(nick)
+        .then((response) => {
+          notesResponse = response
+        })
+        .catch((error) => {
+          console.error(error)
+        })
     } else {
-      noteId = id
+      // Access by ID - use existing method
+      await db
+        .getInfo(db.types.note, id)
+        .then((response) => {
+          notesResponse = response
+        })
+        .catch((error) => {
+          console.error(error)
+        })
     }
-
-    await db
-      .getInfo(db.types.note, noteId)
-      .then((response) => {
-        notesResponse = response
-      })
-      .catch((error) => {
-        console.error(error)
-      })
 
     if (notesResponse.data.data[0].title) {
       props.setPageTitle(notesResponse.data.data[0].title)
