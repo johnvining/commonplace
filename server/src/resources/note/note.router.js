@@ -22,6 +22,7 @@ import controllers, {
   reqUpdateNote,
   reqOcrForNote,
   reqBulkOcrForNotes,
+  reqBulkSuggestTitlesForNotes,
   reqBulkImportForWork,
   reqBulkImportNotesCSV,
 } from './note.controllers'
@@ -65,6 +66,10 @@ router.route('/:id/ideas/suggest').get(reqGetSuggestedIdeasForNote)
 router.route('/:id/ocr').get(asyncWrapper(reqOcrForNote, 200))
 
 router.route('/bulk-ocr').post(asyncWrapper(reqBulkOcrForNotes, 200))
+
+router
+  .route('/bulk-suggest-titles')
+  .post(asyncWrapper(reqBulkSuggestTitlesForNotes, 200))
 
 router.route('/import/work/:work').put(asyncWrapper(reqBulkImportForWork, 200))
 

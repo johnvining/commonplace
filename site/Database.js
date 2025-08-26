@@ -199,6 +199,11 @@ export async function bulkOcrForNotes(noteIds) {
   return axios.post(url_api + 'note/bulk-ocr', data)
 }
 
+export async function bulkSuggestTitlesForNotes(noteIds) {
+  const data = { noteIds: noteIds }
+  return axios.post(url_api + 'note/bulk-suggest-titles', data)
+}
+
 export async function getNoteNick(noteID) {
   return axios.put(url_api + `nick/note/` + noteID)
 }

@@ -332,6 +332,50 @@ class NoteList extends React.Component {
     this.clearSelection()
   }
 
+  async bulkSuggestTitles() {
+    let indicesToBeProcessed = this.getSelectedIndices()
+
+    if (indicesToBeProcessed.length === 0) {
+      alert('No notes selected for title suggestion')
+      return
+    }
+
+    if (!confirm(`Suggest titles for ${indicesToBeProcessed.length} notes?`)) {
+      return
+    }
+
+    let noteIds = indicesToBeProcessed.map(
+      (index) => this.state.notes[index]._id
+    )
+
+    try {
+      const response = await db.bulkSuggestTitlesForNotes(noteIds)
+      const results = response.data.data
+
+      let updatedNotes = [...this.state.notes]
+      let updatedCount = 0
+
+      results.forEach((result) => {
+        if (result.success && result.titleUpdated) {
+          const noteIndex = updatedNotes.findIndex(
+            (note) => note._id === result.noteId
+          )
+          if (noteIndex !== -1) {
+            updatedNotes[noteIndex].title = result.suggestedTitle
+            updatedCount++
+          }
+        }
+      })
+
+      this.setState({ notes: updatedNotes })
+    } catch (error) {
+      console.error('Bulk Suggest Titles error:', error)
+      alert('Error suggesting titles. Please try again.')
+    }
+
+    this.clearSelection()
+  }
+
   render() {
     var showMultiselect =
       this.props.viewMode == constants.view_modes.FULL ||
@@ -395,6 +439,11 @@ class NoteList extends React.Component {
                 <TopLevelStandardButton
                   name="OCR"
                   onClick={this.bulkOcr.bind(this)}
+                  multiSelect={true}
+                />
+                <TopLevelStandardButton
+                  name="Suggest Title"
+                  onClick={this.bulkSuggestTitles.bind(this)}
                   multiSelect={true}
                 />
                 <TopLevelStandardButton

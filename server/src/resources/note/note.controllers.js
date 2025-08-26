@@ -272,9 +272,7 @@ export const reqBulkOcrForNotes = async (req, res) => {
     try {
       let note = await Note.findOne({ _id: noteId })
 
-      // Only run OCR if note has no text and has images
       if (!note.text && note.images && note.images.length > 0) {
-        // Process all images for this note in parallel
         const imagePromises = note.images.map((imagePath) =>
           getOpenAiOCR(config.imageStorePath + '/' + imagePath)
         )
@@ -282,7 +280,6 @@ export const reqBulkOcrForNotes = async (req, res) => {
         const imageResults = await Promise.all(imagePromises)
         const ocrText = imageResults.join('\n\n').trim()
 
-        // Update the note with OCR text
         await Note.updateOne({ _id: noteId }, { $set: { text: ocrText } })
 
         return {
@@ -297,6 +294,47 @@ export const reqBulkOcrForNotes = async (req, res) => {
           success: true,
           textUpdated: false,
           reason: note.text ? 'Note already has text' : 'No images to process',
+        }
+      }
+    } catch (error) {
+      return {
+        noteId: noteId,
+        success: false,
+        error: error.message,
+      }
+    }
+  })
+
+  const results = await Promise.all(notePromises)
+  return results
+}
+
+export const reqBulkSuggestTitlesForNotes = async (req, res) => {
+  const noteIds = req.body.noteIds
+
+  const notePromises = noteIds.map(async (noteId) => {
+    try {
+      let note = await Note.findOne({ _id: noteId })
+
+      if (!note.title && note.text) {
+        let suggestion = await getSuggestedTitle(note.text)
+
+        await Note.updateOne({ _id: noteId }, { $set: { title: suggestion } })
+
+        return {
+          noteId: noteId,
+          success: true,
+          titleUpdated: true,
+          suggestedTitle: suggestion,
+        }
+      } else {
+        return {
+          noteId: noteId,
+          success: true,
+          titleUpdated: false,
+          reason: note.title
+            ? 'Note already has title'
+            : 'No text to generate title from',
         }
       }
     } catch (error) {
