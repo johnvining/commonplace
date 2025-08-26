@@ -1024,6 +1024,7 @@ a.grid-link {
   padding-bottom: 4px;
   padding-top: 4px;
   min-height: 52px;
+  z-index: 2;
 }
 
 div .image-row {
