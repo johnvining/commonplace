@@ -1298,6 +1298,12 @@ div .image-row {
   cursor: pointer;
 }
 
+@media (prefers-color-scheme: dark) {
+  .click-to-copy-nick img {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
 .click-to-copy-nick:not(.disabled):hover code {
   text-decoration: underline;
 }

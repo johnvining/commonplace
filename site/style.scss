@@ -925,6 +925,10 @@ a.grid-link {
 
 // Click to copy nick styles
 .click-to-copy-nick {
+  @media (prefers-color-scheme: dark) {
+    @include button-invert-icon();
+  }
+  
   &:not(.disabled):hover code {
     text-decoration: underline;
   }
