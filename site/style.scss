@@ -50,7 +50,7 @@ a {
     position: sticky;
     top: 0;
     background: $background_color;
-    z-index: 1;
+    z-index: 20;
   }
 
   .title-bar {
@@ -571,6 +571,8 @@ a.grid-link {
 .grid-button {
   background: transparent;
   border-style: none;
+  position: relative;
+  z-index: 5;
   @media (prefers-color-scheme: dark) {
     @include button-invert-icon();
   }
@@ -647,6 +649,7 @@ a.grid-link {
   padding-bottom: 4px;
   padding-top: 4px;
   min-height: 52px;
+  z-index: 15;
 }
 
 .image-row {
