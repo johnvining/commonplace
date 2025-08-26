@@ -1,7 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import * as constants from './constants'
 import * as db from './Database'
-import NoteList from './NoteList'
 import React from 'react'
 import ResultWork from './ResultWork'
 import YearSpan from './YearSpan'
@@ -53,32 +51,6 @@ function Author(props) {
     fetchAuthorInfo(id)
     fetchAuthorWorks(id)
   }, [id])
-
-  const getListOfNotes = async (index, page) => {
-    var notesResponse
-    if (index == undefined) {
-      await db
-        .getRecordsWithFilter(db.types.note, db.types.auth, id)
-        .then((response) => {
-          notesResponse = response
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    } else {
-      var workId = works[index]?._id
-      await db
-        .getRecordsWithFilter(db.types.note, db.types.work, workId)
-        .then((response) => {
-          notesResponse = response
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    }
-
-    return notesResponse
-  }
 
   const deleteAuthor = async () => {
     if (!confirm(`Do you want to permanently delete '${pendingName}'?`)) {
@@ -162,6 +134,10 @@ function Author(props) {
                   setEdit(true)
                 }}
               />
+              <TopLevelStandardButton
+                name="Show Notes"
+                onClick={() => navigate(`/auth/${id}/notes`)}
+              />
             </TopLevelStandardButtonContainer>
           </>
         )}
@@ -171,22 +147,8 @@ function Author(props) {
       {works?.map((work, workindex) => (
         <div key={'work-listing-' + workindex}>
           <ResultWork work={work} key={'work-' + work._id} />
-          <div className="result-box parent">
-            <NoteList
-              key={'notes-for-work' + work._id}
-              index={workindex}
-              viewMode={constants.view_modes.RESULT}
-              getListOfNotes={getListOfNotes}
-            />
-          </div>
         </div>
       ))}
-      <NoteList
-        key={'auth' + id}
-        viewMode={constants.view_modes.RESULT}
-        useGroupings={true}
-        getListOfNotes={getListOfNotes}
-      />
     </div>
   )
 }

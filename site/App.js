@@ -2,6 +2,7 @@ import { createNewNoteFromTitle } from './Database'
 import { createRoot } from 'react-dom/client'
 import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
 import Author from './Author'
+import AuthorNotes from './AuthorNotes'
 import FileList from './FileList'
 import FlipList from './FlipList'
 import Find from './Find'
@@ -180,6 +181,15 @@ class App extends React.Component {
             path="/auth/:id"
             element={
               <Author
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
+          />
+          <Route
+            path="/auth/:id/notes"
+            element={
+              <AuthorNotes
                 viewMode={this.state.viewMode}
                 setPageTitle={this.setPageTitle.bind(this)}
               />
