@@ -12,6 +12,20 @@
   }
 }
 
+@mixin background-image-invert() {
+  &::before {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
+
+@mixin background-image-uninvert() {
+  &::before {
+    -webkit-filter: invert(0%);
+    filter: invert(0%);
+  }
+}
+
 @mixin button-hover($background_color) {
   background-color: $background_color;
   color: $font_color;

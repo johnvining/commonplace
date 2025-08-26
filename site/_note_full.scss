@@ -315,6 +315,11 @@
         width: 17px;
         height: 15px;
         content: '';
+        
+        @media (prefers-color-scheme: dark) {
+          -webkit-filter: invert(100%);
+          filter: invert(100%);
+        }
       }
     }
   }

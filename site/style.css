@@ -349,6 +349,13 @@ input .note-full .edit-work {
   height: 15px;
   content: "";
 }
+@media (prefers-color-scheme: dark) {
+  .note-full .edit-author.option.new::before,
+  .note-full .edit-work.option.new::before {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
 .note-full.form-label {
   font-size: 12px;
   padding: 2px;
@@ -447,6 +454,13 @@ input .note-full .edit-work {
   padding: 2px;
   text-decoration: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  .note-slim.inner .pile::before,
+  .note-slim.inner .idea::before {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
 }
 .note-slim.inner .pile::before {
   background-image: url("/icons/stack.svg");
@@ -1284,6 +1298,12 @@ div .image-row {
   width: 17px;
   height: 15px;
   content: "";
+}
+@media (prefers-color-scheme: dark) {
+  .top-level.author-select.option.new::before {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
 }
 
 .upload-form {
