@@ -22,6 +22,7 @@ import autosize from 'autosize'
 import YearUrlComboSpan from './YearUrlComboSpan'
 import WorkCitationSpan from './WorkCitationSpan'
 import ClickToCopyNick from './ClickToCopyNick'
+import ClickableLabelButton from './ClickableLabelButton'
 
 class Note extends React.Component {
   state = {
@@ -503,8 +504,7 @@ class Note extends React.Component {
               <div className="width-100">
                 <label htmlFor="title" className="note-full form-label">
                   Title
-                  <span
-                    className="note-full clickable-label-button"
+                  <ClickableLabelButton
                     onClick={() => {
                       this.generateTitleSuggestion()
                     }}
@@ -512,7 +512,7 @@ class Note extends React.Component {
                     {this.state.fetchingTitleSuggestion
                       ? 'Fetching'
                       : 'Suggest'}
-                  </span>
+                  </ClickableLabelButton>
                 </label>
 
                 <input
@@ -564,22 +564,20 @@ class Note extends React.Component {
             <div name="text" className="width-100">
               <label htmlFor="text" className="note-full form-label">
                 Text
-                <span
-                  className="note-full clickable-label-button"
+                <ClickableLabelButton
                   onClick={() => {
                     this.runOCROnText()
                   }}
                 >
                   {this.state.fetchingOcr ? 'Fetching' : 'OCR'}
-                </span>
-                <span
-                  className="note-full clickable-label-button"
+                </ClickableLabelButton>
+                <ClickableLabelButton
                   onClick={() => {
                     this.formatMainText()
                   }}
                 >
                   Format
-                </span>
+                </ClickableLabelButton>
               </label>
 
               <textarea

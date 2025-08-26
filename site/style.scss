@@ -124,6 +124,25 @@ a {
   margin: 0 8px;
 }
 
+.clickable-label-button {
+  display: inline;
+  padding: 2px;
+  margin-left: 4px;
+  border-radius: 2px;
+  font-size: 9px;
+  background-color: $button_background;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: $semantic_selection;
+  }
+  
+  &:focus {
+    outline: 2px solid $high_intensity_border;
+    outline-offset: 1px;
+  }
+}
+
 .standard-button {
     background-color: $button_background;
     border-color: $low_intensity_border;
