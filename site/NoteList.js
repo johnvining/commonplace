@@ -376,6 +376,48 @@ class NoteList extends React.Component {
     this.clearSelection()
   }
 
+  async bulkExportToMarkdown() {
+    let indicesToBeProcessed = this.getSelectedIndices()
+
+    if (indicesToBeProcessed.length === 0) {
+      alert('No notes selected for markdown export')
+      return
+    }
+
+    let noteIds = indicesToBeProcessed.map(
+      (index) => this.state.notes[index]._id
+    )
+
+    try {
+      const response = await db.bulkGetNotesForMarkdown(noteIds)
+      const results = response.data.data
+
+      const successfulResults = results.filter((result) => result.success)
+
+      if (successfulResults.length === 0) {
+        alert('No notes could be processed for markdown export')
+        return
+      }
+
+      const markdownLines = successfulResults.map(
+        (result) => `- \`${result.nick}\` ${result.title}`
+      )
+
+      const markdownText = markdownLines.join('\n')
+
+      await navigator.clipboard.writeText(markdownText)
+
+      alert(
+        `Exported ${successfulResults.length} notes to clipboard as markdown`
+      )
+    } catch (error) {
+      console.error('Bulk Markdown Export error:', error)
+      alert('Error exporting notes to markdown. Please try again.')
+    }
+
+    this.clearSelection()
+  }
+
   render() {
     var showMultiselect =
       this.props.viewMode == constants.view_modes.FULL ||
@@ -444,6 +486,11 @@ class NoteList extends React.Component {
                 <TopLevelStandardButton
                   name="Suggest Title"
                   onClick={this.bulkSuggestTitles.bind(this)}
+                  multiSelect={true}
+                />
+                <TopLevelStandardButton
+                  name="List to Clipboard"
+                  onClick={this.bulkExportToMarkdown.bind(this)}
                   multiSelect={true}
                 />
                 <TopLevelStandardButton

@@ -1,6 +1,7 @@
 import Note from './note.model.js'
 import Pile from '../pile/pile.model.js'
 import Work from '../work/work.model.js'
+import Nick from '../nick/nick.model.js'
 import { importCsvFromString } from '../../cli/import.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
@@ -336,6 +337,52 @@ export const reqBulkSuggestTitlesForNotes = async (req, res) => {
             ? 'Note already has title'
             : 'No text to generate title from',
         }
+      }
+    } catch (error) {
+      return {
+        noteId: noteId,
+        success: false,
+        error: error.message,
+      }
+    }
+  })
+
+  const results = await Promise.all(notePromises)
+  return results
+}
+
+export const reqBulkGetNotesForMarkdown = async (req, res) => {
+  const noteIds = req.body.noteIds
+
+  const notePromises = noteIds.map(async (noteId) => {
+    try {
+      let note = await Note.findOne({ _id: noteId })
+
+      if (!note) {
+        return {
+          noteId: noteId,
+          success: false,
+          error: 'Note not found',
+        }
+      }
+
+      let nick = await Nick.findOne({ note: noteId })
+
+      if (!nick) {
+        return {
+          noteId: noteId,
+          success: false,
+          error: 'Nick not found for note',
+        }
+      }
+
+      const title = note.title || 'No title'
+
+      return {
+        noteId: noteId,
+        success: true,
+        nick: nick.key,
+        title: title,
       }
     } catch (error) {
       return {

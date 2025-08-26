@@ -204,6 +204,11 @@ export async function bulkSuggestTitlesForNotes(noteIds) {
   return axios.post(url_api + 'note/bulk-suggest-titles', data)
 }
 
+export async function bulkGetNotesForMarkdown(noteIds) {
+  const data = { noteIds: noteIds }
+  return axios.post(url_api + 'note/bulk-markdown', data)
+}
+
 export async function getNoteNick(noteID) {
   return axios.put(url_api + `nick/note/` + noteID)
 }
