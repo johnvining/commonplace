@@ -1,5 +1,5 @@
 # Build react client
-FROM node:19-alpine
+FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
