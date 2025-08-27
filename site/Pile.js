@@ -12,7 +12,6 @@ import {
 } from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 import {
-  TopLevelPreTitle,
   TopLevelSubTitle,
   TopLevelTitle,
   TopLevelTitleContainer,
@@ -157,14 +156,13 @@ function Pile(props) {
         ) : (
           <>
             <TopLevelTitleContainer>
-              <TopLevelPreTitle>Pile</TopLevelPreTitle>
               <TopLevelTitle>{pendingName}</TopLevelTitle>
               {pendingStartYear || pendingEndYear ? (
                 <TopLevelSubTitle>
                   {pendingStartYear ? (
                     <YearSpan year={pendingStartYear} />
                   ) : null}
-                  {pendingStartYear && pendingEndYear ? ' to ' : null}
+                  {pendingStartYear && pendingEndYear ? ' • ' : null}
                   {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
                 </TopLevelSubTitle>
               ) : null}

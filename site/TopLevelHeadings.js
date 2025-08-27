@@ -4,10 +4,6 @@ export function TopLevelTitleContainer(props) {
   return <div className="top-level container">{props.children}</div>
 }
 
-export function TopLevelPreTitle(props) {
-  return <div className={'top-level pre-title'}>{props.children}</div>
-}
-
 export function TopLevelTitle(props) {
   return <div className={'top-level title'}>{props.children}</div>
 }

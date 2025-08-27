@@ -10,7 +10,6 @@ import {
 } from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 import {
-  TopLevelPreTitle,
   TopLevelSubTitle,
   TopLevelTitle,
   TopLevelTitleContainer,
@@ -108,19 +107,18 @@ function Author(props) {
         ) : (
           <>
             <TopLevelTitleContainer>
-              <TopLevelPreTitle>Author</TopLevelPreTitle>
               <TopLevelTitle>{pendingName}</TopLevelTitle>
               {pendingBirthYear || pendingDeathYear ? (
                 <TopLevelSubTitle>
-                  {' '}
                   {pendingBirthYear ? (
                     <>
-                      {'b. '} <YearSpan year={pendingBirthYear} />
+                      b. <YearSpan year={pendingBirthYear} />
                     </>
                   ) : null}
+                  {pendingBirthYear && pendingDeathYear ? ' • ' : null}
                   {pendingDeathYear ? (
                     <>
-                      {' d. '} <YearSpan year={pendingDeathYear} />
+                      d. <YearSpan year={pendingDeathYear} />
                     </>
                   ) : null}
                 </TopLevelSubTitle>

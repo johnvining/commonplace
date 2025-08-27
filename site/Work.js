@@ -20,7 +20,6 @@ import {
   TopLevelFormContainer,
 } from './TopLevelFormItems'
 import {
-  TopLevelPreTitle,
   TopLevelTitleContainer,
   TopLevelTitle,
   TopLevelPostButtonContent,
@@ -261,7 +260,6 @@ function Work(props) {
         </TopLevelFormContainer>
       ) : (
         <TopLevelTitleContainer>
-          <TopLevelPreTitle>Work</TopLevelPreTitle>
           <TopLevelTitle>
             <WorkCitationSpan
               authorName={pendingAuthorName}

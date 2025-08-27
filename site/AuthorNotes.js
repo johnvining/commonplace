@@ -9,7 +9,6 @@ import {
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
 import {
-  TopLevelPreTitle,
   TopLevelSubTitle,
   TopLevelTitle,
   TopLevelTitleContainer,
@@ -83,9 +82,8 @@ function AuthorNotes(props) {
   return (
     <div>
       <TopLevelTitleContainer>
-        <TopLevelPreTitle>Author Notes</TopLevelPreTitle>
         <TopLevelTitle>{authorName}</TopLevelTitle>
-        <TopLevelSubTitle></TopLevelSubTitle>
+        <TopLevelSubTitle>Notes</TopLevelSubTitle>
       </TopLevelTitleContainer>
 
       <TopLevelStandardButtonContainer>

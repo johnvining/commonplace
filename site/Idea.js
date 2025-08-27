@@ -10,7 +10,6 @@ import {
 } from './TopLevelStandardButton'
 import { TopLevelFormContainer, TopLevelFormInput } from './TopLevelFormItems'
 import {
-  TopLevelPreTitle,
   TopLevelSubTitle,
   TopLevelTitle,
   TopLevelTitleContainer,
@@ -142,14 +141,13 @@ function Idea(props) {
         ) : (
           <>
             <TopLevelTitleContainer>
-              <TopLevelPreTitle>Idea</TopLevelPreTitle>
               <TopLevelTitle>{pendingName}</TopLevelTitle>
               {pendingStartYear || pendingEndYear ? (
                 <TopLevelSubTitle>
                   {pendingStartYear ? (
                     <YearSpan year={pendingStartYear} />
                   ) : null}
-                  {pendingStartYear && pendingEndYear ? ' to ' : null}
+                  {pendingStartYear && pendingEndYear ? ' • ' : null}
                   {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
                 </TopLevelSubTitle>
               ) : null}

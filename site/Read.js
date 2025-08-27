@@ -11,11 +11,7 @@ import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
-import {
-  TopLevelPreTitle,
-  TopLevelTitle,
-  TopLevelTitleContainer,
-} from './TopLevelHeadings'
+import { TopLevelTitle, TopLevelTitleContainer } from './TopLevelHeadings'
 
 function Read(props) {
   const { id } = useParams()
@@ -98,7 +94,6 @@ function Read(props) {
   return (
     <>
       <TopLevelTitleContainer>
-        <TopLevelPreTitle>Reading</TopLevelPreTitle>
         <TopLevelTitle>
           <WorkCitationSpan
             authorName={authorName}
