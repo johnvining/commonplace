@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "parcel index.html",
     "sass": "sass --watch style.scss:style.css",
-    "build": "parcel build index.html"
+    "build": "rm -rf dist .parcel-cache && parcel build index.html"
   },
   "engines": {
     "node": ">=20.0.0",
