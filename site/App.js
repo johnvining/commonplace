@@ -145,7 +145,7 @@ class App extends React.Component {
                     this.setState({ barOpen: true })
                   }}
                 >
-                  <img src={search} />{' '}
+                  <img src={search} />
                 </button>
               </div>
               <div className="tool-bar div">
@@ -155,7 +155,7 @@ class App extends React.Component {
                     window.location.href = '/'
                   }}
                 >
-                  <img src={home_door} />{' '}
+                  <img src={home_door} />
                 </button>
               </div>
               <div className="tool-bar div">
@@ -167,7 +167,7 @@ class App extends React.Component {
                       '/note/' + response.data._id + '/edit'
                   }}
                 >
-                  <img src={plus} />{' '}
+                  <img src={plus} />
                 </button>
               </div>
               <div className="tool-bar div">
@@ -322,5 +322,5 @@ const root = createRoot(document.getElementById('root'))
 root.render(
   <BrowserRouter>
     <App />
-  </BrowserRouter>
+  </BrowserRouter>,
 )
