@@ -31,6 +31,15 @@ Check that the system date/time is correct by running `date` in the shell. If it
 ## If docker on pi has wrong version of a module
 Need to re-install the packages to get the correct version. Bring docker down, prune, build. [Link 1](https://www.reddit.com/r/docker/comments/tm3ojb/docker_not_updating_node_modules_with_new/), [Link 2](https://stackoverflow.com/questions/32612650/how-to-get-docker-compose-to-always-re-create-containers-from-fresh-images)
 
+## If SVG images don't load (404 errors)
+Parcel generates content hashes for all assets including SVG files to enable browser caching. When content changes, the hash changes, forcing browsers to download new versions. If you see 404 errors for SVG files:
+
+1. **Check nginx config**: Ensure the SVG location block has `root /usr/share/nginx/html;` directive to tell it where to look for files
+2. **Clear build cache**: Update `package.json` build script to `"rm -rf dist .parcel-cache && parcel build index.html"`
+3. **Rebuild container**: `docker-compose build --no-cache commonplace-site`
+
+The issue occurs when nginx doesn't know where to find SVG files or when old cached builds conflict with new hashes. One debugging tip is to see if the old hashes work. Note to self: You can find the old hash for an SVG using ngrok.
+
 # Backup
 ## Mongo Database
 Extract the mongo database docker volume into a tarball:
