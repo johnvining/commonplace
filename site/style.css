@@ -364,15 +364,6 @@ input .note-full .edit-work {
   display: flex;
   align-items: flex-start;
 }
-.note-full.clickable-label-button {
-  display: inline;
-  padding: 2px;
-  margin-left: 4px;
-  border-radius: 2px;
-  font-size: 9px;
-  background-color: var(--button-background);
-  cursor: pointer;
-}
 
 .action-bar {
   width: 100%;
@@ -449,7 +440,7 @@ input .note-full .edit-work {
   border-radius: 4px;
   border-style: none;
   color: var(--font-color);
-  font-size: 13px;
+  font-size: var(--font-size-xs);
   margin: 4px;
   padding: 2px;
   text-decoration: none;
@@ -477,6 +468,16 @@ input .note-full .edit-work {
   width: 14px;
   height: 13px;
   content: "";
+}
+
+:root {
+  /* Font Size System */
+  --font-size-xs: 9px; /* Extra small: buttons, labels */
+  --font-size-sm: 12px; /* Small: secondary text, metadata */
+  --font-size-md: 14px; /* Medium: body text, notes */
+  --font-size-lg: 18px; /* Large: headings, buttons */
+  --font-size-xl: 24px; /* Extra large: main titles */
+  --font-size-xxl: 34px; /* Extra extra large: hero titles */
 }
 
 html {
@@ -538,13 +539,13 @@ div .top-bar {
   }
 }
 .top-bar .title-bar .title {
-  font-size: 24px;
+  font-size: var(--font-size-xl);
   padding: 8px 8px 8px 0px;
 }
 @media (min-width: 768px) {
   .top-bar .title-bar .title {
     display: block;
-    font-size: 34px;
+    font-size: var(--font-size-xxl);
   }
 }
 .top-bar .stats-center {
@@ -577,7 +578,7 @@ div .top-bar {
 .stats-display {
   display: flex;
   align-items: center;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--font-color);
   opacity: 0.6;
 }
@@ -590,10 +591,27 @@ div .top-bar {
 }
 
 .stats-loading {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: var(--font-color);
   opacity: 0.4;
   margin: 0 8px;
+}
+
+.clickable-label-button {
+  display: inline;
+  padding: 2px;
+  margin-left: 4px;
+  border-radius: 2px;
+  font-size: var(--font-size-xs);
+  background-color: var(--button-background);
+  cursor: pointer;
+}
+.clickable-label-button:hover {
+  background-color: var(--semantic-selection);
+}
+.clickable-label-button:focus {
+  outline: 2px solid var(--high-intensity-border);
+  outline-offset: 1px;
 }
 
 .standard-button {
@@ -604,6 +622,7 @@ div .top-bar {
   border-width: 2px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: var(--font-size-lg);
   height: 42px;
   margin: 4px 0px 4px 0px;
   padding: 6px;
@@ -678,7 +697,7 @@ div .top-bar {
   background-color: transparent;
   width: 60%;
   border: none;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   margin: 0px;
   padding: 2px;
 }
@@ -686,7 +705,7 @@ div .top-bar {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   border: solid;
   border-radius: 4px;
-  font-size: 15px;
+  font-size: var(--font-size-md);
   margin: 4px;
   padding: 4px;
 }
@@ -704,7 +723,7 @@ div .top-bar {
   border-style: none;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 15px;
+  font-size: var(--font-size-sm);
   margin: 2px;
   padding: 4px;
   text-decoration: none;
@@ -736,10 +755,10 @@ div .top-bar {
 .idea.label.link, .pile.label.link, .link.label.link {
   background-color: transparent;
   font-family: "Courier New", Courier, monospace;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
 }
 .idea.pre, .pile.pre, .link.pre {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   background-color: var(--note-background);
   text-transform: uppercase;
   padding: 2px;
@@ -765,7 +784,7 @@ div .top-bar {
   border-style: none;
   border-width: 0px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: var(--font-size-md);
   margin: 2px;
   padding: 4px;
   text-decoration: none;
@@ -797,7 +816,7 @@ div .top-bar {
   border-style: solid;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   margin: 0px;
   padding: 4px;
   text-decoration: none;
@@ -809,7 +828,7 @@ div .top-bar {
   border-style: solid;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   margin: 0px;
   padding: 4px;
   text-decoration: none;
@@ -841,7 +860,7 @@ div .top-bar {
   display: inline;
   margin: 0px;
   padding: 4px;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
 }
 .pile-select.option::after {
@@ -1013,7 +1032,7 @@ a.grid-link {
 
 .multi-select {
   position: relative;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   color: var(--font-color);
 }
@@ -1135,7 +1154,7 @@ div .image-row {
   padding: 8px;
   margin: 8px;
   border-radius: 4px;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
 }
 @media (prefers-color-scheme: dark) {
   .result-box img {
@@ -1175,7 +1194,7 @@ div .image-row {
   background-color: transparent;
 }
 .result-box .date {
-  font-size: 14px;
+  font-size: var(--font-size-md);
   padding: 4px;
   margin: 4px;
 }

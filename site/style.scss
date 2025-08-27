@@ -3,6 +3,16 @@
 @import '_note_full';
 @import '_note_slim';
 
+:root {
+  /* Font Size System */
+  --font-size-xs: 9px;    /* Extra small: buttons, labels */
+  --font-size-sm: 12px;   /* Small: secondary text, metadata */
+  --font-size-md: 14px;   /* Medium: body text, notes */
+  --font-size-lg: 18px;   /* Large: headings, buttons */
+  --font-size-xl: 24px;   /* Extra large: main titles */
+  --font-size-xxl: 34px;  /* Extra extra large: hero titles */
+}
+
 html {
   box-sizing: border-box;
 }
@@ -63,11 +73,11 @@ a {
     }
 
     .title {
-      font-size: 24px;
+      font-size: var(--font-size-xl);
       padding: 8px 8px 8px 0px;
       @include tablet-plus {
         display: block;
-        font-size: 34px;
+        font-size: var(--font-size-xxl);
       }
     }
   }
@@ -103,7 +113,7 @@ a {
 .stats-display {
   display: flex;
   align-items: center;
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: $font_color;
   opacity: 0.6;
   
@@ -118,7 +128,7 @@ a {
 }
 
 .stats-loading {
-  font-size: 10px;
+  font-size: var(--font-size-xs);
   color: $font_color;
   opacity: 0.4;
   margin: 0 8px;
@@ -129,7 +139,7 @@ a {
   padding: 2px;
   margin-left: 4px;
   border-radius: 2px;
-  font-size: 9px;
+  font-size: var(--font-size-xs);
   background-color: $button_background;
   cursor: pointer;
   
@@ -151,6 +161,7 @@ a {
     border-width: 2px;
     color: $font_color;
     font-family: $main_font;
+    font-size: var(--font-size-lg);
     height: 42px;
     margin: 4px 0px 4px 0px;
     padding: 6px;
@@ -221,7 +232,7 @@ a {
     background-color: transparent;
     width: 60%;
     border: none;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     margin: 0px;
     padding: 2px;
   }
@@ -230,7 +241,7 @@ a {
     font-family: $main_font;
     border: solid;
     border-radius: 4px;
-    font-size: 15px;
+    font-size: var(--font-size-md);
     margin: 4px;
     padding: 4px;
     
@@ -252,7 +263,7 @@ a {
     border-style: none;
     color: $font_color;
     font-family: $main_font;
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     margin: 2px;
     padding: 4px;
     text-decoration: none;
@@ -291,12 +302,12 @@ a {
     &.link {
       background-color: transparent;
       font-family: $monospace;
-      font-size: 12px;
+      font-size: var(--font-size-sm);
     }
   }
 
   &.pre {
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     background-color: $note_background;
     text-transform: uppercase;
     padding: 2px;
@@ -326,7 +337,7 @@ a {
     border-style: none;
     border-width: 0px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: var(--font-size-md);
     margin: 2px;
     padding: 4px;
     text-decoration: none;
@@ -364,7 +375,7 @@ a {
     border-style: solid;
     color: $font_color;
     font-family: $main_font;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     margin: 0px;
     padding: 4px;
     text-decoration: none;
@@ -377,7 +388,7 @@ a {
     border-style: solid;
     color: $font_color;
     font-family: $main_font;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     margin: 0px;
     padding: 4px;
     text-decoration: none;
@@ -414,7 +425,7 @@ a {
     display: inline;
     margin: 0px;
     padding: 4px;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-family: $main_font;
 
     &::after {
@@ -599,7 +610,7 @@ a.grid-link {
 
 .multi-select {
   position: relative;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-family: $main_font;
   color: $font_color;
 
@@ -742,7 +753,7 @@ a.grid-link {
   padding: 8px;
   margin: 8px;
   border-radius: 4px;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
 
   @media (prefers-color-scheme: dark) {
     @include button-invert-icon();
@@ -786,7 +797,7 @@ a.grid-link {
   }
 
   .date {
-    font-size: 14px;
+    font-size: var(--font-size-md);
     padding: 4px;
     margin: 4px;
   }
