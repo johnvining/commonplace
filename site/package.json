@@ -30,7 +30,6 @@
     "@babel/plugin-transform-class-properties": "^7.23.3",
     "@babel/plugin-transform-object-rest-spread": "^7.23.4",
     "@babel/preset-env": "^7.23.5",
-    "@parcel/transformer-svg": "^2.15.4",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^29.7.0",
     "buffer": "^6.0.3",
