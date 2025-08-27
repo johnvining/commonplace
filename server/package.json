@@ -2,6 +2,10 @@
   "name": "commonplace",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "build": "babel src --out-dir dist",
     "cli": "node dist/cli/cli.js",
