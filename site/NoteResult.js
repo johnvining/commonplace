@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import note_img from './icons/write.svg'
+import note_img from 'url:./icons/write.svg'
 import NoteAuthorSpan from './NoteAuthorSpan'
 
 class NoteResult extends React.Component {

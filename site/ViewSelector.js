@@ -1,8 +1,8 @@
 import React from 'react'
 import * as constants from './constants'
-import full from './icons/full.svg'
-import slim from './icons/slim.svg'
-import grid from './icons/grid.svg'
+import full from 'url:./icons/full.svg'
+import slim from 'url:./icons/slim.svg'
+import grid from 'url:./icons/grid.svg'
 
 class SearchBar extends React.Component {
   componentDidMount() {

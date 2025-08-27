@@ -1,8 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import author_img from './icons/author.svg'
-import note_img from './icons/write.svg'
-import work_img from './icons/work.svg'
+import author_img from 'url:./icons/author.svg'
+import note_img from 'url:./icons/write.svg'
+import work_img from 'url:./icons/work.svg'
 
 class AuthorList extends React.Component {
   state = {}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import clipboard from './icons/clipboard.svg'
-import clipboard_check from './icons/clipboard_check.svg'
+import clipboard from 'url:./icons/clipboard.svg'
+import clipboard_check from 'url:./icons/clipboard_check.svg'
 
 function ClickToCopyNick({
   nick,

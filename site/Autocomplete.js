@@ -1,6 +1,6 @@
 import React from 'react'
-import lightbulb from './icons/lightbulb.svg'
-import loader from './icons/loader.svg'
+import lightbulb from 'url:./icons/lightbulb.svg'
+import loader from 'url:./icons/loader.svg'
 import * as constants from './constants'
 
 class Autocomplete extends React.Component {

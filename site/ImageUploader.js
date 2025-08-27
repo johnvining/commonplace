@@ -1,5 +1,5 @@
 import React from 'react'
-import upload from './icons/upload.svg'
+import upload from 'url:./icons/upload.svg'
 
 class ImageUploader extends React.Component {
   state = {

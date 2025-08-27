@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import circle from './icons/circle.svg'
-import check_circle from './icons/check_circle.svg'
+import circle from 'url:./icons/circle.svg'
+import check_circle from 'url:./icons/check_circle.svg'
 import * as db from './Database'
 import ClickToCopyNick from './ClickToCopyNick'
 

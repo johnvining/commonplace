@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import idea_img from './icons/idea.svg'
-import note_img from './icons/write.svg'
+import idea_img from 'url:./icons/idea.svg'
+import note_img from 'url:./icons/write.svg'
 
 class IdeaList extends React.Component {
   state = {}

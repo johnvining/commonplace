@@ -6,8 +6,8 @@ import NoteResult from './NoteResult'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import * as constants from './constants'
-import left from './icons/left.svg'
-import right from './icons/right.svg'
+import left from 'url:./icons/left.svg'
+import right from 'url:./icons/right.svg'
 import autosize from 'autosize'
 import {
   TopLevelStandardButtonContainer,

@@ -1,8 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import pile_img from './icons/stack.svg'
-import work_img from './icons/work.svg'
-import note_img from './icons/write.svg'
+import pile_img from 'url:./icons/stack.svg'
+import work_img from 'url:./icons/work.svg'
+import note_img from 'url:./icons/write.svg'
 
 class PileList extends React.Component {
   state = {}
