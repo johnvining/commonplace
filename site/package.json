@@ -7,17 +7,18 @@
     "build": "parcel build index.html"
   },
   "engines": {
-    "node": "19.9.0",
-    "npm": "9.6.3"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "dependencies": {
+    "@babel/plugin-transform-private-property-in-object": "^7.27.1",
     "autosize": "^6.0.1",
     "axios": "^1.4.0",
     "crypto-browserify": "^3.12.0",
     "dotenv": "^16.0.3",
     "jsonwebtoken": "^9.0.0",
     "npm": "^9.7.1",
-    "parcel": "^2.9.2",
+    "parcel": "^2.15.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.1"
@@ -25,12 +26,12 @@
   "devDependencies": {
     "@babel/cli": "^7.16.0",
     "@babel/core": "^7.11.6",
-    "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/eslint-parser": "^7.28.0",
+    "@babel/plugin-transform-class-properties": "^7.27.1",
+    "@babel/plugin-transform-object-rest-spread": "^7.28.0",
     "@babel/preset-env": "^7.11.5",
-    "@parcel/transformer-html": "^2.9.1",
+    "@parcel/transformer-html": "^2.15.4",
     "babel-core": "7.0.0-bridge.0",
-    "babel-eslint": "^10.1.0",
     "babel-jest": "^29.5.0",
     "buffer": "^6.0.3",
     "cross-env": "^7.0.2",
@@ -45,13 +46,14 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-standard": "^5.0.0",
     "events": "^3.3.0",
     "nodemon": "^3.0.2",
     "prettier": "^2.8.8",
     "sass": "^1.70.0",
     "stream-browserify": "^3.0.0",
-    "util": "^0.12.5"
+    "string_decoder": "^1.3.0",
+    "util": "^0.12.5",
+    "vm-browserify": "^1.1.2"
   },
   "browserslist": [
     "last 2 Chrome versions"
