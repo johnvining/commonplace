@@ -1254,9 +1254,12 @@ div .image-row {
   padding: 1rem;
   white-space: pre-wrap;
   text-align: center;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+}
+.top-level.post-button-content .work-summary {
+  display: block;
+  text-align: left !important;
+  width: 100%;
 }
 
 /* Make button containers more compact */

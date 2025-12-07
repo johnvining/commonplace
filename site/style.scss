@@ -835,6 +835,12 @@ a.grid-link {
     margin: 0px 0px 4px 0px;
     padding: 6px;
     white-space: pre-wrap;
+
+    .work-summary {
+      display: block;
+      text-align: left !important;
+      width: 100%;
+    }
   }
 
   &.form-label {

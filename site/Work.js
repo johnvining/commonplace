@@ -127,7 +127,7 @@ function Work(props) {
     db.createAndLinkToRecord(db.types.auth, authorName, db.types.work, id).then(
       (response) => {
         setPendingAuthorId(response.data.data.id)
-      }
+      },
     )
   }
 
@@ -173,7 +173,7 @@ function Work(props) {
     db.createAndLinkToRecord(db.types.pile, pileName, db.types.work, id).then(
       () => {
         fetchWorkInfo(id)
-      }
+      },
     )
   }
 
@@ -292,7 +292,7 @@ function Work(props) {
               {pendingCitationInfo}
               {pendingCitationInfo && pendingSummary && <br />}
               {pendingCitationInfo && pendingSummary && <br />}
-              {pendingSummary}
+              <span className="work-summary">{pendingSummary}</span>
             </TopLevelPostButtonContent>
           ) : null}
         </TopLevelTitleContainer>
