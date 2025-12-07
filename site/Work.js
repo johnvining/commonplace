@@ -103,6 +103,18 @@ function Work(props) {
     }
   })
 
+  useEffect(() => {
+    if (edit) {
+      // Use setTimeout to ensure the DOM has updated
+      setTimeout(() => {
+        const summaryElement = document.querySelector('#summary')
+        if (summaryElement) {
+          autosize(summaryElement)
+        }
+      }, 0)
+    }
+  }, [edit, pendingSummary])
+
   const getListOfNotes = async () => {
     var notesResponse
     await db
