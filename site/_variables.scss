@@ -28,12 +28,12 @@ $white: white;
 :root {
   // Background Colors
   --background-color: #{$theme_mint};
-  --semantic-idea: #{lighten($theme_blue, 15%)};
+  --semantic-idea: #{color.scale($theme_blue, $lightness: 15%)};
   --semantic-pile: #{$theme_purple};
   --semantic-selection: #{$theme_yellow};
   --semantic-removal: #{$theme_coral};
-  --button-input-background-selected: #{lighten($theme_blue, 15%)};
-  --button-selected: #{lighten($theme_blue, 5%)};
+  --button-input-background-selected: #{color.scale($theme_blue, $lightness: 15%)};
+  --button-selected: #{color.scale($theme_blue, $lightness: 5%)};
   --input-background: #{$grey2};
 
   --note-background-edit: #{$white};
@@ -70,7 +70,7 @@ $white: white;
       --semantic-selection: #{color.scale($theme_yellow, $lightness: -90%)};
       --semantic-removal: #{color.scale($theme_coral, $lightness: -85%)};
       --button-input-background-selected: #{color.scale($dark_theme_blue, $lightness: 5%)};
-      --button-selected: #{lighten($dark_theme_blue, 30%)};
+      --button-selected: #{color.scale($dark_theme_blue, $lightness: 30%)};
       --input-background: #{color.scale($dark_theme_blue, $lightness: 2%)};
 
       --note-background-edit: #{color.scale($dark_theme_blue, $lightness: -93%)};

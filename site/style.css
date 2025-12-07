@@ -1,18 +1,18 @@
 :root {
   --background-color: #F7FCF7;
-  --semantic-idea: #e8f4f8;
+  --semantic-idea: rgb(185.3, 221.85, 233.75);
   --semantic-pile: #f3e8f8;
   --semantic-selection: lightgoldenrodyellow;
   --semantic-removal: lightcoral;
-  --button-input-background-selected: #e8f4f8;
-  --button-selected: #c1e1ec;
+  --button-input-background-selected: rgb(185.3, 221.85, 233.75);
+  --button-selected: rgb(177.1, 217.95, 231.25);
   --input-background: #efefef;
   --note-background-edit: white;
   --note-background-not-selected: #f4f4f4;
   --note-background: white;
   --font-color: black;
   --link-color: black;
-  --inverse-background-color: #071207;
+  --inverse-background-color: rgb(6.8045454545, 18.1454545455, 6.8045454545);
   --inverse-font-color: white;
   --low-intensity-border: white;
   --high-intensity-border: black;
@@ -27,27 +27,27 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #010d12;
-    --semantic-idea: #0e262e;
-    --semantic-pile: #2b1137;
-    --semantic-selection: #292905;
-    --semantic-removal: #310606;
-    --button-input-background-selected: #021e29;
-    --button-selected: #0976a3;
-    --input-background: #02141b;
-    --note-background-edit: #000101;
+    --semantic-idea: rgb(14.1238317757, 38.4168224299, 46.3261682243);
+    --semantic-pile: rgb(43.2, 16.8, 55.2);
+    --semantic-selection: rgb(41.4, 41.4, 4.6);
+    --semantic-removal: rgb(49.3690140845, 5.8309859155, 5.8309859155);
+    --button-input-background-selected: rgb(2.2921052632, 29.7973684211, 41.2578947368);
+    --button-selected: rgb(8.7526315789, 113.7842105263, 157.5473684211);
+    --input-background: rgb(1.5168421053, 19.7189473684, 27.3031578947);
+    --note-background-edit: rgb(0.07, 0.91, 1.26);
     --note-background-not-selected: #f4f4f4;
-    --note-background: #000001;
+    --note-background: rgb(0.03, 0.39, 0.54);
     --link-color: #cccccc;
     --font-color: #cccccc;
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
-    --low-intensity-border: #042f41;
+    --low-intensity-border: rgb(3.5842105263, 46.5947368421, 64.5157894737);
     --high-intensity-border: #cccccc;
-    --note-border-edit: #000101;
+    --note-border-edit: rgb(0.07, 0.91, 1.26);
     --note-border-focused: darkgray;
     --note-border-selected: #efefef;
-    --note-border: #042f41;
-    --button-border: #042f41;
+    --note-border: rgb(3.5842105263, 46.5947368421, 64.5157894737);
+    --button-border: rgb(3.5842105263, 46.5947368421, 64.5157894737);
     --button-background: black;
     --button-shadow-color: darkgray;
   }
@@ -57,7 +57,7 @@
   background-color: var(--note-background);
   border-color: var(--note-border);
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   border-radius: 4px;
   margin: 0px 0px 4px 0px;
   padding: 2px;
@@ -619,14 +619,13 @@ div .top-bar {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: var(--font-size-sm);
-  height: 28px;
-  margin: 2px 0px 2px 0px;
-  padding: 3px 6px;
-  opacity: 0.8;
+  font-size: var(--font-size-lg);
+  height: 42px;
+  margin: 4px 0px 4px 0px;
+  padding: 6px;
 }
 @media (prefers-color-scheme: dark) {
   .standard-button img {
@@ -658,7 +657,6 @@ div .top-bar {
 .standard-button:focus {
   border-color: var(--button-border);
   outline: none;
-  opacity: 1;
 }
 .standard-button:hover {
   background-color: var(--button-input-background-selected);
@@ -666,7 +664,6 @@ div .top-bar {
   cursor: pointer;
   outline: none;
   border-color: white;
-  opacity: 1;
 }
 .standard-button.button-selected {
   background-color: var(--button-selected);
@@ -679,18 +676,18 @@ div .top-bar {
   border-color: var(--button-border);
   outline: none;
 }
+@media (prefers-color-scheme: dark) {
+  .standard-button.button-selected:hover img {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
 .standard-button.button-selected:hover {
   background-color: var(--button-input-background-selected);
   color: var(--font-color);
   cursor: pointer;
   outline: none;
   border-color: white;
-}
-@media (prefers-color-scheme: dark) {
-  .standard-button.button-selected:hover img {
-    -webkit-filter: invert(100%);
-    filter: invert(100%);
-  }
 }
 .standard-button.hidden {
   display: none;
@@ -927,7 +924,7 @@ div .top-bar {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 28px;
@@ -1065,7 +1062,7 @@ a.grid-link {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   padding: 8px;
   margin: 2px;
-  border-width: 1px;
+  border-width: 2px;
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
@@ -1205,67 +1202,35 @@ div .image-row {
 .top-level.container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 1rem;
-  padding: 0.5rem 1rem;
+}
+.top-level.pre-title {
+  font-size: 18px;
+  align-self: center;
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
+  text-transform: uppercase;
 }
 .top-level.title {
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--font-color);
-  margin-bottom: 0.25rem;
-  font-family: "Avenir", "Candara", "Arial", sans-serif;
-  line-height: 1.2;
-  max-width: 90%;
-  word-wrap: break-word;
+  font-size: 30px;
+  text-align: center;
 }
-
 .top-level.sub-title {
-  display: none;
-}
-
-/* Responsive design for smaller screens */
-@media (max-width: 768px) {
-  .top-level.container {
-    padding: 0.5rem 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .top-level.title {
-    font-size: 1.3rem;
-    max-width: 95%;
-  }
-}
-
-@media (max-width: 480px) {
-  .top-level.title {
-    font-size: 1.2rem;
-  }
+  font-size: 22px;
 }
 .top-level.post-button-content {
   background-color: var(--note-background);
   border-color: var(--note-border);
-  border-radius: 8px;
+  border-radius: 4px;
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   display: block;
-  margin: 1rem 0;
-  padding: 1rem;
+  margin: 0px 0px 4px 0px;
+  padding: 6px;
   white-space: pre-wrap;
-  text-align: center;
-  width: 100%;
 }
 .top-level.post-button-content .work-summary {
   display: block;
   text-align: left !important;
   width: 100%;
-}
-
-/* Make button containers more compact */
-.top-level.container + div {
-  margin-top: 0.25rem;
-  margin-bottom: 0.75rem;
 }
 .top-level.form-label {
   font-size: 12px;
@@ -1334,7 +1299,7 @@ div .image-row {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   border: none;
   color: var(--font-color);
   display: inline;
@@ -1366,12 +1331,12 @@ div .image-row {
   }
 }
 
-.upload-form {
-  display: inline;
-}
 .upload-form.hidden {
   visibility: hidden;
   display: none;
+}
+.upload-form {
+  display: inline;
 }
 
 .file-drop {
@@ -1380,7 +1345,7 @@ div .image-row {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 1px;
+  border-width: 2px;
   display: inline-flex;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 14px;
