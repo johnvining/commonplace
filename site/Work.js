@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react'
 import * as constants from './constants'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
+import { marked } from 'marked'
+import parse from 'html-react-parser'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
@@ -282,7 +284,7 @@ function Work(props) {
             />
             <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
           </TopLevelTitle>
-          <div>
+          <div style={{ textAlign: 'center' }}>
             <PileListForItem
               remove={editPiles}
               edit={false}
@@ -304,7 +306,9 @@ function Work(props) {
               {pendingCitationInfo}
               {pendingCitationInfo && pendingSummary && <br />}
               {pendingCitationInfo && pendingSummary && <br />}
-              <span className="work-summary">{pendingSummary}</span>
+              <div className="work-summary">
+                {parse(marked(pendingSummary || ''))}
+              </div>
             </TopLevelPostButtonContent>
           ) : null}
         </TopLevelTitleContainer>
