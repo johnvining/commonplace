@@ -5,12 +5,11 @@ import NoteList from './NoteList'
 import PileListForItem from './PileListForItem'
 import YearUrlComboSpan from './YearUrlComboSpan'
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import * as constants from './constants'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import { marked } from 'marked'
-import parse from 'html-react-parser'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
@@ -46,7 +45,7 @@ function Work(props) {
   const navigate = useNavigate()
 
   // Function to handle nick navigation
-  const handleNickClick = async (nickValue, e) => {
+  const handleNickClick = useCallback(async (nickValue, e) => {
     e.preventDefault()
     try {
       const nickResponse = await db.getNick(nickValue)
@@ -72,7 +71,7 @@ function Work(props) {
     } catch (error) {
       console.error('Error fetching nick:', error)
     }
-  }
+  }, [navigate])
 
   // Function to process HTML string and convert nicks to links (including in code blocks)
   const processHtmlForNicks = (html) => {
@@ -111,6 +110,23 @@ function Work(props) {
   useEffect(() => {
     fetchWorkInfo(id)
   }, [id])
+
+  // Handle click events on nick links using event delegation
+  useEffect(() => {
+    const handleNickLinkClick = (e) => {
+      const target = e.target.closest('.nick-link')
+      if (target && target.dataset.nick) {
+        e.preventDefault()
+        handleNickClick(target.dataset.nick, e)
+      }
+    }
+
+    // Use event delegation on the document, but check for nick-link class
+    document.addEventListener('click', handleNickLinkClick)
+    return () => {
+      document.removeEventListener('click', handleNickLinkClick)
+    }
+  }, [handleNickClick])
 
   useEffect(() => {
     const onKeyDown = async (event) => {
@@ -349,30 +365,12 @@ function Work(props) {
               {pendingCitationInfo}
               {pendingCitationInfo && pendingSummary && <br />}
               {pendingCitationInfo && pendingSummary && <br />}
-              <div className="work-summary">
-                {parse(processHtmlForNicks(marked(pendingSummary || '')), {
-                  replace: (domNode) => {
-                    // Convert anchor tags with data-nick attribute to React Link components
-                    if (
-                      domNode.type === 'tag' &&
-                      domNode.name === 'a' &&
-                      domNode.attribs?.['data-nick']
-                    ) {
-                      const nickValue = domNode.attribs['data-nick']
-                      return (
-                        <Link
-                          key={`nick-${nickValue}`}
-                          to="#"
-                          onClick={(e) => handleNickClick(nickValue, e)}
-                          style={{ textDecoration: 'underline', cursor: 'pointer' }}
-                        >
-                          {nickValue}
-                        </Link>
-                      )
-                    }
-                  },
-                })}
-              </div>
+              <div 
+                className="work-summary"
+                dangerouslySetInnerHTML={{
+                  __html: processHtmlForNicks(marked(pendingSummary || ''))
+                }}
+              />
             </TopLevelPostButtonContent>
           ) : null}
         </TopLevelTitleContainer>
