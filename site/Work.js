@@ -45,6 +45,49 @@ function Work(props) {
   const [nick, setNick] = useState()
   const navigate = useNavigate()
 
+  // Function to handle nick navigation
+  const handleNickClick = async (nickValue, e) => {
+    e.preventDefault()
+    try {
+      const nickResponse = await db.getNick(nickValue)
+      if (nickResponse?.data?.data) {
+        const nickData = nickResponse.data.data
+        switch (nickData.key?.charAt(0)) {
+          case 'n':
+            navigate('/note/' + nickData.note)
+            break
+          case 'w':
+            navigate('/work/' + nickData.work)
+            break
+          case 'i':
+            navigate('/idea/' + nickData.idea)
+            break
+          case 'p':
+            navigate('/pile/' + nickData.pile)
+            break
+          default:
+            break
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching nick:', error)
+    }
+  }
+
+  // Function to process HTML string and convert nicks to links (including in code blocks)
+  const processHtmlForNicks = (html) => {
+    if (!html) return html
+    // Match nick patterns: letter (n, w, i, p) followed by digits
+    const nickPattern = /\b([nwip]\d+)\b/g
+    
+    // Process the HTML string, replacing nicks with anchor tags
+    // We need to handle both regular text and text inside code/pre tags
+    return html.replace(nickPattern, (match) => {
+      // Create an anchor tag with a special data attribute
+      return `<a href="#" data-nick="${match}" class="nick-link">${match}</a>`
+    })
+  }
+
   const fetchWorkInfo = (workId) => {
     db.getInfo(db.types.work, workId)
       .then((response) => {
@@ -307,7 +350,28 @@ function Work(props) {
               {pendingCitationInfo && pendingSummary && <br />}
               {pendingCitationInfo && pendingSummary && <br />}
               <div className="work-summary">
-                {parse(marked(pendingSummary || ''))}
+                {parse(processHtmlForNicks(marked(pendingSummary || '')), {
+                  replace: (domNode) => {
+                    // Convert anchor tags with data-nick attribute to React Link components
+                    if (
+                      domNode.type === 'tag' &&
+                      domNode.name === 'a' &&
+                      domNode.attribs?.['data-nick']
+                    ) {
+                      const nickValue = domNode.attribs['data-nick']
+                      return (
+                        <Link
+                          key={`nick-${nickValue}`}
+                          to="#"
+                          onClick={(e) => handleNickClick(nickValue, e)}
+                          style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                        >
+                          {nickValue}
+                        </Link>
+                      )
+                    }
+                  },
+                })}
               </div>
             </TopLevelPostButtonContent>
           ) : null}
