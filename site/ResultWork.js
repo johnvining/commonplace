@@ -12,7 +12,9 @@ class ResultWork extends React.Component {
     var pilesToShow = this.props.work.piles
       ?.filter(
         (pile) =>
-          pile.name?.includes('Location: ') || pile.name?.includes('Status: ')
+          pile.name?.includes('Location: ') ||
+          pile.name?.includes('Status: ') ||
+          pile.name?.includes('Reading: '),
       )
       .sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
 
