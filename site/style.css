@@ -693,6 +693,9 @@ div .top-bar {
   display: none;
 }
 
+.top-level-standard-button-container {
+  margin-bottom: 16px;
+}
 .top-level-standard-button-container .standard-button {
   font-size: var(--font-size-s);
   height: 28px;
