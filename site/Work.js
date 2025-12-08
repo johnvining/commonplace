@@ -349,9 +349,18 @@ function Work(props) {
         </TopLevelTitleContainer>
       )}
       {edit ? (
-        <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
+        <div style={{ marginBottom: '4px' }}>
+          <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
+        </div>
       ) : editPiles ? (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '4px',
+          }}
+        >
           <TopLevelStandardButtonContainer>
             <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
             {/* TODO: Create Standard Button inline autocomplete with better margin/padding */}
@@ -368,7 +377,7 @@ function Work(props) {
               excludeIds={piles?.map((pile) => pile._id)}
             />
           </TopLevelStandardButtonContainer>
-          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1, alignSelf: 'center' }}>
+          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1 }}>
             <PileListForItem
               remove={editPiles}
               edit={false}
@@ -387,7 +396,14 @@ function Work(props) {
           </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '0px',
+          }}
+        >
           <TopLevelStandardButtonContainer nick={nick}>
             <TopLevelStandardButton
               name="Edit"
@@ -416,9 +432,12 @@ function Work(props) {
                 navigate('/read/' + id)
               }}
             />
-            <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
+            <TopLevelStandardButton
+              name="Add Note"
+              onClick={createNoteForWork}
+            />
           </TopLevelStandardButtonContainer>
-          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1, alignSelf: 'center' }}>
+          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1 }}>
             <PileListForItem
               remove={editPiles}
               edit={false}
