@@ -360,19 +360,6 @@ function Work(props) {
               onPileRemove={handlePileRemove}
             />
           </div>
-          {pendingCitationInfo || pendingSummary ? (
-            <TopLevelPostButtonContent>
-              {pendingCitationInfo}
-              {pendingCitationInfo && pendingSummary && <br />}
-              {pendingCitationInfo && pendingSummary && <br />}
-              <div 
-                className="work-summary"
-                dangerouslySetInnerHTML={{
-                  __html: processHtmlForNicks(marked(pendingSummary || ''))
-                }}
-              />
-            </TopLevelPostButtonContent>
-          ) : null}
         </TopLevelTitleContainer>
       )}
       {edit ? (
@@ -426,6 +413,19 @@ function Work(props) {
           <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
         </TopLevelStandardButtonContainer>
       )}
+      {!edit && !editPiles && (pendingCitationInfo || pendingSummary) ? (
+        <TopLevelPostButtonContent>
+          {pendingCitationInfo}
+          {pendingCitationInfo && pendingSummary && <br />}
+          {pendingCitationInfo && pendingSummary && <br />}
+          <div 
+            className="work-summary"
+            dangerouslySetInnerHTML={{
+              __html: processHtmlForNicks(marked(pendingSummary || ''))
+            }}
+          />
+        </TopLevelPostButtonContent>
+      ) : null}
       {importMode ? (
         <TopLevelFormContainer>
           <TopLevelFormTextArea

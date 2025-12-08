@@ -1231,6 +1231,13 @@ div .image-row {
   display: block;
   text-align: left !important;
   width: 100%;
+  white-space: normal;
+}
+.top-level.post-button-content .work-summary p {
+  margin: 0 0 0.5em 0;
+}
+.top-level.post-button-content .work-summary p:last-child {
+  margin-bottom: 0;
 }
 .top-level.form-label {
   font-size: 12px;

@@ -841,6 +841,15 @@ a.grid-link {
       display: block;
       text-align: left !important;
       width: 100%;
+      white-space: normal;
+
+      p {
+        margin: 0 0 0.5em 0;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
     }
   }
 
