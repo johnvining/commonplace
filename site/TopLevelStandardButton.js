@@ -34,7 +34,7 @@ export function TopLevelStandardButton(props) {
 
 export function TopLevelStandardButtonContainer(props) {
   return (
-    <div>
+    <div className="top-level-standard-button-container">
       {props.children}{' '}
       {props.nick ? (
         <ClickToCopyNick nick={props.nick} style={{ marginLeft: '10px' }} />

@@ -45,40 +45,43 @@ function Work(props) {
   const navigate = useNavigate()
 
   // Function to handle nick navigation
-  const handleNickClick = useCallback(async (nickValue, e) => {
-    e.preventDefault()
-    try {
-      const nickResponse = await db.getNick(nickValue)
-      if (nickResponse?.data?.data) {
-        const nickData = nickResponse.data.data
-        switch (nickData.key?.charAt(0)) {
-          case 'n':
-            navigate('/note/' + nickData.note)
-            break
-          case 'w':
-            navigate('/work/' + nickData.work)
-            break
-          case 'i':
-            navigate('/idea/' + nickData.idea)
-            break
-          case 'p':
-            navigate('/pile/' + nickData.pile)
-            break
-          default:
-            break
+  const handleNickClick = useCallback(
+    async (nickValue, e) => {
+      e.preventDefault()
+      try {
+        const nickResponse = await db.getNick(nickValue)
+        if (nickResponse?.data?.data) {
+          const nickData = nickResponse.data.data
+          switch (nickData.key?.charAt(0)) {
+            case 'n':
+              navigate('/note/' + nickData.note)
+              break
+            case 'w':
+              navigate('/work/' + nickData.work)
+              break
+            case 'i':
+              navigate('/idea/' + nickData.idea)
+              break
+            case 'p':
+              navigate('/pile/' + nickData.pile)
+              break
+            default:
+              break
+          }
         }
+      } catch (error) {
+        console.error('Error fetching nick:', error)
       }
-    } catch (error) {
-      console.error('Error fetching nick:', error)
-    }
-  }, [navigate])
+    },
+    [navigate],
+  )
 
   // Function to process HTML string and convert nicks to links (including in code blocks)
   const processHtmlForNicks = (html) => {
     if (!html) return html
     // Match nick patterns: letter (n, w, i, p) followed by digits
     const nickPattern = /\b([nwip]\d+)\b/g
-    
+
     // Process the HTML string, replacing nicks with anchor tags
     // We need to handle both regular text and text inside code/pre tags
     return html.replace(nickPattern, (match) => {
@@ -418,10 +421,10 @@ function Work(props) {
           {pendingCitationInfo}
           {pendingCitationInfo && pendingSummary && <br />}
           {pendingCitationInfo && pendingSummary && <br />}
-          <div 
+          <div
             className="work-summary"
             dangerouslySetInnerHTML={{
-              __html: processHtmlForNicks(marked(pendingSummary || ''))
+              __html: processHtmlForNicks(marked(pendingSummary || '')),
             }}
           />
         </TopLevelPostButtonContent>

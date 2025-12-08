@@ -227,6 +227,14 @@ a {
   }
 }
 
+.top-level-standard-button-container {
+  .standard-button {
+    font-size: var(--font-size-s);
+    height: 28px;
+    padding: 3px 6px;
+  }
+}
+
 .idea,.pile,.link {
   &.container {
     background-color: transparent;
