@@ -15,6 +15,7 @@ import PileHome from './PileHome'
 import plus from 'url:./icons/plus.svg'
 import React from 'react'
 import RecentList from './RecentList'
+import RecentItems from './RecentItems'
 import search from 'url:./icons/search.svg'
 import home_door from 'url:./icons/home_door.svg'
 import SearchBar from './SearchBar'
@@ -307,6 +308,15 @@ class App extends React.Component {
             path="/read/:id"
             element={
               <Read
+                viewMode={this.state.viewMode}
+                setPageTitle={this.setPageTitle.bind(this)}
+              />
+            }
+          />
+          <Route
+            path="/recent/:type"
+            element={
+              <RecentItems
                 viewMode={this.state.viewMode}
                 setPageTitle={this.setPageTitle.bind(this)}
               />

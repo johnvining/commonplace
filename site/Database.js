@@ -208,6 +208,10 @@ export async function getStats() {
   return axios.get(url_api + 'stats')
 }
 
+export async function getRecentItems(type) {
+  return axios.get(url_api + 'stats/recent/' + type)
+}
+
 export async function bulkSuggestTitlesForNotes(noteIds) {
   const data = { noteIds: noteIds }
   return axios.post(url_api + 'note/bulk-suggest-titles', data)
