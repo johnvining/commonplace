@@ -346,7 +346,29 @@ function Work(props) {
             />
             <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
           </TopLevelTitle>
-          <div style={{ textAlign: 'center' }}>
+        </TopLevelTitleContainer>
+      )}
+      {edit ? (
+        <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
+      ) : editPiles ? (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <TopLevelStandardButtonContainer>
+            <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
+            {/* TODO: Create Standard Button inline autocomplete with better margin/padding */}
+            <Autocomplete
+              inputName="work-work-pile"
+              className={'top-level pile-select'}
+              dontAutofocus={false}
+              defaultValue={''}
+              onSelect={handleNewPile}
+              getSuggestions={db.getSuggestions}
+              apiType={db.types.pile}
+              handleNewSelect={handleCreatePileAndAssign}
+              clearOnSelect={true}
+              excludeIds={piles?.map((pile) => pile._id)}
+            />
+          </TopLevelStandardButtonContainer>
+          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1, alignSelf: 'center' }}>
             <PileListForItem
               remove={editPiles}
               edit={false}
@@ -363,60 +385,59 @@ function Work(props) {
               onPileRemove={handlePileRemove}
             />
           </div>
-        </TopLevelTitleContainer>
-      )}
-      {edit ? (
-        <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
-      ) : editPiles ? (
-        <TopLevelStandardButtonContainer>
-          <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
-          {/* TODO: Create Standard Button inline autocomplete with better margin/padding */}
-          <Autocomplete
-            inputName="work-work-pile"
-            className={'top-level pile-select'}
-            dontAutofocus={false}
-            defaultValue={''}
-            onSelect={handleNewPile}
-            getSuggestions={db.getSuggestions}
-            apiType={db.types.pile}
-            handleNewSelect={handleCreatePileAndAssign}
-            clearOnSelect={true}
-            excludeIds={piles?.map((pile) => pile._id)}
-          />
-        </TopLevelStandardButtonContainer>
+        </div>
       ) : (
-        <TopLevelStandardButtonContainer nick={nick}>
-          <TopLevelStandardButton
-            name="Edit"
-            onClick={() => {
-              setEdit(true)
-              setEditPiles(false)
-            }}
-          />
-          <TopLevelStandardButton
-            name="Piles"
-            onClick={() => {
-              setEdit(false)
-              setEditPiles(true)
-            }}
-          />
-          <TopLevelStandardButton name="Delete" onClick={deleteWork} />
-          <TopLevelStandardButton
-            name="Import"
-            onClick={() => {
-              setImportMode(!importMode)
-            }}
-          />
-          <TopLevelStandardButton
-            name="Read"
-            onClick={() => {
-              navigate('/read/' + id)
-            }}
-          />
-          <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
-        </TopLevelStandardButtonContainer>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <TopLevelStandardButtonContainer nick={nick}>
+            <TopLevelStandardButton
+              name="Edit"
+              onClick={() => {
+                setEdit(true)
+                setEditPiles(false)
+              }}
+            />
+            <TopLevelStandardButton
+              name="Piles"
+              onClick={() => {
+                setEdit(false)
+                setEditPiles(true)
+              }}
+            />
+            <TopLevelStandardButton name="Delete" onClick={deleteWork} />
+            <TopLevelStandardButton
+              name="Import"
+              onClick={() => {
+                setImportMode(!importMode)
+              }}
+            />
+            <TopLevelStandardButton
+              name="Read"
+              onClick={() => {
+                navigate('/read/' + id)
+              }}
+            />
+            <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
+          </TopLevelStandardButtonContainer>
+          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1, alignSelf: 'center' }}>
+            <PileListForItem
+              remove={editPiles}
+              edit={false}
+              piles={piles}
+              onSelect={handleNewPile}
+              getSuggestions={db.getSuggestions}
+              handleNewSelect={handleCreatePileAndAssign}
+              mainClassName="top-level"
+              onStartPileEdit={() => {
+                setEditPiles(true)
+              }}
+              allowAdd={false}
+              allowTabbing={true}
+              onPileRemove={handlePileRemove}
+            />
+          </div>
+        </div>
       )}
-      {!edit && !editPiles && (pendingCitationInfo || pendingSummary) ? (
+      {!edit && (pendingCitationInfo || pendingSummary) ? (
         <TopLevelPostButtonContent>
           {pendingCitationInfo}
           {pendingCitationInfo && pendingSummary && <br />}

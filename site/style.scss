@@ -228,6 +228,8 @@ a {
 }
 
 .top-level-standard-button-container {
+  margin-bottom: 16px;
+  
   .standard-button {
     font-size: var(--font-size-s);
     height: 28px;
@@ -815,6 +817,8 @@ a.grid-link {
   &.container {
     display: flex;
     flex-direction: column;
+    margin-top: 16px;
+    margin-bottom: 16px;
   }
 
   &.pre-title {

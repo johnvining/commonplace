@@ -1208,6 +1208,8 @@ div .image-row {
 .top-level.container {
   display: flex;
   flex-direction: column;
+  margin-top: 16px;
+  margin-bottom: 16px;
 }
 .top-level.pre-title {
   font-size: 18px;
