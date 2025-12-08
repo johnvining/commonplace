@@ -5,17 +5,30 @@ import NoteAuthorSpan from './NoteAuthorSpan'
 
 class NoteResult extends React.Component {
   render() {
+    const note = this.props.note
+    const author = <NoteAuthorSpan note={note} separator=": " />
+    
+    // Determine what to show after author in preference order: title, text, take
+    let content = null
+    if (note.title?.length) {
+      content = note.title
+    } else if (note.text?.length) {
+      content = note.text
+    } else if (note.take?.length) {
+      content = note.take
+    }
+    
     return (
       <Link
-        to={`/note/${this.props.note._id}`}
-        key={'note-list-' + this.props.note._id}
+        to={`/note/${note._id}`}
+        key={'note-list-' + note._id}
       >
         <div className="result-box">
           <div className="result-box header">
             <img src={note_img}></img>
             <span className="truncate">
-              <NoteAuthorSpan note={this.props.note} separator=":" />{' '}
-              {this.props.note.title}
+              {author}
+              {content}
             </span>
           </div>
         </div>
