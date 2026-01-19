@@ -3,6 +3,7 @@ import * as constants from './constants'
 import full from 'url:./icons/full.svg'
 import slim from 'url:./icons/slim.svg'
 import grid from 'url:./icons/grid.svg'
+import gridSmall from 'url:./icons/grid_small.svg'
 
 class SearchBar extends React.Component {
   componentDidMount() {
@@ -21,6 +22,9 @@ class SearchBar extends React.Component {
           break
         case constants.keyCodes.grid:
           this.props.setView(constants.view_modes.GRID)
+          break
+        case constants.keyCodes.tile:
+          this.props.setView(constants.view_modes.TILE)
           break
       }
     }
@@ -56,14 +60,26 @@ class SearchBar extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.GRID
-              ? 'standard-button button-selected right'
-              : 'standard-button right'
+              ? 'standard-button button-selected middle'
+              : 'standard-button middle'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.GRID)
           }}
         >
           <img src={grid} />
+        </button>
+        <button
+          className={
+            this.props.viewMode == constants.view_modes.TILE
+              ? 'standard-button button-selected right'
+              : 'standard-button right'
+          }
+          onClick={() => {
+            this.props.setView(constants.view_modes.TILE)
+          }}
+        >
+          <img src={gridSmall} />
         </button>
       </>
     )

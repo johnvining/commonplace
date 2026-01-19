@@ -227,6 +227,12 @@ a {
   }
 }
 
+.view-icon-placeholder {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+}
+
 .top-level-standard-button-container {
   .standard-button {
     font-size: var(--font-size-s);
@@ -614,6 +620,16 @@ a.grid-link {
   @media (prefers-color-scheme: dark) {
     @include button-invert-icon();
   }
+}
+
+.note-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.note-tile-grid-item {
+  display: flex;
 }
 
 .multi-select {

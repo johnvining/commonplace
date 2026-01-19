@@ -470,6 +470,123 @@ input .note-full .edit-work {
   content: "";
 }
 
+.note-slim.outer.tile {
+  margin: 0px;
+  width: 100%;
+  height: 270px;
+  padding: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  border: 1px solid var(--low-intensity-border);
+  background-color: transparent;
+}
+.note-slim.tile-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.note-slim.tile-images {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.note-slim.tile-images.has-images {
+  height: 156px;
+}
+.note-slim.tile-image-frame {
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: var(--note-background);
+  height: 72px;
+}
+.note-slim.tile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.note-slim.tile-title {
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.note-slim.tile-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-height: 0;
+}
+.note-slim.tile-body.has-images .tile-text {
+  -webkit-line-clamp: 4;
+}
+.note-slim.tile-body.no-images .tile-text {
+  -webkit-line-clamp: 9;
+}
+.note-slim.tile-tags {
+  margin: 6px 0px 0px 0px;
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.note-slim.tile-tags .pile,
+.note-slim.tile-tags .idea {
+  border-radius: 4px;
+  border-style: none;
+  color: var(--font-color);
+  font-size: var(--font-size-xs);
+  margin: 4px;
+  padding: 2px;
+  text-decoration: none;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  .note-slim.tile-tags .pile::before,
+  .note-slim.tile-tags .idea::before {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
+.note-slim.tile-tags .pile::before {
+  background-image: url("/icons/stack.svg");
+  background-size: 13px 15px;
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  content: "";
+}
+.note-slim.tile-tags .idea::before {
+  background-image: url("/icons/tags.svg");
+  background-size: 13px 13px;
+  display: inline-block;
+  width: 14px;
+  height: 13px;
+  content: "";
+}
+.note-slim.tile-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+  font-size: var(--font-size-xs);
+  color: #efefef;
+}
+.note-slim.tile-footer-select {
+  display: flex;
+  align-items: center;
+}
+.note-slim.tile-footer-meta {
+  font-size: var(--font-size-xs);
+  color: #efefef;
+}
+
 :root {
   /* Font Size System */
   --font-size-xs: 9px; /* Extra small: buttons, labels */
@@ -1034,6 +1151,16 @@ a.grid-link {
     -webkit-filter: invert(100%);
     filter: invert(100%);
   }
+}
+
+.note-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.note-tile-grid-item {
+  display: flex;
 }
 
 .multi-select {

@@ -2,6 +2,7 @@ import React from 'react'
 import Note from './Note'
 import NoteSlim from './NoteSlim'
 import NoteGrid from './NoteGrid'
+import NoteTile from './NoteTile'
 import NoteResult from './NoteResult'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
@@ -422,6 +423,7 @@ class NoteList extends React.Component {
     var showMultiselect =
       this.props.viewMode == constants.view_modes.FULL ||
       this.props.viewMode == constants.view_modes.RESULT
+    var isTileView = this.props.viewMode == constants.view_modes.TILE
     return (
       <div className="multi-select">
         {showMultiselect ? null : this.state.selectedArray.some((x) => x) ? (
@@ -532,10 +534,13 @@ class NoteList extends React.Component {
           </div>
         )}
         {this.state.notes === undefined ? null : (
-          <div>
+          <div className={isTileView ? 'note-tile-grid' : ''}>
             {this.state.notes.map((note, index) => {
               return (
-                <div key={'note-view-' + note._id}>
+                <div
+                  key={'note-view-' + note._id}
+                  className={isTileView ? 'note-tile-grid-item' : ''}
+                >
                   {this.props.viewMode == constants.view_modes.GRID ? (
                     <NoteGrid
                       author={
@@ -559,6 +564,19 @@ class NoteList extends React.Component {
                       markShiftChecked={this.markShiftChecked.bind(this)}
                       imageCount={note.images?.length ?? 0}
                       note={note}
+                    />
+                  ) : this.props.viewMode == constants.view_modes.TILE ? (
+                    <NoteTile
+                      deleted={this.state.deleted.includes(index)}
+                      id={note._id}
+                      index={index}
+                      inFocus={this.state.inFocus}
+                      key={note._id}
+                      markChecked={this.markChecked.bind(this)}
+                      markShiftChecked={this.markShiftChecked.bind(this)}
+                      note={note}
+                      selected={this.state.selectedArray[index]}
+                      tabIndex={index + 1}
                     />
                   ) : this.props.viewMode == constants.view_modes.SLIM ? (
                     <NoteSlim

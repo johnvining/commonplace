@@ -15,13 +15,13 @@
     &.inner {
         margin: 4px;
   
-        &.truncate {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-        }
+    &.truncate {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
 
         .pile,
         .idea {
@@ -57,4 +57,139 @@
             content: '';
           }
     }
+
+  &.outer.tile {
+    margin: 0px;
+    width: 100%;
+    height: 270px;
+    padding: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    border: 1px solid $low_intensity_border;
+    background-color: transparent;
+  }
+
+  &.outer.tile .inner.truncate {
+    -webkit-line-clamp: 6;
+    flex: 1;
+  }
+
+  &.tile-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &.tile-images {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 8px;
+
+    &.has-images {
+      height: 156px;
+    }
+  }
+
+  &.tile-image-frame {
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: $note_background;
+    height: 72px;
+  }
+
+  &.tile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &.tile-title {
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.tile-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &.tile-body.has-images .tile-text {
+    -webkit-line-clamp: 4;
+  }
+
+  &.tile-body.no-images .tile-text {
+    -webkit-line-clamp: 9;
+  }
+
+  &.tile-tags {
+    margin: 6px 0px 0px 0px;
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.tile-tags .pile,
+  &.tile-tags .idea {
+    border-radius: 4px;
+    border-style: none;
+    color: $font_color;
+    font-size: var(--font-size-xs);
+    margin: 4px;
+    padding: 2px;
+    text-decoration: none;
+    font-family: $main_font;
+
+    @media (prefers-color-scheme: dark) {
+      @include background-image-invert();
+    }
+  }
+
+  &.tile-tags .pile::before {
+    background-image: url($image_stack_background);
+    background-size: 13px 15px;
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    content: '';
+  }
+
+  &.tile-tags .idea::before {
+    background-image: url($image_tags_background);
+    background-size: 13px 13px;
+    display: inline-block;
+    width: 14px;
+    height: 13px;
+    content: '';
+  }
+
+  &.tile-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: var(--font-size-xs);
+    color: $grey2;
+  }
+
+  &.tile-footer-select {
+    display: flex;
+    align-items: center;
+  }
+
+  &.tile-footer-meta {
+    font-size: var(--font-size-xs);
+    color: $grey2;
+  }
 }

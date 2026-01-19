@@ -3,6 +3,7 @@ export const view_modes = {
   SLIM: 2,
   GRID: 3,
   RESULT: 4,
+  TILE: 5,
 }
 
 // No selection: No specific note is selected
@@ -36,6 +37,7 @@ export const modifiers = {
   slim: 'slim',
   grid: 'grid',
   full: 'full',
+  tile: 'tile',
   load: 'load',
   read: 'read',
 }
@@ -55,6 +57,7 @@ export const keyCodes = {
   full: 49, // 1
   slim: 50, // 2
   grid: 51, // 3
+  tile: 52, // 4
   ocr: 67, // c (oCr)
   image: 73, // i
   nextImage: 75, //k

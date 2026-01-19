@@ -64,7 +64,8 @@ function SearchBar(props) {
       } else if (
         (typedText == constants.modifiers.slim ||
           typedText == constants.modifiers.full ||
-          typedText == constants.modifiers.grid) &&
+          typedText == constants.modifiers.grid ||
+          typedText == constants.modifiers.tile) &&
         event.keyCode == constants.keyCodes.enter
       ) {
         var command = typedText
@@ -80,6 +81,9 @@ function SearchBar(props) {
             break
           case constants.modifiers.grid:
             props.setView(constants.view_modes.GRID)
+            break
+          case constants.modifiers.tile:
+            props.setView(constants.view_modes.TILE)
             break
         }
       } else if (event.keyCode == constants.keyCodes.enter) {

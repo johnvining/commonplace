@@ -21,10 +21,14 @@ class NoteSlim extends React.Component {
       return <div> </div>
     }
 
+    const outerClassName = this.props.selected
+      ? 'note-slim outer selected'
+      : 'note-slim outer'
+
     return (
       <div
         className={
-          this.props.selected ? 'note-slim outer selected' : 'note-slim outer'
+          this.props.tile ? outerClassName + ' tile' : outerClassName
         }
       >
         <div className="note-slim button">
