@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import note_img from 'url:./icons/write.svg'
 import NoteAuthorSpan from './NoteAuthorSpan'
+import PinButton from './PinButton'
 
 class NoteResult extends React.Component {
   render() {
@@ -30,6 +31,14 @@ class NoteResult extends React.Component {
               {author}
               {content}
             </span>
+            <PinButton
+              type="note"
+              id={note._id}
+              label={content || 'Untitled Note'}
+              href={`/note/${note._id}`}
+              compact={true}
+              className="pin-button-inline"
+            />
           </div>
         </div>
       </Link>

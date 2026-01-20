@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import work_img from 'url:./icons/work.svg'
 import note_img from 'url:./icons/write.svg'
 import PileListForItem from './PileListForItem'
+import PinButton from './PinButton'
 
 class ResultWork extends React.Component {
   state = {}
@@ -28,6 +29,14 @@ class ResultWork extends React.Component {
               <em>{work.name}</em>
               {work.year ? <span className="date">{work.year}</span> : null}
             </div>
+              <PinButton
+                type="work"
+                id={work._id}
+                label={work.name}
+                href={`/work/${work._id}`}
+                compact={true}
+                className="pin-button-inline"
+              />
           </div>
           {work.note_count ? (
             <div className="result-box content">

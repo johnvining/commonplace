@@ -17,6 +17,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
+import PinButton from './PinButton'
 
 function Pile(props) {
   const { id } = useParams()
@@ -167,6 +168,13 @@ function Pile(props) {
               ) : null}
             </TopLevelTitleContainer>
             <TopLevelStandardButtonContainer nick={nick}>
+              <PinButton
+                type="pile"
+                id={id}
+                label={pendingName}
+                href={`/pile/${id}`}
+                className="standard-button left-right"
+              />
               <TopLevelStandardButton
                 name="Delete"
                 onClick={handleDeletePile}

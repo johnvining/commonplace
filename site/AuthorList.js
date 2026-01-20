@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import author_img from 'url:./icons/author.svg'
 import note_img from 'url:./icons/write.svg'
 import work_img from 'url:./icons/work.svg'
+import PinButton from './PinButton'
 
 class AuthorList extends React.Component {
   state = {}
@@ -30,6 +31,14 @@ class AuthorList extends React.Component {
                       <img src={author_img} />
 
                       {author.name}
+                      <PinButton
+                        type="auth"
+                        id={author._id}
+                        label={author.name}
+                        href={`/auth/${author._id}`}
+                        compact={true}
+                        className="pin-button-inline"
+                      />
                     </div>
 
                     {author.note_count || author.note_count ? (

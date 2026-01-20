@@ -26,6 +26,7 @@ import {
   TopLevelTitle,
   TopLevelPostButtonContent,
 } from './TopLevelHeadings'
+import PinButton from './PinButton'
 
 function Work(props) {
   const { id } = useParams()
@@ -395,6 +396,13 @@ function Work(props) {
           }}
         >
           <TopLevelStandardButtonContainer nick={nick}>
+            <PinButton
+              type="work"
+              id={id}
+              label={pendingWorkTitle}
+              href={`/work/${id}`}
+              className="standard-button left-right"
+            />
             <TopLevelStandardButton
               name="Edit"
               onClick={() => {

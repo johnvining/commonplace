@@ -6,9 +6,11 @@
         margin: 8px;
         border-radius: 4px;
         background-color: transparent;
+        border: 1px solid $note_border;
         
         &.selected {
-            background-color: $semantic_selection;
+            border-color: $note_border_selected;
+            background-color: transparent;
         }   
     }
 
@@ -65,8 +67,9 @@
     padding: 12px;
     flex-direction: column;
     align-items: stretch;
-    border: 1px solid $low_intensity_border;
-    background-color: transparent;
+    border: 1px solid $note_border;
+    background-color: $note_background;
+    color: $font_color;
   }
 
   &.outer.tile .inner.truncate {
@@ -180,7 +183,7 @@
     margin-top: auto;
     padding-top: 6px;
     font-size: var(--font-size-xs);
-    color: $grey2;
+    color: $font_color;
   }
 
   &.tile-footer-select {
@@ -190,6 +193,6 @@
 
   &.tile-footer-meta {
     font-size: var(--font-size-xs);
-    color: $grey2;
+    color: $font_color;
   }
 }

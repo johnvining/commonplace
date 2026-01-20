@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import idea_img from 'url:./icons/idea.svg'
 import note_img from 'url:./icons/write.svg'
+import PinButton from './PinButton'
 
 class IdeaList extends React.Component {
   state = {}
@@ -25,6 +26,14 @@ class IdeaList extends React.Component {
                     <div className="result-box header">
                       <img src={idea_img} />
                       {idea.name}
+                      <PinButton
+                        type="idea"
+                        id={idea._id}
+                        label={idea.name}
+                        href={`/idea/${idea._id}`}
+                        compact={true}
+                        className="pin-button-inline"
+                      />
                     </div>
                     {idea.note_count ? (
                       <div className="result-box content">

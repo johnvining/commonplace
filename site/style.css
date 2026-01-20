@@ -8,7 +8,7 @@
   --button-selected: rgb(177.1, 217.95, 231.25);
   --input-background: #efefef;
   --note-background-edit: white;
-  --note-background-not-selected: #f4f4f4;
+  --note-background-not-selected: white;
   --note-background: white;
   --font-color: black;
   --link-color: black;
@@ -58,7 +58,7 @@
   background-color: var(--note-background);
   border-color: var(--note-border);
   border-style: solid;
-  border-width: 2px;
+  border-width: 1px;
   border-radius: 4px;
   margin: 0px 0px 4px 0px;
   padding: 2px;
@@ -82,7 +82,7 @@
 }
 
 .note-full.outer.not-selected {
-  background-color: var(--note_background-not-selected);
+  background-color: var(--note-background-not-selected);
 }
 
 .note-full.outer.show-full-image {
@@ -422,7 +422,9 @@ input .note-full .edit-work {
 
 .action-bar {
   width: 100%;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   margin-top: 4px;
 }
 
@@ -466,12 +468,55 @@ input .note-full .edit-work {
   filter: invert(0%);
 }
 
+.action-button.action-button-text {
+  border: 1px solid var(--low-intensity-border);
+  font-size: var(--font-size-xs);
+  height: auto;
+  min-width: 48px;
+  padding: 4px 8px;
+  width: auto;
+}
+
+.action-button.action-button-text:hover {
+  background-color: var(--semantic-selection);
+}
+
 .left-div {
-  float: left;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .right-div {
-  float: right;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-bar .action-button {
+  margin: 0;
+}
+
+.action-button.pin-button {
+  border: none;
+  padding: 4px;
+  width: 50px;
+  height: 40px;
+  background-color: transparent;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button.pin-button:hover,
+.action-button.pin-button:focus {
+  background-color: #F7FCF7;
+  -webkit-filter: invert(0%);
+  filter: invert(0%);
+}
+
+.action-button.pin-button .pin-button-icon {
+  width: 21px;
+  height: 21px;
 }
 
 .note-slim.outer {
@@ -481,10 +526,12 @@ input .note-full .edit-work {
   margin: 8px;
   border-radius: 4px;
   background-color: transparent;
+  border: 1px solid var(--note-border);
 }
 
 .note-slim.outer.selected {
-  background-color: var(--semantic-selection);
+  border-color: var(--note-border-selected);
+  background-color: transparent;
 }
 
 .note-slim.inner {
@@ -545,8 +592,9 @@ input .note-full .edit-work {
   padding: 12px;
   flex-direction: column;
   align-items: stretch;
-  border: 1px solid var(--low-intensity-border);
-  background-color: transparent;
+  border: 1px solid var(--note-border);
+  background-color: var(--note-background);
+  color: var(--font-color);
 }
 
 .note-slim.tile-body {
@@ -660,7 +708,7 @@ input .note-full .edit-work {
   margin-top: auto;
   padding-top: 6px;
   font-size: var(--font-size-xs);
-  color: #efefef;
+  color: var(--font-color);
 }
 
 .note-slim.tile-footer-select {
@@ -670,7 +718,7 @@ input .note-full .edit-work {
 
 .note-slim.tile-footer-meta {
   font-size: var(--font-size-xs);
-  color: #efefef;
+  color: var(--font-color);
 }
 
 :root {
@@ -700,18 +748,18 @@ html {
 }
 
 .main {
-  max-width: 68em;
-  padding: 0px;
-  margin: auto;
+  max-width: 96rem;
+  width: 100%;
+  padding: 0 12px;
+  margin: 0 auto;
   color: var(--font-color);
 }
 
 body {
   background: var(--background-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  margin-left: 8px;
-  margin-right: 8px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 }
 
 a {
@@ -740,7 +788,8 @@ div .top-bar {
 
 .top-bar .title-bar {
   display: none;
-  width: 33%;
+  width: auto;
+  flex: 1;
   align-self: flex-start;
 }
 
@@ -784,13 +833,216 @@ div .top-bar {
 
 @media (min-width: 768px) {
   .top-bar .top-action-bar {
-    width: 33%;
+    width: auto;
+    margin-left: auto;
   }
 }
 
 .top-bar .tool-bar.div {
   margin: 0px 0px 0px 10px;
   align-self: center;
+}
+
+.app-shell {
+  display: block;
+  margin-top: 8px;
+}
+
+.app-content {
+  min-width: 0;
+}
+
+.sidebar {
+  display: none;
+  position: sticky;
+  top: 72px;
+  align-self: flex-start;
+  width: 260px;
+  padding: 12px;
+  border: 1px solid var(--note-border);
+  border-radius: 6px;
+  background-color: var(--background-color);
+  color: var(--font-color);
+  max-height: calc(100vh - 96px);
+  overflow-y: auto;
+}
+
+.sidebar-section + .sidebar-section {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--note-border);
+}
+
+.sidebar-title {
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  color: var(--font-color);
+}
+
+.sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-list-compact {
+  font-size: var(--font-size-xs);
+  gap: 4px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--note-border);
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.sidebar-link:last-child {
+  border-bottom: none;
+}
+
+.sidebar-link:hover {
+  color: var(--font-color);
+}
+
+.sidebar-pin-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--note-border);
+}
+
+.sidebar-pin-row:last-child {
+  border-bottom: none;
+}
+
+.sidebar-pin-row .sidebar-link {
+  flex: 1;
+  border-bottom: none;
+  padding: 0;
+}
+
+.sidebar-link-compact {
+  padding: 2px 0;
+}
+
+.sidebar-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-pin-row .sidebar-item {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  overflow: hidden;
+}
+
+.sidebar-count {
+  font-size: var(--font-size-xs);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.sidebar-muted {
+  font-size: var(--font-size-xs);
+  opacity: 0.5;
+}
+
+.pin-button:not(.standard-button) {
+  background: transparent;
+  border: 1px solid var(--low-intensity-border);
+  border-radius: 4px;
+  color: var(--font-color);
+  cursor: pointer;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: var(--font-size-xs);
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pin-button:not(.standard-button):hover {
+  background-color: var(--semantic-selection);
+}
+
+.pin-button-icon {
+  display: block;
+  width: 21px;
+  height: 21px;
+}
+
+.pin-button-icon-small {
+  width: 16px;
+  height: 16px;
+}
+
+.pin-button-label {
+  line-height: 1;
+}
+
+.pin-button-compact {
+  font-size: var(--font-size-xs);
+  padding: 1px 4px;
+}
+
+.pin-button-inline {
+  margin-left: auto;
+}
+
+.standard-button.pin-button {
+  font-size: var(--font-size-lg);
+  padding: 6px;
+  border: 1px solid var(--low-intensity-border);
+  background-color: var(--button-background);
+  line-height: 1;
+}
+
+.standard-button.pin-button .pin-button-label {
+  line-height: 1;
+}
+
+.action-button.pin-button {
+  padding: 4px;
+  gap: 0;
+  justify-content: center;
+}
+
+.sidebar .pin-button {
+  border: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar .pin-button-icon {
+    -webkit-filter: invert(100%);
+    filter: invert(100%);
+  }
+}
+
+@media (min-width: 1100px) {
+  .app-shell {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+
+  .sidebar {
+    display: block;
+  }
+
+  .app-content {
+    flex: 1;
+  }
 }
 
 .stats-display {
@@ -808,6 +1060,11 @@ div .top-bar {
 
 .stats-display .stat-item:last-child {
   margin-right: 0;
+}
+
+.sidebar .stats-display {
+  flex-wrap: wrap;
+  row-gap: 4px;
 }
 
 .stats-loading {
@@ -841,13 +1098,17 @@ div .top-bar {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 2px;
+  border-width: 1px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: var(--font-size-lg);
   height: 42px;
   margin: 4px 0px 4px 0px;
   padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1121,6 +1382,7 @@ div .top-bar {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
+  border-width: 1px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: var(--font-size-lg);
@@ -1134,6 +1396,7 @@ div .top-bar {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
+  border-width: 1px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: var(--font-size-lg);
@@ -1191,8 +1454,9 @@ div .top-bar {
 }
 
 .search-bar.container {
-  border: 2px;
+  border-width: 1px;
   border-style: solid;
+  border-color: var(--low-intensity-border);
   border-radius: 4px;
   width: 100%;
   background-color: var(--background-color);
@@ -1246,7 +1510,7 @@ div .top-bar {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 2px;
+  border-width: 1px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 28px;
@@ -1377,7 +1641,7 @@ a.grid-link {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   padding: 8px;
   margin: 2px;
-  border-width: 2px;
+  border-width: 1px;
   border-color: var(--low-intensity-border);
   background-color: var(--button-input-background-selected);
   color: var(--font-color);
@@ -1403,7 +1667,7 @@ a.grid-link {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   padding: 8px;
   margin: 2px;
-  border-width: 2px;
+  border-width: 1px;
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
@@ -1587,7 +1851,7 @@ div .image-row {
   border-color: var(--note-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 2px;
+  border-width: 1px;
   display: block;
   margin: 0px 0px 4px 0px;
   padding: 6px;
@@ -1737,7 +2001,7 @@ div .image-row {
   border-color: var(--low-intensity-border);
   border-radius: 4px;
   border-style: solid;
-  border-width: 2px;
+  border-width: 1px;
   display: inline-flex;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 14px;
@@ -1818,7 +2082,7 @@ div .image-row {
   padding: 18px 20px;
   width: min(720px, 90vw);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border: 2px solid var(--high-intensity-border);
+  border: 1px solid var(--high-intensity-border);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1835,7 +2099,7 @@ div .image-row {
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border: 2px solid var(--high-intensity-border);
+  border: 1px solid var(--high-intensity-border);
 }
 
 @media (prefers-color-scheme: dark) {

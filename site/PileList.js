@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import pile_img from 'url:./icons/stack.svg'
 import work_img from 'url:./icons/work.svg'
 import note_img from 'url:./icons/write.svg'
+import PinButton from './PinButton'
 
 class PileList extends React.Component {
   state = {}
@@ -26,6 +27,14 @@ class PileList extends React.Component {
                     <div className="result-box header">
                       <img src={pile_img} />
                       <div>{pile.name}</div>
+                      <PinButton
+                        type="pile"
+                        id={pile._id}
+                        label={pile.name}
+                        href={`/pile/${pile._id}`}
+                        compact={true}
+                        className="pin-button-inline"
+                      />
                     </div>
                     {pile.note_count || pile.work_count ? (
                       <div className="result-box content">

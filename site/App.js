@@ -19,6 +19,7 @@ import RecentItems from './RecentItems'
 import search from 'url:./icons/search.svg'
 import home_door from 'url:./icons/home_door.svg'
 import SearchBar from './SearchBar'
+import Sidebar from './Sidebar'
 import Stats from './Stats'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
@@ -177,148 +178,153 @@ class App extends React.Component {
           </div>
         ) : null}
 
-        <Routes>
-          <Route
-            path="/auth/:id"
-            element={
-              <Author
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+        <div className="app-shell">
+          <Sidebar />
+          <div className="app-content">
+            <Routes>
+              <Route
+                path="/auth/:id"
+                element={
+                  <Author
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/auth/:id/notes"
-            element={
-              <AuthorNotes
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/auth/:id/notes"
+                element={
+                  <AuthorNotes
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/file"
-            element={
-              <FileList
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/file"
+                element={
+                  <FileList
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/flip"
-            element={
-              <FlipList
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/flip"
+                element={
+                  <FlipList
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/load"
-            element={<Load setPageTitle={this.setPageTitle.bind(this)} />}
-          />
-          <Route
-            path="/find/:search"
-            element={
-              <Find
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/load"
+                element={<Load setPageTitle={this.setPageTitle.bind(this)} />}
               />
-            }
-          />
-          <Route
-            path="/idea/:id"
-            element={
-              <Idea
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/find/:search"
+                element={
+                  <Find
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/note/:id"
-            element={<NoteView setPageTitle={this.setPageTitle.bind(this)} />}
-          />
-          <Route
-            path="/nick/:nick"
-            element={<NoteView setPageTitle={this.setPageTitle.bind(this)} />}
-          />
-          <Route
-            path="/note/:id/edit"
-            element={
-              <NoteView
-                edit={true}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/idea/:id"
+                element={
+                  <Idea
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/pile/:id"
-            element={
-              <Pile
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
-                showNotes={false}
+              <Route
+                path="/note/:id"
+                element={<NoteView setPageTitle={this.setPageTitle.bind(this)} />}
               />
-            }
-          />
-          <Route
-            path="/pile/:id/notes"
-            element={
-              <Pile
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
-                showNotes={true}
+              <Route
+                path="/nick/:nick"
+                element={<NoteView setPageTitle={this.setPageTitle.bind(this)} />}
               />
-            }
-          />
-          <Route
-            path="/piles"
-            element={
-              <PileHome
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/note/:id/edit"
+                element={
+                  <NoteView
+                    edit={true}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <RecentList
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/pile/:id"
+                element={
+                  <Pile
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                    showNotes={false}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/work/:id"
-            element={
-              <Work
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/pile/:id/notes"
+                element={
+                  <Pile
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                    showNotes={true}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/read/:id"
-            element={
-              <Read
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/piles"
+                element={
+                  <PileHome
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-          <Route
-            path="/recent/:type"
-            element={
-              <RecentItems
-                viewMode={this.state.viewMode}
-                setPageTitle={this.setPageTitle.bind(this)}
+              <Route
+                path="/"
+                element={
+                  <RecentList
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
               />
-            }
-          />
-        </Routes>
+              <Route
+                path="/work/:id"
+                element={
+                  <Work
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
+              />
+              <Route
+                path="/read/:id"
+                element={
+                  <Read
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
+              />
+              <Route
+                path="/recent/:type"
+                element={
+                  <RecentItems
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
+              />
+            </Routes>
+          </div>
+        </div>
       </div>
     )
   }

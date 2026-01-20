@@ -3,7 +3,7 @@
     background-color: $note_background;
     border-color: $note_border;
     border-style: solid;
-    border-width: 2px;
+    border-width: 1px;
     border-radius: 4px;
     margin: 0px 0px 4px 0px;
     padding: 2px;
@@ -338,7 +338,9 @@
 
 .action-bar {
   width: 100%;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   margin-top: 4px;
 }
 
@@ -371,10 +373,52 @@
   }
 }
 
+.action-button.action-button-text {
+  border: 1px solid $low_intensity_border;
+  font-size: var(--font-size-xs);
+  height: auto;
+  min-width: 48px;
+  padding: 4px 8px;
+  width: auto;
+
+  &:hover {
+    background-color: $semantic_selection;
+  }
+}
+
 .left-div {
-  float: left;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .right-div {
-  float: right;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-bar .action-button {
+  margin: 0;
+}
+
+.action-button.pin-button {
+  border: none;
+  padding: 4px;
+  width: 50px;
+  height: 40px;
+  background-color: transparent;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button.pin-button:hover,
+.action-button.pin-button:focus {
+  background-color: $theme_mint;
+  @include button-uninvert-icon();
+}
+
+.action-button.pin-button .pin-button-icon {
+  width: 21px;
+  height: 21px;
 }

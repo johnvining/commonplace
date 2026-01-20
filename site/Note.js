@@ -24,6 +24,7 @@ import WorkCitationSpan from './WorkCitationSpan'
 import ClickToCopyNick from './ClickToCopyNick'
 import ClickableLabelButton from './ClickableLabelButton'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+import PinButton from './PinButton'
 
 class Note extends React.Component {
   state = {
@@ -428,6 +429,15 @@ class Note extends React.Component {
     if (deleted) {
       return <div> </div>
     }
+
+    const noteLabel =
+      this.state.pendingTitle?.trim()?.length
+        ? this.state.pendingTitle
+        : this.state.pendingText?.trim()?.length
+        ? `${this.state.pendingText.trim().slice(0, 80)}${
+            this.state.pendingText.trim().length > 80 ? '...' : ''
+          }`
+        : 'Untitled Note'
 
     var edit = false,
       edit_ideas = false,
@@ -890,6 +900,16 @@ class Note extends React.Component {
                   <ClickToCopyNick
                     nick={this.state.nick}
                     style={{ verticalAlign: 'super' }}
+                  />
+                  <PinButton
+                    type="note"
+                    id={this.props.id}
+                    label={noteLabel}
+                    href={`/note/${this.props.id}`}
+                    className="action-button"
+                    compact={true}
+                    showLabel={false}
+                    stopPropagation={false}
                   />
                   <button
                     className={'action-button'}
