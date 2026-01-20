@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "parcel index.html",
     "sass": "sass --watch style.scss:style.css",
+    "prebuild": "node scripts/ensure-parcel-native.js",
     "build": "rm -rf dist .parcel-cache && parcel build index.html"
   },
   "engines": {

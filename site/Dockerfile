@@ -1,18 +1,16 @@
 # Build react client
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 WORKDIR /app
 
 COPY package*.json ./
 ###  Installing dependencies
-# --no-cache: download package index on-the-fly, no need to cleanup afterwards
-# --virtual: bundle packages, remove whole bundle at once, when done
-# https://github.com/nodejs/docker-node/issues/282
-RUN apk --no-cache --virtual build-dependencies add \
-    python3 \
-    make \
-    g++ \
-    && npm install \
-    && apk del build-dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      python3 \
+      make \
+      g++ \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm ci --include=optional
 
 COPY . .
 
