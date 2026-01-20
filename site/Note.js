@@ -927,6 +927,11 @@ class Note extends React.Component {
                     compact={true}
                     showLabel={false}
                     stopPropagation={false}
+                    tabIndex={
+                      selected || edit || edit_ideas || edit_piles || edit_links
+                        ? null
+                        : '-1'
+                    }
                   />
                   <button
                     className={'action-button'}

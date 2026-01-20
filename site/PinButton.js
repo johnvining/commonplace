@@ -13,6 +13,7 @@ function PinButton({
   compact = false,
   showLabel,
   stopPropagation = true,
+  tabIndex,
 }) {
   const [pinned, setPinned] = useState(isPinned(type, id))
   const shouldShowLabel = showLabel ?? !compact
@@ -46,6 +47,7 @@ function PinButton({
       aria-pressed={pinned}
       aria-label={pinned ? 'Starred' : 'Star'}
       title={pinned ? 'Starred' : 'Star'}
+      tabIndex={tabIndex}
     >
       <img
         className="pin-button-icon"
