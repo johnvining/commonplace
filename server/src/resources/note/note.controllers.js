@@ -116,6 +116,7 @@ export const reqUpdateNote = async (req, res) => {
   return await updateNote(req.params.id, req.body)
 }
 
+
 // TODO: Create specific file for note.image.controllers
 export const reqAddImageToNote = async (req, res) => {
   try {

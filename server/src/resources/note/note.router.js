@@ -33,7 +33,7 @@ const router = Router()
 
 router.route('/find').put(asyncWrapper(reqFindNotesByString, 200))
 
-router.route('/').post(asyncWrapper(controllers.createOne, 201))
+router.route('/').post(controllers.createOne)
 
 router.route('/all/:skip').get(asyncWrapper(reqGetRecentNotes, 200))
 
@@ -80,10 +80,11 @@ router.route('/import/work/:work').put(asyncWrapper(reqBulkImportForWork, 200))
 
 router.route('/import/csv').put(asyncWrapper(reqBulkImportNotesCSV, 200))
 
+
 router
   .route('/:id')
   .get(asyncWrapper(reqGetNoteDetails, 200))
   .put(asyncWrapper(reqUpdateNote, 200))
-  .delete(asyncWrapper(reqDeleteNote, 204))
+  .delete(reqDeleteNote)
 
 export default router
