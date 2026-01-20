@@ -95,7 +95,7 @@ export const getRecentItems = async (req, res) => {
         break
       case 'ideas':
         items = await Idea.find({})
-          .sort({ createdAt: -1 })
+          .sort({ updatedAt: -1 })
           .limit(limit)
           .lean()
           .exec()
@@ -111,7 +111,7 @@ export const getRecentItems = async (req, res) => {
         break
       case 'piles':
         items = await Pile.find({})
-          .sort({ createdAt: -1 })
+          .sort({ updatedAt: -1 })
           .limit(limit)
           .lean()
           .exec()

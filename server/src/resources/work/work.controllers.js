@@ -150,7 +150,7 @@ export const deleteWork = async function(id) {
 }
 
 export const addPileToId = async (workId, pileId) => {
-  return await Work.findOneAndUpdate(
+  const doc = await Work.findOneAndUpdate(
     { _id: workId },
     { $addToSet: { piles: pileId } },
     { new: true }
@@ -158,16 +158,25 @@ export const addPileToId = async (workId, pileId) => {
     .populate('piles')
     .lean()
     .exec()
+  await touchPile(pileId)
+  return doc
 }
 
 export const removePileFromWork = async (workId, pileId) => {
-  return Work.findOneAndUpdate(
+  const doc = await Work.findOneAndUpdate(
     { _id: workId },
     { $pull: { piles: pileId } },
     { new: true }
   )
     .lean()
     .exec()
+  await touchPile(pileId)
+  return doc
 }
 
 export default defaultControllers(Work)
+
+const touchPile = async (pileId) => {
+  if (!pileId) return
+  await Pile.findByIdAndUpdate(pileId, { $set: { updatedAt: new Date() } })
+}

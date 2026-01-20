@@ -1,5 +1,6 @@
 import Note from './note.model.js'
 import Pile from '../pile/pile.model.js'
+import Idea from '../idea/idea.model.js'
 import Work from '../work/work.model.js'
 import Nick from '../nick/nick.model.js'
 import { importCsvFromString } from '../../cli/import.js'
@@ -60,34 +61,45 @@ export const reqGetRandomNotes = async (req, res) => {
 }
 
 export const reqAddIdea = async (req, res) => {
-  return await updateNote(req.params.id, { $addToSet: { ideas: req.body.id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { ideas: req.body.id } })
+  await touchIdea(req.body.id)
+  return doc
 }
 
 export const reqAddNewIdea = async (req, res) => {
   const newIdea = await IdeaControllers.createIdea(req.body.name)
-  return await updateNote(req.params.id, { $addToSet: { ideas: newIdea._id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { ideas: newIdea._id } })
+  await touchIdea(newIdea._id)
+  return doc
 }
 
 export const reqRemoveIdeaFromNote = async (req, res) => {
-  return await updateNote(req.params.id, {
+  const doc = await updateNote(req.params.id, {
     $pull: { ideas: req.params.ideaId },
   })
+  await touchIdea(req.params.ideaId)
+  return doc
 }
 
 export const reqAddPile = async (req, res) => {
-  return await updateNote(req.params.id, { $addToSet: { piles: req.body.id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { piles: req.body.id } })
+  await touchPile(req.body.id)
+  return doc
 }
 
 export const reqAddNewPile = async (req, res) => {
   const newPile = await Pile.create({ name: req.body.name })
-  return await updateNote(req.params.id, { $addToSet: { piles: newPile._id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { piles: newPile._id } })
+  await touchPile(newPile._id)
+  return doc
 }
 
 export const reqRemovePileFromNote = async (req, res) => {
-  const doc = updateNote(req.params.id, { $pull: { piles: req.params.pileId } })
+  const doc = await updateNote(req.params.id, { $pull: { piles: req.params.pileId } })
   if (!doc) {
     return res.status(400).end()
   }
+  await touchPile(req.params.pileId)
   return doc
 }
 
@@ -220,6 +232,16 @@ export const updateNote = async (noteId, updateObj) => {
     })
     .lean()
     .exec()
+}
+
+const touchIdea = async (ideaId) => {
+  if (!ideaId) return
+  await Idea.findByIdAndUpdate(ideaId, { $set: { updatedAt: new Date() } })
+}
+
+const touchPile = async (pileId) => {
+  if (!pileId) return
+  await Pile.findByIdAndUpdate(pileId, { $set: { updatedAt: new Date() } })
 }
 
 export const reqOcrForNote = async (req, res) => {
