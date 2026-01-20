@@ -2,6 +2,7 @@ import React from 'react'
 import lightbulb from 'url:./icons/lightbulb.svg'
 import loader from 'url:./icons/loader.svg'
 import * as constants from './constants'
+import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
 class Autocomplete extends React.Component {
   state = {
@@ -22,28 +23,33 @@ class Autocomplete extends React.Component {
   }
 
   componentDidMount() {
-    this.keyDownListener = this.handleKeyDown.bind(this)
-    document.addEventListener('keydown', this.keyDownListener, false)
     this.setState({
       currentTypedText: this.props.defaultValue,
       hideResults: true,
     })
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.keyDownListener, false)
-  }
-
-  handleKeyDown(event) {
-    if (event.keyCode == constants.keyCodes.esc) {
+  // Section 6: Autocomplete keyboard shortcuts - called from wrapper
+  handleKeyboardShortcut(event) {
+    // Section 6.1: Navigation
+    if (shortcuts.autocomplete.close(event)) {
       if (this.props.escape) this.props.escape()
       this.setState({ currentTypedText: '' })
-    } else if (event.keyCode == 8 && !this.state.currentTypedText) {
+      return true
+    }
+
+    if (shortcuts.autocomplete.back(event) && !this.state.currentTypedText) {
       if (this.props.escape) this.props.escape()
+      return true
     }
-    if (this.props.showSuggestedIdeas && event.ctrlKey && event.key == 's') {
+
+    // Section 6.2: AI Suggestions
+    if (shortcuts.autocomplete.suggestIdeas(event) && this.props.showSuggestedIdeas) {
       this.handleFetchIdeaSuggestions()
+      return true
     }
+
+    return false
   }
 
   handleTypingChange = (val) => {
@@ -248,4 +254,21 @@ class Autocomplete extends React.Component {
   }
 }
 
-export default Autocomplete
+// Wrapper component that provides keyboard shortcuts
+function AutocompleteWithKeyboard(props) {
+  const autocompleteRef = React.useRef(null)
+
+  // Section 6: Autocomplete keyboard shortcuts
+  useKeyboardShortcuts(
+    constants.keyboardScopes.AUTOCOMPLETE,
+    (event) => {
+      if (!autocompleteRef.current) return false
+      return autocompleteRef.current.handleKeyboardShortcut(event)
+    },
+    []
+  )
+
+  return <Autocomplete ref={autocompleteRef} {...props} />
+}
+
+export default AutocompleteWithKeyboard

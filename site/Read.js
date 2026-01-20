@@ -12,6 +12,7 @@ import {
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
 import { TopLevelTitle, TopLevelTitleContainer } from './TopLevelHeadings'
+import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 
 function Read(props) {
   const { id } = useParams()
@@ -44,19 +45,6 @@ function Read(props) {
     fetchWorkInfo(id)
   }, [id])
 
-  useEffect(() => {
-    const onKeyDown = async (event) => {
-      if (event.ctrlKey && event.keyCode == constants.keyCodes.new) {
-        createNoteForWork()
-      }
-    }
-
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  })
-
   const getListOfNotes = async () => {
     var notesResponse
     await db
@@ -85,9 +73,25 @@ function Read(props) {
   }
 
   const createNoteForWork = async () => {
-    const response = await db.createNewNoteForWork(id)
-    navigate('/note/' + response.data._id + '/edit')
+    try {
+      const response = await db.createNewNoteForWork(id)
+      const noteId = response?.data?._id
+      if (!noteId) {
+        console.error('Create note response missing id', response)
+        return
+      }
+      navigate('/note/' + noteId + '/edit')
+    } catch (error) {
+      console.error('Error creating note', error)
+    }
   }
+
+  // Section 3.1 & 3.3: Read page keyboard shortcuts
+  // Read page is a simplified view, so only Ctrl+N (new note) is needed
+  useEntityKeyboardShortcuts({
+    isEditing: false,
+    onNewNote: createNoteForWork,
+  })
 
   props.setPageTitle(workTitle)
 

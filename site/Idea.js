@@ -15,6 +15,7 @@ import {
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
 import * as constants from './constants'
+import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 
 function Idea(props) {
   const { id } = useParams()
@@ -43,33 +44,6 @@ function Idea(props) {
   useEffect(() => {
     fetchIdeaInfo(id)
   }, [id])
-
-  useEffect(() => {
-    const onKeyDown = async (event) => {
-      if (event.keyCode == constants.keyCodes.esc) {
-        setEdit(false)
-        return
-      }
-
-      if (!event.ctrlKey) {
-        return
-      }
-
-      switch (event.keyCode) {
-        case constants.keyCodes.accept:
-          edit && handleAcceptUpdates()
-          return
-        case constants.keyCodes.edit:
-          setEdit(true)
-          return
-      }
-    }
-
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  })
 
   const getListOfNotes = async () => {
     var notesResponse
@@ -104,6 +78,31 @@ function Idea(props) {
     db.updateRecord(db.types.idea, id, updateObject)
     setEdit(false)
   }
+
+  const createNoteForIdea = async () => {
+    try {
+      const response = await db.createNewNoteFromTitle('')
+      const noteId = response?.data?._id
+      if (!noteId) {
+        console.error('Create note response missing id', response)
+        return
+      }
+      // Add the idea to the new note
+      await db.addLinkToRecord(db.types.idea, id, db.types.note, noteId)
+      navigate('/note/' + noteId + '/edit')
+    } catch (error) {
+      console.error('Error creating note for idea', error)
+    }
+  }
+
+  // Section 3.1 & 3.5: Idea page keyboard shortcuts
+  useEntityKeyboardShortcuts({
+    isEditing: edit,
+    onEdit: () => setEdit(true),
+    onSave: handleAcceptUpdates,
+    onExitEdit: () => setEdit(false),
+    onNewNote: createNoteForIdea,
+  })
 
   props.setPageTitle(pendingName)
 

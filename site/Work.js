@@ -10,6 +10,7 @@ import * as constants from './constants'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import { marked } from 'marked'
+import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
@@ -132,42 +133,6 @@ function Work(props) {
   }, [handleNickClick])
 
   useEffect(() => {
-    const onKeyDown = async (event) => {
-      if (event.keyCode == constants.keyCodes.esc) {
-        // TODO: This crashes because of a failure in NoteList
-        handleFinishEditing()
-        return
-      }
-
-      if (!event.ctrlKey) {
-        return
-      }
-
-      switch (event.keyCode) {
-        case constants.keyCodes.new:
-          createNoteForWork()
-          return
-        case constants.keyCodes.accept:
-          edit && handleAcceptUpdates()
-          return
-        case constants.keyCodes.piles:
-          setEdit(false)
-          setEditPiles(true)
-          return
-        case constants.keyCodes.edit:
-          setEdit(true)
-          setEditPiles(false)
-          return
-      }
-    }
-
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  })
-
-  useEffect(() => {
     if (edit) {
       // Use setTimeout to ensure the DOM has updated
       setTimeout(() => {
@@ -270,9 +235,34 @@ function Work(props) {
   }
 
   const createNoteForWork = async () => {
-    const response = await db.createNewNoteForWork(id)
-    navigate('/note/' + response.data._id + '/edit')
+    try {
+      const response = await db.createNewNoteForWork(id)
+      const noteId = response?.data?._id
+      if (!noteId) {
+        console.error('Create note response missing id', response)
+        return
+      }
+      navigate('/note/' + noteId + '/edit')
+    } catch (error) {
+      console.error('Error creating note', error)
+    }
   }
+
+  // Section 3.1 & 3.2: Work page keyboard shortcuts
+  useEntityKeyboardShortcuts({
+    isEditing: edit || editPiles,
+    onEdit: () => {
+      setEdit(true)
+      setEditPiles(false)
+    },
+    onSave: handleAcceptUpdates,
+    onExitEdit: handleFinishEditing,
+    onNewNote: createNoteForWork,
+    onEditPiles: () => {
+      setEdit(false)
+      setEditPiles(true)
+    },
+  })
 
   props.setPageTitle(pendingWorkTitle)
 

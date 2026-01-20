@@ -1,120 +1,149 @@
 import React from 'react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
+import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
 function SearchBar(props) {
   const [modifier, setModifier] = useState('')
   const [typedText, setTypedText] = useState('')
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const onKeyDown = async (event) => {
+  const handleExecute = async () => {
+    const currentModifier = modifier
+    const currentText = typedText
+
+    // Create new note
+    if (currentModifier === constants.modifiers.note) {
+      setModifier('')
+      try {
+        const response = await db.createNewNoteFromTitle(currentText)
+        const noteId = response?.data?._id
+        if (!noteId) {
+          console.error('Create note response missing id', response)
+          return
+        }
+        props.beforeNavigate()
+        navigate('/note/' + noteId + '/edit')
+      } catch (error) {
+        console.error('Error creating note', error)
+      }
+      return
+    }
+
+    // Find/search
+    if (currentModifier === constants.modifiers.find) {
+      const search = currentText
+      setTypedText('')
+      props.beforeNavigate()
+      navigate('/find/' + search)
+      return
+    }
+
+    // Direct navigation commands
+    if (
+      !currentModifier &&
+      [constants.modifiers.flip, constants.modifiers.file, constants.modifiers.home, constants.modifiers.load].includes(currentText)
+    ) {
+      let destination = currentText
+      if (currentText === constants.modifiers.home) {
+        destination = ''
+      }
+      setTypedText('')
+      props.beforeNavigate()
+      navigate('/' + destination)
+      return
+    }
+
+    // List piles
+    if (currentModifier === constants.modifiers.list && currentText === constants.modifiers.pile) {
+      setTypedText('')
+      props.beforeNavigate()
+      navigate('/piles')
+      return
+    }
+
+    // View mode commands
+    if ([constants.modifiers.slim, constants.modifiers.full, constants.modifiers.grid, constants.modifiers.tile].includes(currentText)) {
+      const command = currentText
+      setTypedText('')
+      props.beforeNavigate()
+      switch (command) {
+        case constants.modifiers.slim:
+          props.setView(constants.view_modes.SLIM)
+          break
+        case constants.modifiers.full:
+          props.setView(constants.view_modes.FULL)
+          break
+        case constants.modifiers.grid:
+          props.setView(constants.view_modes.GRID)
+          break
+        case constants.modifiers.tile:
+          props.setView(constants.view_modes.TILE)
+          break
+      }
+      return
+    }
+
+    if (!currentText) {
+      return
+    }
+
+    // Nick lookup
+    try {
+      const nickResponse = await db.getNick(currentText)
+      const nickData = nickResponse?.data?.data
+      if (!nickData) {
+        return
+      }
+      props.beforeNavigate()
+      switch (nickData.key?.charAt(0)) {
+        case 'n':
+          navigate('/note/' + nickData.note)
+          return
+        case 'w':
+          navigate('/work/' + nickData.work)
+          return
+        case 'i':
+          navigate('/idea/' + nickData.idea)
+          return
+        case 'p':
+          navigate('/pile/' + nickData.pile)
+          return
+      }
+    } catch (error) {
+      console.error('Error fetching nick', error)
+    }
+  }
+
+  // Section 2: Search Bar keyboard shortcuts
+  useKeyboardShortcuts(
+    constants.keyboardScopes.SEARCH_BAR,
+    (event) => {
+      // Section 2.1: Navigation - Backspace to go back
       if (
-        // Delete to go back
-        event.keyCode == constants.keyCodes.delete &&
+        shortcuts.searchBar.back(event) &&
         modifier &&
-        typedText == '' &&
+        typedText === '' &&
         !shouldShowAutocomplete()
       ) {
-        var previousModifier = modifier
-        setTypedText(previousModifier + '')
+        setTypedText(modifier)
         setModifier('')
-      } else if (
-        // Create new note
-        modifier == constants.modifiers.note &&
-        event.keyCode == constants.keyCodes.enter
-      ) {
-        setModifier('')
-        const response = await db.createNewNoteFromTitle(typedText)
-        props.beforeNavigate()
-        navigate('/note/' + response.data._id + '/edit')
-      } else if (
-        modifier == constants.modifiers.find &&
-        event.keyCode == constants.keyCodes.enter
-      ) {
-        var search = typedText
-        setTypedText('')
-        props.beforeNavigate()
-        navigate('/find/' + search)
-      } else if (
-        !modifier &&
-        (typedText == constants.modifiers.flip ||
-          typedText == constants.modifiers.file ||
-          typedText == constants.modifiers.home ||
-          typedText == constants.modifiers.load) &&
-        event.keyCode == constants.keyCodes.enter
-      ) {
-        var destination = typedText
-        if (typedText == constants.modifiers.home) {
-          destination = ''
-        }
-        setTypedText('')
-        props.beforeNavigate()
-        navigate('/' + destination)
-      } else if (
-        modifier == constants.modifiers.list &&
-        typedText == constants.modifiers.pile
-      ) {
-        setTypedText('')
-        props.beforeNavigate()
-        navigate('/piles')
-      } else if (
-        (typedText == constants.modifiers.slim ||
-          typedText == constants.modifiers.full ||
-          typedText == constants.modifiers.grid ||
-          typedText == constants.modifiers.tile) &&
-        event.keyCode == constants.keyCodes.enter
-      ) {
-        var command = typedText
-        setTypedText('')
-
-        props.beforeNavigate()
-        switch (command) {
-          case constants.modifiers.slim:
-            props.setView(constants.view_modes.SLIM)
-            break
-          case constants.modifiers.full:
-            props.setView(constants.view_modes.FULL)
-            break
-          case constants.modifiers.grid:
-            props.setView(constants.view_modes.GRID)
-            break
-          case constants.modifiers.tile:
-            props.setView(constants.view_modes.TILE)
-            break
-        }
-      } else if (event.keyCode == constants.keyCodes.enter) {
-        const nick = await db.getNick(typedText)
-        if (nick) {
-          props.beforeNavigate()
-          switch (nick.data.data.key?.charAt(0)) {
-            case 'n':
-              navigate('/note/' + nick.data.data.note)
-              break
-            case 'w':
-              navigate('/work/' + nick.data.data.work)
-              break
-            case 'i':
-              navigate('/idea/' + nick.data.data.idea)
-              break
-            case 'p':
-              navigate('/pile/' + nick.data.data.pile)
-              break
-            default:
-              break
-          }
-        }
+        return true
       }
-    }
 
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  })
+      // Section 2.2: Execution - Enter to execute
+      if (shortcuts.searchBar.execute(event)) {
+        void handleExecute()
+        return true
+      }
+
+      return false
+    },
+    [modifier, typedText]
+  )
 
   const handleTextChange = (input) => {
     setTypedText(input.target.value)
@@ -162,9 +191,18 @@ function SearchBar(props) {
 
   const handleCreate = async (typedValue) => {
     var dbType = modifierToDbTypes(modifier)
-    var newRecord = await db.createRecord(dbType, typedValue)
-    props.beforeNavigate()
-    navigate('/' + dbType + '/' + newRecord.data.data._id)
+    try {
+      var newRecord = await db.createRecord(dbType, typedValue)
+      const newId = newRecord?.data?.data?._id
+      if (!newId) {
+        console.error('Create record response missing id', newRecord)
+        return
+      }
+      props.beforeNavigate()
+      navigate('/' + dbType + '/' + newId)
+    } catch (error) {
+      console.error('Error creating record', error)
+    }
   }
 
   const modifierToDbTypes = (modifier) => {

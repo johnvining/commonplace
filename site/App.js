@@ -26,6 +26,8 @@ import Read from './Read'
 import jwt from 'jsonwebtoken'
 import axios from 'axios'
 import * as constants from './constants'
+import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+import HelpOverlay from './HelpOverlay'
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1, hasToken: false }
@@ -38,21 +40,7 @@ class App extends React.Component {
 
   componentDidMount() {
     this.setState({ viewMode: localStorage.viewMode })
-    this.keyDownListener = this.handleKeyDown.bind(this)
-    document.addEventListener('keydown', this.keyDownListener, false)
     this.validateAuth()
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.keyDownListener, false)
-  }
-
-  handleKeyDown(event) {
-    if (event.ctrlKey && event.keyCode == constants.keyCodes.open) {
-      this.setState({ barOpen: !this.state.barOpen })
-    } else if (event.keyCode == constants.keyCodes.esc && this.state.barOpen) {
-      this.setState({ barOpen: false })
-    }
   }
 
   beforeSearchNavigate() {
@@ -328,9 +316,116 @@ class App extends React.Component {
   }
 }
 
+// Wrapper component that provides keyboard context and handles global shortcuts
+function AppWithKeyboard() {
+  const appRef = React.useRef(null)
+  const [helpOpen, setHelpOpen] = React.useState(false)
+  const activeScopes = useKeyboardScopes()
+
+  // Global shortcuts (Section 1 in docs)
+  useKeyboardShortcuts(
+    constants.keyboardScopes.GLOBAL,
+    (event) => {
+      // 1.1 Help Toggle (Ctrl+H) - always available
+      if (shortcuts.global.toggleHelp(event)) {
+        setHelpOpen((prev) => {
+          const next = !prev
+          console.log('[help-overlay] toggle', { open: next })
+          return next
+        })
+        return true
+      }
+
+      // Close help with Escape
+      if (helpOpen && event.keyCode === constants.keyCodes.esc) {
+        setHelpOpen(false)
+        return true
+      }
+
+      if (!appRef.current) return false
+
+      const appState = appRef.current.state || {}
+
+      // Close search bar with Escape
+      if (appState.barOpen && event.keyCode === constants.keyCodes.esc) {
+        appRef.current.setState({ barOpen: false })
+        return true
+      }
+
+      // 1.1 Search Bar Toggle (Ctrl+O)
+      if (shortcuts.global.toggleSearchBar(event)) {
+        appRef.current.setState((state) => ({ barOpen: !state.barOpen }))
+        return true
+      }
+
+      // 1.2 View Mode Switching
+      if (shortcuts.global.viewFull(event)) {
+        appRef.current.setView(constants.view_modes.FULL)
+        return true
+      }
+      if (shortcuts.global.viewSlim(event)) {
+        appRef.current.setView(constants.view_modes.SLIM)
+        return true
+      }
+      if (shortcuts.global.viewGrid(event)) {
+        appRef.current.setView(constants.view_modes.GRID)
+        return true
+      }
+      if (shortcuts.global.viewTile(event)) {
+        appRef.current.setView(constants.view_modes.TILE)
+        return true
+      }
+
+      return false
+    },
+    [helpOpen]
+  )
+
+  // Build current context for help overlay
+  const getCurrentContext = () => {
+    if (!appRef.current) return {}
+    const state = appRef.current.state || {}
+    const hasScope = (scope) => activeScopes.has(scope)
+    const noteMode = hasScope(constants.keyboardScopes.NOTE_EDIT_LINKS)
+      ? constants.note_modes.EDIT_LINKS
+      : hasScope(constants.keyboardScopes.NOTE_EDIT_IDEAS)
+        ? constants.note_modes.EDIT_IDEAS
+        : hasScope(constants.keyboardScopes.NOTE_EDIT_PILES)
+          ? constants.note_modes.EDIT_PILES
+          : hasScope(constants.keyboardScopes.NOTE_EDIT)
+            ? constants.note_modes.EDIT
+            : hasScope(constants.keyboardScopes.NOTE_SELECTED)
+              ? constants.note_modes.SELECTED
+              : null
+    const entityPage = hasScope(constants.keyboardScopes.ENTITY_PAGE) || hasScope(constants.keyboardScopes.ENTITY_EDIT)
+      ? 'Entity'
+      : null
+    return {
+      searchBarOpen: hasScope(constants.keyboardScopes.SEARCH_BAR),
+      viewMode: state.viewMode,
+      entityPage,
+      noteMode,
+      activeScopes,
+    }
+  }
+
+  return (
+    <>
+      <App ref={appRef} />
+      <HelpOverlay
+        isVisible={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        currentContext={getCurrentContext()}
+      />
+    </>
+  )
+}
+
 const root = createRoot(document.getElementById('root'))
 root.render(
   <BrowserRouter>
-    <App />
+    <KeyboardProvider>
+      <AppWithKeyboard />
+    </KeyboardProvider>
   </BrowserRouter>,
 )

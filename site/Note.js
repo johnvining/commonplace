@@ -23,6 +23,7 @@ import YearUrlComboSpan from './YearUrlComboSpan'
 import WorkCitationSpan from './WorkCitationSpan'
 import ClickToCopyNick from './ClickToCopyNick'
 import ClickableLabelButton from './ClickableLabelButton'
+import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
 class Note extends React.Component {
   state = {
@@ -48,9 +49,6 @@ class Note extends React.Component {
   }
 
   componentDidMount() {
-    this.keyDownListener = this.handleKeyDown.bind(this)
-    document.addEventListener('keydown', this.keyDownListener, false)
-
     if (this.props.note.nick) {
       this.setState({ nick: this.props.note.nick })
     } else {
@@ -79,71 +77,68 @@ class Note extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.keyDownListener, false)
-  }
+  // Section 5: Note Editing keyboard shortcuts - called from wrapper
+  handleKeyboardShortcut(event) {
+    const selected = this.props.mode === constants.note_modes.SELECTED
+    const editMode = this.props.mode === constants.note_modes.EDIT
+    const editIdeas = this.props.mode === constants.note_modes.EDIT_IDEAS
+    const editPiles = this.props.mode === constants.note_modes.EDIT_PILES
+    const editLinks = this.props.mode === constants.note_modes.EDIT_LINKS
+    const anyEditMode = editMode || editIdeas || editPiles || editLinks
 
-  handleKeyDown(event) {
-    let selected = this.props.mode == constants.note_modes.SELECTED
-    let anyEditMode =
-      this.props.mode == constants.note_modes.EDIT ||
-      this.props.mode == constants.note_modes.EDIT_IDEAS ||
-      this.props.mode == constants.note_modes.EDIT_PILES ||
-      this.props.mode == constants.note_modes.EDIT_LINKS
+    // Only handle if this note is selected or in edit mode
+    if (!selected && !anyEditMode) {
+      return false
+    }
 
-    if (anyEditMode && event.keyCode == constants.keyCodes.esc) {
+    // Section 5.1: Save and Exit
+    if (shortcuts.note.exitEdit(event) && anyEditMode) {
       this.props.setNoteMode('', '')
-      return
+      return true
     }
 
-    if (
-      this.props.mode == constants.note_modes.EDIT_LINKS &&
-      event.code == 'Enter'
-    ) {
+    if (shortcuts.note.save(event) && anyEditMode) {
+      this.handleAccept()
+      return true
+    }
+
+    // Section 5.4: Note Links Mode
+    if (shortcuts.note.addLink(event) && editLinks) {
       this.handleNewNoteLink()
+      return true
     }
 
-    if ((anyEditMode || selected) && event.ctrlKey) {
-      switch (event.keyCode) {
-        case constants.keyCodes.image:
-          this.toggleFocusImage()
-          return
-        case constants.keyCodes.prevImage:
-          this.moveFocusedImage(-1)
-          return
-        case constants.keyCodes.nextImage:
-          this.moveFocusedImage(1)
-          return
-      }
+    // Section 5.3: Image Navigation (works in selected or edit modes)
+    if (shortcuts.note.toggleImage(event)) {
+      this.toggleFocusImage()
+      return true
+    }
+    if (shortcuts.note.prevImage(event)) {
+      this.moveFocusedImage(-1)
+      return true
+    }
+    if (shortcuts.note.nextImage(event)) {
+      this.moveFocusedImage(1)
+      return true
     }
 
-    if (anyEditMode && event.ctrlKey) {
-      switch (event.keyCode) {
-        case constants.keyCodes.accept:
-          this.handleAccept()
-          return
-        default:
-          break
-      }
-    }
-
-    if (!this.props.mode == constants.note_modes.EDIT || !event.ctrlKey) {
-      return
-    }
-
-    switch (event.keyCode) {
-      case constants.keyCodes.format:
+    // Section 5.2: Text Tools (Edit mode only)
+    if (editMode) {
+      if (shortcuts.note.format(event)) {
         this.formatMainText()
-        return
-      case constants.keyCodes.suggest:
+        return true
+      }
+      if (shortcuts.note.suggestTitle(event)) {
         this.generateTitleSuggestion()
-        return
-      case constants.keyCodes.ocr:
+        return true
+      }
+      if (shortcuts.note.ocr(event)) {
         this.runOCROnText()
-        return
-      default:
-        break
+        return true
+      }
     }
+
+    return false
   }
 
   formatMainText() {
@@ -280,7 +275,7 @@ class Note extends React.Component {
     }
 
     this.setState({ keep: true })
-    this.props.setNoteMode(constants.note_modes.SELECT)
+    this.props.setNoteMode(constants.note_modes.SELECTED)
     await db
       .updateRecord(db.types.note, this.props.id, updateObject)
       .then(this.props.refetchMe(this.props.index))
@@ -969,4 +964,41 @@ class Note extends React.Component {
   }
 }
 
-export default Note
+// Wrapper component that provides keyboard shortcuts
+function NoteWithKeyboard(props) {
+  const noteRef = React.useRef(null)
+
+  // Determine the keyboard scope based on the current mode
+  const getScope = () => {
+    switch (props.mode) {
+      case constants.note_modes.EDIT:
+        return constants.keyboardScopes.NOTE_EDIT
+      case constants.note_modes.EDIT_IDEAS:
+        return constants.keyboardScopes.NOTE_EDIT_IDEAS
+      case constants.note_modes.EDIT_PILES:
+        return constants.keyboardScopes.NOTE_EDIT_PILES
+      case constants.note_modes.EDIT_LINKS:
+        return constants.keyboardScopes.NOTE_EDIT_LINKS
+      case constants.note_modes.SELECTED:
+        return constants.keyboardScopes.NOTE_SELECTED
+      default:
+        return null
+    }
+  }
+
+  const scope = getScope()
+
+  // Section 5: Note Editing keyboard shortcuts
+  useKeyboardShortcuts(
+    scope || constants.keyboardScopes.NOTE_EDIT, // fallback scope, won't match if null
+    (event) => {
+      if (!noteRef.current || !scope) return false
+      return noteRef.current.handleKeyboardShortcut(event)
+    },
+    [props.mode]
+  )
+
+  return <Note ref={noteRef} {...props} />
+}
+
+export default NoteWithKeyboard

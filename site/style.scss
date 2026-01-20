@@ -5,12 +5,18 @@
 
 :root {
   /* Font Size System */
-  --font-size-xs: 9px;    /* Extra small: buttons, labels */
-  --font-size-sm: 12px;   /* Small: secondary text, metadata */
-  --font-size-md: 14px;   /* Medium: body text, notes */
-  --font-size-lg: 18px;   /* Large: headings, buttons */
-  --font-size-xl: 24px;   /* Extra large: main titles */
-  --font-size-xxl: 34px;  /* Extra extra large: hero titles */
+  --font-size-xs: 9px;
+  /* Extra small: buttons, labels */
+  --font-size-sm: 12px;
+  /* Small: secondary text, metadata */
+  --font-size-md: 14px;
+  /* Medium: body text, notes */
+  --font-size-lg: 18px;
+  /* Large: headings, buttons */
+  --font-size-xl: 24px;
+  /* Extra large: main titles */
+  --font-size-xxl: 34px;
+  /* Extra extra large: hero titles */
 }
 
 html {
@@ -24,7 +30,7 @@ html {
 }
 
 .main {
-  max-width: 68em; 
+  max-width: 68em;
   padding: 0px;
   margin: auto;
   color: $font_color;
@@ -75,6 +81,7 @@ a {
     .title {
       font-size: var(--font-size-xl);
       padding: 8px 8px 8px 0px;
+
       @include tablet-plus {
         display: block;
         font-size: var(--font-size-xxl);
@@ -98,15 +105,16 @@ a {
     justify-content: flex-end;
     width: 100%;
     min-height: 4em;
+
     @include tablet-plus {
       width: 33%;
     }
   }
 
   .tool-bar.div {
-      margin: 0px 0px 0px 10px;
-      align-self: center;
-    
+    margin: 0px 0px 0px 10px;
+    align-self: center;
+
   }
 }
 
@@ -116,11 +124,11 @@ a {
   font-size: var(--font-size-xs);
   color: $font_color;
   opacity: 0.6;
-  
+
   .stat-item {
     margin-right: 8px;
     white-space: nowrap;
-    
+
     &:last-child {
       margin-right: 0;
     }
@@ -142,11 +150,11 @@ a {
   font-size: var(--font-size-xs);
   background-color: $button_background;
   cursor: pointer;
-  
+
   &:hover {
     background-color: $semantic_selection;
   }
-  
+
   &:focus {
     outline: 2px solid $high_intensity_border;
     outline-offset: 1px;
@@ -154,21 +162,21 @@ a {
 }
 
 .standard-button {
-    background-color: $button_background;
-    border-color: $low_intensity_border;
-    border-radius: 4px;
-    border-style: solid;
-    border-width: 2px;
-    color: $font_color;
-    font-family: $main_font;
-    font-size: var(--font-size-lg);
-    height: 42px;
-    margin: 4px 0px 4px 0px;
-    padding: 6px;
+  background-color: $button_background;
+  border-color: $low_intensity_border;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 2px;
+  color: $font_color;
+  font-family: $main_font;
+  font-size: var(--font-size-lg);
+  height: 42px;
+  margin: 4px 0px 4px 0px;
+  padding: 6px;
 
-    @media (prefers-color-scheme: dark) {
-      @include button-invert-icon();
-    }
+  @media (prefers-color-scheme: dark) {
+    @include button-invert-icon();
+  }
 
   +.standard-button {
     margin-left: 4px;
@@ -219,6 +227,7 @@ a {
     @media (prefers-color-scheme: dark) {
       @include button-invert-icon();
     }
+
     @include button-hover($button_input_background_selected);
   }
 
@@ -241,7 +250,9 @@ a {
   }
 }
 
-.idea,.pile,.link {
+.idea,
+.pile,
+.link {
   &.container {
     background-color: transparent;
     width: 60%;
@@ -258,7 +269,7 @@ a {
     font-size: var(--font-size-md);
     margin: 4px;
     padding: 4px;
-    
+
     &:focus {
       outline: none; // TODO: Fix a11y
     }
@@ -266,7 +277,7 @@ a {
     &.pile {
       border-color: $semantic_pile;
     }
-  
+
     &.idea {
       border-color: $semantic_idea;
     }
@@ -308,7 +319,7 @@ a {
       background-color: $semantic_pile;
     }
 
-  
+
     &.idea {
       background-color: $semantic_idea;
     }
@@ -361,7 +372,7 @@ a {
     &.pile {
       background-color: $semantic_pile;
     }
-  
+
     &.idea {
       background-color: $semantic_idea;
     }
@@ -586,7 +597,7 @@ a.grid-link {
   font-size: 12px;
 }
 
-.grid-nick{
+.grid-nick {
   width: 8%;
   display: inline-block;
   white-space: nowrap;
@@ -594,7 +605,7 @@ a.grid-link {
   text-overflow: ellipsis;
   vertical-align: middle;
   padding: 2px;
-  font-family:'Courier New', Courier, monospace;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 12px;
 }
 
@@ -617,6 +628,7 @@ a.grid-link {
   border-style: none;
   position: relative;
   z-index: 5;
+
   @media (prefers-color-scheme: dark) {
     @include button-invert-icon();
   }
@@ -858,7 +870,7 @@ a.grid-link {
     border-radius: 4px;
     border-style: solid;
     border-width: 2px;
-    display:block;
+    display: block;
     margin: 0px 0px 4px 0px;
     padding: 6px;
     white-space: pre-wrap;
@@ -871,7 +883,7 @@ a.grid-link {
 
       p {
         margin: 0 0 0.5em 0;
-        
+
         &:last-child {
           margin-bottom: 0;
         }
@@ -911,7 +923,7 @@ a.grid-link {
       white-space: pre-wrap;
     }
 
-    &:focus { 
+    &:focus {
       background-color: $button_input_background_selected;
       outline: none;
     }
@@ -929,8 +941,8 @@ a.grid-link {
       font-family: $main_font;
       font-size: 20px;
       padding: 4px;
-      
-      &:focus { 
+
+      &:focus {
         background-color: $button_input_background_selected;
         outline: none;
       }
@@ -966,7 +978,7 @@ a.grid-link {
       font-size: 20px;
       margin: 4px 0px 4px 0px;
       padding: 4px;
-      
+
 
       &:focus {
         outline: none;
@@ -985,7 +997,7 @@ a.grid-link {
         width: 17px;
         height: 15px;
         content: '';
-        
+
         @media (prefers-color-scheme: dark) {
           -webkit-filter: invert(100%);
           filter: invert(100%);
@@ -1002,7 +1014,7 @@ a.grid-link {
   }
 
   display:inline;
-  
+
 }
 
 .file-drop {
@@ -1043,8 +1055,131 @@ a.grid-link {
   @media (prefers-color-scheme: dark) {
     @include button-invert-icon();
   }
-  
+
   &:not(.disabled):hover code {
     text-decoration: underline;
+  }
+}
+
+// Help Overlay (Ctrl+H)
+.help-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+.help-overlay-content {
+  background-color: $background_color;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid $high_intensity_border;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: rgba(1, 13, 18, 0.95);
+  }
+}
+
+.help-overlay-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid $low_intensity_border;
+  padding-bottom: 12px;
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: var(--font-size-xl);
+    color: $font_color;
+  }
+}
+
+.help-overlay-hint {
+  display: block;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: $black;
+  background-color: color.scale($background_color, $lightness: -5%);
+  border-radius: 6px;
+  padding: 6px 10px;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: color.scale($dark_theme_blue, $lightness: 20%);
+    color: $white;
+  }
+}
+
+.help-overlay-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.help-section {
+  h3 {
+    font-size: var(--font-size-md);
+    text-transform: uppercase;
+    color: $font_color;
+    margin: 0 0 12px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid $low_intensity_border;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  tr {
+    &:hover {
+      background-color: $semantic_selection;
+    }
+  }
+
+  td {
+    padding: 4px 8px;
+    font-size: var(--font-size-sm);
+    color: $font_color;
+  }
+
+  .help-key {
+    width: 40%;
+    text-align: right;
+    padding-right: 12px;
+  }
+
+  .help-action {
+    width: 60%;
+    text-align: left;
+  }
+
+  kbd {
+    background-color: $button_background;
+    border: 1px solid $low_intensity_border;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 $button_shadow_color;
+    color: $font_color;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: $monospace;
+    font-size: var(--font-size-xs);
+    padding: 2px 6px;
+    white-space: nowrap;
+
+    @media (prefers-color-scheme: dark) {
+      background-color: color.scale($dark_theme_blue, $lightness: 18%);
+      border-color: $high_intensity_border;
+    }
   }
 }

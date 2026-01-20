@@ -58,8 +58,24 @@ export const keyCodes = {
   slim: 50, // 2
   grid: 51, // 3
   tile: 52, // 4
-  ocr: 67, // c (oCr)
+  ocr: 82, // r (changed from c to avoid conflict with copy)
   image: 73, // i
   nextImage: 75, //k
   prevImage: 74, //j
+  help: 191, // / (forward slash) - Ctrl+/ for help
+}
+
+// Keyboard scopes - ordered from most specific to least specific
+export const keyboardScopes = {
+  NOTE_EDIT: 'note_edit',
+  NOTE_EDIT_IDEAS: 'note_edit_ideas',
+  NOTE_EDIT_PILES: 'note_edit_piles',
+  NOTE_EDIT_LINKS: 'note_edit_links',
+  NOTE_SELECTED: 'note_selected',
+  NOTE_LIST: 'note_list',
+  AUTOCOMPLETE: 'autocomplete',
+  SEARCH_BAR: 'search_bar',
+  ENTITY_EDIT: 'entity_edit',
+  ENTITY_PAGE: 'entity_page',
+  GLOBAL: 'global',
 }

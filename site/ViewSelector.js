@@ -5,31 +5,10 @@ import slim from 'url:./icons/slim.svg'
 import grid from 'url:./icons/grid.svg'
 import gridSmall from 'url:./icons/grid_small.svg'
 
-class SearchBar extends React.Component {
-  componentDidMount() {
-    this.keyDownListener = this.handleKeyDown.bind(this)
-    document.addEventListener('keydown', this.keyDownListener, false)
-  }
+// View mode shortcuts (Ctrl+Shift+1/2/3/4) are handled globally in App.js
+// This component only renders the view mode buttons
 
-  handleKeyDown(event) {
-    if (event.ctrlKey && event.shiftKey) {
-      switch (event.keyCode) {
-        case constants.keyCodes.full:
-          this.props.setView(constants.view_modes.FULL)
-          break
-        case constants.keyCodes.slim:
-          this.props.setView(constants.view_modes.SLIM)
-          break
-        case constants.keyCodes.grid:
-          this.props.setView(constants.view_modes.GRID)
-          break
-        case constants.keyCodes.tile:
-          this.props.setView(constants.view_modes.TILE)
-          break
-      }
-    }
-  }
-
+class ViewSelector extends React.Component {
   render() {
     return (
       <>
@@ -86,4 +65,4 @@ class SearchBar extends React.Component {
   }
 }
 
-export default SearchBar
+export default ViewSelector

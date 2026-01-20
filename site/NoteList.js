@@ -14,6 +14,7 @@ import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
+import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
 class NoteList extends React.Component {
   state = {
@@ -30,9 +31,6 @@ class NoteList extends React.Component {
   }
 
   async componentDidMount() {
-    this.keyDownListener = this.handleKeyDown.bind(this)
-    document.addEventListener('keydown', this.keyDownListener, false)
-
     const response = await this.props.getListOfNotes(
       this.props.index,
       this.state.page
@@ -60,8 +58,49 @@ class NoteList extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.keyDownListener, false)
+  // Section 4: Note List keyboard shortcuts - called from wrapper
+  handleKeyboardShortcut(event) {
+    // Only handle shortcuts in Full view mode
+    if (this.props.viewMode !== constants.view_modes.FULL) {
+      return false
+    }
+
+    // Section 4.2: Quick Edit shortcuts (Ctrl+key)
+    if (event.ctrlKey) {
+      switch (event.keyCode) {
+        case constants.keyCodes.edit:
+          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT)
+          autosize(document.querySelector('#text'))
+          autosize(document.querySelector('#take'))
+          return true
+        case constants.keyCodes.ideas:
+          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT_IDEAS)
+          return true
+        case constants.keyCodes.piles:
+          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT_PILES)
+          return true
+      }
+    }
+
+    // Section 4.1: Selection shortcuts
+    if (shortcuts.noteList.select(event)) {
+      if (this.state.focusType === constants.note_modes.NO_SELECTION) {
+        this.setNoteMode(document.activeElement.id, constants.note_modes.SELECTED)
+        return true
+      }
+    }
+
+    if (shortcuts.noteList.deselect(event)) {
+      if (this.state.selectedNote) {
+        var divToFocus = document.getElementById(this.state.selectedNote)
+        if (divToFocus) divToFocus.focus()
+      }
+      this.setNoteMode('', constants.note_modes.NO_SELECTION)
+      this.setState({ selectedArray: [] })
+      return true
+    }
+
+    return false
   }
 
   async incPage() {
@@ -129,54 +168,10 @@ class NoteList extends React.Component {
     })
   }
 
-  handleKeyDown(event) {
-    if (event.ctrlKey) {
-      switch (event.keyCode) {
-        case constants.keyCodes.edit:
-          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT)
-          autosize(document.querySelector('#text'))
-          autosize(document.querySelector('#take'))
-          break
-        case constants.keyCodes.ideas:
-          this.setNoteMode(
-            document.activeElement.id,
-            constants.note_modes.EDIT_IDEAS
-          )
-          break
-        case constants.keyCodes.piles: // Ctrl P
-          this.setNoteMode(
-            document.activeElement.id,
-            constants.note_modes.EDIT_PILES
-          )
-      }
-    } else {
-      switch (event.keyCode) {
-        case constants.keyCodes.enter:
-          if (this.state.focusType == constants.note_modes.NO_SELECTION) {
-            this.setNoteMode(
-              document.activeElement.id,
-              constants.note_modes.SELECTED
-            )
-          }
-
-          break
-        case constants.keyCodes.esc:
-          if (this.state.selectedNote) {
-            var divToFocus = document.getElementById(this.state.selectedNote)
-            divToFocus.focus()
-          }
-
-          this.setNoteMode('', constants.note_modes.NO_SELECTION)
-          this.setState({ selectedArray: [] })
-          break
-      }
-    }
-  }
-
   setNoteMode(noteId, mode) {
-    if (mode == constants.note_modes.SELECT) {
+    if (mode == constants.note_modes.SELECTED) {
       let divToFocus = document.getElementById(this.state.selectedNote)
-      divToFocus.focus()
+      if (divToFocus) divToFocus.focus()
     }
     this.setState({
       selectedNote: noteId,
@@ -625,4 +620,21 @@ class NoteList extends React.Component {
   }
 }
 
-export default NoteList
+// Wrapper component that provides keyboard shortcuts
+function NoteListWithKeyboard(props) {
+  const noteListRef = React.useRef(null)
+
+  // Section 4: Note List keyboard shortcuts
+  useKeyboardShortcuts(
+    constants.keyboardScopes.NOTE_LIST,
+    (event) => {
+      if (!noteListRef.current) return false
+      return noteListRef.current.handleKeyboardShortcut(event)
+    },
+    [props.viewMode]
+  )
+
+  return <NoteList ref={noteListRef} {...props} />
+}
+
+export default NoteListWithKeyboard
