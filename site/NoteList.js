@@ -197,10 +197,22 @@ class NoteList extends React.Component {
       let divToFocus = document.getElementById(noteId)
       if (divToFocus) divToFocus.focus()
     }
-    this.setState({
-      selectedNote: noteId,
-      focusType: mode,
-    })
+    this.setState(
+      {
+        selectedNote: noteId,
+        focusType: mode,
+      },
+      () => {
+        if (mode === constants.note_modes.EDIT) {
+          requestAnimationFrame(() => {
+            const textArea = document.querySelector('#text')
+            const takeArea = document.querySelector('#take')
+            if (textArea) autosize(textArea)
+            if (takeArea) autosize(takeArea)
+          })
+        }
+      }
+    )
   }
 
   onStartPileEdit(noteId) {
