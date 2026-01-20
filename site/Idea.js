@@ -16,7 +16,7 @@ import {
 } from './TopLevelHeadings'
 import * as constants from './constants'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
-import PinButton from './PinButton'
+import PinButton, { TopLevelStarButton } from './PinButton'
 
 function Idea(props) {
   const { id } = useParams()
@@ -152,13 +152,15 @@ function Idea(props) {
                 </TopLevelSubTitle>
               ) : null}
             </TopLevelTitleContainer>
-            <TopLevelStandardButtonContainer nick={nick}>
-              <PinButton
+            <TopLevelStandardButtonContainer
+              nick={nick}
+              className="top-level-toolbar"
+            >
+              <TopLevelStarButton
                 type="idea"
                 id={id}
                 label={pendingName}
                 href={`/idea/${id}`}
-                className="standard-button left-right"
               />
               <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
               <TopLevelStandardButton

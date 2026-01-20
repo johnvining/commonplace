@@ -270,7 +270,7 @@ a {
 }
 
 .pin-button-label {
-  line-height: 1;
+  line-height: inherit;
 }
 
 .pin-button-compact {
@@ -283,15 +283,8 @@ a {
 }
 
 .standard-button.pin-button {
-  font-size: var(--font-size-lg);
-  padding: 6px;
   border: 1px solid $low_intensity_border;
   background-color: $button_background;
-  line-height: 1;
-}
-
-.standard-button.pin-button .pin-button-label {
-  line-height: 1;
 }
 
 .action-button.pin-button {
@@ -464,9 +457,22 @@ a {
 
 .top-level-standard-button-container {
   .standard-button {
-    font-size: var(--font-size-s);
+    font-size: var(--font-size-lg);
     height: 28px;
     padding: 3px 6px;
+  }
+}
+
+.top-level-standard-button-container.top-level-toolbar {
+  .standard-button {
+    align-items: center;
+    line-height: 1;
+  }
+
+  .standard-button .pin-button-icon {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
   }
 }
 

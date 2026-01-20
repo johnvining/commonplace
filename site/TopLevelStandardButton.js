@@ -19,6 +19,9 @@ export function TopLevelStandardButton(props) {
     default:
       className += ' left-right'
   }
+  if (props.className) {
+    className += ` ${props.className}`
+  }
 
   return (
     <button
@@ -33,8 +36,11 @@ export function TopLevelStandardButton(props) {
 }
 
 export function TopLevelStandardButtonContainer(props) {
+  const containerClassName = props.className
+    ? `top-level-standard-button-container ${props.className}`
+    : 'top-level-standard-button-container'
   return (
-    <div className="top-level-standard-button-container">
+    <div className={containerClassName}>
       {props.children}{' '}
       {props.nick ? (
         <ClickToCopyNick nick={props.nick} style={{ marginLeft: '10px' }} />

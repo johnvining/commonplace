@@ -14,7 +14,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
-import PinButton from './PinButton'
+import PinButton, { TopLevelStarButton } from './PinButton'
 
 function Author(props) {
   const { id } = useParams()
@@ -125,13 +125,12 @@ function Author(props) {
                 </TopLevelSubTitle>
               ) : null}
             </TopLevelTitleContainer>
-            <TopLevelStandardButtonContainer>
-              <PinButton
+            <TopLevelStandardButtonContainer className="top-level-toolbar">
+              <TopLevelStarButton
                 type="auth"
                 id={id}
                 label={pendingName}
                 href={`/auth/${id}`}
-                className="standard-button left-right"
               />
               <TopLevelStandardButton name="Delete" onClick={deleteAuthor} />
               <TopLevelStandardButton

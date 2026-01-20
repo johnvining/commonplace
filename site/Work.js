@@ -26,7 +26,7 @@ import {
   TopLevelTitle,
   TopLevelPostButtonContent,
 } from './TopLevelHeadings'
-import PinButton from './PinButton'
+import PinButton, { TopLevelStarButton } from './PinButton'
 
 function Work(props) {
   const { id } = useParams()
@@ -395,13 +395,15 @@ function Work(props) {
             marginBottom: '0px',
           }}
         >
-          <TopLevelStandardButtonContainer nick={nick}>
-            <PinButton
+          <TopLevelStandardButtonContainer
+            nick={nick}
+            className="top-level-toolbar"
+          >
+            <TopLevelStarButton
               type="work"
               id={id}
               label={pendingWorkTitle}
               href={`/work/${id}`}
-              className="standard-button left-right"
             />
             <TopLevelStandardButton
               name="Edit"
