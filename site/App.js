@@ -40,7 +40,12 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ viewMode: localStorage.viewMode })
+    const storedViewMode = parseInt(localStorage.viewMode, 10)
+    this.setState({
+      viewMode: Number.isFinite(storedViewMode)
+        ? storedViewMode
+        : constants.view_modes.FULL,
+    })
     this.validateAuth()
   }
 

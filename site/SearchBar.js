@@ -271,6 +271,7 @@ function SearchBar(props) {
       ) : (
         <input
           className="search-bar search-box"
+          data-allow-shortcuts="true"
           autoFocus
           value={typedText}
           onChange={(event) => handleTextChange(event)}

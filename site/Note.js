@@ -142,6 +142,21 @@ class Note extends React.Component {
     return false
   }
 
+  handleSelectKeyDown = (event) => {
+    if (event.keyCode !== constants.keyCodes.enter) {
+      return
+    }
+
+    if (
+      this.props.mode === constants.note_modes.NO_SELECTION ||
+      this.props.mode === constants.note_modes.NOT_SELECTED
+    ) {
+      this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
   formatMainText() {
     let originalText = this.state.pendingText
     let newText = originalText.replaceAll('\n', ' ').replaceAll('  ', ' ')
@@ -485,7 +500,9 @@ class Note extends React.Component {
         }
         key={this.props.id}
         id={this.props.id}
+        data-note-id={this.props.id}
         tabIndex={no_selection ? this.props.tabIndex : '-1'}
+        onKeyDown={this.handleSelectKeyDown}
       >
         {this.state.largeImage >= 0 ? (
           <div

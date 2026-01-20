@@ -52,10 +52,17 @@ export function KeyboardProvider({ children }) {
   const handleKeyDown = useCallback((event) => {
     // Skip if user is typing in a non-shortcut input
     const target = event.target
-    const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+    const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
+    const allowInputShortcuts = target?.dataset?.allowShortcuts === 'true'
 
     // For inputs, only process Escape, Enter, and Ctrl+key combinations
-    if (isInput && !event.ctrlKey && event.keyCode !== constants.keyCodes.esc && event.keyCode !== constants.keyCodes.enter && event.keyCode !== constants.keyCodes.delete) {
+    if (
+      isInput &&
+      !event.ctrlKey &&
+      event.keyCode !== constants.keyCodes.esc &&
+      event.keyCode !== constants.keyCodes.enter &&
+      !(event.keyCode === constants.keyCodes.delete && allowInputShortcuts)
+    ) {
       return
     }
 

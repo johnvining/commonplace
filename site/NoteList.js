@@ -30,6 +30,13 @@ class NoteList extends React.Component {
     page: 1,
   }
 
+  getActiveNoteId(event) {
+    const target = event?.target || document.activeElement
+    if (!target || typeof target.closest !== 'function') return null
+    const noteElement = target.closest('[data-note-id]')
+    return noteElement?.dataset?.noteId || null
+  }
+
   async componentDidMount() {
     const response = await this.props.getListOfNotes(
       this.props.index,
@@ -67,25 +74,42 @@ class NoteList extends React.Component {
 
     // Section 4.2: Quick Edit shortcuts (Ctrl+key)
     if (event.ctrlKey) {
+      let activeNoteId = this.getActiveNoteId(event) || this.state.selectedNote
+      if (!activeNoteId && this.state.notes?.length) {
+        activeNoteId = this.state.notes[0]._id
+      }
       switch (event.keyCode) {
         case constants.keyCodes.edit:
-          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT)
+          this.setNoteMode(
+            activeNoteId,
+            constants.note_modes.EDIT
+          )
           autosize(document.querySelector('#text'))
           autosize(document.querySelector('#take'))
           return true
         case constants.keyCodes.ideas:
-          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT_IDEAS)
+          this.setNoteMode(
+            activeNoteId,
+            constants.note_modes.EDIT_IDEAS
+          )
           return true
         case constants.keyCodes.piles:
-          this.setNoteMode(document.activeElement.id, constants.note_modes.EDIT_PILES)
+          this.setNoteMode(
+            activeNoteId,
+            constants.note_modes.EDIT_PILES
+          )
           return true
       }
     }
 
     // Section 4.1: Selection shortcuts
     if (shortcuts.noteList.select(event)) {
-      if (this.state.focusType === constants.note_modes.NO_SELECTION) {
-        this.setNoteMode(document.activeElement.id, constants.note_modes.SELECTED)
+      let activeNoteId = this.getActiveNoteId(event) || this.state.selectedNote
+      if (!activeNoteId && this.state.notes?.length) {
+        activeNoteId = this.state.notes[0]._id
+      }
+      if (activeNoteId) {
+        this.setNoteMode(activeNoteId, constants.note_modes.SELECTED)
         return true
       }
     }
@@ -170,7 +194,7 @@ class NoteList extends React.Component {
 
   setNoteMode(noteId, mode) {
     if (mode == constants.note_modes.SELECTED) {
-      let divToFocus = document.getElementById(this.state.selectedNote)
+      let divToFocus = document.getElementById(noteId)
       if (divToFocus) divToFocus.focus()
     }
     this.setState({
