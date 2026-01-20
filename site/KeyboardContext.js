@@ -163,6 +163,7 @@ export const shortcuts = {
     exitEdit: (e) => isKey(e, constants.keyCodes.esc),
     newNote: (e) => isKey(e, constants.keyCodes.new, { ctrl: true }),
     editPiles: (e) => isKey(e, constants.keyCodes.piles, { ctrl: true }),
+    star: (e) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
   },
 
   // 4. Note List
@@ -185,6 +186,7 @@ export const shortcuts = {
     prevImage: (e) => isKey(e, constants.keyCodes.prevImage, { ctrl: true }),
     nextImage: (e) => isKey(e, constants.keyCodes.nextImage, { ctrl: true }),
     addLink: (e) => isKey(e, constants.keyCodes.enter),
+    star: (e) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
   },
 
   // 6. Autocomplete

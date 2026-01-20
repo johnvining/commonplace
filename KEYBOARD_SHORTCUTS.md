@@ -60,6 +60,7 @@ Available on all entity pages (Work, Pile, Idea, Read).
 |----------|--------|
 | `Ctrl+E` | Edit entity details |
 | `Ctrl+A` | Save changes (when editing) |
+| `Ctrl+S` | Star/unstar entity (when not editing) |
 | `Escape` | Exit edit mode |
 
 ### 3.2 Work Page
@@ -101,6 +102,7 @@ Shortcuts for navigating and selecting notes. **Only works in Full view mode.**
 | `Ctrl+E` | Edit note content |
 | `Ctrl+T` | Edit tags/ideas |
 | `Ctrl+P` | Edit piles |
+| `Ctrl+S` | Star/unstar selected note |
 
 ---
 

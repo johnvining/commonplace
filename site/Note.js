@@ -24,6 +24,7 @@ import WorkCitationSpan from './WorkCitationSpan'
 import ClickToCopyNick from './ClickToCopyNick'
 import ClickableLabelButton from './ClickableLabelButton'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+import { togglePinned } from './pinned'
 import PinButton from './PinButton'
 
 class Note extends React.Component {
@@ -98,6 +99,11 @@ class Note extends React.Component {
       return true
     }
 
+    if (shortcuts.note.star(event) && selected && !anyEditMode) {
+      this.toggleStar()
+      return true
+    }
+
     if (shortcuts.note.save(event) && anyEditMode) {
       this.handleAccept()
       return true
@@ -140,6 +146,26 @@ class Note extends React.Component {
     }
 
     return false
+  }
+
+  getNoteLabel() {
+    if (this.state.pendingTitle?.trim()?.length) {
+      return this.state.pendingTitle
+    }
+    if (this.state.pendingText?.trim()?.length) {
+      const trimmed = this.state.pendingText.trim()
+      return `${trimmed.slice(0, 80)}${trimmed.length > 80 ? '...' : ''}`
+    }
+    return 'Untitled Note'
+  }
+
+  toggleStar() {
+    togglePinned({
+      type: 'note',
+      id: this.props.id,
+      label: this.getNoteLabel(),
+      href: `/note/${this.props.id}`,
+    })
   }
 
   handleSelectKeyDown = (event) => {
@@ -445,14 +471,7 @@ class Note extends React.Component {
       return <div> </div>
     }
 
-    const noteLabel =
-      this.state.pendingTitle?.trim()?.length
-        ? this.state.pendingTitle
-        : this.state.pendingText?.trim()?.length
-        ? `${this.state.pendingText.trim().slice(0, 80)}${
-            this.state.pendingText.trim().length > 80 ? '...' : ''
-          }`
-        : 'Untitled Note'
+    const noteLabel = this.getNoteLabel()
 
     var edit = false,
       edit_ideas = false,

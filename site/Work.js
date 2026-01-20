@@ -27,6 +27,7 @@ import {
   TopLevelPostButtonContent,
 } from './TopLevelHeadings'
 import PinButton, { TopLevelStarButton } from './PinButton'
+import { togglePinned } from './pinned'
 
 function Work(props) {
   const { id } = useParams()
@@ -249,6 +250,15 @@ function Work(props) {
     }
   }
 
+  const toggleStar = () => {
+    togglePinned({
+      type: 'work',
+      id,
+      label: pendingWorkTitle,
+      href: `/work/${id}`,
+    })
+  }
+
   // Section 3.1 & 3.2: Work page keyboard shortcuts
   useEntityKeyboardShortcuts({
     isEditing: edit || editPiles,
@@ -263,6 +273,7 @@ function Work(props) {
       setEdit(false)
       setEditPiles(true)
     },
+    onToggleStar: toggleStar,
   })
 
   props.setPageTitle(pendingWorkTitle)

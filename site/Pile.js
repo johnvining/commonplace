@@ -18,6 +18,7 @@ import {
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
 import PinButton, { TopLevelStarButton } from './PinButton'
+import { togglePinned } from './pinned'
 
 function Pile(props) {
   const { id } = useParams()
@@ -111,6 +112,15 @@ function Pile(props) {
     }
   }
 
+  const toggleStar = () => {
+    togglePinned({
+      type: 'pile',
+      id,
+      label: pendingName,
+      href: `/pile/${id}`,
+    })
+  }
+
   // Section 3.1 & 3.4: Pile page keyboard shortcuts
   useEntityKeyboardShortcuts({
     isEditing: edit,
@@ -118,6 +128,7 @@ function Pile(props) {
     onSave: handleAcceptUpdates,
     onExitEdit: () => setEdit(false),
     onNewNote: createNoteForPile,
+    onToggleStar: toggleStar,
   })
 
   props.setPageTitle(pendingName)

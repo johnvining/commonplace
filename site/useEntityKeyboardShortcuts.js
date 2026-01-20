@@ -10,6 +10,7 @@ export function useEntityKeyboardShortcuts({
   onExitEdit,
   onNewNote,
   onEditPiles,
+  onToggleStar,
 }) {
   // Entity edit mode shortcuts (Section 3.1)
   useKeyboardShortcuts(
@@ -59,6 +60,12 @@ export function useEntityKeyboardShortcuts({
         return true
       }
 
+      // Ctrl+S: Star/unstar entity
+      if (shortcuts.entity.star(event) && onToggleStar) {
+        onToggleStar()
+        return true
+      }
+
       // Escape: Exit any mode (piles edit, etc.)
       if (shortcuts.entity.exitEdit(event) && onExitEdit) {
         onExitEdit()
@@ -67,6 +74,6 @@ export function useEntityKeyboardShortcuts({
 
       return false
     },
-    [isEditing, onEdit, onNewNote, onEditPiles, onExitEdit]
+    [isEditing, onEdit, onNewNote, onEditPiles, onToggleStar, onExitEdit]
   )
 }

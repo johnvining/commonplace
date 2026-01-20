@@ -17,6 +17,7 @@ import {
 import * as constants from './constants'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import PinButton, { TopLevelStarButton } from './PinButton'
+import { togglePinned } from './pinned'
 
 function Idea(props) {
   const { id } = useParams()
@@ -96,6 +97,15 @@ function Idea(props) {
     }
   }
 
+  const toggleStar = () => {
+    togglePinned({
+      type: 'idea',
+      id,
+      label: pendingName,
+      href: `/idea/${id}`,
+    })
+  }
+
   // Section 3.1 & 3.5: Idea page keyboard shortcuts
   useEntityKeyboardShortcuts({
     isEditing: edit,
@@ -103,6 +113,7 @@ function Idea(props) {
     onSave: handleAcceptUpdates,
     onExitEdit: () => setEdit(false),
     onNewNote: createNoteForIdea,
+    onToggleStar: toggleStar,
   })
 
   props.setPageTitle(pendingName)
