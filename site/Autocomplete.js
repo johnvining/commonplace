@@ -13,6 +13,7 @@ class Autocomplete extends React.Component {
     fetchingIdeaSuggestions: false,
     suggested_ideas: [],
   }
+  containerRef = React.createRef()
   className = this.props.className
   style = {
     searchBox: this.className + ' search-box',
@@ -54,6 +55,19 @@ class Autocomplete extends React.Component {
         activeElement?.classList?.contains('option')
       if (isOption) {
         activeElement.click()
+        return true
+      }
+
+      const isInputForThis =
+        activeElement?.tagName === 'INPUT' &&
+        activeElement?.id === this.props.inputName
+      if (isInputForThis) {
+        const container = this.containerRef.current
+        const firstOption = container?.querySelector('button.option')
+        if (firstOption) {
+          firstOption.click()
+        }
+        // Prevent Enter from bubbling to note list selection shortcuts
         return true
       }
     }
@@ -185,7 +199,10 @@ class Autocomplete extends React.Component {
   render() {
     const { responses } = this.state
     return (
-      <div className={this.props.className + ' autocomplete-div'}>
+      <div
+        className={this.props.className + ' autocomplete-div'}
+        ref={this.containerRef}
+      >
         {this.props.showSuggestedIdeas ? (
           <button
             className={'action-button'}

@@ -145,7 +145,12 @@ When autocomplete dropdown is visible.
 | `Escape` | Close autocomplete |
 | `Backspace` | Return to previous state (when input empty) |
 
-### 6.2 AI Suggestions
+### 6.2 Selection
+| Shortcut | Action |
+|----------|--------|
+| `Enter` | Select focused autocomplete option |
+
+### 6.3 AI Suggestions
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+S` | Fetch AI idea suggestions (when editing note ideas) |
