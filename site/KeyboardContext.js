@@ -5,14 +5,14 @@ const KeyboardContext = createContext(null)
 
 // Scope priority - lower number = higher priority (more specific)
 const scopePriority = {
+  [constants.keyboardScopes.AUTOCOMPLETE]: 0,
+  [constants.keyboardScopes.SEARCH_BAR]: 1,
   [constants.keyboardScopes.NOTE_EDIT]: 1,
   [constants.keyboardScopes.NOTE_EDIT_IDEAS]: 1,
   [constants.keyboardScopes.NOTE_EDIT_PILES]: 1,
   [constants.keyboardScopes.NOTE_EDIT_LINKS]: 1,
   [constants.keyboardScopes.NOTE_SELECTED]: 2,
-  [constants.keyboardScopes.AUTOCOMPLETE]: 3,
   [constants.keyboardScopes.NOTE_LIST]: 4,
-  [constants.keyboardScopes.SEARCH_BAR]: 5,
   [constants.keyboardScopes.ENTITY_EDIT]: 6,
   [constants.keyboardScopes.ENTITY_PAGE]: 7,
   [constants.keyboardScopes.GLOBAL]: 10,

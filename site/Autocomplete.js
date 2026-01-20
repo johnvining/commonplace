@@ -33,6 +33,10 @@ class Autocomplete extends React.Component {
   handleKeyboardShortcut(event) {
     // Section 6.1: Navigation
     if (shortcuts.autocomplete.close(event)) {
+      if (this.props.onClose) {
+        this.props.onClose()
+        return true
+      }
       if (this.props.escape) this.props.escape()
       this.setState({ currentTypedText: '' })
       return true
@@ -41,6 +45,17 @@ class Autocomplete extends React.Component {
     if (shortcuts.autocomplete.back(event) && !this.state.currentTypedText) {
       if (this.props.escape) this.props.escape()
       return true
+    }
+
+    if (event.keyCode === constants.keyCodes.enter) {
+      const activeElement = document.activeElement
+      const isOption =
+        activeElement?.tagName === 'BUTTON' &&
+        activeElement?.classList?.contains('option')
+      if (isOption) {
+        activeElement.click()
+        return true
+      }
     }
 
     // Section 6.2: AI Suggestions
@@ -118,16 +133,20 @@ class Autocomplete extends React.Component {
   }
 
   handleOptionSelect = (val) => {
+    const selectedId = val.target.id || val.target.getAttribute('data-id')
+    const selectedName = val.target.name || val.target.getAttribute('data-name')
     this.setState(
       {
-        currentTypedText: val.target.name,
-        selectedId: val.target.id,
+        currentTypedText: selectedName,
+        selectedId: selectedId,
         hideResults: true,
       },
       () => {
         this.props.onSelect(this.state.selectedId, this.state.currentTypedText)
-        document.getElementById(this.props.inputName).value =
-          this.state.currentTypedText
+        const input = document.getElementById(this.props.inputName)
+        if (input) {
+          input.value = this.state.currentTypedText
+        }
       }
     )
 
@@ -220,11 +239,14 @@ class Autocomplete extends React.Component {
             {/* Options */}
             <ul className={this.style.ul}>
               {responses?.map((res) => {
+                const optionId = res?._id || res?.id
                 return (
-                  <li key={res._id} className={this.style.li}>
+                  <li key={optionId} className={this.style.li}>
                     <button
-                      id={res._id}
+                      id={optionId}
+                      data-id={optionId}
                       name={res.name}
+                      data-name={res.name}
                       className={this.style.option}
                       onClick={this.handleOptionSelect.bind(this)}
                     >

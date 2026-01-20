@@ -105,6 +105,60 @@ class App extends React.Component {
     let environment = process.env.NODE_ENV
     return (
       <div className="main">
+        <div className="top-bar">
+          <div className="title-bar">
+            <Link to="/" className="title-link">
+              {environment === 'development' ? (
+                <div className="title">DEVELOPMENT </div>
+              ) : (
+                <div className="title">commonplace </div>
+              )}
+            </Link>
+          </div>
+          <div className="stats-center">
+            <Stats />
+          </div>
+          <div className="top-action-bar">
+            <div className="tool-bar div">
+              <button
+                className="standard-button left-right"
+                onClick={async () => {
+                  this.setState({ barOpen: true })
+                }}
+              >
+                <img src={search} />
+              </button>
+            </div>
+            <div className="tool-bar div">
+              <button
+                className="standard-button left-right"
+                onClick={async () => {
+                  window.location.href = '/'
+                }}
+              >
+                <img src={home_door} />
+              </button>
+            </div>
+            <div className="tool-bar div">
+              <button
+                className="standard-button left-right"
+                onClick={async () => {
+                  const response = await createNewNoteFromTitle('')
+                  window.location.href =
+                    '/note/' + response.data._id + '/edit'
+                }}
+              >
+                <img src={plus} />
+              </button>
+            </div>
+            <div className="tool-bar div">
+              <ViewSelector
+                viewMode={this.state.viewMode}
+                setView={this.setView.bind(this)}
+              />
+            </div>
+          </div>
+        </div>
         {this.state.barOpen ? (
           <div
             className="search-overlay"
@@ -117,65 +171,11 @@ class App extends React.Component {
               <SearchBar
                 beforeNavigate={this.beforeSearchNavigate.bind(this)}
                 setView={this.setView.bind(this)}
+                onClose={() => this.setState({ barOpen: false })}
               />
             </div>
           </div>
-        ) : (
-          <div className="top-bar">
-            <div className="title-bar">
-              <Link to="/" className="title-link">
-                {environment === 'development' ? (
-                  <div className="title">DEVELOPMENT </div>
-                ) : (
-                  <div className="title">commonplace </div>
-                )}
-              </Link>
-            </div>
-            <div className="stats-center">
-              <Stats />
-            </div>
-            <div className="top-action-bar">
-              <div className="tool-bar div">
-                <button
-                  className="standard-button left-right"
-                  onClick={async () => {
-                    this.setState({ barOpen: true })
-                  }}
-                >
-                  <img src={search} />
-                </button>
-              </div>
-              <div className="tool-bar div">
-                <button
-                  className="standard-button left-right"
-                  onClick={async () => {
-                    window.location.href = '/'
-                  }}
-                >
-                  <img src={home_door} />
-                </button>
-              </div>
-              <div className="tool-bar div">
-                <button
-                  className="standard-button left-right"
-                  onClick={async () => {
-                    const response = await createNewNoteFromTitle('')
-                    window.location.href =
-                      '/note/' + response.data._id + '/edit'
-                  }}
-                >
-                  <img src={plus} />
-                </button>
-              </div>
-              <div className="tool-bar div">
-                <ViewSelector
-                  viewMode={this.state.viewMode}
-                  setView={this.setView.bind(this)}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        ) : null}
 
         <Routes>
           <Route

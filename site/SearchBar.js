@@ -14,6 +14,7 @@ function SearchBar(props) {
   const handleExecute = async () => {
     const currentModifier = modifier
     const currentText = typedText
+    const normalizedText = (currentText || '').trim().toLowerCase()
 
     // Create new note
     if (currentModifier === constants.modifiers.note) {
@@ -58,7 +59,7 @@ function SearchBar(props) {
     }
 
     // List piles
-    if (currentModifier === constants.modifiers.list && currentText === constants.modifiers.pile) {
+    if (currentModifier === constants.modifiers.list && (normalizedText === constants.modifiers.pile || normalizedText === 'piles')) {
       setTypedText('')
       props.beforeNavigate()
       navigate('/piles')
@@ -122,6 +123,10 @@ function SearchBar(props) {
   useKeyboardShortcuts(
     constants.keyboardScopes.SEARCH_BAR,
     (event) => {
+      const target = event.target
+      const isAutocompleteOption = target?.tagName === 'BUTTON' &&
+        target?.classList?.contains('option')
+
       // Section 2.1: Navigation - Backspace to go back
       if (
         shortcuts.searchBar.back(event) &&
@@ -134,8 +139,14 @@ function SearchBar(props) {
         return true
       }
 
+      // Close search bar with Escape
+      if (shortcuts.searchBar.close(event)) {
+        if (props.onClose) props.onClose()
+        return true
+      }
+
       // Section 2.2: Execution - Enter to execute
-      if (shortcuts.searchBar.execute(event)) {
+      if (shortcuts.searchBar.execute(event) && !isAutocompleteOption) {
         void handleExecute()
         return true
       }
@@ -255,6 +266,7 @@ function SearchBar(props) {
           getSuggestions={getSuggestions}
           handleNewSelect={handleCreate}
           escape={handleEscape}
+          onClose={props.onClose}
         />
       ) : (
         <input
