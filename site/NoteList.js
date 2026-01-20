@@ -177,14 +177,23 @@ class NoteList extends React.Component {
 
     var imagePromises = []
     for (var i = 1; i <= numberImages; i++) {
-      imagePromises.push(db.getImagesForNote(notes[index]._id, i))
+      imagePromises.push(
+        db.getImagesForNote(notes[index]._id, i).catch((error) => {
+          if (error?.response?.status !== 404) {
+            console.error('Error fetching image', error)
+          }
+          return null
+        })
+      )
     }
 
     await Promise.all(imagePromises).then((responses) => {
       var imagesArray = []
       var note = notes[index]
-      responses.map((response) => {
-        imagesArray.push(URL.createObjectURL(response.data))
+      responses.forEach((response) => {
+        if (response?.data) {
+          imagesArray.push(URL.createObjectURL(response.data))
+        }
       })
       note.imageUrls = imagesArray
       notes[index] = note
