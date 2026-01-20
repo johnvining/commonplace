@@ -61,6 +61,12 @@ function Sidebar() {
     auth: 'Author',
   }
 
+  const getPileItemCount = (pile) => {
+    const noteCount = pile?.note_count ?? 0
+    const workCount = pile?.work_count ?? 0
+    return noteCount + workCount
+  }
+
   return (
     <aside className="sidebar">
       <div className="sidebar-section">
@@ -142,7 +148,7 @@ function Sidebar() {
                 >
                   <span className="sidebar-item">{pile.name}</span>
                   <span className="sidebar-count">
-                    {pile.note_count?.toLocaleString() ?? 0}
+                    {getPileItemCount(pile).toLocaleString()}
                   </span>
                 </Link>
               ))
