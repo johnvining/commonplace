@@ -1490,7 +1490,7 @@ div .top-bar {
   color: var(--inverse-font-color);
   display: inline-block;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 28px;
+  font-size: var(--font-size-lg);
   margin: -2px;
   padding: 12px;
   vertical-align: top;
@@ -1501,7 +1501,7 @@ div .top-bar {
   border-style: none;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 28px;
+  font-size: var(--font-size-lg);
   margin: 4px auto;
   padding: 6px;
   width: 100%;
@@ -1529,7 +1529,7 @@ div .top-bar {
   border-width: 1px;
   color: var(--font-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  font-size: 28px;
+  font-size: var(--font-size-lg);
   margin: 4px;
   padding: 4px;
   text-align: left;

@@ -718,7 +718,7 @@ a {
     color: $inverse_font_color;
     display: inline-block;
     font-family: $main_font;
-    font-size: 28px;
+    font-size: var(--font-size-lg);
     margin: -2px;
     padding: 12px;
     vertical-align: top;
@@ -729,7 +729,7 @@ a {
     border-style: none;
     color: $font_color;
     font-family: $main_font;
-    font-size: 28px;
+    font-size: var(--font-size-lg);
     margin: 4px auto;
     padding: 6px;
     width: 100%;
@@ -757,7 +757,7 @@ a {
     border-width: 1px;
     color: $font_color;
     font-family: $main_font;
-    font-size: 28px;
+    font-size: var(--font-size-lg);
     margin: 4px;
     padding: 4px;
     text-align: left;

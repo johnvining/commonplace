@@ -88,6 +88,46 @@ function SearchBar(props) {
       return
     }
 
+    // Entity navigation by name
+    if (
+      [
+        constants.modifiers.auth,
+        constants.modifiers.idea,
+        constants.modifiers.work,
+        constants.modifiers.pile,
+        constants.modifiers.read,
+      ].includes(currentModifier)
+    ) {
+      if (!currentText) {
+        return
+      }
+      const dbType = modifierToDbTypes(currentModifier)
+      if (!dbType) {
+        return
+      }
+      try {
+        const response = await db.getSuggestions(dbType, currentText)
+        const options = response?.data?.data || []
+        if (!options.length) {
+          return
+        }
+        const normalized = currentText.trim().toLowerCase()
+        const exactMatch =
+          options.find((item) => item?.name?.toLowerCase() === normalized) ||
+          options[0]
+        const id = exactMatch?._id || exactMatch?.id
+        if (!id) {
+          return
+        }
+        props.beforeNavigate()
+        navigate('/' + currentModifier + '/' + id)
+        return
+      } catch (error) {
+        console.error('Error fetching suggestions', error)
+        return
+      }
+    }
+
     if (!currentText) {
       return
     }
