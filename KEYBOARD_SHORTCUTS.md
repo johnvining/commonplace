@@ -150,6 +150,8 @@ When autocomplete dropdown is visible.
 ### 6.2 Selection
 | Shortcut | Action |
 |----------|--------|
+| `Tab` | Move focus into options and cycle through them |
+| `Shift+Tab` | Cycle backwards through options |
 | `Enter` | Select focused autocomplete option |
 
 ### 6.3 AI Suggestions

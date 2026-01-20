@@ -44,8 +44,11 @@ class Autocomplete extends React.Component {
     }
 
     if (shortcuts.autocomplete.back(event) && !this.state.currentTypedText) {
-      if (this.props.escape) this.props.escape()
-      return true
+      if (this.props.escape) {
+        this.props.escape()
+        return true
+      }
+      return false
     }
 
     if (event.keyCode === constants.keyCodes.enter) {
@@ -62,12 +65,6 @@ class Autocomplete extends React.Component {
         activeElement?.tagName === 'INPUT' &&
         activeElement?.id === this.props.inputName
       if (isInputForThis) {
-        const container = this.containerRef.current
-        const firstOption = container?.querySelector('button.option')
-        if (firstOption) {
-          firstOption.click()
-        }
-        // Prevent Enter from bubbling to note list selection shortcuts
         return true
       }
     }
@@ -88,6 +85,54 @@ class Autocomplete extends React.Component {
         this.handleTextUpdate()
       }
     )
+  }
+
+  handleInputKeyDown = (event) => {
+    if (event.keyCode === 9) {
+      const container = this.containerRef.current
+      const firstOption = container?.querySelector('button.option')
+      if (firstOption) {
+        event.preventDefault()
+        event.stopPropagation()
+        firstOption.focus()
+      }
+      return
+    }
+
+    if (event.keyCode === constants.keyCodes.enter) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
+  handleOptionKeyDown = (event) => {
+    if (event.keyCode === constants.keyCodes.enter) {
+      event.preventDefault()
+      event.stopPropagation()
+      event.currentTarget.click()
+      return
+    }
+
+    if (event.keyCode !== 9) {
+      return
+    }
+    const container = this.containerRef.current
+    const options = Array.from(
+      container?.querySelectorAll('button.option') || []
+    )
+    if (!options.length) {
+      return
+    }
+    const currentIndex = options.indexOf(event.currentTarget)
+    if (currentIndex === -1) {
+      return
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    const direction = event.shiftKey ? -1 : 1
+    const nextIndex =
+      (currentIndex + direction + options.length) % options.length
+    options[nextIndex].focus()
   }
 
   handleTextUpdate = () => {
@@ -147,6 +192,12 @@ class Autocomplete extends React.Component {
   }
 
   handleOptionSelect = (val) => {
+    if (val?.preventDefault) {
+      val.preventDefault()
+    }
+    if (val?.stopPropagation) {
+      val.stopPropagation()
+    }
     const selectedId = val.target.id || val.target.getAttribute('data-id')
     const selectedName = val.target.name || val.target.getAttribute('data-name')
     this.setState(
@@ -227,6 +278,7 @@ class Autocomplete extends React.Component {
           data-allow-shortcuts="true"
           value={this.state.currentTypedText || ''}
           onChange={this.handleTypingChange.bind(this)}
+          onKeyDown={this.handleInputKeyDown}
         ></input>
         {this.state.hideResults ? (
           <>
@@ -267,6 +319,7 @@ class Autocomplete extends React.Component {
                       data-name={res.name}
                       className={this.style.option}
                       onClick={this.handleOptionSelect.bind(this)}
+                      onKeyDown={this.handleOptionKeyDown}
                     >
                       {res.name}
                     </button>
@@ -281,6 +334,7 @@ class Autocomplete extends React.Component {
                     name="New"
                     className={this.style.newOption}
                     onClick={this.handleNewSelect.bind(this)}
+                    onKeyDown={this.handleOptionKeyDown}
                   >
                     {this.state.currentTypedText}
                   </button>

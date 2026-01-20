@@ -703,7 +703,9 @@ class Note extends React.Component {
           ) : this.state.pendingAuthorId ||
             this.props.note?.work?.author ||
             this.state.pendingWorkId ||
-            this.state.pendingYear ? (
+            this.state.pendingYear ||
+            this.state.pendingUrl ||
+            this.props.note?.work?.url ? (
             <div name="work" className="width-100">
               <div className="citation">
                 <WorkCitationSpan
