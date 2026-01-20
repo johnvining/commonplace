@@ -36,7 +36,7 @@
     --button-selected: rgb(8.7526315789, 113.7842105263, 157.5473684211);
     --input-background: rgb(1.5168421053, 19.7189473684, 27.3031578947);
     --note-background-edit: rgb(0.07, 0.91, 1.26);
-    --note-background-not-selected: #f4f4f4;
+    --note-background-not-selected: rgb(1.7842105263, 23.2973684211, 32.2578947368);
     --note-background: rgb(0.03, 0.39, 0.54);
     --link-color: #cccccc;
     --font-color: #cccccc;
@@ -517,6 +517,13 @@ input .note-full .edit-work {
 .action-button.pin-button .pin-button-icon {
   width: 21px;
   height: 21px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .action-button.pin-button:focus {
+    box-shadow: none;
+    outline: none;
+  }
 }
 
 .note-slim.outer {
@@ -1019,6 +1026,8 @@ div .top-bar {
   padding: 4px;
   gap: 0;
   justify-content: center;
+  border: none;
+  background-color: transparent;
 }
 
 .sidebar .pin-button {

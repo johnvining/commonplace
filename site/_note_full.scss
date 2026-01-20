@@ -371,6 +371,11 @@
     outline: none;
     @include button-uninvert-icon();
   }
+
+  @media (prefers-color-scheme: dark) {
+    border: none;
+    box-shadow: none;
+  }
 }
 
 .action-button.action-button-text {
@@ -421,4 +426,11 @@
 .action-button.pin-button .pin-button-icon {
   width: 21px;
   height: 21px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .action-button.pin-button:focus {
+    box-shadow: none;
+    outline: none;
+  }
 }

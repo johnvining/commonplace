@@ -74,7 +74,7 @@ $white: white;
       --input-background: #{color.scale($dark_theme_blue, $lightness: 2%)};
 
       --note-background-edit: #{color.scale($dark_theme_blue, $lightness: -93%)};
-      --note-background-not-selected: #{$grey1};
+      --note-background-not-selected: #{color.scale($dark_theme_blue, $lightness: 6%)};
       --note-background: #{color.scale($dark_theme_blue, $lightness: -97%)};
   
       // Font Colors
