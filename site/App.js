@@ -106,11 +106,19 @@ class App extends React.Component {
     return (
       <div className="main">
         {this.state.barOpen ? (
-          <div className="top-bar">
-            <SearchBar
-              beforeNavigate={this.beforeSearchNavigate.bind(this)}
-              setView={this.setView.bind(this)}
-            />
+          <div
+            className="search-overlay"
+            onClick={() => this.setState({ barOpen: false })}
+          >
+            <div
+              className="search-overlay-content"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <SearchBar
+                beforeNavigate={this.beforeSearchNavigate.bind(this)}
+                setView={this.setView.bind(this)}
+              />
+            </div>
           </div>
         ) : (
           <div className="top-bar">
