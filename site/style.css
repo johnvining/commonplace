@@ -784,6 +784,7 @@ div .top-bar {
   top: 0;
   background: var(--background-color);
   z-index: 20;
+  align-items: center;
 }
 
 .top-bar .title-bar {
@@ -813,7 +814,8 @@ div .top-bar {
 
 .top-bar .stats-center {
   display: none;
-  width: 34%;
+  width: auto;
+  flex: 1;
   align-self: center;
   justify-content: center;
 }
@@ -834,7 +836,8 @@ div .top-bar {
 @media (min-width: 768px) {
   .top-bar .top-action-bar {
     width: auto;
-    margin-left: auto;
+    flex: 1;
+    margin-left: 0;
   }
 }
 

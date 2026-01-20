@@ -67,6 +67,7 @@ a {
     top: 0;
     background: $background_color;
     z-index: 20;
+    align-items: center;
   }
 
   .title-bar {
@@ -92,7 +93,8 @@ a {
 
   .stats-center {
     display: none;
-    width: 34%;
+    width: auto;
+    flex: 1;
     align-self: center;
     justify-content: center;
 
@@ -109,7 +111,8 @@ a {
 
     @include tablet-plus {
       width: auto;
-      margin-left: auto;
+      flex: 1;
+      margin-left: 0;
     }
   }
 
