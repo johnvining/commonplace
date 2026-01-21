@@ -111,7 +111,10 @@ function Read(props) {
       </TopLevelTitleContainer>
       <TopLevelStandardButtonContainer nick={nick}>
         <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
-        <ImageUploader onImageUpload={createNoteWithImageForWork} />
+        <ImageUploader
+          onImageUpload={createNoteWithImageForWork}
+          buttonClassName="button left-right"
+        />
       </TopLevelStandardButtonContainer>
       <NoteList
         key={'work' + id}

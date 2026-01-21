@@ -853,7 +853,7 @@ class Note extends React.Component {
                   <div className="left-div">
                     <ImageUploader
                       onImageUpload={this.onImageUpload.bind(this)}
-                      noMarginNoBorders={true}
+                    buttonClassName="button left-right"
                     />
                   </div>
 
@@ -937,7 +937,7 @@ class Note extends React.Component {
                 <span>
                   <ClickToCopyNick
                     nick={this.state.nick}
-                    style={{ verticalAlign: 'super' }}
+                    style={{ verticalAlign: 'super', marginRight: '8px' }}
                   />
                   <PinButton
                     type="note"

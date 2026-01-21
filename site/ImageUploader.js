@@ -3,32 +3,54 @@ import upload from 'url:./icons/upload.svg'
 
 class ImageUploader extends React.Component {
   state = {
-    selectedFile: '',
-    ready: false,
     uploading: false,
     dragActive: false,
+    uploadTotal: 0,
+    uploadDone: 0,
   }
+  inputRef = React.createRef()
 
   onFileSelect(event) {
-    this.setState(
-      {
-        selectedFile: event.target.files[0],
-        ready: true,
-      },
-      () => {
-        this.onSubmit() // yolo
-      }
-    )
+    this.handleFiles(event.target.files)
   }
 
-  onSubmit() {
-    this.setState({ ready: false, uploading: true }, () => {
-      this.props.onImageUpload(this.state.selectedFile).then(() => {
-        // eslint-disable-next-line no-undef
-        fileUploadInput.value = '' // TODO: Fix this -- working but janky
-        this.setState({ uploading: false, selectedFile: '' })
-      })
-    })
+  handleFiles(filesList) {
+    const files = Array.from(filesList || [])
+    if (!files.length) {
+      return
+    }
+
+    this.setState(
+      { uploading: true, uploadTotal: files.length, uploadDone: 0 },
+      async () => {
+        try {
+          if (this.props.onImagesUpload) {
+            const onProgress = (done, total = files.length) => {
+              this.setState({ uploadDone: done, uploadTotal: total })
+            }
+            await this.props.onImagesUpload(files, onProgress)
+            this.setState({ uploadDone: files.length })
+          } else if (this.props.onImageUpload) {
+            for (const file of files) {
+              await this.props.onImageUpload(file)
+              this.setState((prevState) => ({
+                uploadDone: prevState.uploadDone + 1,
+              }))
+            }
+          }
+        } finally {
+          if (this.inputRef.current) {
+            this.inputRef.current.value = ''
+          }
+          this.setState({
+            uploading: false,
+            dragActive: false,
+            uploadTotal: 0,
+            uploadDone: 0,
+          })
+        }
+      }
+    )
   }
 
   handleDragEnter(e) {
@@ -51,17 +73,40 @@ class ImageUploader extends React.Component {
     e.preventDefault()
     e.stopPropagation()
 
-    const { files } = e.dataTransfer
-
-    if (files && files.length == 1) {
-      // TODO: Support for multi-file
-      this.setState({ selectedFile: files[0], ready: true }, () => {
-        this.onSubmit()
-      })
+    if (this.state.uploading) {
+      return
     }
+
+    const { files } = e.dataTransfer
+    if (!files || files.length === 0) {
+      return
+    }
+
+    if (this.props.allowMultiple || this.props.onImagesUpload) {
+      this.handleFiles(files)
+      return
+    }
+
+    this.handleFiles([files[0]])
   }
 
   render() {
+    const uploadLabel = this.props.allowMultiple ? 'Upload Images' : 'Upload Image'
+    const dropLabel = this.props.allowMultiple ? 'Drop Images' : 'Drop Image'
+    const { uploadDone, uploadTotal, uploading } = this.state
+    const uploadingLabel =
+      uploadTotal > 1
+        ? `Uploading ${uploadDone}/${uploadTotal}`
+        : 'Uploading...'
+    const buttonClassName = this.props.buttonClassName
+      ? `file-drop ${this.props.buttonClassName}`
+      : 'file-drop button left-right'
+    const showIcon = this.props.showIcon || this.props.iconOnly
+    const content = uploading
+      ? uploadingLabel
+      : this.state.dragActive
+      ? dropLabel
+      : uploadLabel
     return (
       <form className="upload-form">
         <input
@@ -69,6 +114,8 @@ class ImageUploader extends React.Component {
           type="file"
           name="file"
           id="fileUploadInput"
+          ref={this.inputRef}
+          multiple={this.props.allowMultiple}
           onChange={this.onFileSelect.bind(this)}
           title="asdfsdf"
         />
@@ -79,7 +126,9 @@ class ImageUploader extends React.Component {
         >
           <div
             className={
-              'file-drop' +
+              buttonClassName +
+              (uploading ? ' uploading' : '') +
+              ' ' +
               (this.state.dragActive ? ' drag-active' : '') +
               (this.props.noMarginNoBorders ? ' no-margin-no-border' : '')
             }
@@ -88,11 +137,11 @@ class ImageUploader extends React.Component {
             onDragEnter={this.handleDragEnter.bind(this)}
             onDragLeave={this.handleDragLeave.bind(this)}
           >
-            {!this.state.dragActive
-              ? 'Upload Image'
-              : this.state.uploading
-              ? 'Uploading'
-              : 'Drop Image'}
+            {showIcon && !uploading ? (
+              <img src={upload} alt="" />
+            ) : (
+              content
+            )}
           </div>
         </label>
       </form>

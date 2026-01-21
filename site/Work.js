@@ -11,6 +11,7 @@ import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import { marked } from 'marked'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
+import ImageUploader from './ImageUploader'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
@@ -45,6 +46,7 @@ function Work(props) {
   const [pendingCitationInfo, setPendingCitationInfo] = useState('')
   const [piles, setPiles] = useState()
   const [nick, setNick] = useState()
+  const [notesRefreshKey, setNotesRefreshKey] = useState(0)
   const navigate = useNavigate()
 
   // Function to handle nick navigation
@@ -250,6 +252,36 @@ function Work(props) {
     }
   }
 
+  const createNotesForWorkFromImages = async (images, onProgress) => {
+    if (!images?.length) {
+      return
+    }
+
+    let completed = 0
+    for (const image of images) {
+      try {
+        const response = await db.createNewNoteForWork(id)
+        const noteId = response?.data?._id
+        if (!noteId) {
+          console.error('Create note response missing id', response)
+          completed += 1
+          if (onProgress) onProgress(completed, images.length)
+          continue
+        }
+        await db.addImageToNote(noteId, image)
+        await db.getNoteTextOCR(noteId)
+        completed += 1
+        if (onProgress) onProgress(completed, images.length)
+      } catch (error) {
+        console.error('Error creating note from image', error)
+        completed += 1
+        if (onProgress) onProgress(completed, images.length)
+      }
+    }
+
+    setNotesRefreshKey((prev) => prev + 1)
+  }
+
   const toggleStar = () => {
     togglePinned({
       type: 'work',
@@ -447,6 +479,11 @@ function Work(props) {
               name="Add Note"
               onClick={createNoteForWork}
             />
+            <ImageUploader
+              onImagesUpload={createNotesForWorkFromImages}
+              allowMultiple={true}
+              buttonClassName="button left-right"
+            />
           </TopLevelStandardButtonContainer>
           <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1 }}>
             <PileListForItem
@@ -497,7 +534,7 @@ function Work(props) {
         </TopLevelFormContainer>
       ) : (
         <NoteList
-          key={'work' + id}
+          key={`work-${id}-${notesRefreshKey}`}
           viewMode={props.viewMode}
           getListOfNotes={getListOfNotes}
         />

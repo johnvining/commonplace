@@ -1294,6 +1294,10 @@ div .top-bar {
   padding: 3px 6px;
 }
 
+.top-level-button-container .button + .upload-form .file-drop.button {
+  margin-left: 4px;
+}
+
 .top-level-button-container.top-level-toolbar .button {
   align-items: center;
   line-height: 1;
@@ -2126,18 +2130,12 @@ div .image-row {
 
 .file-drop {
   align-items: center;
-  background-color: var(--button-background);
-  border-color: var(--low-intensity-border);
   border-radius: 4px;
-  border-style: solid;
-  border-width: 1px;
   display: inline-flex;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 14px;
-  height: 42px;
-  margin-left: 4px;
-  margin: 4px 0px 4px 0px;
-  padding: 6px;
+  line-height: 1;
+  user-select: none;
 }
 
 .file-drop.no-margin-no-border {
@@ -2145,12 +2143,8 @@ div .image-row {
   border-width: 0px;
 }
 
-.file-drop:hover {
-  background-color: var(--button-input-background-selected);
-  color: var(--font-color);
-  cursor: pointer;
-  outline: none;
-  border-color: white;
+.file-drop.uploading {
+  cursor: progress;
 }
 
 .drag-active {
