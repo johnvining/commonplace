@@ -240,7 +240,7 @@ a {
   opacity: 0.5;
 }
 
-.pin-button:not(.standard-button) {
+.button.pin-button {
   background: transparent;
   border: 1px solid $low_intensity_border;
   border-radius: 4px;
@@ -282,9 +282,42 @@ a {
   margin-left: auto;
 }
 
-.standard-button.pin-button {
+.button.pin-button {
   border: 1px solid $low_intensity_border;
   background-color: $button_background;
+}
+
+.pin-button-icon-only {
+  border: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  min-width: auto;
+  height: 22px;
+  width: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:hover {
+    background-color: $button_input_background_selected;
+  }
+}
+
+.button.pin-button.pin-button-icon-only {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 22px;
+  height: 22px;
+  width: 22px;
+  background-color: transparent;
 }
 
 .action-button.pin-button {
@@ -370,7 +403,7 @@ a {
   }
 }
 
-.standard-button {
+.button {
   background-color: $button_background;
   border-color: $low_intensity_border;
   border-radius: 4px;
@@ -391,7 +424,7 @@ a {
     @include button-invert-icon();
   }
 
-  +.standard-button {
+  +.button {
     margin-left: 4px;
   }
 
@@ -449,27 +482,37 @@ a {
   }
 }
 
+.button.action-button {
+  background-color: transparent;
+  border-style: none;
+  height: 40px;
+  width: 50px;
+  margin: 4px;
+  padding: 4px;
+  display: inline-block;
+}
+
 .view-icon-placeholder {
   display: inline-block;
   width: 18px;
   height: 18px;
 }
 
-.top-level-standard-button-container {
-  .standard-button {
+.top-level-button-container {
+  .button {
     font-size: var(--font-size-lg);
     height: 28px;
     padding: 3px 6px;
   }
 }
 
-.top-level-standard-button-container.top-level-toolbar {
-  .standard-button {
+.top-level-button-container.top-level-toolbar {
+  .button {
     align-items: center;
     line-height: 1;
   }
 
-  .standard-button .pin-button-icon {
+  .button .pin-button-icon {
     width: 12px;
     height: 12px;
     display: inline-block;
@@ -857,6 +900,12 @@ a.grid-link {
   border-style: none;
   position: relative;
   z-index: 5;
+  padding: 0;
+  height: auto;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   @media (prefers-color-scheme: dark) {
     @include button-invert-icon();
@@ -1028,13 +1077,27 @@ a.grid-link {
     padding: 0px;
     margin: 0px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &.header > div,
+  &.header > span {
+    flex: 0 1 auto;
+    min-width: 0;
+    text-align: left;
   }
 
   .truncate {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &.header .pin-button-inline {
+    margin-left: auto;
   }
 
   &.content {

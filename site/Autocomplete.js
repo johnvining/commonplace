@@ -256,7 +256,7 @@ class Autocomplete extends React.Component {
       >
         {this.props.showSuggestedIdeas ? (
           <button
-            className={'action-button'}
+            className={'button action-button'}
             tabIndex="-1"
             onClick={() => {
               this.handleFetchIdeaSuggestions()

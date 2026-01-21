@@ -15,8 +15,8 @@ class ViewSelector extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.FULL
-              ? 'standard-button button-selected left'
-              : 'standard-button left'
+              ? 'button button-selected left'
+              : 'button left'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.FULL)
@@ -27,8 +27,8 @@ class ViewSelector extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.SLIM
-              ? 'standard-button button-selected middle'
-              : 'standard-button middle'
+              ? 'button button-selected middle'
+              : 'button middle'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.SLIM)
@@ -39,8 +39,8 @@ class ViewSelector extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.GRID
-              ? 'standard-button button-selected middle'
-              : 'standard-button middle'
+              ? 'button button-selected middle'
+              : 'button middle'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.GRID)
@@ -51,8 +51,8 @@ class ViewSelector extends React.Component {
         <button
           className={
             this.props.viewMode == constants.view_modes.TILE
-              ? 'standard-button button-selected right'
-              : 'standard-button right'
+              ? 'button button-selected right'
+              : 'button right'
           }
           onClick={() => {
             this.props.setView(constants.view_modes.TILE)

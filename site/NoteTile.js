@@ -76,17 +76,17 @@ class NoteTile extends React.Component {
         <div className="note-slim tile-footer">
           <div className="note-slim tile-footer-select">
             {this.props.selected ? (
-              <button
-                onClick={this.markChecked.bind(this)}
-                className="grid-button"
-              >
+                <button
+                  onClick={this.markChecked.bind(this)}
+                  className="button grid-button"
+                >
                 <img src={check_circle} />
               </button>
             ) : (
-              <button
-                onClick={this.markChecked.bind(this)}
-                className="grid-button"
-              >
+                <button
+                  onClick={this.markChecked.bind(this)}
+                  className="button grid-button"
+                >
                 <img src={circle} />
               </button>
             )}

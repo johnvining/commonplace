@@ -87,7 +87,7 @@ function Sidebar() {
                   </span>
                 </Link>
                 <button
-                  className="pin-button pin-button-compact pin-button-inline starred"
+                  className="button pin-button pin-button-compact pin-button-inline pin-button-icon-only starred"
                   onClick={(event) => {
                     event.preventDefault()
                     event.stopPropagation()

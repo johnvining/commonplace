@@ -35,14 +35,14 @@ class NoteSlim extends React.Component {
           {this.props.selected ? (
             <button
               onClick={this.markChecked.bind(this)}
-              className="grid-button"
+              className="button grid-button"
             >
               <img src={check_circle} />
             </button>
           ) : (
             <button
               onClick={this.markChecked.bind(this)}
-              className="grid-button"
+              className="button grid-button"
             >
               <img src={circle} />
             </button>

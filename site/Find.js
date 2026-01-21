@@ -6,10 +6,22 @@ import NoteList from './NoteList'
 import PileList from './PileList'
 import React from 'react'
 import WorkList from './WorkList'
-import { useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import {
+  TopLevelSubTitle,
+  TopLevelTitle,
+  TopLevelTitleContainer,
+} from './TopLevelHeadings'
+import {
+  TopLevelStandardButton,
+  TopLevelStandardButtonContainer,
+} from './TopLevelStandardButton'
 
 function Find(props) {
   const { search } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const showNotesOnly = location.pathname.endsWith('/notes')
 
   const getListOfNotes = async () => {
     return await db.searchNotes(search)
@@ -34,19 +46,39 @@ function Find(props) {
   props.setPageTitle('Find: ' + search)
   return (
     <div>
-      <div>
-        <span className="title">{search}</span>
-      </div>
-      <PileList key={'pileList' + search} getListOfPiles={getListOfPiles} />
-      <AuthorList
-        key={'authorList' + search}
-        getListOfAuthors={getListOfAuthors}
-      />
-      <WorkList key={'workList' + search} getListOfWorks={getListOfWorks} />
-      <IdeaList key={'ideaList' + search} getListOfIdeas={getListOfIdeas} />
+      <TopLevelTitleContainer>
+        <TopLevelTitle>{search}</TopLevelTitle>
+        {showNotesOnly ? (
+          <TopLevelSubTitle>Notes</TopLevelSubTitle>
+        ) : null}
+      </TopLevelTitleContainer>
+      <TopLevelStandardButtonContainer className="top-level-toolbar">
+        {showNotesOnly ? (
+          <TopLevelStandardButton
+            name="Back to results"
+            onClick={() => navigate('/find/' + search)}
+          />
+        ) : (
+          <TopLevelStandardButton
+            name="View notes"
+            onClick={() => navigate('/find/' + search + '/notes')}
+          />
+        )}
+      </TopLevelStandardButtonContainer>
+      {showNotesOnly ? null : (
+        <>
+          <PileList key={'pileList' + search} getListOfPiles={getListOfPiles} />
+          <AuthorList
+            key={'authorList' + search}
+            getListOfAuthors={getListOfAuthors}
+          />
+          <WorkList key={'workList' + search} getListOfWorks={getListOfWorks} />
+          <IdeaList key={'ideaList' + search} getListOfIdeas={getListOfIdeas} />
+        </>
+      )}
       <NoteList
-        key={'search-list-' + props.search}
-        viewMode={constants.view_modes.RESULT}
+        key={'search-list-' + search + (showNotesOnly ? '-notes' : '')}
+        viewMode={showNotesOnly ? props.viewMode : constants.view_modes.RESULT}
         getListOfNotes={getListOfNotes}
       />
     </div>

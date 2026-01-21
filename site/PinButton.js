@@ -17,6 +17,7 @@ function PinButton({
 }) {
   const [pinned, setPinned] = useState(isPinned(type, id))
   const shouldShowLabel = showLabel ?? !compact
+  const iconOnly = compact && !shouldShowLabel
 
   useEffect(() => {
     const handleUpdate = () => setPinned(isPinned(type, id))
@@ -36,9 +37,11 @@ function PinButton({
   return (
     <button
       className={[
+        'button',
         'pin-button',
         pinned ? 'starred' : 'unstarred',
         compact ? 'pin-button-compact' : '',
+        iconOnly ? 'pin-button-icon-only' : '',
         className,
       ]
         .filter(Boolean)

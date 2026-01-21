@@ -859,13 +859,13 @@ class Note extends React.Component {
 
                   <div className="right-div">
                     <button
-                      className={'action-button'}
+                      className={'button action-button'}
                       onClick={this.handleAccept.bind(this)}
                     >
                       <img src={check_circle}></img>
                     </button>
                     <button
-                      className={'action-button'}
+                      className={'button action-button'}
                       onClick={this.toggleCompact.bind(this)}
                     >
                       <img
@@ -873,7 +873,7 @@ class Note extends React.Component {
                       ></img>
                     </button>
                     <button
-                      className={'action-button'}
+                      className={'button action-button'}
                       onClick={() => {
                         this.props.setNoteMode(this.props.id, '')
                       }}
@@ -944,7 +944,7 @@ class Note extends React.Component {
                     id={this.props.id}
                     label={noteLabel}
                     href={`/note/${this.props.id}`}
-                    className="action-button"
+                    className="button action-button"
                     compact={true}
                     showLabel={false}
                     stopPropagation={false}
@@ -955,7 +955,7 @@ class Note extends React.Component {
                     }
                   />
                   <button
-                    className={'action-button'}
+                    className={'button action-button'}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
@@ -967,7 +967,7 @@ class Note extends React.Component {
                     <img src={pile_img}></img>
                   </button>
                   <button
-                    className={'action-button'}
+                    className={'button action-button'}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
@@ -980,14 +980,14 @@ class Note extends React.Component {
                   </button>
                   <Link to={'/note/' + this.props.id}>
                     <button
-                      className={'action-button'}
+                      className={'button action-button'}
                       tabIndex={selected ? null : '-1'}
                     >
                       <img src={document_image}></img>
                     </button>
                   </Link>
                   <button
-                    className={'action-button'}
+                    className={'button action-button'}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
@@ -999,7 +999,7 @@ class Note extends React.Component {
                     <img src={link}></img>
                   </button>
                   <button
-                    className={'action-button'}
+                    className={'button action-button'}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
@@ -1012,7 +1012,7 @@ class Note extends React.Component {
                   </button>
                   <button
                     onClick={this.handleDelete.bind(this)}
-                    className={'action-button'}
+                    className={'button action-button'}
                     tabIndex={selected ? null : '-1'}
                   >
                     <img src={trash}></img>

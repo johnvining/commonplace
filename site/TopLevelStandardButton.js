@@ -2,7 +2,7 @@ import React from 'react'
 import ClickToCopyNick from './ClickToCopyNick'
 
 export function TopLevelStandardButton(props) {
-  let className = 'standard-button'
+  let className = 'button'
   switch (props.position) {
     case 'left':
       className += ' left'
@@ -37,8 +37,8 @@ export function TopLevelStandardButton(props) {
 
 export function TopLevelStandardButtonContainer(props) {
   const containerClassName = props.className
-    ? `top-level-standard-button-container ${props.className}`
-    : 'top-level-standard-button-container'
+    ? `top-level-button-container ${props.className}`
+    : 'top-level-button-container'
   return (
     <div className={containerClassName}>
       {props.children}{' '}

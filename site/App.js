@@ -127,7 +127,7 @@ class App extends React.Component {
           <div className="top-action-bar">
             <div className="tool-bar div">
               <button
-                className="standard-button left-right"
+                className="button left-right"
                 onClick={async () => {
                   this.setState({ barOpen: true })
                 }}
@@ -137,7 +137,7 @@ class App extends React.Component {
             </div>
             <div className="tool-bar div">
               <button
-                className="standard-button left-right"
+                className="button left-right"
                 onClick={async () => {
                   window.location.href = '/'
                 }}
@@ -147,7 +147,7 @@ class App extends React.Component {
             </div>
             <div className="tool-bar div">
               <button
-                className="standard-button left-right"
+                className="button left-right"
                 onClick={async () => {
                   const response = await createNewNoteFromTitle('')
                   window.location.href =
@@ -229,6 +229,15 @@ class App extends React.Component {
               />
               <Route
                 path="/find/:search"
+                element={
+                  <Find
+                    viewMode={this.state.viewMode}
+                    setPageTitle={this.setPageTitle.bind(this)}
+                  />
+                }
+              />
+              <Route
+                path="/find/:search/notes"
                 element={
                   <Find
                     viewMode={this.state.viewMode}

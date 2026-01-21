@@ -968,7 +968,7 @@ div .top-bar {
   opacity: 0.5;
 }
 
-.pin-button:not(.standard-button) {
+.button.pin-button {
   background: transparent;
   border: 1px solid var(--low-intensity-border);
   border-radius: 4px;
@@ -982,7 +982,7 @@ div .top-bar {
   gap: 4px;
 }
 
-.pin-button:not(.standard-button):hover {
+.button.pin-button:hover {
   background-color: var(--semantic-selection);
 }
 
@@ -1010,9 +1010,42 @@ div .top-bar {
   margin-left: auto;
 }
 
-.standard-button.pin-button {
+.button.pin-button {
   border: 1px solid var(--low-intensity-border);
   background-color: var(--button-background);
+}
+
+.pin-button-icon-only {
+  border: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  min-width: auto;
+  height: 22px;
+  width: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.pin-button-icon-only:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.pin-button-icon-only:hover {
+  background-color: var(--button-input-background-selected);
+}
+
+.button.pin-button.pin-button-icon-only {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 22px;
+  height: 22px;
+  width: 22px;
+  background-color: transparent;
 }
 
 .action-button.pin-button {
@@ -1098,7 +1131,7 @@ div .top-bar {
   outline-offset: 1px;
 }
 
-.standard-button {
+.button {
   background-color: var(--button-background);
   border-color: var(--low-intensity-border);
   border-radius: 4px;
@@ -1117,44 +1150,44 @@ div .top-bar {
 }
 
 @media (prefers-color-scheme: dark) {
-  .standard-button img {
+  .button img {
     -webkit-filter: invert(100%);
     filter: invert(100%);
   }
 }
 
-.standard-button+.standard-button {
+.button+.button {
   margin-left: 4px;
 }
 
-.standard-button.left {
+.button.left {
   border-radius: 4px 0px 0px 4px;
   border-right: 0px;
 }
 
-.standard-button.right {
+.button.right {
   border-radius: 0px 4px 4px 0px;
   border-left: 0px;
   margin-left: 0px;
 }
 
-.standard-button.left-right {
+.button.left-right {
   border-radius: 4px 4px 4px 4px;
 }
 
-.standard-button.middle {
+.button.middle {
   border-radius: 0px;
   border-left: 0px;
   border-right: 0px;
   margin-left: 0px;
 }
 
-.standard-button:focus {
+.button:focus {
   border-color: var(--button-border);
   outline: none;
 }
 
-.standard-button:hover {
+.button:hover {
   background-color: var(--button-input-background-selected);
   color: var(--font-color);
   cursor: pointer;
@@ -1162,28 +1195,28 @@ div .top-bar {
   border-color: white;
 }
 
-.standard-button.button-selected {
+.button.button-selected {
   background-color: var(--button-selected);
 }
 
-.standard-button.button-selected img {
+.button.button-selected img {
   -webkit-filter: invert(0%);
   filter: invert(0%);
 }
 
-.standard-button.button-selected:focus {
+.button.button-selected:focus {
   border-color: var(--button-border);
   outline: none;
 }
 
 @media (prefers-color-scheme: dark) {
-  .standard-button.button-selected:hover img {
+  .button.button-selected:hover img {
     -webkit-filter: invert(100%);
     filter: invert(100%);
   }
 }
 
-.standard-button.button-selected:hover {
+.button.button-selected:hover {
   background-color: var(--button-input-background-selected);
   color: var(--font-color);
   cursor: pointer;
@@ -1191,22 +1224,32 @@ div .top-bar {
   border-color: white;
 }
 
-.standard-button.hidden {
+.button.hidden {
   display: none;
 }
 
-.top-level-standard-button-container .standard-button {
+.button.action-button {
+  background-color: transparent;
+  border-style: none;
+  height: 40px;
+  width: 50px;
+  margin: 4px;
+  padding: 4px;
+  display: inline-block;
+}
+
+.top-level-button-container .button {
   font-size: var(--font-size-lg);
   height: 28px;
   padding: 3px 6px;
 }
 
-.top-level-standard-button-container.top-level-toolbar .standard-button {
+.top-level-button-container.top-level-toolbar .button {
   align-items: center;
   line-height: 1;
 }
 
-.top-level-standard-button-container.top-level-toolbar .standard-button .pin-button-icon {
+.top-level-button-container.top-level-toolbar .button .pin-button-icon {
   width: 12px;
   height: 12px;
   display: inline-block;
@@ -1627,6 +1670,12 @@ a.grid-link {
   border-style: none;
   position: relative;
   z-index: 5;
+  padding: 0;
+  height: auto;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1800,13 +1849,27 @@ div .image-row {
   padding: 0px;
   margin: 0px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
+}
+
+.result-box.header > div,
+.result-box.header > span {
+  flex: 0 1 auto;
+  min-width: 0;
+  text-align: left;
 }
 
 .result-box .truncate {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.result-box.header .pin-button-inline {
+  margin-left: auto;
 }
 
 .result-box.content {
