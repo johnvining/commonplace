@@ -63,13 +63,17 @@
   &.outer.tile {
     margin: 0px;
     width: 100%;
-    height: 270px;
+    height: 290px;
     padding: 12px;
     flex-direction: column;
     align-items: stretch;
     border: 1px solid $note_border;
     background-color: $note_background;
     color: $font_color;
+  }
+
+  &.outer.tile.selected {
+    background-color: $semantic_selection;
   }
 
   &.outer.tile .inner.truncate {
@@ -93,6 +97,18 @@
     &.has-images {
       height: 156px;
     }
+
+    &.count-1 {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &.count-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &.count-3plus {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   &.tile-image-frame {
@@ -100,6 +116,11 @@
     overflow: hidden;
     background-color: $note_background;
     height: 72px;
+  }
+
+  &.tile-images.count-1 .tile-image-frame,
+  &.tile-images.count-2 .tile-image-frame {
+    height: 156px;
   }
 
   &.tile-image {
@@ -110,10 +131,24 @@
   }
 
   &.tile-title {
-    margin-bottom: 6px;
+    margin-bottom: 0px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &.tile-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  &.tile-title-link {
+    flex: 1;
+    min-width: 0;
+    text-decoration: none;
+    color: $font_color;
   }
 
   &.tile-text {
@@ -126,7 +161,7 @@
   }
 
   &.tile-body.has-images .tile-text {
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 2;
   }
 
   &.tile-body.no-images .tile-text {

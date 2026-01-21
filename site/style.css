@@ -595,13 +595,17 @@ input .note-full .edit-work {
 .note-slim.outer.tile {
   margin: 0px;
   width: 100%;
-  height: 270px;
+  height: 290px;
   padding: 12px;
   flex-direction: column;
   align-items: stretch;
   border: 1px solid var(--note-border);
   background-color: var(--note-background);
   color: var(--font-color);
+}
+
+.note-slim.outer.tile.selected {
+  background-color: var(--semantic-selection);
 }
 
 .note-slim.tile-body {
@@ -622,11 +626,28 @@ input .note-full .edit-work {
   height: 156px;
 }
 
+.note-slim.tile-images.count-1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.note-slim.tile-images.count-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.note-slim.tile-images.count-3plus {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .note-slim.tile-image-frame {
   border-radius: 4px;
   overflow: hidden;
   background-color: var(--note-background);
   height: 72px;
+}
+
+.note-slim.tile-images.count-1 .note-slim.tile-image-frame,
+.note-slim.tile-images.count-2 .note-slim.tile-image-frame {
+  height: 156px;
 }
 
 .note-slim.tile-image {
@@ -637,10 +658,24 @@ input .note-full .edit-work {
 }
 
 .note-slim.tile-title {
-  margin-bottom: 6px;
+  margin-bottom: 0px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.note-slim.tile-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.note-slim.tile-title-link {
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: var(--font-color);
 }
 
 .note-slim.tile-text {
@@ -653,7 +688,7 @@ input .note-full .edit-work {
 }
 
 .note-slim.tile-body.has-images .tile-text {
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 2;
 }
 
 .note-slim.tile-body.no-images .tile-text {

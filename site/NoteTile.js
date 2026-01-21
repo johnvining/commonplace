@@ -22,7 +22,10 @@ class NoteTile extends React.Component {
       ? 'note-slim outer selected'
       : 'note-slim outer'
 
-    const hasImages = this.props.note.imageUrls?.length > 0
+    const imageCount = this.props.note.imageUrls?.length || 0
+    const hasImages = imageCount > 0
+    const imageLayoutClass =
+      imageCount === 1 ? 'count-1' : imageCount === 2 ? 'count-2' : 'count-3plus'
 
     return (
       <div className={outerClassName + ' tile'}>
@@ -33,8 +36,18 @@ class NoteTile extends React.Component {
               : 'note-slim tile-body no-images'
           }
         >
-          <Link to={'/note/' + this.props.id} className="note-slim">
-            <div tabIndex={this.props.tabIndex} className="note-slim">
+          <div className="note-slim tile-header">
+            <button
+              onClick={this.markChecked.bind(this)}
+              className="button grid-button"
+            >
+              <img src={this.props.selected ? check_circle : circle} />
+            </button>
+            <Link
+              to={'/note/' + this.props.id}
+              className="note-slim tile-title-link"
+              tabIndex={this.props.tabIndex}
+            >
               <div className="note-slim tile-title">
                 <b>
                   {this.props.note.title?.length
@@ -43,8 +56,14 @@ class NoteTile extends React.Component {
                   .
                 </b>
               </div>
+            </Link>
+          </div>
+          <Link to={'/note/' + this.props.id} className="note-slim tile-link">
+            <div tabIndex="-1" className="note-slim">
               {hasImages ? (
-                <div className="note-slim tile-images has-images">
+                <div
+                  className={`note-slim tile-images has-images ${imageLayoutClass}`}
+                >
                   {this.props.note.imageUrls.slice(0, 4).map((url, idx) => (
                     <div
                       className="note-slim tile-image-frame"
@@ -74,23 +93,6 @@ class NoteTile extends React.Component {
           </div>
         </div>
         <div className="note-slim tile-footer">
-          <div className="note-slim tile-footer-select">
-            {this.props.selected ? (
-                <button
-                  onClick={this.markChecked.bind(this)}
-                  className="button grid-button"
-                >
-                <img src={check_circle} />
-              </button>
-            ) : (
-                <button
-                  onClick={this.markChecked.bind(this)}
-                  className="button grid-button"
-                >
-                <img src={circle} />
-              </button>
-            )}
-          </div>
           <div className="note-slim tile-footer-meta">
             <WorkCitationSpan
               authorName={
