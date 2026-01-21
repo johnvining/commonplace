@@ -109,6 +109,11 @@ class Note extends React.Component {
       return true
     }
 
+    if (shortcuts.note.editLinks(event) && selected && !anyEditMode) {
+      this.props.setNoteMode(this.props.id, constants.note_modes.EDIT_LINKS)
+      return true
+    }
+
     // Section 5.4: Note Links Mode
     if (shortcuts.note.addLink(event) && editLinks) {
       this.handleNewNoteLink()

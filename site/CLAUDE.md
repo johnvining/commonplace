@@ -64,6 +64,7 @@ Most specific (highest priority) to least specific:
 | `Ctrl+N` | New note | ENTITY_PAGE |
 | `Ctrl+P` | Edit piles | ENTITY_PAGE, NOTE_LIST |
 | `Ctrl+T` | Edit tags/ideas | NOTE_LIST |
+| `Ctrl+L` | Add links | NOTE_SELECTED |
 | `Ctrl+F` | Format text | NOTE_EDIT |
 | `Ctrl+S` | Suggest title/ideas | NOTE_EDIT, AUTOCOMPLETE |
 | `Ctrl+R` | OCR | NOTE_EDIT |

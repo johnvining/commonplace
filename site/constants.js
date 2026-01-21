@@ -60,6 +60,7 @@ export const keyCodes = {
   tile: 52, // 4
   ocr: 82, // r (changed from c to avoid conflict with copy)
   image: 73, // i
+  link: 76, // l
   nextImage: 75, //k
   prevImage: 74, //j
   help: 191, // / (forward slash) - Ctrl+/ for help

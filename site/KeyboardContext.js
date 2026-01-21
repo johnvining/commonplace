@@ -185,6 +185,7 @@ export const shortcuts = {
     toggleImage: (e) => isKey(e, constants.keyCodes.image, { ctrl: true }),
     prevImage: (e) => isKey(e, constants.keyCodes.prevImage, { ctrl: true }),
     nextImage: (e) => isKey(e, constants.keyCodes.nextImage, { ctrl: true }),
+    editLinks: (e) => isKey(e, constants.keyCodes.link, { ctrl: true }),
     addLink: (e) => isKey(e, constants.keyCodes.enter),
     star: (e) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
   },

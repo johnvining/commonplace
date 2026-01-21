@@ -102,6 +102,7 @@ Shortcuts for navigating and selecting notes. **Only works in Full view mode.**
 | `Ctrl+E` | Edit note content |
 | `Ctrl+T` | Edit tags/ideas |
 | `Ctrl+P` | Edit piles |
+| `Ctrl+L` | Add links |
 | `Ctrl+S` | Star/unstar selected note |
 
 ---

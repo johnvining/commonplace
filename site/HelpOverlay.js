@@ -105,6 +105,10 @@ function HelpOverlay({ isVisible, onClose, currentContext }) {
         )
       }
 
+      if (currentContext.noteMode === constants.note_modes.SELECTED) {
+        noteShortcuts.push({ key: 'Ctrl+L', action: 'Add link' })
+      }
+
       sections.push({
         title: 'Note Editing',
         shortcuts: noteShortcuts,
