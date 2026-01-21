@@ -95,7 +95,7 @@ class Note extends React.Component {
 
     // Section 5.1: Save and Exit
     if (shortcuts.note.exitEdit(event) && anyEditMode) {
-      this.props.setNoteMode('', '')
+      this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
       return true
     }
 
@@ -317,7 +317,7 @@ class Note extends React.Component {
     }
 
     this.setState({ keep: true })
-    this.props.setNoteMode(constants.note_modes.SELECTED)
+    this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
     await db
       .updateRecord(db.types.note, this.props.id, updateObject)
       .then(this.props.refetchMe(this.props.index))

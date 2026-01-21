@@ -228,10 +228,6 @@ class NoteList extends React.Component {
   }
 
   setNoteMode(noteId, mode) {
-    if (mode == constants.note_modes.SELECTED) {
-      let divToFocus = document.getElementById(noteId)
-      if (divToFocus) divToFocus.focus()
-    }
     this.setState(
       {
         selectedNote: noteId,
@@ -244,6 +240,13 @@ class NoteList extends React.Component {
             const takeArea = document.querySelector('#take')
             if (textArea) autosize(textArea)
             if (takeArea) autosize(takeArea)
+          })
+        }
+
+        if (mode === constants.note_modes.SELECTED) {
+          requestAnimationFrame(() => {
+            const divToFocus = document.getElementById(noteId)
+            if (divToFocus) divToFocus.focus()
           })
         }
       }
