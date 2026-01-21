@@ -55,6 +55,7 @@ class NoteList extends React.Component {
         }
 
         this.clearSelection()
+        this.focusFirstNote()
       }
     )
 
@@ -136,7 +137,10 @@ class NoteList extends React.Component {
       notes: response.data.data,
       page: this.state.page + 1,
       selectedArray: [],
+      selectedNote: '',
+      focusType: constants.note_modes.NO_SELECTION,
     })
+    this.focusFirstNote()
   }
 
   async decPage() {
@@ -148,6 +152,28 @@ class NoteList extends React.Component {
       notes: response.data.data,
       page: this.state.page - 1,
       selectedArray: [],
+      selectedNote: '',
+      focusType: constants.note_modes.NO_SELECTION,
+    })
+    this.focusFirstNote()
+  }
+
+  focusFirstNote() {
+    if (this.props.viewMode !== constants.view_modes.FULL) {
+      return
+    }
+    if (this.props.editFirst) {
+      return
+    }
+    const firstNoteId = this.state.notes?.[0]?._id
+    if (!firstNoteId) {
+      return
+    }
+    requestAnimationFrame(() => {
+      const element = document.getElementById(firstNoteId)
+      if (element) {
+        element.focus()
+      }
     })
   }
 
