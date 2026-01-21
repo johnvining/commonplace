@@ -25,8 +25,8 @@ function Login(props) {
   }
 
   return (
-    <div>
-      <form onSubmit={handleSubmitPassword}>
+    <div className="login-page">
+      <form onSubmit={handleSubmitPassword} className="login-form">
         <TopLevelFormContainer>
           <TopLevelFormInput
             name="Password"

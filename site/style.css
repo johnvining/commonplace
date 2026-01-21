@@ -762,6 +762,21 @@ html {
   color: var(--font-color);
 }
 
+.login-page {
+  display: flex;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+.login-form {
+  width: min(420px, 100%);
+  padding: 24px;
+  border: 1px solid var(--note-border);
+  border-radius: 8px;
+  background-color: var(--note-background);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
 body {
   background: var(--background-color);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
