@@ -75,30 +75,25 @@ class NoteList extends React.Component {
 
     // Section 4.2: Quick Edit shortcuts (Ctrl+key)
     if (event.ctrlKey) {
-      let activeNoteId = this.getActiveNoteId(event) || this.state.selectedNote
-      if (!activeNoteId && this.state.notes?.length) {
-        activeNoteId = this.state.notes[0]._id
+      if (
+        this.state.focusType !== constants.note_modes.SELECTED ||
+        !this.state.selectedNote
+      ) {
+        return false
       }
+
+      const activeNoteId = this.state.selectedNote
       switch (event.keyCode) {
         case constants.keyCodes.edit:
-          this.setNoteMode(
-            activeNoteId,
-            constants.note_modes.EDIT
-          )
+          this.setNoteMode(activeNoteId, constants.note_modes.EDIT)
           autosize(document.querySelector('#text'))
           autosize(document.querySelector('#take'))
           return true
         case constants.keyCodes.ideas:
-          this.setNoteMode(
-            activeNoteId,
-            constants.note_modes.EDIT_IDEAS
-          )
+          this.setNoteMode(activeNoteId, constants.note_modes.EDIT_IDEAS)
           return true
         case constants.keyCodes.piles:
-          this.setNoteMode(
-            activeNoteId,
-            constants.note_modes.EDIT_PILES
-          )
+          this.setNoteMode(activeNoteId, constants.note_modes.EDIT_PILES)
           return true
       }
     }
