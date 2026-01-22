@@ -73,6 +73,17 @@ class NoteList extends React.Component {
       return false
     }
 
+    if (
+      [
+        constants.note_modes.EDIT,
+        constants.note_modes.EDIT_IDEAS,
+        constants.note_modes.EDIT_PILES,
+        constants.note_modes.EDIT_LINKS,
+      ].includes(this.state.focusType)
+    ) {
+      return false
+    }
+
     // Section 4.2: Quick Edit shortcuts (Ctrl+key)
     if (event.ctrlKey) {
       if (
