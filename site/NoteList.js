@@ -177,12 +177,6 @@ class NoteList extends React.Component {
   }
 
   focusFirstNote() {
-    if (this.props.viewMode !== constants.view_modes.FULL) {
-      return
-    }
-    if (this.props.editFirst) {
-      return
-    }
     const firstNoteId = this.state.notes?.[0]?._id
     if (!firstNoteId) {
       return
