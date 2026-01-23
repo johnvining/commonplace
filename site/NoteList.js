@@ -43,11 +43,13 @@ class NoteList extends React.Component {
       this.state.page
     )
 
+    const notes = this.props.reverse
+      ? response.data.data.reverse()
+      : response.data.data
+
     this.setState(
       {
-        notes: this.props.reverse
-          ? response.data.data.reverse()
-          : response.data.data,
+        notes: notes,
       },
       () => {
         for (var i = 0; i < this.state.notes?.length; i++) {
@@ -56,14 +58,24 @@ class NoteList extends React.Component {
 
         this.clearSelection()
         this.focusFirstNote()
+
+        const firstNoteId = this.state.notes?.[0]?._id
+        if (!firstNoteId) {
+          return
+        }
+
+        if (this.props.editFirst) {
+          this.setNoteMode(firstNoteId, constants.note_modes.EDIT)
+          autosize(document.querySelector('#text'))
+          autosize(document.querySelector('#take'))
+          return
+        }
+
+        if (this.props.fromNoteView) {
+          this.setNoteMode(firstNoteId, constants.note_modes.SELECTED)
+        }
       }
     )
-
-    if (this.props.editFirst && this.state.notes[0]) {
-      this.setNoteMode(this.state.notes[0]._id, constants.note_modes.EDIT)
-      autosize(document.querySelector('#text'))
-      autosize(document.querySelector('#take'))
-    }
   }
 
   // Section 4: Note List keyboard shortcuts - called from wrapper
