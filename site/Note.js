@@ -21,6 +21,7 @@ import * as constants from './constants'
 import autosize from 'autosize'
 import YearUrlComboSpan from './YearUrlComboSpan'
 import WorkCitationSpan from './WorkCitationSpan'
+import { marked } from 'marked'
 import ClickToCopyNick from './ClickToCopyNick'
 import ClickableLabelButton from './ClickableLabelButton'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
@@ -637,14 +638,15 @@ class Note extends React.Component {
             <div name="text" className="width-100">
               <div
                 className={
-                  'note-full note-text' +
+                  'note-full note-text markdown' +
                   (this.state.largeImage >= 0 && (edit_ideas || edit_piles)
                     ? ' abbreviate'
                     : '')
                 }
-              >
-                {this.state.pendingText}
-              </div>
+                dangerouslySetInnerHTML={{
+                  __html: marked(this.state.pendingText || ''),
+                }}
+              />
             </div>
           ) : null}
 
@@ -663,9 +665,12 @@ class Note extends React.Component {
             </div>
           ) : this.state.pendingTake ? (
             <div name="take" className="width-100">
-              <div className="note-full note-take">
-                {this.state.pendingTake}
-              </div>
+              <div
+                className="note-full note-take markdown"
+                dangerouslySetInnerHTML={{
+                  __html: marked(this.state.pendingTake || ''),
+                }}
+              />
             </div>
           ) : null}
 

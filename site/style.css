@@ -247,6 +247,34 @@
   -webkit-box-orient: vertical;
 }
 
+.note-full .note-text.markdown,
+.note-full .note-take.markdown {
+  white-space: normal;
+}
+
+.note-full .note-text.markdown p,
+.note-full .note-take.markdown p {
+  margin: 0 0 0.5em 0;
+}
+
+.note-full .note-text.markdown p:last-child,
+.note-full .note-take.markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.note-full .note-text.markdown ul,
+.note-full .note-text.markdown ol,
+.note-full .note-take.markdown ul,
+.note-full .note-take.markdown ol {
+  margin: 0 0 0.5em 1.25em;
+  padding: 0;
+}
+
+.note-full .note-text.markdown li,
+.note-full .note-take.markdown li {
+  margin: 0;
+}
+
 .note-full .title,
 .note-full .url {
   width: 100%;
