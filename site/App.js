@@ -10,6 +10,7 @@ import Idea from './Idea'
 import Login from './Login'
 import Load from './Load'
 import NoteView from './NoteView'
+import NickView from './NickView'
 import Pile from './Pile'
 import PileHome from './PileHome'
 import plus from 'url:./icons/plus.svg'
@@ -260,7 +261,7 @@ class App extends React.Component {
               />
               <Route
                 path="/nick/:nick"
-                element={<NoteView setPageTitle={this.setPageTitle.bind(this)} />}
+                element={<NickView setPageTitle={this.setPageTitle.bind(this)} />}
               />
               <Route
                 path="/note/:id/edit"
