@@ -13,6 +13,9 @@ function Load(props) {
   const [pendingImportText, setPendingImportText] = useState('')
   const [notesImported, setNotesImported] = useState(-1)
   const [importFormat, setImportFormat] = useState('csv')
+  const [importing, setImporting] = useState(false)
+  const [importProgress, setImportProgress] = useState(null)
+  const cancelRef = React.useRef(false)
   const navigate = useNavigate()
 
   const parseUrlLine = (line) => {
@@ -56,6 +59,8 @@ function Load(props) {
     }
 
     for (const line of lines) {
+      if (cancelRef.current) break
+      setImportProgress({ done: importedCount, total: lines.length })
       const url = parseUrlLine(line) || line
       const title = url
       const noteResponse = await db.createNewNoteFromTitle(title)
@@ -79,20 +84,31 @@ function Load(props) {
     }
 
     setNotesImported(importedCount)
+    setImportProgress(null)
   }
 
   const handleImport = async () => {
+    cancelRef.current = false
+    setImporting(true)
+    setNotesImported(-1)
     let importText = pendingImportText
     setPendingImportText('')
-    if (importFormat === 'csv') {
-      let imported = await db.importNotesCsv(importText)
-      setNotesImported(imported.data.data)
-      // TODO: Error handling on bad CSV
-      // TODO: Validate CSV then load all records, rather than erroring midway through
-      return
+    try {
+      if (importFormat === 'csv') {
+        let imported = await db.importNotesCsv(importText)
+        setNotesImported(imported.data.data)
+        // TODO: Error handling on bad CSV
+        // TODO: Validate CSV then load all records, rather than erroring midway through
+      } else {
+        await importUrlsAsNotes()
+      }
+    } finally {
+      setImporting(false)
     }
+  }
 
-    await importUrlsAsNotes()
+  const handleCancel = () => {
+    cancelRef.current = true
   }
 
   props.setPageTitle('Import Notes')
@@ -144,10 +160,17 @@ function Load(props) {
           }}
         />
         <TopLevelStandardButtonContainer>
-          <TopLevelStandardButton name="Submit" onClick={handleImport} />
+          <TopLevelStandardButton name="Submit" onClick={handleImport} disabled={importing} />
+          {importing && (
+            <TopLevelStandardButton name="Cancel" onClick={handleCancel} />
+          )}
         </TopLevelStandardButtonContainer>
         <span>
-          {notesImported > -1 ? notesImported + ' notes imported' : null}
+          {importing && importProgress
+            ? `Importing… ${importProgress.done} / ${importProgress.total}`
+            : notesImported > -1
+            ? notesImported + ' notes imported'
+            : null}
         </span>
       </div>
     </div>
