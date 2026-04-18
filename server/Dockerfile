@@ -2,13 +2,15 @@
 # https://medium.com/mozilla-club-bbsr/dockerizing-a-mern-stack-web-application-ebf78babf136
 
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Create App Directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install Dependencies
+RUN npm install -g npm@latest
+
 COPY package*.json ./
 
 # --no-cache: download package index on-the-fly, no need to cleanup afterwards
