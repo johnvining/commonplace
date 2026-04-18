@@ -51,6 +51,39 @@ class Note extends React.Component {
     linkedNotes: {},
   }
 
+  _beforeUnloadHandler = (e) => {
+    e.preventDefault()
+    e.returnValue = ''
+  }
+
+  isInEditMode() {
+    return [
+      constants.note_modes.EDIT,
+      constants.note_modes.EDIT_IDEAS,
+      constants.note_modes.EDIT_PILES,
+      constants.note_modes.EDIT_LINKS,
+    ].includes(this.props.mode)
+  }
+
+  componentDidUpdate(prevProps) {
+    const wasEditing = [
+      constants.note_modes.EDIT,
+      constants.note_modes.EDIT_IDEAS,
+      constants.note_modes.EDIT_PILES,
+      constants.note_modes.EDIT_LINKS,
+    ].includes(prevProps.mode)
+    const isEditing = this.isInEditMode()
+    if (!wasEditing && isEditing) {
+      window.addEventListener('beforeunload', this._beforeUnloadHandler)
+    } else if (wasEditing && !isEditing) {
+      window.removeEventListener('beforeunload', this._beforeUnloadHandler)
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('beforeunload', this._beforeUnloadHandler)
+  }
+
   componentDidMount() {
     if (this.props.note.nick) {
       this.setState({ nick: this.props.note.nick })
