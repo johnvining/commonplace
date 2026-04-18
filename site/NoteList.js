@@ -278,13 +278,13 @@ class NoteList extends React.Component {
   }
 
   markChecked(noteIndex) {
-    let tempSelectedArray = this.state.selectedArray
+    const tempSelectedArray = [...this.state.selectedArray]
     tempSelectedArray[noteIndex] = !tempSelectedArray[noteIndex] ?? false
     this.setState({ selectedArray: tempSelectedArray, anchorIndex: noteIndex })
   }
 
   markShiftChecked(noteIndex) {
-    let tempSelectedArray = this.state.selectedArray
+    const tempSelectedArray = [...this.state.selectedArray]
     if (noteIndex > this.state.anchorIndex) {
       if (noteIndex > this.state.lastTouchedIndex) {
         for (let i = this.state.anchorIndex; i <= noteIndex; i++) {
