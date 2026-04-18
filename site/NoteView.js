@@ -32,10 +32,13 @@ function NoteView(props) {
         })
     }
 
-    if (notesResponse.data.data[0].title) {
-      props.setPageTitle(notesResponse.data.data[0].title)
-    } else if (notesResponse.data.data[0].text) {
-      props.setPageTitle(notesResponse.data.data[0].text)
+    const note = notesResponse?.data?.data?.[0]
+    if (!note) return notesResponse
+
+    if (note.title) {
+      props.setPageTitle(note.title)
+    } else if (note.text) {
+      props.setPageTitle(note.text)
     } else {
       props.setPageTitle('Untitled Note')
     }
