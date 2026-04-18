@@ -30,6 +30,10 @@ class Autocomplete extends React.Component {
     })
   }
 
+  componentWillUnmount() {
+    clearTimeout(this._debounceTimer)
+  }
+
   // Section 6: Autocomplete keyboard shortcuts - called from wrapper
   handleKeyboardShortcut(event) {
     // Section 6.1: Navigation
@@ -78,11 +82,14 @@ class Autocomplete extends React.Component {
     return false
   }
 
+  _debounceTimer = null
+
   handleTypingChange = (val) => {
     this.setState(
       { hideResults: false, currentTypedText: val.target.value },
       () => {
-        this.handleTextUpdate()
+        clearTimeout(this._debounceTimer)
+        this._debounceTimer = setTimeout(() => this.handleTextUpdate(), 300)
       }
     )
   }
