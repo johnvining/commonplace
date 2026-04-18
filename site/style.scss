@@ -764,6 +764,13 @@ a {
   }
 }
 
+.search-bar-error {
+  font-size: 0.8rem;
+  color: #e53e3e;
+  padding: 2px 8px;
+  align-self: center;
+}
+
 .search-bar {
   &.container {
     border-width: 1px;

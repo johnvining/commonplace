@@ -9,6 +9,7 @@ import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 function SearchBar(props) {
   const [modifier, setModifier] = useState('')
   const [typedText, setTypedText] = useState('')
+  const [searchError, setSearchError] = useState('')
   const navigate = useNavigate()
 
   const handleExecute = async () => {
@@ -137,6 +138,7 @@ function SearchBar(props) {
       const nickResponse = await db.getNick(currentText)
       const nickData = nickResponse?.data?.data
       if (!nickData) {
+        setSearchError('Nick not found')
         return
       }
       props.beforeNavigate()
@@ -153,9 +155,12 @@ function SearchBar(props) {
         case 'p':
           navigate('/pile/' + nickData.pile)
           return
+        default:
+          setSearchError('Nick not found')
       }
     } catch (error) {
       console.error('Error fetching nick', error)
+      setSearchError('Nick not found')
     }
   }
 
@@ -197,6 +202,7 @@ function SearchBar(props) {
   )
 
   const handleTextChange = (input) => {
+    setSearchError('')
     setTypedText(input.target.value)
     if (!modifier) {
       var text = input.target.value.toLowerCase()
@@ -296,6 +302,7 @@ function SearchBar(props) {
       {modifier.length ? (
         <div className="search-bar current-modifier">{modifier}</div>
       ) : null}
+      {searchError && <div className="search-bar-error">{searchError}</div>}
 
       {showAutocomplete ? (
         <Autocomplete
