@@ -53,10 +53,7 @@ class NoteList extends React.Component {
         notes: notes,
       },
       () => {
-        for (var i = 0; i < this.state.notes?.length; i++) {
-          this.getImagesForNoteAtIndex(i, false)
-        }
-
+        this.setupImageObserver()
         this.clearSelection()
         this.focusFirstNote()
 
@@ -153,14 +150,17 @@ class NoteList extends React.Component {
       this.props.index,
       this.state.page + 1
     )
-    this.setState({
-      notes: response.data.data,
-      page: this.state.page + 1,
-      selectedArray: [],
-      selectedNote: '',
-      focusType: constants.note_modes.NO_SELECTION,
-      pageLoading: false,
-    })
+    this.setState(
+      {
+        notes: response.data.data,
+        page: this.state.page + 1,
+        selectedArray: [],
+        selectedNote: '',
+        focusType: constants.note_modes.NO_SELECTION,
+        pageLoading: false,
+      },
+      () => this.setupImageObserver()
+    )
     this.focusFirstNote()
   }
 
@@ -170,14 +170,17 @@ class NoteList extends React.Component {
       this.props.index,
       this.state.page - 1
     )
-    this.setState({
-      notes: response.data.data,
-      page: this.state.page - 1,
-      selectedArray: [],
-      selectedNote: '',
-      focusType: constants.note_modes.NO_SELECTION,
-      pageLoading: false,
-    })
+    this.setState(
+      {
+        notes: response.data.data,
+        page: this.state.page - 1,
+        selectedArray: [],
+        selectedNote: '',
+        focusType: constants.note_modes.NO_SELECTION,
+        pageLoading: false,
+      },
+      () => this.setupImageObserver()
+    )
     this.focusFirstNote()
   }
 
@@ -205,6 +208,37 @@ class NoteList extends React.Component {
     if (this.props.fromNoteView) {
       this.props.setPageTitle(notes[0].title)
     }
+  }
+
+  setupImageObserver() {
+    if (this._imageObserver) {
+      this._imageObserver.disconnect()
+    }
+    this._imageObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.dataset.noteIndex, 10)
+            if (!isNaN(index)) {
+              this.getImagesForNoteAtIndex(index, false)
+              this._imageObserver.unobserve(entry.target)
+            }
+          }
+        })
+      },
+      { rootMargin: '200px' }
+    )
+    this.state.notes.forEach((note, index) => {
+      const el = document.getElementById(note._id)
+      if (el) {
+        el.dataset.noteIndex = index
+        this._imageObserver.observe(el)
+      }
+    })
+  }
+
+  componentWillUnmount() {
+    if (this._imageObserver) this._imageObserver.disconnect()
   }
 
   async getImagesForNoteAtIndex(index, refetch) {
