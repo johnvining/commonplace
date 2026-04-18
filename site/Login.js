@@ -9,19 +9,17 @@ import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
 function Login(props) {
   const [password, setPassword] = useState('')
-  const [redirect, setRedirect] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmitPassword = async (e) => {
-    e.preventDefault() // Prevent navigating to new page on submit
-    await db
-      .getAuthentication(password)
-      .then((response) => {
-        const token = response.data.token
-        props.onTokenReceived(token)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
+    e.preventDefault()
+    setError('')
+    try {
+      const response = await db.getAuthentication(password)
+      props.onTokenReceived(response.data.token)
+    } catch {
+      setError('Incorrect password')
+    }
   }
 
   return (
@@ -36,6 +34,7 @@ function Login(props) {
             }}
             type="password"
           />
+          {error && <p className="login-error">{error}</p>}
           <TopLevelStandardButtonContainer>
             <TopLevelStandardButton name="Submit" type="submit" />
           </TopLevelStandardButtonContainer>

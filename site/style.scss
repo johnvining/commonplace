@@ -52,6 +52,12 @@ html {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
+.login-error {
+  color: #e53e3e;
+  font-size: 0.875rem;
+  margin: 4px 0 8px;
+}
+
 body {
   background: $background_color;
   font-family: $main_font;
