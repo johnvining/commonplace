@@ -28,7 +28,7 @@ export const getAutoComplete = async (req, res, withCounts = false) => {
 }
 
 export const findAuthorsByString = async function (str, withCounts) {
-  let authors = await Auth.find({ name: new RegExp(str, 'i') })
+  let authors = await Auth.find({ name: new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
   if (!withCounts) {

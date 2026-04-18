@@ -57,7 +57,7 @@ export const reqGetAutoComplete = async (req, res, withCounts = false) => {
 }
 
 export const findIdeasByString = async function(string, withCounts = false) {
-  let ideas = await Idea.find({ name: new RegExp(string, 'i') })
+  let ideas = await Idea.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
   if (!withCounts) {

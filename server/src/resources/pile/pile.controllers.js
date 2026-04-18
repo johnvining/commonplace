@@ -58,7 +58,7 @@ export const reqDeletePile = async (req, res) => {
 
 // TODO: Duplicative of whats in work.controllers.js
 export const filePilesByString = async function (string, withCounts) {
-  let piles = await Pile.find({ name: new RegExp(string, 'i') })
+  let piles = await Pile.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
   if (!withCounts) {

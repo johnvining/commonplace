@@ -84,7 +84,7 @@ export const reqRemovePileFromWork = async (req, res) => {
 }
 
 export const findWorksByString = async function(string, withCounts = false) {
-  let works = await Work.find({ name: new RegExp(string, 'i') })
+  let works = await Work.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .populate('author')
     .lean()
     .exec()
