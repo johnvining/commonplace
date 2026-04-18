@@ -25,7 +25,7 @@ export const removeOne = model => async (req, res) => {
 
 export const updateOne = model => async (req, res) => {
   const id = req.params.id
-  await model.findOneAndUpdate({ _id: id }, req.body)
+  await model.findOneAndUpdate({ _id: id }, { $set: req.body })
   res.status(200).end()
 }
 
