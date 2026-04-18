@@ -82,15 +82,13 @@ export const reqAuthorizeUser = async (req, res) => {
             token: token,
           })
         } else {
-          res.status(400).json({ message: 'Login not succesful' })
+          res.status(400).json({ message: 'Incorrect password' })
         }
       })
     }
   } catch (error) {
-    res.status(400).json({
-      message: 'An error occurred',
-      error: error.message,
-    })
+    console.error(error)
+    res.status(400).json({ message: 'An error occurred' })
   }
 }
 
