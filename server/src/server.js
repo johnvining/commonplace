@@ -24,6 +24,11 @@ app.disable('x-powered-by')
 app.use(
   fileUpload({
     createParentPath: true,
+    limits: { fileSize: 20 * 1024 * 1024 },
+    abortOnLimit: true,
+    useTempFiles: true,
+    safeFileNames: true,
+    preserveExtension: true,
   })
 )
 
