@@ -4,7 +4,7 @@
 
 FROM node:22-alpine
 
-RUN corepack enable && corepack prepare npm@latest --activate
+RUN corepack enable && corepack prepare npm@11 --activate
 
 # Create App Directory
 RUN mkdir -p /usr/src/app
