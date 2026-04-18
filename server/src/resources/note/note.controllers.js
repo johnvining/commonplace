@@ -127,7 +127,8 @@ export const reqAddImageToNote = async (req, res) => {
       let currentNote = await Note.findOne({ _id: req.params.id })
       let numberNotes = currentNote.images.length + 1
 
-      let localPath = req.params.id + '/' + numberNotes + '-' + image.name
+      const safeName = image.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+      let localPath = req.params.id + '/' + numberNotes + '-' + safeName
 
       image.mv(config.imageStorePath + '/' + localPath)
 
