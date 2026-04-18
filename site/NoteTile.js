@@ -4,7 +4,7 @@ import circle from 'url:./icons/circle.svg'
 import check_circle from 'url:./icons/check_circle.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 
-class NoteTile extends React.Component {
+class NoteTile extends React.PureComponent {
   markChecked(e) {
     if (e.shiftKey) {
       this.props.markShiftChecked(this.props.index)

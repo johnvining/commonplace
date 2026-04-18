@@ -4,7 +4,7 @@ import note_img from 'url:./icons/write.svg'
 import NoteAuthorSpan from './NoteAuthorSpan'
 import PinButton from './PinButton'
 
-class NoteResult extends React.Component {
+class NoteResult extends React.PureComponent {
   render() {
     const note = this.props.note
     const author = <NoteAuthorSpan note={note} separator=": " />

@@ -5,7 +5,7 @@ import check_circle from 'url:./icons/check_circle.svg'
 import NoteAuthorSpan from './NoteAuthorSpan'
 import WorkCitationSpan from './WorkCitationSpan'
 
-class NoteSlim extends React.Component {
+class NoteSlim extends React.PureComponent {
   state = {}
 
   markChecked(e) {
