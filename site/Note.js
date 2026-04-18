@@ -239,13 +239,14 @@ class Note extends React.Component {
   }
 
   fetchLinkedNotes() {
-    db.getLinkedNotes(this.props.id).then((response) => {
-      let dict = {}
-      response.data.data.forEach(async (element) => {
-        dict[element._id] = (await db.getNoteNick(element._id)).data.data.key
-        // TODO: Smarter way of doing this
-        this.setState({ linkedNotes: dict })
-      })
+    db.getLinkedNotes(this.props.id).then(async (response) => {
+      const entries = await Promise.all(
+        response.data.data.map(async (element) => {
+          const nick = (await db.getNoteNick(element._id)).data.data.key
+          return [element._id, nick]
+        })
+      )
+      this.setState({ linkedNotes: Object.fromEntries(entries) })
     })
   }
 
