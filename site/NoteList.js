@@ -28,6 +28,7 @@ class NoteList extends React.Component {
     lastTouchedIndex: 0,
     useGridView: 1,
     page: 1,
+    pageLoading: false,
   }
 
   getActiveNoteId(event) {
@@ -147,6 +148,7 @@ class NoteList extends React.Component {
   }
 
   async incPage() {
+    this.setState({ pageLoading: true })
     const response = await this.props.getListOfNotes(
       this.props.index,
       this.state.page + 1
@@ -157,11 +159,13 @@ class NoteList extends React.Component {
       selectedArray: [],
       selectedNote: '',
       focusType: constants.note_modes.NO_SELECTION,
+      pageLoading: false,
     })
     this.focusFirstNote()
   }
 
   async decPage() {
+    this.setState({ pageLoading: true })
     const response = await this.props.getListOfNotes(
       this.props.index,
       this.state.page - 1
@@ -172,6 +176,7 @@ class NoteList extends React.Component {
       selectedArray: [],
       selectedNote: '',
       focusType: constants.note_modes.NO_SELECTION,
+      pageLoading: false,
     })
     this.focusFirstNote()
   }
@@ -594,13 +599,14 @@ class NoteList extends React.Component {
               />
             </TopLevelStandardButtonContainer>
 
-            <div>p. {this.state.page}</div>
+            <div>p. {this.state.pageLoading ? '…' : this.state.page}</div>
 
             <TopLevelStandardButtonContainer>
               <TopLevelStandardButton
                 onClick={this.decPage.bind(this)}
                 multiSelect={true}
                 position={this.state.page == 1 ? 'hidden' : 'left'}
+                disabled={this.state.pageLoading}
               >
                 <img src={left} />
               </TopLevelStandardButton>
@@ -608,6 +614,7 @@ class NoteList extends React.Component {
                 onClick={this.incPage.bind(this)}
                 multiSelect={true}
                 position={this.state.page == 1 ? 'left-right' : 'right'}
+                disabled={this.state.pageLoading}
               >
                 <img src={right} />
               </TopLevelStandardButton>
