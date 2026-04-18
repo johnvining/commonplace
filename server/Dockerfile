@@ -19,8 +19,6 @@ RUN apk --no-cache --virtual build-dependencies add \
     make \
     g++ \
     && npm install \
-    && npm i openai\
-    && npm i tesseract.js\
     && apk del build-dependencies
 
 # Copy app source code
