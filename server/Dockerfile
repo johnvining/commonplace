@@ -9,8 +9,6 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 # Install Dependencies
-RUN npm install -g npm@latest
-
 COPY package*.json ./
 
 # --no-cache: download package index on-the-fly, no need to cleanup afterwards
