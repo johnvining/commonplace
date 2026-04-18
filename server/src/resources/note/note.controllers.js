@@ -19,7 +19,7 @@ const pageSize = 40
 
 export const reqFindNotesByString = async (req, res) => {
   return await findNotesAndPopulate(
-    { $text: { $search: '"' + req.body.searchString + '"' } },
+    { $text: { $search: '"' + req.body.searchString.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"' } },
     {}
   )
 }
