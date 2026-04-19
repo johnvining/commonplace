@@ -1,3 +1,4 @@
+@charset "UTF-8";
 :root {
   --background-color: #F7FCF7;
   --semantic-idea: rgb(185.3, 221.85, 233.75);
@@ -380,12 +381,17 @@ input .note-full .edit-work {
   }
 }
 .note-full.form-label {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   padding: 2px;
-  text-transform: uppercase;
   font-family: "Avenir", "Candara", "Arial", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--font-color);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+}
+.note-full.form-label .clickable-label-button:first-of-type {
+  margin-left: auto;
 }
 
 .action-bar {
@@ -700,20 +706,25 @@ input .note-full .edit-work {
   color: var(--font-color);
 }
 
+/*
+ * TEXT ROLES — 4 styles, used consistently throughout
+ *
+ * Title   30px  serif             Page titles (.top-level.title)
+ * Heading 18px  serif             Entity names, result items, list content
+ * Body    14px  serif             Note text, descriptions, form inputs
+ * Label   12px  sans, grey        Section headers, form labels, metadata, dates
+ *                                 uppercase, letter-spacing: 0.04em
+ *
+ * Tiny (9px sans) for counts/badges where space is very tight.
+ * Monospace reserved for URLs and code.
+ */
 :root {
-  /* Font Size System */
   --font-size-xs: 9px;
-  /* Extra small: buttons, labels */
   --font-size-sm: 12px;
-  /* Small: secondary text, metadata */
   --font-size-md: 14px;
-  /* Medium: body text, notes */
   --font-size-lg: 18px;
-  /* Large: headings, buttons */
   --font-size-xl: 24px;
-  /* Extra large: main titles */
   --font-size-xxl: 34px;
-  /* Extra extra large: hero titles */
 }
 
 html {
@@ -869,10 +880,11 @@ div .top-bar {
 
 .sidebar-title {
   font-size: var(--font-size-sm);
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 8px;
-  color: var(--font-color);
+  color: darkgray;
 }
 
 .sidebar-list {
@@ -1764,9 +1776,9 @@ mark.search-highlight {
 
 .search-group-label {
   font-family: "Avenir", "Candara", "Arial", sans-serif;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
   color: darkgray;
 }
 
@@ -1861,10 +1873,12 @@ mark.search-highlight {
   margin-bottom: 16px;
 }
 .top-level.pre-title {
-  font-size: 18px;
+  font-size: var(--font-size-sm);
   align-self: center;
   font-family: "Avenir", "Candara", "Arial", sans-serif;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: darkgray;
 }
 .top-level.title {
   font-size: 30px;
@@ -1897,11 +1911,12 @@ mark.search-highlight {
   margin-bottom: 0;
 }
 .top-level.form-label {
-  font-size: 12px;
-  text-transform: uppercase;
+  font-size: var(--font-size-sm);
   font-family: "Avenir", "Candara", "Arial", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   display: block;
-  color: var(--font-color);
+  color: darkgray;
 }
 .top-level.form-container {
   padding: 4px;
@@ -2135,9 +2150,11 @@ mark.search-highlight {
 }
 
 .help-section h3 {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
   text-transform: uppercase;
-  color: var(--font-color);
+  letter-spacing: 0.04em;
+  color: darkgray;
   margin: 0 0 12px 0;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--low-intensity-border);

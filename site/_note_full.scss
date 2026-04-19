@@ -348,12 +348,18 @@
   }
 
   &.form-label {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     padding: 2px;
-    text-transform: uppercase;
     font-family: $sans_font;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $font_color;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+
+    .clickable-label-button:first-of-type {
+      margin-left: auto;
+    }
   }
 
 

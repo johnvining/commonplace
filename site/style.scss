@@ -4,20 +4,26 @@
 @import '_note_full';
 @import '_note_slim';
 
+/*
+ * TEXT ROLES — 4 styles, used consistently throughout
+ *
+ * Title   30px  serif             Page titles (.top-level.title)
+ * Heading 18px  serif             Entity names, result items, list content
+ * Body    14px  serif             Note text, descriptions, form inputs
+ * Label   12px  sans, grey        Section headers, form labels, metadata, dates
+ *                                 uppercase, letter-spacing: 0.04em
+ *
+ * Tiny (9px sans) for counts/badges where space is very tight.
+ * Monospace reserved for URLs and code.
+ */
+
 :root {
-  /* Font Size System */
   --font-size-xs: 9px;
-  /* Extra small: buttons, labels */
   --font-size-sm: 12px;
-  /* Small: secondary text, metadata */
   --font-size-md: 14px;
-  /* Medium: body text, notes */
   --font-size-lg: 18px;
-  /* Large: headings, buttons */
   --font-size-xl: 24px;
-  /* Extra large: main titles */
   --font-size-xxl: 34px;
-  /* Extra extra large: hero titles */
 }
 
 html {
@@ -179,10 +185,11 @@ a {
 
 .sidebar-title {
   font-size: var(--font-size-sm);
+  font-family: $sans_font;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 8px;
-  color: $font_color;
+  color: $grey3;
 }
 
 .sidebar-list {
@@ -1115,9 +1122,9 @@ mark.search-highlight {
 
 .search-group-label {
   font-family: $sans_font;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.04em;
   color: $grey3;
 }
 
@@ -1223,10 +1230,12 @@ mark.search-highlight {
   }
 
   &.pre-title {
-    font-size: 18px;
+    font-size: var(--font-size-sm);
     align-self: center;
     font-family: $sans_font;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $grey3;
   }
 
   &.title {
@@ -1267,11 +1276,12 @@ mark.search-highlight {
   }
 
   &.form-label {
-    font-size: 12px;
-    text-transform: uppercase;
+    font-size: var(--font-size-sm);
     font-family: $sans_font;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     display: block;
-    color: $font_color;
+    color: $grey3;
   }
 
   &.form-container {
@@ -1523,9 +1533,11 @@ mark.search-highlight {
 
 .help-section {
   h3 {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
+    font-family: $sans_font;
     text-transform: uppercase;
-    color: $font_color;
+    letter-spacing: 0.04em;
+    color: $grey3;
     margin: 0 0 12px 0;
     padding-bottom: 4px;
     border-bottom: 1px solid $low_intensity_border;
