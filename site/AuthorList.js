@@ -18,9 +18,11 @@ class AuthorList extends React.Component {
   render() {
     return (
       <div className="author-list">
-        {this.state.authors === undefined ? null : (
+        {this.state.authors === undefined ? null : this.state.authors.length === 0 ? (
+          <div className="search-empty-state">No authors found.</div>
+        ) : (
           <div>
-            {this.state.authors.map((author) => {
+            {(this.props.limit ? this.state.authors.slice(0, this.props.limit) : this.state.authors).map((author) => {
               return (
                 <Link
                   to={`/auth/${author._id}`}

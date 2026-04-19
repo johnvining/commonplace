@@ -12,13 +12,17 @@ class WorkList extends React.Component {
   }
 
   render() {
+    const works = this.state.works
+    const display = works === undefined
+      ? null
+      : this.props.limit ? works.slice(0, this.props.limit) : works
     return (
       <div className="work-list">
-        {this.state.works === undefined
-          ? null
-          : this.state.works.map(work => (
-              <ResultWork work={work} key={'work-list-' + work._id} />
-            ))}
+        {works === undefined ? null : works.length === 0 ? (
+          <div className="search-empty-state">No works found.</div>
+        ) : display.map(work => (
+          <ResultWork work={work} key={'work-list-' + work._id} />
+        ))}
       </div>
     )
   }

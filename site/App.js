@@ -238,7 +238,7 @@ class App extends React.Component {
                 }
               />
               <Route
-                path="/find/:search/notes"
+                path="/find/:search/:category"
                 element={
                   <Find
                     viewMode={this.state.viewMode}
@@ -246,6 +246,7 @@ class App extends React.Component {
                   />
                 }
               />
+
               <Route
                 path="/idea/:id"
                 element={

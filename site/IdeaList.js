@@ -17,9 +17,11 @@ class IdeaList extends React.Component {
   render() {
     return (
       <div className="idea-list">
-        {this.state.ideas === undefined ? null : (
+        {this.state.ideas === undefined ? null : this.state.ideas.length === 0 ? (
+          <div className="search-empty-state">No ideas found.</div>
+        ) : (
           <div>
-            {this.state.ideas.map((idea) => {
+            {(this.props.limit ? this.state.ideas.slice(0, this.props.limit) : this.state.ideas).map((idea) => {
               return (
                 <Link to={`/idea/${idea._id}`} key={'idea-list-' + idea._id}>
                   <div className="result-box">

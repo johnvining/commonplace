@@ -655,7 +655,10 @@ class NoteList extends React.Component {
             </TopLevelStandardButtonContainer>
           </div>
         )}
-        {this.state.notes === undefined ? null : (
+        {this.state.notes !== undefined && this.state.notes.length === 0 ? (
+          <div className="search-empty-state">No notes found.</div>
+        ) : null}
+        {this.state.notes === undefined || this.state.notes.length === 0 ? null : (
           <div className={isTileView ? 'note-tile-grid' : ''}>
             {this.state.notes.map((note, index) => {
               return (

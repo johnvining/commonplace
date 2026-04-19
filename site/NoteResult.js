@@ -4,29 +4,47 @@ import note_img from 'url:./icons/write.svg'
 import NoteAuthorSpan from './NoteAuthorSpan'
 import PinButton from './PinButton'
 
+function snippetAround(text, query) {
+  const idx = text.toLowerCase().indexOf(query.toLowerCase())
+  if (idx === -1) return <>{text}</>
+  const BEFORE = 40
+  const start = Math.max(0, idx - BEFORE)
+  const end = Math.min(text.length, idx + query.length + 80)
+  return (
+    <>
+      {start > 0 ? '…' : null}
+      {text.slice(start, idx)}
+      <mark className="search-highlight">{text.slice(idx, idx + query.length)}</mark>
+      {text.slice(idx + query.length, end)}
+      {end < text.length ? '…' : null}
+    </>
+  )
+}
+
 class NoteResult extends React.PureComponent {
   render() {
     const note = this.props.note
+    const hl = this.props.highlight
     const author = <NoteAuthorSpan note={note} separator=": " />
-    
-    // Determine what to show after author in preference order: title, text, take
-    let content = null
+
+    let contentText = null
     if (note.title?.length) {
-      content = note.title
+      contentText = note.title
     } else if (note.text?.length) {
-      content = note.text
+      contentText = note.text
     } else if (note.take?.length) {
-      content = note.take
+      contentText = note.take
     }
-    
+
+    const content = hl && contentText
+      ? snippetAround(contentText, hl)
+      : contentText
+
     return (
-      <Link
-        to={`/note/${note._id}`}
-        key={'note-list-' + note._id}
-      >
+      <Link to={`/note/${note._id}`} key={'note-list-' + note._id}>
         <div className="result-box">
           <div className="result-box header">
-            <img src={note_img}></img>
+            <img src={note_img} />
             <span className="truncate">
               {author}
               {content}
@@ -34,7 +52,7 @@ class NoteResult extends React.PureComponent {
             <PinButton
               type="note"
               id={note._id}
-              label={content || 'Untitled Note'}
+              label={contentText || 'Untitled Note'}
               href={`/note/${note._id}`}
               compact={true}
               className="pin-button-inline"
