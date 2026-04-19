@@ -897,7 +897,8 @@ class Note extends React.Component {
                   <div className="left-div">
                     <ImageUploader
                       onImageUpload={this.onImageUpload.bind(this)}
-                    buttonClassName="button left-right"
+                      buttonClassName="action-button"
+                      iconOnly={true}
                     />
                   </div>
 

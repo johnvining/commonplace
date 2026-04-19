@@ -6,7 +6,7 @@
     border-width: 1px;
     border-radius: 4px;
     margin: 0px 0px 4px 0px;
-    padding: 2px;
+    padding: 6px;
     display: flex;
     flex-wrap: wrap;
 
@@ -64,8 +64,8 @@
   .year,
   .page,
   .url {
-    margin: 2px;
-    padding: 2px;
+    margin: 4px 2px;
+    padding: 6px 8px;
   }
 
   .title,
@@ -106,6 +106,7 @@
     width: 100%;
     margin: 0px;
     padding: 2px;
+    margin-bottom: 10px;
   }
 
   .year,
@@ -144,7 +145,7 @@
     font-family: $main_font;
     font-size: 14px;
     margin: auto;
-    padding: 2px;
+    padding: 6px 8px;
     resize: none;
     white-space: pre-wrap;
     width: 100%;
@@ -273,7 +274,7 @@
       background-color: $input_background;
       border-radius: 4px;
       display: inline-block;
-      width: 50%;
+      width: 100%;
       border: none;
       font-family: $main_font;
       font-size: 18px;
@@ -306,29 +307,45 @@
     }
 
     &.ul {
-      display: inline;
-      margin: 0px;
-      padding: 0px;
+      display: block;
+      margin: 2px 0 0 0;
+      padding: 0;
+      background-color: $note_background_edit;
+      border: 1px solid $note_border_focused;
+      border-radius: 4px;
+      overflow: hidden;
+
+      &:empty {
+        display: none;
+      }
     }
 
     &.li {
-      display: inline;
-      margin: 0px;
-      padding: 0px;
+      display: block;
+      margin: 0;
+      padding: 0;
     }
 
     &.option {
       background: transparent;
       border: none;
-      color: #393939;
-      display: inline;
-      margin: 0px;
-      padding: 2px;
-      font-size: 18px;
+      color: $font_color;
+      display: block;
+      width: 100%;
+      text-align: left;
+      margin: 0;
+      padding: 6px 10px;
+      font-size: var(--font-size-lg);
       font-family: $main_font;
+      cursor: pointer;
 
       &::after {
-        content: '? ';
+        content: '';
+      }
+
+      &:hover, &:focus {
+        background-color: $semantic_selection;
+        outline: none;
       }
 
       &.new::before {
@@ -338,7 +355,7 @@
         width: 17px;
         height: 15px;
         content: '';
-        
+
         @media (prefers-color-scheme: dark) {
           -webkit-filter: invert(100%);
           filter: invert(100%);
@@ -349,7 +366,7 @@
 
   &.form-label {
     font-size: var(--font-size-sm);
-    padding: 2px;
+    padding: 2px 2px 2px 8px;
     font-family: $sans_font;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -434,6 +451,34 @@
 
 .action-bar .action-button {
   margin: 0;
+}
+
+.action-bar .upload-form {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+}
+
+.action-bar .upload-label {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.action-bar .file-drop.button {
+  background-color: transparent;
+  border: none;
+  height: 40px;
+  font-size: var(--font-size-md);
+  padding: 4px 10px;
+
+  &:hover {
+    background-color: $theme_mint;
+  }
 }
 
 .action-button.pin-button {

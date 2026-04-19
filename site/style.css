@@ -61,7 +61,7 @@
   border-width: 1px;
   border-radius: 4px;
   margin: 0px 0px 4px 0px;
-  padding: 2px;
+  padding: 6px;
   display: flex;
   flex-wrap: wrap;
 }
@@ -110,8 +110,8 @@
 .note-full .year,
 .note-full .page,
 .note-full .url {
-  margin: 2px;
-  padding: 2px;
+  margin: 4px 2px;
+  padding: 6px 8px;
 }
 .note-full .title,
 .note-full .year,
@@ -149,6 +149,7 @@
   width: 100%;
   margin: 0px;
   padding: 2px;
+  margin-bottom: 10px;
 }
 .note-full .year,
 .note-full .page {
@@ -184,7 +185,7 @@
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 14px;
   margin: auto;
-  padding: 2px;
+  padding: 6px 8px;
   resize: none;
   white-space: pre-wrap;
   width: 100%;
@@ -306,7 +307,7 @@ input .note-full .note-take {
   background-color: var(--input-background);
   border-radius: 4px;
   display: inline-block;
-  width: 50%;
+  width: 100%;
   border: none;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-size: 18px;
@@ -339,30 +340,47 @@ input .note-full .edit-work {
 }
 .note-full .edit-author.ul,
 .note-full .edit-work.ul {
-  display: inline;
-  margin: 0px;
-  padding: 0px;
+  display: block;
+  margin: 2px 0 0 0;
+  padding: 0;
+  background-color: var(--note-background-edit);
+  border: 1px solid var(--note-border-focused);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.note-full .edit-author.ul:empty,
+.note-full .edit-work.ul:empty {
+  display: none;
 }
 .note-full .edit-author.li,
 .note-full .edit-work.li {
-  display: inline;
-  margin: 0px;
-  padding: 0px;
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 .note-full .edit-author.option,
 .note-full .edit-work.option {
   background: transparent;
   border: none;
-  color: #393939;
-  display: inline;
-  margin: 0px;
-  padding: 2px;
-  font-size: 18px;
+  color: var(--font-color);
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: var(--font-size-lg);
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  cursor: pointer;
 }
 .note-full .edit-author.option::after,
 .note-full .edit-work.option::after {
-  content: "? ";
+  content: "";
+}
+.note-full .edit-author.option:hover, .note-full .edit-author.option:focus,
+.note-full .edit-work.option:hover,
+.note-full .edit-work.option:focus {
+  background-color: var(--semantic-selection);
+  outline: none;
 }
 .note-full .edit-author.option.new::before,
 .note-full .edit-work.option.new::before {
@@ -382,7 +400,7 @@ input .note-full .edit-work {
 }
 .note-full.form-label {
   font-size: var(--font-size-sm);
-  padding: 2px;
+  padding: 2px 2px 2px 8px;
   font-family: "Avenir", "Candara", "Arial", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -469,6 +487,33 @@ input .note-full .edit-work {
 
 .action-bar .action-button {
   margin: 0;
+}
+
+.action-bar .upload-form {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+}
+
+.action-bar .upload-label {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.action-bar .file-drop.button {
+  background-color: transparent;
+  border: none;
+  height: 40px;
+  font-size: var(--font-size-md);
+  padding: 4px 10px;
+}
+.action-bar .file-drop.button:hover {
+  background-color: #F7FCF7;
 }
 
 .action-button.pin-button {
