@@ -51,6 +51,8 @@ export async function importCsvFromString(string, recordType) {
   var parser = parse({ delimiter, relax_column_count: true })
   stream.pipe(parser).on('data', async (data) => {
     entries.push(data)
+  }).on('error', (err) => {
+    console.error('Import parse error:', err)
   })
   await streamComplete(parser)
 
@@ -94,7 +96,7 @@ function getImportFunction(dataType) {
     case 2:
       return importWork
     case 3:
-      return importNote
+      return importInstapaperNote
   }
   return null
 }
@@ -255,6 +257,48 @@ async function importNote(importObject) {
   importObject.externalImageUrls.map((url, idx) => {
     imagePromises.push(
       downloadImageForNote(createdNote._id, idx + 1, url, true)
+    )
+  })
+
+  let imagePromiseResp = await Promise.all(imagePromises)
+  await NoteControllers.updateNote(createdNote._id, {
+    images: imagePromiseResp,
+  })
+}
+
+async function importInstapaperNote(importObject) {
+  let authorPromise = AuthControllers.findOrCreateAuthor(importObject.authorName)
+  let workPromise = WorkControllers.findOrCreateWork(importObject.workName)
+  let response = await Promise.all([authorPromise, workPromise])
+
+  let newNote = {
+    author: response[0]?._id,
+    work: response[1]?._id,
+    ideas: [],
+    piles: [],
+    text: importObject.text,
+    title: importObject.title,
+    url: importObject.url,
+    year: null,
+  }
+
+  if (newNote.url) {
+    newNote.year = utils.guessYearFromURL(newNote.url)
+  }
+
+  let createdNote = await NoteControllers.createNoteObj(newNote)
+
+  if (
+    importObject.externalImageUrls.length == 1 &&
+    importObject.externalImageUrls[0] == ''
+  ) {
+    return
+  }
+
+  let imagePromises = []
+  importObject.externalImageUrls.map((url, idx) => {
+    imagePromises.push(
+      downloadImageForNote(createdNote._id, idx + 1, url, false)
     )
   })
 

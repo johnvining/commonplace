@@ -33,8 +33,8 @@ app.use(
 )
 
 app.use(cors())
-app.use(json())
-app.use(urlencoded({ extended: true }))
+app.use(json({ limit: '5mb' }))
+app.use(urlencoded({ extended: true, limit: '5mb' }))
 app.use(morgan('dev'))
 
 app.use(cookieParser())

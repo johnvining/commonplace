@@ -15,6 +15,7 @@ function Load(props) {
   const [importFormat, setImportFormat] = useState('csv')
   const [importing, setImporting] = useState(false)
   const [importProgress, setImportProgress] = useState(null)
+  const [importError, setImportError] = useState(null)
   const cancelRef = React.useRef(false)
   const navigate = useNavigate()
 
@@ -91,6 +92,7 @@ function Load(props) {
     cancelRef.current = false
     setImporting(true)
     setNotesImported(-1)
+    setImportError(null)
     let importText = pendingImportText
     setPendingImportText('')
     try {
@@ -104,6 +106,13 @@ function Load(props) {
         setNotesImported(imported.data.data)
       } else {
         await importUrlsAsNotes()
+      }
+    } catch (e) {
+      const status = e?.response?.status
+      if (status === 413) {
+        setImportError('The import text is too large. Try splitting it into smaller batches.')
+      } else {
+        setImportError('Import failed. Check that the format matches the selected import type.')
       }
     } finally {
       setImporting(false)
@@ -125,7 +134,8 @@ function Load(props) {
           </pre>
         ) : importFormat === 'instapaper' ? (
           <pre>
-            TSV from IFTTT Instapaper Google Sheet: Article, Text, Note Url, Image Url, Title
+            Paste TSV from the IFTTT Instapaper Google Sheet. Columns: Article, Text, Note Url, Image Url, Title.{'\n'}
+            To export: select all rows in Google Sheets and copy (Cmd+C), then paste here. Or use File → Download → Tab Separated Values (.tsv) and paste the file contents.
           </pre>
         ) : (
           <pre>
@@ -143,7 +153,7 @@ function Load(props) {
             checked={importFormat === 'csv'}
             onChange={() => setImportFormat('csv')}
           />
-          CSV Import
+          Kindlescrape Import (CSV)
         </label>
         <label className="note-full form-label">
           <input
@@ -185,6 +195,8 @@ function Load(props) {
         <span>
           {importing && importProgress
             ? `Importing… ${importProgress.done} / ${importProgress.total}`
+            : importError
+            ? importError
             : notesImported > -1
             ? notesImported + ' notes imported'
             : null}
