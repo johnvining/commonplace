@@ -48,7 +48,8 @@ export async function importCsvFromString(string, recordType) {
   let stream = Readable.from(string)
   var entries = []
   const delimiter = recordType === 3 ? '\t' : ','
-  var parser = parse({ delimiter, relax_column_count: true })
+  const quote = recordType === 3 ? false : '"'
+  var parser = parse({ delimiter, relax_column_count: true, quote })
   stream.pipe(parser).on('data', async (data) => {
     entries.push(data)
   }).on('error', (err) => {
