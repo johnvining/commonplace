@@ -99,6 +99,9 @@ function Load(props) {
         setNotesImported(imported.data.data)
         // TODO: Error handling on bad CSV
         // TODO: Validate CSV then load all records, rather than erroring midway through
+      } else if (importFormat === 'instapaper') {
+        let imported = await db.importNotesInstapaper(importText)
+        setNotesImported(imported.data.data)
       } else {
         await importUrlsAsNotes()
       }
@@ -119,6 +122,10 @@ function Load(props) {
         {importFormat === 'csv' ? (
           <pre>
             author,title,text,workName,url,ideas,externalImageUrls,piles,year,page,take
+          </pre>
+        ) : importFormat === 'instapaper' ? (
+          <pre>
+            TSV from IFTTT Instapaper Google Sheet: Article, Text, Note Url, Image Url, Title
           </pre>
         ) : (
           <pre>
@@ -142,6 +149,16 @@ function Load(props) {
           <input
             type="radio"
             name="import-format"
+            value="instapaper"
+            checked={importFormat === 'instapaper'}
+            onChange={() => setImportFormat('instapaper')}
+          />
+          Instapaper (IFTTT Google Sheet TSV)
+        </label>
+        <label className="note-full form-label">
+          <input
+            type="radio"
+            name="import-format"
             value="urls"
             checked={importFormat === 'urls'}
             onChange={() => setImportFormat('urls')}
@@ -151,7 +168,7 @@ function Load(props) {
       </div>
       <div name="text" className="width-100">
         <TopLevelFormTextArea
-          name={importFormat === 'csv' ? 'Import CSV' : 'Import URLs'}
+          name={importFormat === 'csv' ? 'Import CSV' : importFormat === 'instapaper' ? 'Import Instapaper TSV' : 'Import URLs'}
           id="import-text"
           defaultValue={pendingImportText}
           onChange={(e) => {

@@ -290,6 +290,19 @@ export const reqBulkImportNotesCSV = async (req, res) => {
   return recordsImported
 }
 
+export const reqBulkImportInstapaper = async (req, res) => {
+  let recordsImported = -2
+  try {
+    let tsv = req.body.importList
+    recordsImported = await importCsvFromString(tsv, 3)
+  } catch (e) {
+    console.error(e)
+    res.status(400).end()
+  }
+
+  return recordsImported
+}
+
 export const reqBulkOcrForNotes = async (req, res) => {
   const noteIds = req.body.noteIds
 

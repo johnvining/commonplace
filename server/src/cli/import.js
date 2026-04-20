@@ -40,14 +40,15 @@ export async function importCSV(filePath, recordType) {
 }
 
 export async function importCsvFromString(string, recordType) {
-  if (recordType != 1) {
+  if (recordType != 1 && recordType != 3) {
     return null // Unsupported
   }
 
   const Readable = require('stream').Readable
   let stream = Readable.from(string)
   var entries = []
-  var parser = parse({ delimiter: ',', relax_column_count: true })
+  const delimiter = recordType === 3 ? '\t' : ','
+  var parser = parse({ delimiter, relax_column_count: true })
   stream.pipe(parser).on('data', async (data) => {
     entries.push(data)
   })
@@ -80,6 +81,8 @@ function getParseFunction(dataType) {
       return parseNote
     case 2:
       return parseWork
+    case 3:
+      return parseInstapaper
   }
   return null
 }
@@ -90,6 +93,8 @@ function getImportFunction(dataType) {
       return importNote
     case 2:
       return importWork
+    case 3:
+      return importNote
   }
   return null
 }
@@ -107,6 +112,23 @@ function parseNote(csvLine) {
   obj.year = csvLine[8]
   obj.page = csvLine[9]
   obj.take = csvLine[10]
+  return obj
+}
+
+// Columns from IFTTT Instapaper → Google Sheets: Article, Text, Note Url, Image Url, Title
+function parseInstapaper(tsvLine) {
+  var obj = {}
+  obj.workName = tsvLine[0]
+  obj.text = tsvLine[1]
+  obj.url = tsvLine[2]
+  obj.externalImageUrls = tsvLine[3] ? [tsvLine[3]] : ['']
+  obj.title = tsvLine[4]
+  obj.authorName = ''
+  obj.ideas = ['']
+  obj.piles = ['']
+  obj.year = null
+  obj.page = ''
+  obj.take = ''
   return obj
 }
 

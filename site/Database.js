@@ -257,6 +257,11 @@ export async function importNotesCsv(importList) {
   return axios.put(url_api + 'note/import/csv', data)
 }
 
+export async function importNotesInstapaper(importList) {
+  const data = { importList: importList }
+  return axios.put(url_api + 'note/import/instapaper', data)
+}
+
 
 export async function addNoteLinkToNote(leftNick, rightNick) {
   const data = { leftNoteNick: leftNick, rightNoteNick: rightNick }

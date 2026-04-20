@@ -25,6 +25,7 @@ import controllers, {
   reqBulkSuggestTitlesForNotes,
   reqBulkGetNotesForMarkdown,
   reqBulkImportForWork,
+  reqBulkImportInstapaper,
   reqBulkImportNotesCSV,
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
@@ -79,6 +80,8 @@ router
 router.route('/import/work/:work').put(asyncWrapper(reqBulkImportForWork, 200))
 
 router.route('/import/csv').put(asyncWrapper(reqBulkImportNotesCSV, 200))
+
+router.route('/import/instapaper').put(asyncWrapper(reqBulkImportInstapaper, 200))
 
 
 router
