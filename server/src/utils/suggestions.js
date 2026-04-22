@@ -16,7 +16,7 @@ export const getSuggestedTitle = async function (note_text) {
           note_text,
       },
     ],
-    model: 'gpt-3.5-turbo',
+    model: 'gpt-4o-mini',
   })
 
   return chatCompletion.choices[0].message.content
@@ -43,7 +43,7 @@ export const getSuggestedIdeas = async function (note_title, note_text) {
           note_text,
       },
     ],
-    model: 'gpt-4-1106-preview',
+    model: 'gpt-4o',
     response_format: { type: 'json_object' },
   })
 
