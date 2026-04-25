@@ -278,28 +278,14 @@ export const reqBulkImportForWork = async (req, res) => {
 }
 
 export const reqBulkImportNotesCSV = async (req, res) => {
-  let recordsImported = -2
-  try {
-    let csv = req.body.importList
-    recordsImported = await importCsvFromString(csv, 1)
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-
+  let csv = req.body.importList
+  const recordsImported = await importCsvFromString(csv, 1)
   return recordsImported
 }
 
 export const reqBulkImportInstapaper = async (req, res) => {
-  let recordsImported = -2
-  try {
-    let tsv = req.body.importList
-    recordsImported = await importCsvFromString(tsv, 3)
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-
+  let tsv = req.body.importList
+  const recordsImported = await importCsvFromString(tsv, 3)
   return recordsImported
 }
 
