@@ -3,7 +3,11 @@ import OpenAI from 'openai'
 import config from '../config'
 import { getOpenAiOCR } from './suggestions.js'
 
-const openai = new OpenAI({ apiKey: config.secrets.openaikey })
+let _openai = null
+const openai = () => {
+  if (!_openai) _openai = new OpenAI({ apiKey: config.secrets.openaikey })
+  return _openai
+}
 
 export function buildEmbeddingInput(note) {
   return [
@@ -18,7 +22,8 @@ export function buildEmbeddingInput(note) {
 }
 
 export function hashContent(text) {
-  return crypto.createHash('sha256').update(text).digest('hex').slice(0, 16)
+  const normalized = text.toLowerCase().replace(/[^a-z0-9]/g, '')
+  return crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 16)
 }
 
 export function cosineSimilarity(a, b) {
@@ -32,7 +37,7 @@ export function cosineSimilarity(a, b) {
 }
 
 export async function generateEmbedding(text) {
-  const response = await openai.embeddings.create({
+  const response = await openai().embeddings.create({
     model: 'text-embedding-3-small',
     input: text,
     dimensions: 256,
@@ -41,7 +46,7 @@ export async function generateEmbedding(text) {
 }
 
 export async function generateBatchEmbeddings(texts) {
-  const response = await openai.embeddings.create({
+  const response = await openai().embeddings.create({
     model: 'text-embedding-3-small',
     input: texts,
     dimensions: 256,
