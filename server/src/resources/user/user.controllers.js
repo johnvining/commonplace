@@ -51,29 +51,23 @@ export const reqAuthorizeUser = async (req, res) => {
         error: 'User not found',
       })
     } else {
-      bcrypt.compare(password, user.password).then(function (result) {
-        if (result) {
-          const maxAge = 24 * 60 * 60
-          const token = jwt.sign(
-            { id: user._id, username, role: user.role },
-            config.secrets.jwt,
-            {
-              expiresIn: maxAge,
-            }
-          )
-          res.cookie('jwt', token, {
-            httpOnly: true,
-            maxAge: maxAge * 1000,
-          })
-          res.status(201).json({
-            message: 'User successfully Logged in',
-            user: user._id,
-            token: token,
-          })
-        } else {
-          res.status(400).json({ message: 'Incorrect password' })
-        }
-      })
+      const result = await bcrypt.compare(password, user.password)
+      if (result) {
+        const maxAge = 24 * 60 * 60
+        const token = jwt.sign(
+          { id: user._id, username, role: user.role },
+          config.secrets.jwt,
+          { expiresIn: maxAge }
+        )
+        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
+        res.status(201).json({
+          message: 'User successfully Logged in',
+          user: user._id,
+          token: token,
+        })
+      } else {
+        res.status(400).json({ message: 'Incorrect password' })
+      }
     }
   } catch (error) {
     console.error(error)
