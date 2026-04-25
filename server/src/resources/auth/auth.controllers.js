@@ -47,9 +47,10 @@ export const findAuthorByUrl = async function (url) {
     if (candidates.size === 0) return null
 
     const escaped = [...candidates].map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-    return await Auth.findOne({
+    const matches = await Auth.find({
       usernames: { $elemMatch: { $regex: new RegExp(`^(${escaped.join('|')})$`, 'i') } }
-    }).lean()
+    }).limit(2).lean()
+    return matches.length === 1 ? matches[0] : null
   } catch {
     return null
   }
