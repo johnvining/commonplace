@@ -984,6 +984,12 @@ class Note extends React.Component {
                     nick={this.state.nick}
                     style={{ verticalAlign: 'super', marginRight: '8px' }}
                   />
+                  {!this.props.note.embeddingHash ? (
+                    <span
+                      className="embedding-missing-dot"
+                      title="Not yet embedded"
+                    />
+                  ) : null}
                   <PinButton
                     type="note"
                     id={this.props.id}
