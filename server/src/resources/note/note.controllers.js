@@ -14,6 +14,7 @@ import {
 } from '../../utils/suggestions.js'
 import config from '../../config'
 import fs from 'fs'
+import { guessYearFromUrl } from '../../utils/urls.js'
 
 const pageSize = 40
 
@@ -146,6 +147,10 @@ export const reqUpdateNote = async (req, res) => {
       const { findAuthorByUrl } = await import('../auth/auth.controllers.js')
       const author = await findAuthorByUrl(updates.url)
       if (author) updates.author = author._id
+    }
+    if (!updates.year) {
+      const year = guessYearFromUrl(updates.url)
+      if (year) updates.year = year
     }
   }
 

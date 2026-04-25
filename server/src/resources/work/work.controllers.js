@@ -2,6 +2,7 @@ import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
 import Pile from '../pile/pile.model.js'
 import { createAuthor, findAuthorByUrl } from '../auth/auth.controllers.js'
+import { guessYearFromUrl } from '../../utils/urls.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 
@@ -38,6 +39,10 @@ export const reqUpdateWork = async (req, res) => {
     if (existing && !existing.author) {
       const author = await findAuthorByUrl(updates.url)
       if (author) updates.author = author._id
+    }
+    if (!updates.year) {
+      const year = guessYearFromUrl(updates.url)
+      if (year) updates.year = year
     }
   }
 
