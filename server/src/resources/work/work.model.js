@@ -16,5 +16,7 @@ const workSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-// TODO: Add indices
+workSchema.index({ name: 1 })
+workSchema.index({ author: 1 })
+
 export default mongoose.model('work', workSchema)

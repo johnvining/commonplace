@@ -9,4 +9,6 @@ const noteSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
+noteSchema.index({ name: 1 })
+
 export default mongoose.model('pile', noteSchema)

@@ -9,5 +9,6 @@ const ideaSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-// TODO: Add indices
+ideaSchema.index({ name: 1 })
+
 export default mongoose.model('idea', ideaSchema)

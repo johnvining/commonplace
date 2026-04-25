@@ -26,5 +26,10 @@ const noteSchema = new mongoose.Schema(
 // TODO: How to refresh index?
 noteSchema.index({ title: 'text', text: 'text', take: 'text' })
 
-// TODO: Add indices
+noteSchema.index({ author: 1 })
+noteSchema.index({ work: 1 })
+noteSchema.index({ piles: 1 })
+noteSchema.index({ ideas: 1 })
+noteSchema.index({ updatedAt: -1 })
+
 export default mongoose.model('note', noteSchema)

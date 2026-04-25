@@ -9,5 +9,6 @@ const authSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-// TODO: Add indices
+authSchema.index({ name: 1 })
+
 export const Auth = mongoose.model('author', authSchema)
