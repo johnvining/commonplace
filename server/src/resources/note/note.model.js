@@ -18,11 +18,14 @@ const noteSchema = new mongoose.Schema(
     images: [{ type: String }],
     page: String,
     piles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'pile' }],
-    take: String
+    take: String,
+    ocrText: String,
+    embedding: [Number],
+    embeddingHash: String,
   },
   { timestamps: true }
 )
-noteSchema.index({ title: 'text', text: 'text', take: 'text' })
+noteSchema.index({ title: 'text', text: 'text', take: 'text', ocrText: 'text' })
 
 noteSchema.index({ author: 1 })
 noteSchema.index({ work: 1 })
