@@ -29,8 +29,13 @@ export const reqGetNoteDetails = async (req, res) => {
 }
 
 export const reqDeleteNote = async (req, res) => {
-  // TODO: Delete images when deleting note, #101
   const id = req.params.id
+  const note = await Note.findOne({ _id: id }).lean()
+  if (note?.images?.length) {
+    await Promise.allSettled(
+      note.images.map((img) => fs.promises.unlink(config.imageStorePath + '/' + img))
+    )
+  }
   await Note.deleteOne({ _id: id })
   res.status(200).end()
 }
