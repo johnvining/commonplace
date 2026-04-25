@@ -19,29 +19,18 @@ export const reqRegisterUser = async (req, res) => {
   }
 
   try {
-    bcrypt.hash(password, 10).then(async (hash) => {
-      await User.create({
-        username,
-        password: hash,
-      }).then((user) => {
-        const maxAge = 24 * 60 * 60
-        const token = jwt.sign({ id: user._id, username }, config.secrets.jwt, {
-          expiresIn: maxAge,
-        })
-        res.cookie('jwt', token, {
-          httpOnly: true,
-          maxAge: maxAge * 1000,
-        })
-        res.status(201).json({
-          message: 'User successfully created',
-          user: user._id,
-        })
-      })
+    const hash = await bcrypt.hash(password, 10)
+    const user = await User.create({ username, password: hash })
+    const maxAge = 24 * 60 * 60
+    const token = jwt.sign({ id: user._id, username }, config.secrets.jwt, {
+      expiresIn: maxAge,
     })
+    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
+    res.status(201).json({ message: 'User successfully created', user: user._id })
   } catch (error) {
     res.status(401).json({
       message: 'User not successfully created',
-      error: error.mesage,
+      error: error.message,
     })
   }
 }
