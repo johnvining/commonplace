@@ -1139,6 +1139,28 @@ mark.search-highlight {
   }
 }
 
+.semantic-badge {
+  font-size: var(--font-size-xs);
+  color: $grey3;
+  flex-shrink: 0;
+  padding: 1px 4px;
+  border: 1px solid $grey3;
+  border-radius: 3px;
+  line-height: 1;
+  font-family: $sans_font;
+  title: "Semantic match";
+}
+
+.embedding-missing-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $grey3;
+  flex-shrink: 0;
+  title: "No embedding yet";
+}
+
 .search-no-results {
   padding: 40px 8px;
   color: $grey3;

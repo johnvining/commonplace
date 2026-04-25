@@ -49,6 +49,7 @@ class NoteResult extends React.PureComponent {
               {author}
               {content}
             </span>
+            {this.props.semantic ? <span className="semantic-badge">~</span> : null}
             <PinButton
               type="note"
               id={note._id}

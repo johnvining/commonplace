@@ -173,6 +173,14 @@ export async function searchNotes(searchString) {
   return axios.put(url_api + 'note/find', data)
 }
 
+export async function hybridSearchNotes(query, limit = 20) {
+  return axios.post(url_api + 'note/hybrid-search', { query, limit })
+}
+
+export async function bulkEmbedNotes() {
+  return axios.post(url_api + 'note/bulk-embed', {})
+}
+
 export async function getRecentNotes(page) {
   return axios.get(url_api + `note/all/` + page)
 }

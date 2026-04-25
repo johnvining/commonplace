@@ -61,7 +61,7 @@ function Find(props) {
   React.useEffect(() => {
     setResults(null)
     Promise.all([
-      db.searchNotes(search),
+      db.hybridSearchNotes(search),
       db.getSuggestions(db.types.work, search, true),
       db.getSuggestions(db.types.idea, search, true),
       db.getSuggestions(db.types.auth, search, true),
@@ -171,7 +171,7 @@ function Find(props) {
             search={search}
             category="notes"
             items={results.notes}
-            renderItem={note => <NoteResult note={note} key={note._id} highlight={search} />}
+            renderItem={note => <NoteResult note={note} key={note._id} highlight={search} semantic={note._semantic} />}
           />
 
           <SearchGroup
