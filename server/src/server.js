@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import config from './config'
 import cors from 'cors'
 import { connect } from './utils/db'
+import Note from './resources/note/note.model'
 import noteRouter from './resources/note/note.router'
 import authRouter from './resources/auth/auth.router'
 import ideaRouter from './resources/idea/idea.router'
@@ -55,6 +56,8 @@ export const start = async () => {
   try {
     console.log('Connecting to Mongo...')
     await connect()
+
+    await Note.syncIndexes()
 
     console.log('Listening...')
     app.listen(config.port, () => {

@@ -22,8 +22,6 @@ const noteSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
-// TODO: Title not working
-// TODO: How to refresh index?
 noteSchema.index({ title: 'text', text: 'text', take: 'text' })
 
 noteSchema.index({ author: 1 })
