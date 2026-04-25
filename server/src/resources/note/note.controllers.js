@@ -15,6 +15,7 @@ import {
 import config from '../../config'
 import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
+import { embedNoteIfStale } from '../../utils/embeddings.js'
 
 const pageSize = 40
 
@@ -158,6 +159,16 @@ export const reqUpdateNote = async (req, res) => {
 
   if (updates.url && updated?.work) {
     await inferWorkUrl(updated.work, updates.url)
+  }
+
+  if (updated) {
+    embedNoteIfStale(updated)
+      .then(async (embeddingUpdate) => {
+        if (embeddingUpdate) {
+          await Note.findByIdAndUpdate(req.params.id, embeddingUpdate)
+        }
+      })
+      .catch((err) => console.error('[embed] error for note', req.params.id, err))
   }
 
   return updated
