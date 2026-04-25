@@ -171,9 +171,8 @@ export const reqRemoveImageFromNote = async function (req, res) {
       { $pull: { images: filename } },
       { new: true }
     )
-    fs.unlink(config.imageStorePath + '/' + filename, () => {
-      res.status(200).json({ data: doc })
-    })
+    await fs.promises.unlink(config.imageStorePath + '/' + filename)
+    res.status(200).json({ data: doc })
   } catch (e) {
     console.error(e)
     res.status(400).end()
