@@ -2,7 +2,7 @@ import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
 import Pile from '../pile/pile.model.js'
 import { createAuthor } from '../auth/auth.controllers.js'
-import { findNotesAndPopulate } from '../note/note.controllers.js'
+import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 
 // Request response
@@ -142,7 +142,7 @@ export const deleteWork = async function(id) {
   let notes = await findNotesAndPopulate({ work: id }, {}, true)
   let deletionPromises = []
   notes.map(note => {
-    deletionPromises.push(updateNote(note._id), { work: null })
+    deletionPromises.push(updateNote(note._id, { work: null }))
   })
 
   await Promise.all(deletionPromises)
