@@ -1,7 +1,7 @@
 import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
-import { findNotesAndPopulate } from '../note/note.controllers.js'
+import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 
 export const reqGetNotesForAuthor = async (req, res) => {
