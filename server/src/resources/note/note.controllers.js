@@ -130,7 +130,8 @@ export const reqAddImageToNote = async (req, res) => {
       const safeName = image.name.replace(/[^a-zA-Z0-9._-]/g, '_')
       let localPath = req.params.id + '/' + numberNotes + '-' + safeName
 
-      image.mv(config.imageStorePath + '/' + localPath)
+      await fs.promises.mkdir(config.imageStorePath + '/' + req.params.id, { recursive: true })
+      await image.mv(config.imageStorePath + '/' + localPath)
 
       const newNote = await Note.findOneAndUpdate(
         { _id: req.params.id },
