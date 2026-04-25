@@ -1,6 +1,6 @@
 import { createNewNoteFromTitle, getAuthStatus } from './Database'
 import { createRoot } from 'react-dom/client'
-import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
+import { Routes, Route, Link, BrowserRouter, useNavigate } from 'react-router-dom'
 import Author from './Author'
 import AuthorNotes from './AuthorNotes'
 import FileList from './FileList'
@@ -35,6 +35,7 @@ class App extends React.Component {
 
   constructor(props) {
     super(props)
+    this.redirectTo = null
   }
 
   componentDidMount() {
@@ -61,13 +62,20 @@ class App extends React.Component {
   }
 
   setNewToken() {
-    this.setState({ authorized: true })
+    const redirectTo = this.redirectTo || '/'
+    this.redirectTo = null
+    this.setState({ authorized: true }, () => {
+      this.props.navigate(redirectTo)
+    })
   }
 
   validateAuth() {
     getAuthStatus()
       .then(() => this.setState({ authorized: true }))
-      .catch(() => this.setState({ authorized: false }))
+      .catch(() => {
+        this.redirectTo = window.location.pathname + window.location.search
+        this.setState({ authorized: false })
+      })
   }
 
   render() {
@@ -317,6 +325,7 @@ function AppWithKeyboard() {
   const appRef = React.useRef(null)
   const [helpOpen, setHelpOpen] = React.useState(false)
   const activeScopes = useKeyboardScopes()
+  const navigate = useNavigate()
 
   // Global shortcuts (Section 1 in docs)
   useKeyboardShortcuts(
@@ -407,7 +416,7 @@ function AppWithKeyboard() {
 
   return (
     <>
-      <App ref={appRef} />
+      <App ref={appRef} navigate={navigate} />
       <HelpOverlay
         isVisible={helpOpen}
         onClose={() => setHelpOpen(false)}
