@@ -117,6 +117,26 @@ export const reqAddNewWork = async (req, res) => {
   return await addWorkToId(req.params.id, newWork._id)
 }
 
+const inferWorkUrl = async function (workId, noteUrl) {
+  if (!workId) return
+  const work = await Work.findById(workId).lean()
+  if (!work || work.url) return
+
+  const [allNotes, notesWithUrl] = await Promise.all([
+    Note.find({ work: workId }).lean(),
+    Note.find({ work: workId, url: { $exists: true, $ne: '' } }).lean(),
+  ])
+
+  if (allNotes.length === 0 || notesWithUrl.length !== allNotes.length) return
+
+  // If all notes share the same hostname, use that origin; otherwise use the triggering URL
+  try {
+    const origins = notesWithUrl.map(n => new URL(n.url).origin)
+    const unique = [...new Set(origins)]
+    await Work.findByIdAndUpdate(workId, { url: unique.length === 1 ? unique[0] : noteUrl })
+  } catch {}
+}
+
 export const reqUpdateNote = async (req, res) => {
   const updates = { ...req.body }
 
@@ -129,7 +149,13 @@ export const reqUpdateNote = async (req, res) => {
     }
   }
 
-  return await updateNote(req.params.id, updates)
+  const updated = await updateNote(req.params.id, updates)
+
+  if (updates.url && updated?.work) {
+    await inferWorkUrl(updated.work, updates.url)
+  }
+
+  return updated
 }
 
 
