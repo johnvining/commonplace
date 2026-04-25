@@ -478,6 +478,49 @@ export const reqBulkGetNotesForMarkdown = async (req, res) => {
   return results
 }
 
+export const reqBulkEmbedNotes = async (req, res) => {
+  const BATCH = 100
+  let skip = 0
+  let processed = 0
+  let skipped = 0
+  let failed = 0
+
+  while (true) {
+    const batch = await Note.find({})
+      .skip(skip)
+      .limit(BATCH)
+      .populate('author')
+      .populate('ideas')
+      .populate({ path: 'work', populate: { path: 'author' } })
+      .lean()
+      .exec()
+
+    if (batch.length === 0) break
+    skip += batch.length
+
+    await Promise.all(
+      batch.map(async (note) => {
+        try {
+          const update = await embedNoteIfStale(note)
+          if (update) {
+            await Note.findByIdAndUpdate(note._id, update)
+            processed++
+          } else {
+            skipped++
+          }
+        } catch (err) {
+          console.error('[bulk-embed] error for note', note._id, err)
+          failed++
+        }
+      })
+    )
+
+    if (batch.length < BATCH) break
+  }
+
+  return { processed, skipped, failed }
+}
+
 export const findNotesAndPopulate = async function (
   searchObject,
   sortObject,
