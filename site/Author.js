@@ -22,6 +22,7 @@ function Author(props) {
   const [pendingName, setPendingName] = useState('')
   const [pendingBirthYear, setPendingBirthYear] = useState('')
   const [pendingDeathYear, setPendingDeathYear] = useState('')
+  const [pendingUsernames, setPendingUsernames] = useState('')
   const [works, setWorks] = useState(null)
   const navigate = useNavigate()
 
@@ -31,6 +32,7 @@ function Author(props) {
         setPendingName(response.data.data.name)
         setPendingBirthYear(response.data.data.birth_year)
         setPendingDeathYear(response.data.data.death_year)
+        setPendingUsernames((response.data.data.usernames ?? []).join(', '))
       })
       .catch((error) => {
         console.error(error)
@@ -66,6 +68,7 @@ function Author(props) {
       name: pendingName,
       birth_year: pendingBirthYear,
       death_year: pendingDeathYear,
+      usernames: pendingUsernames.split(',').map(u => u.trim()).filter(Boolean),
     }
 
     db.updateRecord(db.types.auth, id, updateObject)
@@ -103,6 +106,14 @@ function Author(props) {
                 setPendingDeathYear(e.target.value)
               }}
             />
+            <TopLevelFormInput
+              id="usernames"
+              name="Usernames"
+              defaultValue={pendingUsernames}
+              onChange={(e) => {
+                setPendingUsernames(e.target.value)
+              }}
+            />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
@@ -122,6 +133,11 @@ function Author(props) {
                       d. <YearSpan year={pendingDeathYear} />
                     </>
                   ) : null}
+                </TopLevelSubTitle>
+              ) : null}
+              {pendingUsernames ? (
+                <TopLevelSubTitle>
+                  {pendingUsernames.split(',').map(u => u.trim()).filter(Boolean).map(u => `@${u}`).join(', ')}
                 </TopLevelSubTitle>
               ) : null}
             </TopLevelTitleContainer>
