@@ -15,15 +15,30 @@ import {
 import config from '../../config'
 import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
-import { embedNoteIfStale } from '../../utils/embeddings.js'
+import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 
 const pageSize = 40
 
 export const reqFindNotesByString = async (req, res) => {
-  return await findNotesAndPopulate(
-    { $text: { $search: '"' + req.body.searchString.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"' } },
-    {}
+  const escaped = req.body.searchString.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+  const notes = await Note.find(
+    { $text: { $search: escaped } },
+    { score: { $meta: 'textScore' } }
   )
+    .sort({ score: { $meta: 'textScore' } })
+    .populate('author')
+    .populate('ideas')
+    .populate('piles')
+    .populate({ path: 'work', populate: { path: 'author' } })
+    .lean()
+    .exec()
+
+  const noteIds = notes.map((n) => n._id)
+  const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
+  const nickMap = {}
+  nicks.forEach((nick) => { nickMap[nick.note] = nick.key })
+  notes.forEach((note) => { note.nick = nickMap[note._id] || null })
+  return notes
 }
 
 export const reqGetNoteDetails = async (req, res) => {
@@ -476,6 +491,94 @@ export const reqBulkGetNotesForMarkdown = async (req, res) => {
 
   const results = await Promise.all(notePromises)
   return results
+}
+
+export const reqHybridSearch = async (req, res) => {
+  const { query, limit = 20 } = req.body
+  if (!query?.trim()) return []
+
+  const [keywordNotes, queryEmbedding] = await Promise.all([
+    Note.find(
+      { $text: { $search: query.replace(/\\/g, '\\\\').replace(/"/g, '\\"') } },
+      { score: { $meta: 'textScore' } }
+    )
+      .sort({ score: { $meta: 'textScore' } })
+      .limit(50)
+      .populate('author')
+      .populate('ideas')
+      .populate('piles')
+      .populate({ path: 'work', populate: { path: 'author' } })
+      .lean()
+      .exec(),
+    generateEmbedding(query),
+  ])
+
+  // Semantic search over all embedded notes
+  const embeddedNotes = await Note.find(
+    { embedding: { $exists: true, $ne: [] } },
+    { embedding: 1, _id: 1 }
+  ).lean().exec()
+
+  const semanticScores = embeddedNotes.map((n) => ({
+    id: String(n._id),
+    score: cosineSimilarity(queryEmbedding, n.embedding),
+  }))
+  semanticScores.sort((a, b) => b.score - a.score)
+  const top50Semantic = semanticScores.slice(0, 50)
+
+  // Normalize keyword scores (textScore can be any positive number)
+  const maxKeyword = keywordNotes.length > 0 ? Math.max(...keywordNotes.map((n) => n.score || 0)) : 1
+  const keywordMap = new Map(keywordNotes.map((n) => [String(n._id), n]))
+  const keywordScoreMap = new Map(keywordNotes.map((n) => [String(n._id), (n.score || 0) / (maxKeyword || 1)]))
+
+  // Collect all candidate IDs
+  const candidateIds = new Set([
+    ...keywordNotes.map((n) => String(n._id)),
+    ...top50Semantic.map((s) => s.id),
+  ])
+
+  // Fetch semantic-only candidates that aren't in keyword results
+  const semanticOnlyIds = top50Semantic
+    .map((s) => s.id)
+    .filter((id) => !keywordMap.has(id))
+    .slice(0, 30)
+
+  let semanticOnlyNotes = []
+  if (semanticOnlyIds.length > 0) {
+    semanticOnlyNotes = await Note.find({ _id: { $in: semanticOnlyIds } })
+      .populate('author')
+      .populate('ideas')
+      .populate('piles')
+      .populate({ path: 'work', populate: { path: 'author' } })
+      .lean()
+      .exec()
+  }
+
+  const semanticScoreMap = new Map(top50Semantic.map((s) => [s.id, s.score]))
+
+  // Merge and score: 0.6 * keyword + 0.4 * semantic
+  const allNotes = [...keywordNotes, ...semanticOnlyNotes]
+  const seen = new Set()
+  const scored = []
+  for (const note of allNotes) {
+    const id = String(note._id)
+    if (seen.has(id)) continue
+    seen.add(id)
+    const kw = keywordScoreMap.get(id) ?? 0
+    const sem = semanticScoreMap.get(id) ?? 0
+    scored.push({ ...note, _hybridScore: 0.6 * kw + 0.4 * sem, _semantic: sem > 0 && kw === 0 })
+  }
+  scored.sort((a, b) => b._hybridScore - a._hybridScore)
+  const top = scored.slice(0, limit)
+
+  // Attach nicks
+  const noteIds = top.map((n) => n._id)
+  const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
+  const nickMap = {}
+  nicks.forEach((nick) => { nickMap[nick.note] = nick.key })
+  top.forEach((note) => { note.nick = nickMap[note._id] || null })
+
+  return top
 }
 
 export const reqBulkEmbedNotes = async (req, res) => {
