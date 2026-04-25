@@ -253,6 +253,10 @@ export async function getAuthStatus() {
   return axios.get(url_api + `user/me`)
 }
 
+export async function logout() {
+  return axios.post(url_api + `user/logout`)
+}
+
 export async function importNotesForWork(notesText, workID) {
   const data = { notesText: notesText }
   return axios.put(url_api + 'note/import/work/' + workID, data)

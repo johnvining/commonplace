@@ -1,4 +1,4 @@
-import { createNewNoteFromTitle, getAuthStatus } from './Database'
+import { createNewNoteFromTitle, getAuthStatus, logout } from './Database'
 import { createRoot } from 'react-dom/client'
 import { Routes, Route, Link, BrowserRouter, useNavigate } from 'react-router-dom'
 import Author from './Author'
@@ -137,6 +137,17 @@ class App extends React.Component {
                 viewMode={this.state.viewMode}
                 setView={this.setView.bind(this)}
               />
+            </div>
+            <div className="tool-bar div">
+              <button
+                className="button left-right"
+                onClick={async () => {
+                  await logout()
+                  this.setState({ authorized: false })
+                }}
+              >
+                Log out
+              </button>
             </div>
           </div>
         </div>

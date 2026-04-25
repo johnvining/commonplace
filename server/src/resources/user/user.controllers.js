@@ -101,6 +101,11 @@ export const reqCheckAuth = (req, res) => {
   res.status(200).end()
 }
 
+export const reqLogout = (req, res) => {
+  res.clearCookie('jwt', cookieOptions(config))
+  res.status(200).end()
+}
+
 export const reqChangePassword = async (req, res) => {
   const { username, oldPassword, newPassword } = req.body
   let existingUser = await User.findOne({ username: username }).exec()
