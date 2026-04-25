@@ -27,6 +27,34 @@ export const getAutoComplete = async (req, res, withCounts = false) => {
   return doc
 }
 
+export const findAuthorByUrl = async function (url) {
+  try {
+    const parsed = new URL(url)
+    const candidates = new Set()
+
+    // subdomain: username.substack.com, username.github.io
+    const hostParts = parsed.hostname.split('.')
+    if (hostParts.length > 2 && hostParts[0] !== 'www') {
+      candidates.add(hostParts[0].toLowerCase())
+    }
+
+    // first path segment: /username or /@username
+    const segments = parsed.pathname.split('/').filter(Boolean)
+    if (segments.length > 0) {
+      candidates.add(segments[0].replace(/^@/, '').toLowerCase())
+    }
+
+    if (candidates.size === 0) return null
+
+    const escaped = [...candidates].map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    return await Auth.findOne({
+      usernames: { $elemMatch: { $regex: new RegExp(`^(${escaped.join('|')})$`, 'i') } }
+    }).lean()
+  } catch {
+    return null
+  }
+}
+
 export const findAuthorsByString = async function (str, withCounts) {
   let authors = await Auth.find({ name: new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()

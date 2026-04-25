@@ -1,7 +1,7 @@
 import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
 import Pile from '../pile/pile.model.js'
-import { createAuthor } from '../auth/auth.controllers.js'
+import { createAuthor, findAuthorByUrl } from '../auth/auth.controllers.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 
@@ -31,10 +31,18 @@ export const reqCreateWork = async (req, res) => {
 }
 
 export const reqUpdateWork = async (req, res) => {
-  const doc = await updateWorkInfo(req.params.id, req.body)
-  if (!doc) {
-    return res.status(400).end()
+  const updates = { ...req.body }
+
+  if (updates.url) {
+    const existing = await Work.findById(req.params.id).lean()
+    if (existing && !existing.author) {
+      const author = await findAuthorByUrl(updates.url)
+      if (author) updates.author = author._id
+    }
   }
+
+  const doc = await updateWorkInfo(req.params.id, updates)
+  if (!doc) return res.status(400).end()
   return doc
 }
 

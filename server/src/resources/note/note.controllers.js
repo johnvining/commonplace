@@ -118,7 +118,18 @@ export const reqAddNewWork = async (req, res) => {
 }
 
 export const reqUpdateNote = async (req, res) => {
-  return await updateNote(req.params.id, req.body)
+  const updates = { ...req.body }
+
+  if (updates.url) {
+    const existing = await Note.findById(req.params.id).lean()
+    if (existing && !existing.author) {
+      const { findAuthorByUrl } = await import('../auth/auth.controllers.js')
+      const author = await findAuthorByUrl(updates.url)
+      if (author) updates.author = author._id
+    }
+  }
+
+  return await updateNote(req.params.id, updates)
 }
 
 
