@@ -3,6 +3,15 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import config from '../../config'
 
+const TOKEN_LIFETIME_SECONDS = 30 * 24 * 60 * 60
+
+const cookieOptions = (config) => ({
+  httpOnly: true,
+  sameSite: 'strict',
+  secure: !config.isDev,
+  maxAge: TOKEN_LIFETIME_SECONDS * 1000,
+})
+
 export const reqRegisterUser = async (req, res) => {
   const { username, password } = req.body
   if (username != 'commonplace' || !password) {
@@ -21,11 +30,10 @@ export const reqRegisterUser = async (req, res) => {
   try {
     const hash = await bcrypt.hash(password, 10)
     const user = await User.create({ username, password: hash })
-    const maxAge = 24 * 60 * 60
     const token = jwt.sign({ id: user._id, username }, config.secrets.jwt, {
-      expiresIn: maxAge,
+      expiresIn: TOKEN_LIFETIME_SECONDS,
     })
-    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
+    res.cookie('jwt', token, cookieOptions(config))
     res.status(201).json({ message: 'User successfully created', user: user._id })
   } catch (error) {
     res.status(401).json({
@@ -53,17 +61,15 @@ export const reqAuthorizeUser = async (req, res) => {
     } else {
       const result = await bcrypt.compare(password, user.password)
       if (result) {
-        const maxAge = 24 * 60 * 60
         const token = jwt.sign(
           { id: user._id, username, role: user.role },
           config.secrets.jwt,
-          { expiresIn: maxAge }
+          { expiresIn: TOKEN_LIFETIME_SECONDS }
         )
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
+        res.cookie('jwt', token, cookieOptions(config))
         res.status(201).json({
           message: 'User successfully Logged in',
           user: user._id,
-          token: token,
         })
       } else {
         res.status(400).json({ message: 'Incorrect password' })
@@ -76,23 +82,23 @@ export const reqAuthorizeUser = async (req, res) => {
 }
 
 export const reqAuthenticate = async (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '')
-  if (token) {
-    jwt.verify(token, config.secrets.jwt, (err, decodedToken) => {
-      if (err) {
-        console.log(err)
-        return res.status(401).json({ message: 'Not authorized' })
-      } else if (decodedToken.username != 'commonplace') {
-        return res.status(401).json({ message: 'Wrong username' })
-      } else {
-        next()
-      }
-    })
-  } else {
-    return res
-      .status(401)
-      .json({ message: 'Not authorized, token not available' })
+  const token = req.cookies.jwt
+  if (!token) {
+    return res.status(401).json({ message: 'Not authorized, token not available' })
   }
+  jwt.verify(token, config.secrets.jwt, (err, decodedToken) => {
+    if (err) {
+      return res.status(401).json({ message: 'Not authorized' })
+    } else if (decodedToken.username != 'commonplace') {
+      return res.status(401).json({ message: 'Wrong username' })
+    } else {
+      next()
+    }
+  })
+}
+
+export const reqCheckAuth = (req, res) => {
+  res.status(200).end()
 }
 
 export const reqChangePassword = async (req, res) => {
