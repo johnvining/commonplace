@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+axios.defaults.withCredentials = true
+
 export const types = {
   auth: 'auth',
   note: 'note',
@@ -245,6 +247,10 @@ export async function getNick(nick) {
 export async function getAuthentication(password) {
   const data = { username: 'commonplace', password: password }
   return axios.post(url_api + `user/auth`, data)
+}
+
+export async function getAuthStatus() {
+  return axios.get(url_api + `user/me`)
 }
 
 export async function importNotesForWork(notesText, workID) {

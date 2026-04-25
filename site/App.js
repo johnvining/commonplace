@@ -1,4 +1,4 @@
-import { createNewNoteFromTitle } from './Database'
+import { createNewNoteFromTitle, getAuthStatus } from './Database'
 import { createRoot } from 'react-dom/client'
 import { Routes, Route, Link, BrowserRouter } from 'react-router-dom'
 import Author from './Author'
@@ -25,7 +25,6 @@ import Stats from './Stats'
 import ViewSelector from './ViewSelector'
 import Work from './Work'
 import Read from './Read'
-import jwt from 'jsonwebtoken'
 import axios from 'axios'
 import * as constants from './constants'
 import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
@@ -36,8 +35,6 @@ class App extends React.Component {
 
   constructor(props) {
     super(props)
-    axios.defaults.headers.common['Authorization'] =
-      localStorage.getItem('token')
   }
 
   componentDidMount() {
@@ -63,45 +60,14 @@ class App extends React.Component {
     document.title = title
   }
 
-  setNewToken(token) {
-    if (!token || token == 'null' || this.tokenIsExpired(token)) {
-      this.setState({ authorized: false })
-    } else {
-      axios.defaults.headers.common['Authorization'] = `${token}`
-      this.setState({ authorized: true }, () => {
-        localStorage.setItem('token', token)
-      })
-    }
+  setNewToken() {
+    this.setState({ authorized: true })
   }
 
   validateAuth() {
-    let token = localStorage.getItem('token')
-    if (!token || token == 'null' || this.tokenIsExpired(token)) {
-      localStorage.removeItem('token')
-      delete axios.defaults.headers.common['Authorization']
-      this.setState({ authorized: false }, () => {
-        return false
-      })
-    } else {
-      axios.defaults.headers.common['Authorization'] = `${token}`
-      this.setState({ authorized: true }, () => {
-        return true
-      })
-    }
-  }
-
-  tokenIsExpired(token) {
-    if (!token || token == null || token == 'null') {
-      return true
-    }
-    var decodedToken = jwt.decode(token, { complete: true })
-    var dateNow = new Date()
-
-    if (decodedToken) {
-      return decodedToken.payload.exp * 1000 < dateNow.getTime()
-    } else {
-      return true
-    }
+    getAuthStatus()
+      .then(() => this.setState({ authorized: true }))
+      .catch(() => this.setState({ authorized: false }))
   }
 
   render() {
