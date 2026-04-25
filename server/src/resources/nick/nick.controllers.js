@@ -33,7 +33,8 @@ export const generateNickForType = async (req, res, type) => {
   if (!existingNick || existingNick._id == null) {
     var hash = hashFunc(req.params.id)
 
-    while (true) {
+    const MAX_ATTEMPTS = 100
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       let hashString = ('000000' + hash).slice(-6)
       let dupe = await Nick.findOne({ key: prefix + hashString })
 
@@ -60,10 +61,10 @@ export const generateNickForType = async (req, res, type) => {
           })
         }
       } else {
-        // If there's a duplicate, hash again and check on the next round
         hash = hashFunc(hash.toString())
       }
     }
+    throw new Error('Nick generation failed: could not find a unique hash after 100 attempts')
   } else {
     return existingNick
   }
