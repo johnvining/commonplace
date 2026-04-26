@@ -75,6 +75,19 @@ export const reqGetNick = async (req, res) => {
   return nick
 }
 
+export const reqGetNickForNote = async (req, res) => {
+  return Nick.findOne({ note: req.params.id }).lean().exec()
+}
+export const reqGetNickForWork = async (req, res) => {
+  return Nick.findOne({ work: req.params.id }).lean().exec()
+}
+export const reqGetNickForIdea = async (req, res) => {
+  return Nick.findOne({ idea: req.params.id }).lean().exec()
+}
+export const reqGetNickForPile = async (req, res) => {
+  return Nick.findOne({ pile: req.params.id }).lean().exec()
+}
+
 export const hashFunc = function hash(str) {
   let hash = 0
   for (let i = 0, len = str.length; i < len; i++) {

@@ -86,15 +86,36 @@ function formatEntity(type, item) {
   const color = typeColor(type)
   const label = typeLabel(type)
   let name = item.name || '(unnamed)'
+  const nick = item.nick ? `${DIM}:${item.nick}${RESET}` : ''
   let meta = ''
   if (type === 'work' && item.author?.name) meta = ` ${DIM}— ${item.author.name}${RESET}`
   if (type === 'work' && item.year) meta += ` ${DIM}(${item.year})${RESET}`
-  return `${BOLD}${color}[${label}]${RESET} ${name}${meta}\n  ${DIM}${item._id}${RESET}`
+  return `${BOLD}${color}[${label}]${RESET} ${name}${meta}${nick ? '  ' + nick : ''}\n  ${DIM}${item._id}${RESET}`
 }
 
 function formatResult(entry) {
   if (entry.type === 'note') return formatNote(entry.item)
   return formatEntity(entry.type, entry.item)
+}
+
+async function fetchNick(type, id, config) {
+  const map = { note: 'note', auth: null, work: 'work', idea: 'idea', pile: 'pile' }
+  const nickType = map[type]
+  if (!nickType) return null
+  try {
+    const res = await api('GET', `nick/${nickType}/${id}`, null, config)
+    return res?.data?.key || null
+  } catch { return null }
+}
+
+async function ensureNick(type, id, config) {
+  const map = { note: 'note', auth: null, work: 'work', idea: 'idea', pile: 'pile' }
+  const nickType = map[type]
+  if (!nickType) return null
+  try {
+    const res = await api('PUT', `nick/${nickType}/${id}`, null, config)
+    return res?.data?.key || null
+  } catch { return null }
 }
 
 function urlFor(type, id) {
@@ -160,6 +181,11 @@ async function cmdSearch(args, config) {
   }
 
   if (!results.length) { console.log('No results.'); return }
+  await Promise.all(results.map(async (entry) => {
+    if (!entry.item.nick) {
+      entry.item.nick = await ensureNick(entry.type, entry.item._id, config)
+    }
+  }))
   results.forEach((entry, i) => {
     console.log(`\n${DIM}${i + 1}.${RESET}`)
     console.log(formatResult(entry))
@@ -169,16 +195,21 @@ async function cmdSearch(args, config) {
 async function cmdNote(args, config) {
   let id = args[0]
   if (!id) { console.error('Usage: cplace note <id|nick>'); return }
-  // If it looks like a nick (letter + digits), resolve it first
+  let resolvedNick = null
   if (/^[nwip]\d+$/.test(id)) {
+    resolvedNick = id
     const nickRes = await api('GET', `nick/${id}`, null, config)
     const noteId = nickRes?.data?.note
     if (!noteId) { console.log('Nick not found.'); return }
     id = noteId
   }
-  const res = await api('GET', `note/${id}`, null, config)
+  const [res, nickRes] = await Promise.all([
+    api('GET', `note/${id}`, null, config),
+    resolvedNick ? Promise.resolve(null) : ensureNick('note', id, config),
+  ])
   const note = res?.data
   if (!note) { console.log('Not found.'); return }
+  note.nick = resolvedNick || nickRes
   console.log('\n' + formatNote(note, { full: true }))
 }
 
@@ -187,7 +218,9 @@ async function cmdRecent(args, config) {
   const res = await api('GET', `note/all/${page}`, null, config)
   const notes = res?.data || []
   if (!notes.length) { console.log('No notes.'); return }
+  const nicks = await Promise.all(notes.map(n => fetchNick('note', n._id, config)))
   notes.forEach((note, i) => {
+    note.nick = nicks[i]
     const num = (page - 1) * 40 + i + 1
     console.log(`\n${DIM}${num}.${RESET}`)
     console.log(formatNote(note))
@@ -199,7 +232,9 @@ async function cmdAdd(args, config) {
   const res = await api('POST', 'note', { title }, config)
   const note = res
   if (!note?._id) { console.error('Failed to create note.'); return }
-  console.log(`${GREEN}Created:${RESET} ${note._id}`)
+  const nick = await fetchNick('note', note._id, config)
+  const nickStr = nick ? `  ${DIM}:${nick}${RESET}` : ''
+  console.log(`${GREEN}Created:${RESET} ${note._id}${nickStr}`)
   console.log(urlFor('note', note._id) + '/edit')
   exec(`open "${urlFor('note', note._id)}/edit"`)
 }
@@ -210,7 +245,9 @@ async function cmdQuick(args, config) {
   const res = await api('POST', 'note', { title }, config)
   const note = res
   if (!note?._id) { console.error('Failed to create note.'); return }
-  console.log(`${GREEN}Created:${RESET} ${note._id}  ${DIM}${title}${RESET}`)
+  const nick = await fetchNick('note', note._id, config)
+  const nickStr = nick ? `  ${DIM}:${nick}${RESET}` : ''
+  console.log(`${GREEN}Created:${RESET} ${note._id}${nickStr}  ${DIM}${title}${RESET}`)
 }
 
 async function cmdStats(args, config) {
@@ -258,8 +295,12 @@ async function cmdCapture(args, config) {
   const note = res
   if (!note?._id) { console.error('Failed to create note.'); return }
   const id = note._id
+  const nick = isJson ? null : await fetchNick('note', id, config)
 
-  if (!isJson) console.log(`${GREEN}Created:${RESET} ${id}  ${DIM}${title}${RESET}`)
+  if (!isJson) {
+    const nickStr = nick ? `  ${DIM}:${nick}${RESET}` : ''
+    console.log(`${GREEN}Created:${RESET} ${id}${nickStr}  ${DIM}${title}${RESET}`)
+  }
 
   if (flags.author) {
     const authorId = await resolveOrCreate('auth', flags.author, config)
@@ -290,7 +331,8 @@ async function cmdCapture(args, config) {
   }
 
   if (isJson) {
-    console.log(JSON.stringify({ id, title, url: urlFor('note', id) }))
+    const nick = await fetchNick('note', id, config)
+    console.log(JSON.stringify({ id, nick, title, url: urlFor('note', id) }))
   }
 }
 
