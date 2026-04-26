@@ -14,4 +14,7 @@ const linkSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
+linkSchema.index({ left_note: 1 })
+linkSchema.index({ right_note: 1 })
+
 export default mongoose.model('link', linkSchema)
