@@ -382,9 +382,18 @@ async function cmdSet(args, config) {
 }
 
 async function cmdOpen(args, config) {
-  const id = args[0]
-  const type = args[1] || 'note'
-  if (!id) { console.error('Usage: cp open <id> [type]'); return }
+  let id = args[0]
+  if (!id) { console.error('Usage: cplace open <id|nick>'); return }
+  let type = 'note'
+  if (/^[nwip]\d+$/.test(id)) {
+    const nickRes = await api('GET', `nick/${id}`, null, config)
+    const data = nickRes?.data
+    if (!data) { console.error('Nick not found.'); return }
+    if (data.note)  { id = data.note; type = 'note' }
+    if (data.work)  { id = data.work; type = 'work' }
+    if (data.idea)  { id = data.idea; type = 'idea' }
+    if (data.pile)  { id = data.pile; type = 'pile' }
+  }
   const url = urlFor(type, id)
   console.log(url)
   exec(`open "${url}"`)
