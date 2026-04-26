@@ -4,7 +4,6 @@ import defaultControllers, {
   getAutoCompleteWithCounts,
   reqCreateAuthor,
   reqDeleteAuthor,
-  reqGetAuthorDetails,
   reqGetNotesForAuthor,
   reqGetAllNotesForAuthor,
   reqGetWorksForAuthor
