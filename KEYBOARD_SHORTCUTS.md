@@ -47,14 +47,24 @@ Active when the search bar is open.
 | `work` | Search/create works |
 | `read` | Access reading page |
 
+### 2.4 Direct Commands (Enter to Execute)
+| Command | Action |
+|---------|--------|
+| `logout` | Log out |
+| `flip` | Go to flip view |
+| `home` | Go to home |
+| `load` | Go to load page |
+| `file` | Go to file list |
+| `slim` / `full` / `grid` / `tile` | Switch view mode |
+
 ---
 
 ## 3. Entity Pages
 
-Shortcuts for Work, Pile, Idea, and Read pages.
+Shortcuts for Author, Work, Pile, Idea, and Read pages.
 
 ### 3.1 Common Entity Shortcuts
-Available on all entity pages (Work, Pile, Idea, Read).
+Available on all entity pages (Author, Work, Pile, Idea, Read).
 
 | Shortcut | Action |
 |----------|--------|
@@ -63,23 +73,28 @@ Available on all entity pages (Work, Pile, Idea, Read).
 | `Ctrl+S` | Star/unstar entity (when not editing) |
 | `Escape` | Exit edit mode |
 
-### 3.2 Work Page
+### 3.2 Author Page
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+S` | Star / unstar author |
+
+### 3.3 Work Page
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+N` | Create new note for this work |
 | `Ctrl+P` | Edit piles |
 
-### 3.3 Read Page
+### 3.4 Read Page
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+N` | Create new note for this work |
 
-### 3.4 Pile Page
+### 3.5 Pile Page
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+N` | Create new note in this pile |
 
-### 3.5 Idea Page
+### 3.6 Idea Page
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+N` | Create new note with this idea |
