@@ -19,10 +19,11 @@ function Login(props) {
       props.onTokenReceived(response.data.token)
     } catch (err) {
       const status = err?.response?.status
+      const code = status ? ` (${status})` : ''
       if (status === 401 || status === 403) {
-        setError('Incorrect password')
+        setError(`Incorrect password${code}`)
       } else {
-        setError('Server unavailable — try again shortly')
+        setError(`Server unavailable — try again shortly${code}`)
       }
     }
   }
