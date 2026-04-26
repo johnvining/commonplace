@@ -1,34 +1,38 @@
 import { createNewNoteFromTitle, getAuthStatus, logout } from './Database'
 import { createRoot } from 'react-dom/client'
 import { Routes, Route, Link, BrowserRouter, useNavigate } from 'react-router-dom'
-import Author from './Author'
-import AuthorNotes from './AuthorNotes'
-import FileList from './FileList'
-import FlipList from './FlipList'
-import Find from './Find'
-import Idea from './Idea'
-import Login from './Login'
-import Load from './Load'
-import NoteView from './NoteView'
-import NickView from './NickView'
-import Pile from './Pile'
-import PileHome from './PileHome'
 import plus from 'url:./icons/plus.svg'
-import React from 'react'
-import RecentList from './RecentList'
-import RecentItems from './RecentItems'
+import React, { Suspense } from 'react'
 import search from 'url:./icons/search.svg'
 import home_door from 'url:./icons/home_door.svg'
+import axios from 'axios'
+import * as constants from './constants'
+import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+
+// Always-visible shell components — kept eager so the chrome renders immediately
+import Login from './Login'
+import RecentList from './RecentList'
 import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
 import Stats from './Stats'
 import ViewSelector from './ViewSelector'
-import Work from './Work'
-import Read from './Read'
-import axios from 'axios'
-import * as constants from './constants'
-import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import HelpOverlay from './HelpOverlay'
+
+// Route-specific components — lazy-loaded so they don't bloat the initial bundle
+const Author      = React.lazy(() => import('./Author'))
+const AuthorNotes = React.lazy(() => import('./AuthorNotes'))
+const FileList    = React.lazy(() => import('./FileList'))
+const FlipList    = React.lazy(() => import('./FlipList'))
+const Find        = React.lazy(() => import('./Find'))
+const Idea        = React.lazy(() => import('./Idea'))
+const Load        = React.lazy(() => import('./Load'))
+const NoteView    = React.lazy(() => import('./NoteView'))
+const NickView    = React.lazy(() => import('./NickView'))
+const Pile        = React.lazy(() => import('./Pile'))
+const PileHome    = React.lazy(() => import('./PileHome'))
+const RecentItems = React.lazy(() => import('./RecentItems'))
+const Work        = React.lazy(() => import('./Work'))
+const Read        = React.lazy(() => import('./Read'))
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1, hasToken: false }
@@ -167,6 +171,7 @@ class App extends React.Component {
         <div className="app-shell">
           <Sidebar />
           <div className="app-content">
+            <Suspense fallback={null}>
             <Routes>
               <Route
                 path="/auth/:id"
@@ -319,6 +324,7 @@ class App extends React.Component {
                 }
               />
             </Routes>
+            </Suspense>
           </div>
         </div>
       </div>
