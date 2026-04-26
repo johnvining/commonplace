@@ -368,10 +368,12 @@ export const reqBulkImportInstapaper = async (req, res) => {
 
 export const reqBulkOcrForNotes = async (req, res) => {
   const noteIds = req.body.noteIds
+  const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
+  const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
 
   const notePromises = noteIds.map(async (noteId) => {
     try {
-      let note = await Note.findOne({ _id: noteId })
+      let note = noteMap[String(noteId)]
 
       if (!note.text && note.images && note.images.length > 0) {
         const imagePromises = note.images.map((imagePath) =>
@@ -412,10 +414,12 @@ export const reqBulkOcrForNotes = async (req, res) => {
 
 export const reqBulkSuggestTitlesForNotes = async (req, res) => {
   const noteIds = req.body.noteIds
+  const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
+  const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
 
   const notePromises = noteIds.map(async (noteId) => {
     try {
-      let note = await Note.findOne({ _id: noteId })
+      let note = noteMap[String(noteId)]
 
       if (!note.title && note.text) {
         let suggestion = await getSuggestedTitle(note.text)
