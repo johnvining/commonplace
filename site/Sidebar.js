@@ -5,12 +5,31 @@ import { getPinnedItems, unpinItem } from './pinned'
 import starSmall from 'url:./icons/star-small.svg'
 
 const RECENT_LIMIT = 15
+const SIDEBAR_CACHE_KEY = 'sidebar_cache'
+const SIDEBAR_CACHE_TTL = 5 * 60 * 1000
+
+function readSidebarCache() {
+  try {
+    const raw = localStorage.getItem(SIDEBAR_CACHE_KEY)
+    if (!raw) return null
+    const { data, ts } = JSON.parse(raw)
+    if (Date.now() - ts > SIDEBAR_CACHE_TTL) return null
+    return data
+  } catch { return null }
+}
+
+function writeSidebarCache(data) {
+  try {
+    localStorage.setItem(SIDEBAR_CACHE_KEY, JSON.stringify({ data, ts: Date.now() }))
+  } catch {}
+}
 
 function Sidebar() {
-  const [recentIdeas, setRecentIdeas] = useState([])
-  const [recentPiles, setRecentPiles] = useState([])
+  const cached = readSidebarCache()
+  const [recentIdeas, setRecentIdeas] = useState(cached?.ideas || [])
+  const [recentPiles, setRecentPiles] = useState(cached?.piles || [])
   const [pinnedItems, setPinnedItems] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!cached)
   useEffect(() => {
     let isMounted = true
 
@@ -23,11 +42,14 @@ function Sidebar() {
 
         if (!isMounted) return
 
-        setRecentIdeas((ideasResponse.data.data || []).slice(0, RECENT_LIMIT))
-        setRecentPiles((pilesResponse.data.data || []).slice(0, RECENT_LIMIT))
+        const ideas = (ideasResponse.data.data || []).slice(0, RECENT_LIMIT)
+        const piles = (pilesResponse.data.data || []).slice(0, RECENT_LIMIT)
+        setRecentIdeas(ideas)
+        setRecentPiles(piles)
+        writeSidebarCache({ ideas, piles })
       } catch (error) {
         console.error('Sidebar recent load error:', error)
-        if (isMounted) {
+        if (isMounted && !cached) {
           setRecentIdeas([])
           setRecentPiles([])
         }
