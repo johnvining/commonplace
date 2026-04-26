@@ -78,6 +78,11 @@ class App extends React.Component {
       })
   }
 
+  async handleLogout() {
+    await logout()
+    this.setState({ authorized: false })
+  }
+
   render() {
     if (!this.state.authorized) {
       return <Login onTokenReceived={this.setNewToken.bind(this)} />
@@ -138,17 +143,6 @@ class App extends React.Component {
                 setView={this.setView.bind(this)}
               />
             </div>
-            <div className="tool-bar div">
-              <button
-                className="button left-right"
-                onClick={async () => {
-                  await logout()
-                  this.setState({ authorized: false })
-                }}
-              >
-                Log out
-              </button>
-            </div>
           </div>
         </div>
         {this.state.barOpen ? (
@@ -164,6 +158,7 @@ class App extends React.Component {
                 beforeNavigate={this.beforeSearchNavigate.bind(this)}
                 setView={this.setView.bind(this)}
                 onClose={() => this.setState({ barOpen: false })}
+                onLogout={this.handleLogout.bind(this)}
               />
             </div>
           </div>

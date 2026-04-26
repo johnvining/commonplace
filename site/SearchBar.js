@@ -44,6 +44,14 @@ function SearchBar(props) {
       return
     }
 
+    // Logout command
+    if (!currentModifier && normalizedText === 'logout') {
+      setTypedText('')
+      props.beforeNavigate()
+      if (props.onLogout) await props.onLogout()
+      return
+    }
+
     // Direct navigation commands
     if (
       !currentModifier &&
