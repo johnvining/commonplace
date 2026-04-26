@@ -181,6 +181,87 @@ async function cmdAdd(args, config) {
   exec(`open "${urlFor('note', note._id)}/edit"`)
 }
 
+async function cmdQuick(args, config) {
+  const title = args.join(' ')
+  if (!title) { console.error('Usage: cplace quick <title>'); return }
+  const res = await api('POST', 'note', { title }, config)
+  const note = res
+  if (!note?._id) { console.error('Failed to create note.'); return }
+  console.log(`${GREEN}Created:${RESET} ${note._id}  ${DIM}${title}${RESET}`)
+}
+
+async function cmdStats(args, config) {
+  const res = await api('GET', 'stats', null, config)
+  const d = res?.data
+  if (!d) { console.log('No stats.'); return }
+  console.log(`${BOLD}Notes${RESET}   ${d.notes}`)
+  console.log(`${BOLD}Authors${RESET} ${d.authors}`)
+  console.log(`${BOLD}Works${RESET}   ${d.works}`)
+  console.log(`${BOLD}Ideas${RESET}   ${d.ideas}`)
+  console.log(`${BOLD}Piles${RESET}   ${d.piles}`)
+}
+
+function parseFlags(args) {
+  const flags = {}
+  let title = []
+  for (let i = 0; i < args.length; i++) {
+    if (args[i].startsWith('--') && i + 1 < args.length) {
+      const key = args[i].slice(2)
+      flags[key] = args[++i]
+    } else {
+      title.push(args[i])
+    }
+  }
+  return { title: title.join(' '), flags }
+}
+
+async function resolveOrCreate(type, name, config) {
+  const ac = await api('POST', `${type}/autocomplete`, { string: name }, config)
+  const items = ac?.data || []
+  if (items.length) return items[0]._id
+  const created = await api('POST', type, { name }, config)
+  return created?._id || created?.data?._id
+}
+
+async function cmdCapture(args, config) {
+  const { title, flags } = parseFlags(args)
+  if (!title) { console.error('Usage: cplace capture <title> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME]'); return }
+
+  const res = await api('POST', 'note', { title }, config)
+  const note = res
+  if (!note?._id) { console.error('Failed to create note.'); return }
+  const id = note._id
+  console.log(`${GREEN}Created:${RESET} ${id}  ${DIM}${title}${RESET}`)
+
+  if (flags.author) {
+    const authorId = await resolveOrCreate('auth', flags.author, config)
+    if (authorId) {
+      await api('PUT', `note/${id}`, { author: authorId }, config)
+      console.log(`${DIM}  author → ${flags.author}${RESET}`)
+    }
+  }
+
+  if (flags.work) {
+    const workId = await resolveOrCreate('work', flags.work, config)
+    if (workId) {
+      await api('PUT', `note/${id}/work`, { id: workId }, config)
+      console.log(`${DIM}  work → ${flags.work}${RESET}`)
+    }
+  }
+
+  if (flags.idea) {
+    for (const tag of flags.idea.split(',').map(s => s.trim()).filter(Boolean)) {
+      await api('PUT', `note/${id}/idea/create`, { name: tag }, config)
+      console.log(`${DIM}  idea → ${tag}${RESET}`)
+    }
+  }
+
+  if (flags.pile) {
+    await api('PUT', `note/${id}/pile/create`, { name: flags.pile }, config)
+    console.log(`${DIM}  pile → ${flags.pile}${RESET}`)
+  }
+}
+
 async function cmdOpen(args, config) {
   const id = args[0]
   const type = args[1] || 'note'
@@ -310,7 +391,11 @@ ${BOLD}Commands${RESET}
   ideas <query>      Search ideas
   works <query>      Search works
   piles <query>      Search piles
+  quick <title>      Create a note without opening browser
+  capture <title> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME]
+                     Create a note with metadata in one step
   flip               Show random notes
+  stats              Show counts (notes, authors, works, ideas, piles)
   edit <id> <field> <value>  Update a note's title or text
   config [url <url>] Show or set config (server URL)
   ping               Check server status
@@ -341,6 +426,9 @@ const commands = {
   flip:    cmdFlip,
   edit:    cmdEdit,
   config:  cmdConfig,
+  quick:   cmdQuick,
+  stats:   cmdStats,
+  capture: cmdCapture,
   help:    async () => cmdHelp(),
 }
 
