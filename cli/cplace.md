@@ -51,9 +51,9 @@ Creates a note silently and prints the ID. Use this when capturing from within a
 
 ### Capture with metadata
 ```bash
-cplace capture "<title>" [--author "Name"] [--work "Title"] [--idea "tag1,tag2"] [--pile "pile name"]
+cplace capture "<title>" [--text "body"] [--author "Name"] [--work "Title"] [--idea "tag1,tag2"] [--pile "pile name"]
 ```
-Creates a note and links author, work, ideas, and/or pile in one step. Author and work are resolved by autocomplete (created if not found). Multiple ideas are comma-separated.
+Creates a note and links author, work, ideas, and/or pile in one step. Author and work are resolved by autocomplete (created if not found). Multiple ideas are comma-separated. Add `--json` for machine-readable output.
 
 ### Stats
 ```bash
@@ -61,10 +61,27 @@ cplace stats
 ```
 Shows total counts for notes, authors, works, ideas, and piles.
 
-### Edit a note field
+### Update metadata on an existing note
+```bash
+cplace set <id> [--author "Name"] [--work "Title"] [--idea "tag1,tag2"] [--pile "Name"] [--title "T"] [--text "T"]
+```
+Links or creates author/work/ideas/pile on an existing note. Also updates title or text inline.
+
+### Edit a note field (simple)
 ```bash
 cplace edit <id> title "New title"
 cplace edit <id> text "Note body text"
+```
+
+### Random notes
+```bash
+cplace flip
+```
+
+### Config
+```bash
+cplace config                # show current URL and auth status
+cplace config url http://... # set server URL
 ```
 
 ### Check server status
