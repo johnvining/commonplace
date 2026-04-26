@@ -49,8 +49,8 @@ class NoteSlim extends React.PureComponent {
           )}
         </div>
         <div className="note-slim">
-          <Link to={'/note/' + this.props.id} className="note-slim">
-            <div tabIndex={this.props.tabIndex} className="note-slim">
+          <Link to={'/note/' + this.props.id} className="note-slim" tabIndex={this.props.tabIndex}>
+            <div className="note-slim">
               <div className="note-slim inner truncate">
                 <WorkCitationSpan
                   authorName={
