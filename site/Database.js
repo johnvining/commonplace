@@ -14,13 +14,14 @@ export const types = {
 export const url_api = process.env.SERVER_API
 
 // Supported types: idea, auth, work, pile
-export async function getSuggestions(type, search, withCounts = false) {
+export async function getSuggestions(type, search, withCounts = false, signal) {
   const data = { string: search }
+  const opts = signal ? { signal } : {}
 
   if (!withCounts) {
-    return axios.post(url_api + type + `/autocomplete`, data)
+    return axios.post(url_api + type + `/autocomplete`, data, opts)
   } else {
-    return axios.post(url_api + type + `/autocomplete/with-counts`, data)
+    return axios.post(url_api + type + `/autocomplete/with-counts`, data, opts)
   }
 }
 
@@ -173,8 +174,9 @@ export async function searchNotes(searchString) {
   return axios.put(url_api + 'note/find', data)
 }
 
-export async function hybridSearchNotes(query, limit = 20) {
-  return axios.post(url_api + 'note/hybrid-search', { query, limit })
+export async function hybridSearchNotes(query, limit = 20, signal) {
+  const opts = signal ? { signal } : {}
+  return axios.post(url_api + 'note/hybrid-search', { query, limit }, opts)
 }
 
 export async function bulkEmbedNotes() {
