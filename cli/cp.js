@@ -135,13 +135,24 @@ async function cmdLogin(args, config) {
 }
 
 async function cmdSearch(args, config) {
-  const query = args.join(' ')
-  if (!query) { console.error('Usage: cp search <query>'); return }
+  const jsonFlag = args.includes('--json')
+  const query = args.filter(a => a !== '--json').join(' ')
+  if (!query) { console.error('Usage: cplace search <query> [--json]'); return }
 
-  process.stdout.write(`Searching for "${query}"...\r`)
+  if (!jsonFlag) process.stdout.write(`Searching for "${query}"...\r`)
   const res = await api('POST', 'note/unified-search', { query, limit: 20 }, config)
   const results = res?.data || []
-  process.stdout.write('\x1b[2K\r')
+  if (!jsonFlag) process.stdout.write('\x1b[2K\r')
+
+  if (jsonFlag) {
+    console.log(JSON.stringify(results.map(e => ({
+      type: e.type,
+      id: e.item._id,
+      name: e.item.title || e.item.name,
+      score: e.score,
+    }))))
+    return
+  }
 
   if (!results.length) { console.log('No results.'); return }
   results.forEach((entry, i) => {
@@ -225,19 +236,24 @@ async function resolveOrCreate(type, name, config) {
 
 async function cmdCapture(args, config) {
   const { title, flags } = parseFlags(args)
-  if (!title) { console.error('Usage: cplace capture <title> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME]'); return }
+  if (!title) { console.error('Usage: cplace capture <title> [--text BODY] [--author NAME] [--work NAME] [--idea TAG] [--pile NAME]'); return }
+  const isJson = flags.json !== undefined
 
-  const res = await api('POST', 'note', { title }, config)
+  const createBody = { title }
+  if (flags.text) createBody.text = flags.text
+
+  const res = await api('POST', 'note', createBody, config)
   const note = res
   if (!note?._id) { console.error('Failed to create note.'); return }
   const id = note._id
-  console.log(`${GREEN}Created:${RESET} ${id}  ${DIM}${title}${RESET}`)
+
+  if (!isJson) console.log(`${GREEN}Created:${RESET} ${id}  ${DIM}${title}${RESET}`)
 
   if (flags.author) {
     const authorId = await resolveOrCreate('auth', flags.author, config)
     if (authorId) {
       await api('PUT', `note/${id}`, { author: authorId }, config)
-      console.log(`${DIM}  author → ${flags.author}${RESET}`)
+      if (!isJson) console.log(`${DIM}  author → ${flags.author}${RESET}`)
     }
   }
 
@@ -245,20 +261,24 @@ async function cmdCapture(args, config) {
     const workId = await resolveOrCreate('work', flags.work, config)
     if (workId) {
       await api('PUT', `note/${id}/work`, { newWork: workId }, config)
-      console.log(`${DIM}  work → ${flags.work}${RESET}`)
+      if (!isJson) console.log(`${DIM}  work → ${flags.work}${RESET}`)
     }
   }
 
   if (flags.idea) {
     for (const tag of flags.idea.split(',').map(s => s.trim()).filter(Boolean)) {
       await api('PUT', `note/${id}/idea/create`, { name: tag }, config)
-      console.log(`${DIM}  idea → ${tag}${RESET}`)
+      if (!isJson) console.log(`${DIM}  idea → ${tag}${RESET}`)
     }
   }
 
   if (flags.pile) {
     await api('PUT', `note/${id}/pile/create`, { name: flags.pile }, config)
-    console.log(`${DIM}  pile → ${flags.pile}${RESET}`)
+    if (!isJson) console.log(`${DIM}  pile → ${flags.pile}${RESET}`)
+  }
+
+  if (isJson) {
+    console.log(JSON.stringify({ id, title, url: urlFor('note', id) }))
   }
 }
 
