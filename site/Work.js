@@ -96,22 +96,22 @@ function Work(props) {
   }
 
   const fetchWorkInfo = (workId) => {
-    db.getInfo(db.types.work, workId)
-      .then((response) => {
-        setPendingWorkTitle(response.data.data.name)
-        setPiles(response.data.data.piles)
-        setPendingAuthorName(response.data.data.author?.name)
-        setPendingAuthorId(response.data.data.author?._id)
-        setPendingUrl(response.data.data.url)
-        setPendingYear(response.data.data.year)
-        setPendingSummary(response.data.data.summary)
-        setPendingCitationInfo(response.data.data.citation_information)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-    db.getWorkNick(workId).then((response) => {
-      setNick(response.data.data.key)
+    Promise.all([
+      db.getInfo(db.types.work, workId),
+      db.getWorkNick(workId),
+    ]).then(([infoResponse, nickResponse]) => {
+      const work = infoResponse.data.data
+      setPendingWorkTitle(work.name)
+      setPiles(work.piles)
+      setPendingAuthorName(work.author?.name)
+      setPendingAuthorId(work.author?._id)
+      setPendingUrl(work.url)
+      setPendingYear(work.year)
+      setPendingSummary(work.summary)
+      setPendingCitationInfo(work.citation_information)
+      setNick(nickResponse.data.data.key)
+    }).catch((error) => {
+      console.error(error)
     })
   }
 

@@ -25,19 +25,19 @@ function Read(props) {
   const navigate = useNavigate()
 
   const fetchWorkInfo = (workId) => {
-    db.getInfo(db.types.work, workId)
-      .then((response) => {
-        setWorkTitle(response.data.data.name)
-        setAuthorName(response.data.data.author?.name)
-        setAuthorId(response.data.data.author?._id)
-        setUrl(response.data.data.url)
-        setYear(response.data.data.year)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-    db.getWorkNick(workId).then((response) => {
-      setNick(response.data.data.key)
+    Promise.all([
+      db.getInfo(db.types.work, workId),
+      db.getWorkNick(workId),
+    ]).then(([infoResponse, nickResponse]) => {
+      const work = infoResponse.data.data
+      setWorkTitle(work.name)
+      setAuthorName(work.author?.name)
+      setAuthorId(work.author?._id)
+      setUrl(work.url)
+      setYear(work.year)
+      setNick(nickResponse.data.data.key)
+    }).catch((error) => {
+      console.error(error)
     })
   }
 

@@ -29,17 +29,17 @@ function Idea(props) {
   const navigate = useNavigate()
 
   const fetchIdeaInfo = (ideaId) => {
-    db.getInfo(db.types.idea, ideaId)
-      .then((response) => {
-        setPendingName(response.data.data.name)
-        setPendingStartYear(response.data.data.start_year)
-        setPendingEndYear(response.data.data.end_year)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-    db.getIdeaNick(ideaId).then((response) => {
-      setNick(response.data.data.key)
+    Promise.all([
+      db.getInfo(db.types.idea, ideaId),
+      db.getIdeaNick(ideaId),
+    ]).then(([infoResponse, nickResponse]) => {
+      const idea = infoResponse.data.data
+      setPendingName(idea.name)
+      setPendingStartYear(idea.start_year)
+      setPendingEndYear(idea.end_year)
+      setNick(nickResponse.data.data.key)
+    }).catch((error) => {
+      console.error(error)
     })
   }
 

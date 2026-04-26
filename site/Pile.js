@@ -30,17 +30,17 @@ function Pile(props) {
   const navigate = useNavigate()
 
   const fetchPileInfo = (pileId) => {
-    db.getInfo(db.types.pile, pileId)
-      .then((response) => {
-        setPendingName(response.data.data.name)
-        setPendingStartYear(response.data.data.start_year)
-        setPendingEndYear(response.data.data.end_year)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-    db.getPileNick(pileId).then((response) => {
-      setNick(response.data.data.key)
+    Promise.all([
+      db.getInfo(db.types.pile, pileId),
+      db.getPileNick(pileId),
+    ]).then(([infoResponse, nickResponse]) => {
+      const pile = infoResponse.data.data
+      setPendingName(pile.name)
+      setPendingStartYear(pile.start_year)
+      setPendingEndYear(pile.end_year)
+      setNick(nickResponse.data.data.key)
+    }).catch((error) => {
+      console.error(error)
     })
   }
 
