@@ -150,6 +150,7 @@ class NoteList extends React.Component {
       this.props.index,
       this.state.page + 1
     )
+    window.scrollTo({ top: 0, behavior: 'instant' })
     this.setState(
       {
         notes: response.data.data,
@@ -170,6 +171,7 @@ class NoteList extends React.Component {
       this.props.index,
       this.state.page - 1
     )
+    window.scrollTo({ top: 0, behavior: 'instant' })
     this.setState(
       {
         notes: response.data.data,
