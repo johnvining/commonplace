@@ -2,24 +2,43 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import * as db from './Database'
 
+const CACHE_KEY = 'stats_cache'
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
+function readCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const { data, ts } = JSON.parse(raw)
+    if (Date.now() - ts > CACHE_TTL) return null
+    return data
+  } catch {
+    return null
+  }
+}
+
+function writeCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }))
+  } catch {}
+}
+
 function Stats() {
-  const [stats, setStats] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState(() => readCache())
   const [error, setError] = useState(null)
   const navigate = useNavigate()
 
   useEffect(() => {
+    // If we already have cached data, fetch in the background to refresh it
     const fetchStats = async () => {
       try {
-        setLoading(true)
         const response = await db.getStats()
         setStats(response.data.data)
         setError(null)
+        writeCache(response.data.data)
       } catch (err) {
         console.error('Error fetching stats:', err)
-        setError('Failed to load statistics')
-      } finally {
-        setLoading(false)
+        if (!stats) setError('Failed to load statistics')
       }
     }
 
@@ -30,16 +49,12 @@ function Stats() {
     navigate(`/recent/${type}`)
   }
 
-  if (loading) {
-    return <div className="stats-loading">...</div>
-  }
-
-  if (error) {
-    return null // Don't show anything if there's an error
+  if (error && !stats) {
+    return null
   }
 
   if (!stats) {
-    return null
+    return <div className="stats-loading">...</div>
   }
 
   return (
