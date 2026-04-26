@@ -262,6 +262,51 @@ async function cmdCapture(args, config) {
   }
 }
 
+async function cmdSet(args, config) {
+  const id = args[0]
+  const { flags } = parseFlags(args.slice(1))
+  if (!id) { console.error('Usage: cplace set <id> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME] [--title TEXT] [--text TEXT]'); return }
+
+  if (flags.title || flags.text) {
+    const body = {}
+    if (flags.title) body.title = flags.title
+    if (flags.text) body.text = flags.text
+    await api('PUT', `note/${id}`, body, config)
+    if (flags.title) console.log(`${DIM}  title → ${flags.title}${RESET}`)
+    if (flags.text) console.log(`${DIM}  text updated${RESET}`)
+  }
+
+  if (flags.author) {
+    const authorId = await resolveOrCreate('auth', flags.author, config)
+    if (authorId) {
+      await api('PUT', `note/${id}`, { author: authorId }, config)
+      console.log(`${DIM}  author → ${flags.author}${RESET}`)
+    }
+  }
+
+  if (flags.work) {
+    const workId = await resolveOrCreate('work', flags.work, config)
+    if (workId) {
+      await api('PUT', `note/${id}/work`, { id: workId }, config)
+      console.log(`${DIM}  work → ${flags.work}${RESET}`)
+    }
+  }
+
+  if (flags.idea) {
+    for (const tag of flags.idea.split(',').map(s => s.trim()).filter(Boolean)) {
+      await api('PUT', `note/${id}/idea/create`, { name: tag }, config)
+      console.log(`${DIM}  idea → ${tag}${RESET}`)
+    }
+  }
+
+  if (flags.pile) {
+    await api('PUT', `note/${id}/pile/create`, { name: flags.pile }, config)
+    console.log(`${DIM}  pile → ${flags.pile}${RESET}`)
+  }
+
+  console.log(`${GREEN}Done.${RESET}`)
+}
+
 async function cmdOpen(args, config) {
   const id = args[0]
   const type = args[1] || 'note'
@@ -394,6 +439,8 @@ ${BOLD}Commands${RESET}
   quick <title>      Create a note without opening browser
   capture <title> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME]
                      Create a note with metadata in one step
+  set <id> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME] [--title T] [--text T]
+                     Update metadata on an existing note
   flip               Show random notes
   stats              Show counts (notes, authors, works, ideas, piles)
   edit <id> <field> <value>  Update a note's title or text
@@ -429,6 +476,7 @@ const commands = {
   quick:   cmdQuick,
   stats:   cmdStats,
   capture: cmdCapture,
+  set:     cmdSet,
   help:    async () => cmdHelp(),
 }
 
