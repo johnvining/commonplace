@@ -17,8 +17,13 @@ function Login(props) {
     try {
       const response = await db.getAuthentication(password)
       props.onTokenReceived(response.data.token)
-    } catch {
-      setError('Incorrect password')
+    } catch (err) {
+      const status = err?.response?.status
+      if (status === 401 || status === 403) {
+        setError('Incorrect password')
+      } else {
+        setError('Server unavailable — try again shortly')
+      }
     }
   }
 
