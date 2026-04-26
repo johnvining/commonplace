@@ -30,8 +30,11 @@ async function api(method, path, body, config) {
   const opts = { method, headers }
   if (body) opts.body = JSON.stringify(body)
   const res = await fetch(url, opts)
-  if (res.status === 401) throw new Error('Not authenticated — run: cp login')
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  if (res.status === 401) throw new Error('Not authenticated — run: cplace login')
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '')
+    throw new Error(`HTTP ${res.status}: ${errText}`)
+  }
   // Capture Set-Cookie on login
   const setCookie = res.headers.get('set-cookie')
   if (setCookie) {
