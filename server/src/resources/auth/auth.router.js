@@ -6,6 +6,7 @@ import defaultControllers, {
   reqDeleteAuthor,
   reqGetAuthorDetails,
   reqGetNotesForAuthor,
+  reqGetAllNotesForAuthor,
   reqGetWorksForAuthor
 } from './auth.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
@@ -19,6 +20,7 @@ router
 router.route('/autocomplete').post(asyncWrapper(getAutoComplete, 200))
 router.route('/:id/delete').delete(asyncWrapper(reqDeleteAuthor, 204))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForAuthor, 200))
+router.route('/:id/all-notes').get(asyncWrapper(reqGetAllNotesForAuthor, 200))
 router.route('/:id/works').get(asyncWrapper(reqGetWorksForAuthor, 200))
 router
   .route('/:id')

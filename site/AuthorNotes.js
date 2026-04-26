@@ -29,49 +29,7 @@ function AuthorNotes(props) {
       })
   }
 
-  const getAllNotesForAuthor = async () => {
-    try {
-      const authorNotesResponse = await db.getRecordsWithFilter(
-        db.types.note,
-        db.types.auth,
-        id
-      )
-      const authorNotes = authorNotesResponse.data.data || []
-
-      const worksResponse = await db.getRecordsWithFilter(
-        db.types.work,
-        db.types.auth,
-        id
-      )
-      const works = worksResponse.data.data || []
-
-      let workNotes = []
-      if (works.length > 0) {
-        const workNotesPromises = works.map((work) =>
-          db.getRecordsWithFilter(db.types.note, db.types.work, work._id)
-        )
-        const workNotesResponses = await Promise.all(workNotesPromises)
-        workNotes = workNotesResponses.flatMap(
-          (response) => response.data.data || []
-        )
-      }
-
-      const allNotes = [...authorNotes, ...workNotes]
-      const uniqueNotes = allNotes.filter(
-        (note, index, self) =>
-          index === self.findIndex((n) => n._id === note._id)
-      )
-
-      return {
-        data: {
-          data: uniqueNotes,
-        },
-      }
-    } catch (error) {
-      console.error('Error fetching notes:', error)
-      return { data: { data: [] } }
-    }
-  }
+  const getAllNotesForAuthor = () => db.getAllNotesForAuthor(id)
 
   useEffect(() => {
     fetchAuthorInfo(id)

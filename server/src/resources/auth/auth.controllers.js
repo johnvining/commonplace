@@ -15,6 +15,16 @@ export const reqGetNotesForAuthor = async (req, res) => {
   return doc
 }
 
+export const reqGetAllNotesForAuthor = async (req, res) => {
+  const authorId = req.params.id
+  const works = await Work.find({ author: authorId }, { _id: 1 }).lean().exec()
+  const workIds = works.map(w => w._id)
+  const query = workIds.length
+    ? { $or: [{ author: authorId }, { work: { $in: workIds } }] }
+    : { author: authorId }
+  return findNotesAndPopulate(query, { updatedAt: -1 })
+}
+
 export const getAutoCompleteWithCounts = async (req, res) => {
   return getAutoComplete(req, res, true)
 }

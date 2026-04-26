@@ -74,6 +74,11 @@ export async function getRecordsWithFilter(recordType, filterType, filterId) {
   )
 }
 
+// All notes for an author, including notes on their works
+export async function getAllNotesForAuthor(authorId) {
+  return axios.get(url_api + 'auth/' + authorId + '/all-notes')
+}
+
 // Supported combinations:
 //   - create auth and add to work
 //   - create pile and add to work
