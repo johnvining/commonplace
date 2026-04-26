@@ -18,6 +18,7 @@ import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
+import { generateNick } from '../nick/nick.controllers.js'
 
 const pageSize = 40
 
@@ -295,11 +296,15 @@ export const reqGetSuggestedIdeasForNote = async function (req, res) {
 }
 
 export const createNote = async function (title, author) {
-  return await Note.create({ title: title, author: author })
+  const note = await Note.create({ title: title, author: author })
+  generateNick('note', note._id).catch(() => {})
+  return note
 }
 
 export const createNoteObj = async function (obj) {
-  return await Note.create(obj)
+  const note = await Note.create(obj)
+  generateNick('note', note._id).catch(() => {})
+  return note
 }
 
 export const updateNote = async (noteId, updateObj) => {

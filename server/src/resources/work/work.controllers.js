@@ -5,6 +5,7 @@ import { createAuthor, findAuthorByUrl } from '../auth/auth.controllers.js'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
+import { generateNick } from '../nick/nick.controllers.js'
 
 // Request response
 export const reqGetNotesForWork = async (req, res) => {
@@ -72,6 +73,7 @@ export const reqAddPile = async (req, res) => {
 
 export const reqAddNewPile = async (req, res) => {
   const newPile = await Pile.create({ name: req.body.name })
+  generateNick('pile', newPile._id).catch(() => {})
   const doc = await addPileToId(req.params.id, newPile._id)
   return doc
 }
@@ -113,7 +115,9 @@ export const findWorksByString = async function(string, withCounts = false) {
 }
 
 export const createWork = async function(name) {
-  return await Work.create({ name: name })
+  const work = await Work.create({ name: name })
+  generateNick('work', work._id).catch(() => {})
+  return work
 }
 
 export const getWorkInfo = async function(workId) {

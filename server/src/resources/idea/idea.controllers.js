@@ -1,6 +1,7 @@
 import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
+import { generateNick } from '../nick/nick.controllers.js'
 import {
   removeIdeaFromNote,
   findNotesAndPopulate
@@ -87,7 +88,9 @@ export const reqDeleteIdea = async (req, res) => {
 
 // Idea
 export const createIdea = async function(name) {
-  return await Idea.create({ name: name })
+  const idea = await Idea.create({ name: name })
+  generateNick('idea', idea._id).catch(() => {})
+  return idea
 }
 
 export const findIdeaByString = async function(string) {

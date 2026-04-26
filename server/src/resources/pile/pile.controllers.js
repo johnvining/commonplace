@@ -4,6 +4,7 @@ import Work from '../work/work.model.js'
 import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { removePileFromWork } from '../work/work.controllers.js'
+import { generateNick } from '../nick/nick.controllers.js'
 
 export const reqGetNotesForPile = async (req, res) => {
   const doc = await findNotesAndPopulate(
@@ -110,7 +111,9 @@ export const deletePile = async function (pileId) {
 
 export const findOrCreatePile = async (name) => {
   if (!name) return
-  return Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
+  const pile = await Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
+  generateNick('pile', pile._id).catch(() => {})
+  return pile
 }
 
 export const findPiles = async function (
