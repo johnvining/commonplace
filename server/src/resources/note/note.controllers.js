@@ -1,5 +1,5 @@
 import Note from './note.model.js'
-import Auth from '../auth/auth.model.js'
+import { Auth } from '../auth/auth.model.js'
 import Pile from '../pile/pile.model.js'
 import Idea from '../idea/idea.model.js'
 import Work from '../work/work.model.js'
