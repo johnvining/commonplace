@@ -179,6 +179,11 @@ export async function hybridSearchNotes(query, limit = 20, signal) {
   return axios.post(url_api + 'note/hybrid-search', { query, limit }, opts)
 }
 
+export async function unifiedSearch(query, limit = 50, signal) {
+  const opts = signal ? { signal } : {}
+  return axios.post(url_api + 'note/unified-search', { query, limit }, opts)
+}
+
 export async function bulkEmbedNotes() {
   return axios.post(url_api + 'note/bulk-embed', {})
 }

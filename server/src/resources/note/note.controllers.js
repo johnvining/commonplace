@@ -1,4 +1,5 @@
 import Note from './note.model.js'
+import Auth from '../auth/auth.model.js'
 import Pile from '../pile/pile.model.js'
 import Idea from '../idea/idea.model.js'
 import Work from '../work/work.model.js'
@@ -501,8 +502,7 @@ export const reqBulkGetNotesForMarkdown = async (req, res) => {
   return results
 }
 
-export const reqHybridSearch = async (req, res) => {
-  const { query, limit = 20 } = req.body
+async function hybridSearch(query, limit = 20) {
   if (!query?.trim()) return []
 
   const [keywordNotes, queryEmbedding] = await Promise.all([
@@ -522,7 +522,6 @@ export const reqHybridSearch = async (req, res) => {
     generateEmbedding(query),
   ])
 
-  // Semantic search over all embedded notes
   const embeddedNotes = await Note.find(
     { embedding: { $exists: true, $ne: [] } },
     { embedding: 1, _id: 1 }
@@ -535,18 +534,10 @@ export const reqHybridSearch = async (req, res) => {
   semanticScores.sort((a, b) => b.score - a.score)
   const top50Semantic = semanticScores.slice(0, 50)
 
-  // Normalize keyword scores (textScore can be any positive number)
   const maxKeyword = keywordNotes.length > 0 ? Math.max(...keywordNotes.map((n) => n.score || 0)) : 1
   const keywordMap = new Map(keywordNotes.map((n) => [String(n._id), n]))
   const keywordScoreMap = new Map(keywordNotes.map((n) => [String(n._id), (n.score || 0) / (maxKeyword || 1)]))
 
-  // Collect all candidate IDs
-  const candidateIds = new Set([
-    ...keywordNotes.map((n) => String(n._id)),
-    ...top50Semantic.map((s) => s.id),
-  ])
-
-  // Fetch semantic-only candidates that aren't in keyword results
   const semanticOnlyIds = top50Semantic
     .map((s) => s.id)
     .filter((id) => !keywordMap.has(id))
@@ -566,7 +557,6 @@ export const reqHybridSearch = async (req, res) => {
 
   const semanticScoreMap = new Map(top50Semantic.map((s) => [s.id, s.score]))
 
-  // Merge and score: 0.6 * keyword + 0.4 * semantic
   const allNotes = [...keywordNotes, ...semanticOnlyNotes]
   const seen = new Set()
   const scored = []
@@ -581,7 +571,6 @@ export const reqHybridSearch = async (req, res) => {
   scored.sort((a, b) => b._hybridScore - a._hybridScore)
   const top = scored.slice(0, limit)
 
-  // Attach nicks
   const noteIds = top.map((n) => n._id)
   const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
   const nickMap = {}
@@ -589,6 +578,47 @@ export const reqHybridSearch = async (req, res) => {
   top.forEach((note) => { note.nick = nickMap[note._id] || null })
 
   return top
+}
+
+function scoreEntityName(name, query) {
+  if (!name) return 0.3
+  const n = name.toLowerCase()
+  const q = query.toLowerCase()
+  if (n === q) return 1.0
+  if (n.startsWith(q)) return 0.85
+  if (n.includes(q)) return 0.7
+  return 0.5
+}
+
+export const reqHybridSearch = async (req, res) => {
+  const { query, limit = 20 } = req.body
+  return hybridSearch(query, limit)
+}
+
+export const reqUnifiedSearch = async (req, res) => {
+  const { query, limit = 50 } = req.body
+  if (!query?.trim()) return []
+
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(escaped, 'i')
+
+  const [notes, authors, works, ideas, piles] = await Promise.all([
+    hybridSearch(query, limit),
+    Auth.find({ name: regex }).lean().exec(),
+    Work.find({ name: regex }).populate('author').lean().exec(),
+    Idea.find({ name: regex }).lean().exec(),
+    Pile.find({ name: regex }).lean().exec(),
+  ])
+
+  const results = []
+  for (const note of notes)   results.push({ type: 'note', item: note, score: note._hybridScore || 0.5 })
+  for (const a of authors)    results.push({ type: 'auth', item: a, score: scoreEntityName(a.name, query) })
+  for (const w of works)      results.push({ type: 'work', item: w, score: scoreEntityName(w.name, query) })
+  for (const i of ideas)      results.push({ type: 'idea', item: i, score: scoreEntityName(i.name, query) })
+  for (const p of piles)      results.push({ type: 'pile', item: p, score: scoreEntityName(p.name, query) })
+
+  results.sort((a, b) => b.score - a.score)
+  return results
 }
 
 export const reqBulkEmbedNotes = async (req, res) => {

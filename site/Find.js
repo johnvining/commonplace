@@ -40,37 +40,6 @@ function highlight(text, query) {
 
 const PAGE_SIZE = 20
 
-function scoreEntity(name, query) {
-  if (!name) return 0.3
-  const n = name.toLowerCase()
-  const q = query.toLowerCase()
-  if (n === q) return 1.0
-  if (n.startsWith(q)) return 0.85
-  if (n.includes(q)) return 0.7
-  return 0.5
-}
-
-function buildUnifiedResults(rawResults, query) {
-  const all = []
-
-  ;(rawResults.notes || []).forEach(n => all.push({
-    type: 'note', item: n, score: n._hybridScore || 0.5, id: n._id,
-  }))
-  ;(rawResults.works || []).forEach(w => all.push({
-    type: 'work', item: w, score: scoreEntity(w.name, query), id: w._id,
-  }))
-  ;(rawResults.authors || []).forEach(a => all.push({
-    type: 'auth', item: a, score: scoreEntity(a.name, query), id: a._id,
-  }))
-  ;(rawResults.ideas || []).forEach(i => all.push({
-    type: 'idea', item: i, score: scoreEntity(i.name, query), id: i._id,
-  }))
-  ;(rawResults.piles || []).forEach(p => all.push({
-    type: 'pile', item: p, score: scoreEntity(p.name, query), id: p._id,
-  }))
-
-  return all.sort((a, b) => b.score - a.score)
-}
 
 function UnifiedResult({ entry, query }) {
   const { type, item } = entry
@@ -142,30 +111,21 @@ function UnifiedResult({ entry, query }) {
   return null
 }
 
-const EMPTY_RESULTS = { notes: null, works: null, ideas: null, authors: null, piles: null }
-
 function Find(props) {
   const { search, category } = useParams()
-  const [rawResults, setRawResults] = React.useState(EMPTY_RESULTS)
+  const [results, setResults] = React.useState(null)
   const [page, setPage] = React.useState(1)
 
   React.useEffect(() => {
     const controller = new AbortController()
     const { signal } = controller
 
-    setRawResults(EMPTY_RESULTS)
+    setResults(null)
     setPage(1)
 
-    const update = (key) => (res) => {
-      if (!signal.aborted) setRawResults(prev => ({ ...prev, [key]: res.data.data }))
-    }
-    const ignore = () => {}
-
-    db.hybridSearchNotes(search, 50, signal).then(update('notes')).catch(ignore)
-    db.getSuggestions(db.types.work, search, true, signal).then(update('works')).catch(ignore)
-    db.getSuggestions(db.types.idea, search, true, signal).then(update('ideas')).catch(ignore)
-    db.getSuggestions(db.types.auth, search, true, signal).then(update('authors')).catch(ignore)
-    db.getSuggestions(db.types.pile, search, false, signal).then(update('piles')).catch(ignore)
+    db.unifiedSearch(search, 50, signal)
+      .then(res => { if (!signal.aborted) setResults(res.data.data) })
+      .catch(() => { if (!signal.aborted) setResults([]) })
 
     return () => controller.abort()
   }, [search])
@@ -240,12 +200,8 @@ function Find(props) {
   }
 
   // Main unified search page
-  const allResolved = Object.values(rawResults).every(v => v !== null)
-  const anyResolved = Object.values(rawResults).some(v => v !== null)
-  const unified = buildUnifiedResults(rawResults, search)
-  const totalPages = Math.ceil(unified.length / PAGE_SIZE)
-  const pageItems = unified.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-  const nothing = allResolved && unified.length === 0
+  const totalPages = results ? Math.ceil(results.length / PAGE_SIZE) : 0
+  const pageItems = results ? results.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : []
 
   return (
     <div>
@@ -253,14 +209,14 @@ function Find(props) {
         <TopLevelTitle>{search}</TopLevelTitle>
       </TopLevelTitleContainer>
 
-      {!anyResolved ? (
+      {results === null ? (
         <div className="search-loading-state">Loading...</div>
-      ) : nothing ? (
+      ) : results.length === 0 ? (
         <div className="search-no-results">No results for "{search}"</div>
       ) : (
         <>
-          {pageItems.map((entry, i) => (
-            <UnifiedResult key={entry.type + '-' + entry.id} entry={entry} query={search} />
+          {pageItems.map((entry) => (
+            <UnifiedResult key={entry.type + '-' + String(entry.item._id)} entry={entry} query={search} />
           ))}
 
           {totalPages > 1 && (
