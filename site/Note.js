@@ -1003,7 +1003,7 @@ class Note extends React.Component {
                     stopPropagation={false}
                     tabIndex={
                       selected || edit || edit_ideas || edit_piles || edit_links
-                        ? null
+                        ? this.props.tabIndex
                         : '-1'
                     }
                   />
@@ -1015,7 +1015,7 @@ class Note extends React.Component {
                         constants.note_modes.EDIT_PILES
                       )
                     }}
-                    tabIndex={selected ? null : '-1'}
+                    tabIndex={selected ? this.props.tabIndex : '-1'}
                   >
                     <img src={pile_img}></img>
                   </button>
@@ -1027,14 +1027,14 @@ class Note extends React.Component {
                         constants.note_modes.EDIT_IDEAS
                       )
                     }}
-                    tabIndex={selected ? null : '-1'}
+                    tabIndex={selected ? this.props.tabIndex : '-1'}
                   >
                     <img src={tags}></img>
                   </button>
                   <Link to={'/note/' + this.props.id}>
                     <button
                       className={'button action-button'}
-                      tabIndex={selected ? null : '-1'}
+                      tabIndex={selected ? this.props.tabIndex : '-1'}
                     >
                       <img src={document_image}></img>
                     </button>
@@ -1047,7 +1047,7 @@ class Note extends React.Component {
                         constants.note_modes.EDIT_LINKS
                       )
                     }}
-                    tabIndex={selected ? null : '-1'}
+                    tabIndex={selected ? this.props.tabIndex : '-1'}
                   >
                     <img src={link}></img>
                   </button>
@@ -1059,14 +1059,14 @@ class Note extends React.Component {
                         constants.note_modes.EDIT
                       )
                     }}
-                    tabIndex={selected ? null : '-1'}
+                    tabIndex={selected ? this.props.tabIndex : '-1'}
                   >
                     <img src={write}></img>
                   </button>
                   <button
                     onClick={this.handleDelete.bind(this)}
                     className={'button action-button'}
-                    tabIndex={selected ? null : '-1'}
+                    tabIndex={selected ? this.props.tabIndex : '-1'}
                   >
                     <img src={trash}></img>
                   </button>
