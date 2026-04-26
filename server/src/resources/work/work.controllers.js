@@ -101,22 +101,15 @@ export const findWorksByString = async function(string, withCounts = false) {
     .populate('author')
     .lean()
     .exec()
-  if (!withCounts) {
-    return works
-  } else {
-    let notePromises = []
-    works.map(work => {
-      notePromises.push(Note.find({ work: work._id }).countDocuments())
-    })
+  if (!withCounts || !works.length) return works
 
-    await Promise.all(notePromises).then(result => {
-      result.map((val, idx) => {
-        works[idx] = { ...works[idx], note_count: val }
-      })
-    })
-
-    return works
-  }
+  const workIds = works.map(w => w._id)
+  const noteCounts = await Note.aggregate([
+    { $match: { work: { $in: workIds } } },
+    { $group: { _id: '$work', count: { $sum: 1 } } },
+  ])
+  const noteMap = Object.fromEntries(noteCounts.map(x => [String(x._id), x.count]))
+  return works.map(w => ({ ...w, note_count: noteMap[String(w._id)] || 0 }))
 }
 
 export const createWork = async function(name) {
