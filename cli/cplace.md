@@ -102,17 +102,11 @@ If the server is not running, say so clearly and stop — do not fabricate resul
 
 ## Example interactions
 
-> "What do I have on Seneca?"
-> → `cplace search Seneca`
+> "What do I have on Shakespeare?"
+> → `cplace search Shakespeare`
 
 > "Show me that note on attention"
 > → `cplace search attention` then `cplace note <id>` on the best match
-
-> "Save this: Marcus Aurelius says the obstacle is the way"
-> → `cplace capture "The obstacle is the way" --author "Marcus Aurelius"`
-
-> "Note that Seneca says time is the only true capital in Letters from a Stoic"
-> → `cplace capture "Time is the only true capital" --author "Seneca" --work "Letters from a Stoic"`
 
 > "What authors have I read?"
 > → `cplace authors ""` or `cplace search <topic>`
