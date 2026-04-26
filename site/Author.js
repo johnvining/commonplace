@@ -15,6 +15,7 @@ import {
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
 import PinButton, { TopLevelStarButton } from './PinButton'
+import useEntityKeyboardShortcuts from './useEntityKeyboardShortcuts'
 
 function Author(props) {
   const { id } = useParams()
@@ -53,6 +54,13 @@ function Author(props) {
     fetchAuthorInfo(id)
     fetchAuthorWorks(id)
   }, [id])
+
+  useEntityKeyboardShortcuts({
+    isEditing: edit,
+    onEdit: () => setEdit(true),
+    onSave: handleAcceptUpdates,
+    onExitEdit: () => setEdit(false),
+  })
 
   const deleteAuthor = async () => {
     if (!confirm(`Do you want to permanently delete '${pendingName}'?`)) {
