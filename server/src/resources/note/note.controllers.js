@@ -691,15 +691,12 @@ export const findRandomNotesAndPopulate = async function (
     { $sample: { size: pageSize } },
   ]).exec()
 
-  await Note.populate(random_notes, { path: 'author' })
-  await Note.populate(random_notes, { path: 'ideas' })
-  await Note.populate(random_notes, { path: 'piles' })
-  const populated_notes = await Note.populate(random_notes, {
-    path: 'work',
-    populate: {
-      path: 'author',
-    },
-  })
+  const populated_notes = await Note.populate(random_notes, [
+    { path: 'author' },
+    { path: 'ideas' },
+    { path: 'piles' },
+    { path: 'work', populate: { path: 'author' } },
+  ])
 
   const noteIds = populated_notes.map((note) => note._id)
   const nicks = await Nick.find({ note: { $in: noteIds } })
