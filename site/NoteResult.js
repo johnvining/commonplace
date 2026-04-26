@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import note_img from 'url:./icons/write.svg'
-import NoteAuthorSpan from './NoteAuthorSpan'
+import WorkCitationSpan from './WorkCitationSpan'
 import PinButton from './PinButton'
 
 function snippetAround(text, query) {
@@ -25,7 +25,12 @@ class NoteResult extends React.PureComponent {
   render() {
     const note = this.props.note
     const hl = this.props.highlight
-    const author = <NoteAuthorSpan note={note} separator=": " />
+
+    const authorName = note.author?.name ?? note.work?.author?.name
+    const authorID = note.author?._id ?? null
+    const workTitle = note.work?.name ?? null
+    const workID = note.work?._id ?? null
+    const hasAttribution = authorName || workTitle
 
     const title = note.title?.length ? note.title : null
     const body = note.text?.length ? note.text : note.take?.length ? note.take : null
@@ -51,6 +56,7 @@ class NoteResult extends React.PureComponent {
       : null
 
     const labelText = title || body || 'Untitled Note'
+    const ideas = note.ideas?.length ? note.ideas : null
 
     return (
       <Link to={`/note/${note._id}`} key={'note-list-' + note._id}>
@@ -58,7 +64,18 @@ class NoteResult extends React.PureComponent {
           <div className="result-box header">
             <img src={note_img} />
             <span className="truncate">
-              {author}
+              {hasAttribution ? (
+                <>
+                  <WorkCitationSpan
+                    authorName={authorName}
+                    authorID={authorID}
+                    workTitle={workTitle}
+                    workID={workID}
+                    spaceAfter={false}
+                  />
+                  {': '}
+                </>
+              ) : null}
               {primaryContent}
             </span>
             {this.props.semantic ? <span className="semantic-badge">~</span> : null}
@@ -73,6 +90,13 @@ class NoteResult extends React.PureComponent {
           </div>
           {secondaryContent ? (
             <div className="result-box-snippet">{secondaryContent}</div>
+          ) : null}
+          {ideas ? (
+            <div className="result-box-ideas">
+              {ideas.map(i => (
+                <span key={i._id} className="idea">{i.name}</span>
+              ))}
+            </div>
           ) : null}
         </div>
       </Link>
