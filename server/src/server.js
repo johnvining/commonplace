@@ -33,7 +33,10 @@ app.use(
   })
 )
 
-app.use(cors())
+app.use(cors({
+  origin: config.isDev ? true : false, // reflect request origin in dev; same-origin in prod via nginx
+  credentials: true,
+}))
 app.use(json({ limit: '5mb' }))
 app.use(urlencoded({ extended: true, limit: '5mb' }))
 app.use(morgan('dev'))
