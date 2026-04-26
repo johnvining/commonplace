@@ -241,6 +241,45 @@ async function cmdPiles(args, config) {
   piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}  ${DIM}${p._id}${RESET}`))
 }
 
+async function cmdFlip(args, config) {
+  const res = await api('GET', 'note/flip', null, config)
+  const notes = res?.data || []
+  if (!notes.length) { console.log('No notes.'); return }
+  notes.forEach((note, i) => {
+    console.log(`\n${DIM}${i + 1}.${RESET}`)
+    console.log(formatNote(note))
+  })
+}
+
+async function cmdEdit(args, config) {
+  const id = args[0]
+  const field = args[1]
+  const value = args.slice(2).join(' ')
+  if (!id) { console.error('Usage: cplace edit <id> title|text <value>'); return }
+  if (!field || !value) { console.error('Usage: cplace edit <id> title|text <value>'); return }
+  if (field !== 'title' && field !== 'text') { console.error('Field must be title or text'); return }
+  await api('PUT', `note/${id}`, { [field]: value }, config)
+  console.log(`${GREEN}Updated.${RESET}`)
+}
+
+async function cmdConfig(args, config) {
+  const key = args[0]
+  const val = args[1]
+  if (!key) {
+    console.log(`url:   ${config.url || DEFAULT_URL}`)
+    console.log(`token: ${config.token ? '(set)' : '(none)'}`)
+    return
+  }
+  if (key === 'url') {
+    if (!val) { console.error('Usage: cplace config url <url>'); return }
+    config.url = val.endsWith('/') ? val : val + '/'
+    saveConfig(config)
+    console.log(`${GREEN}URL set to ${config.url}${RESET}`)
+    return
+  }
+  console.error(`Unknown config key: ${key}`)
+}
+
 async function cmdNick(args, config) {
   const nick = args[0]
   if (!nick) { console.error('Usage: cp nick <nick>'); return }
@@ -271,6 +310,9 @@ ${BOLD}Commands${RESET}
   ideas <query>      Search ideas
   works <query>      Search works
   piles <query>      Search piles
+  flip               Show random notes
+  edit <id> <field> <value>  Update a note's title or text
+  config [url <url>] Show or set config (server URL)
   ping               Check server status
   help               Show this help
 
@@ -296,6 +338,9 @@ const commands = {
   works:   cmdWorks,
   piles:   cmdPiles,
   nick:    cmdNick,
+  flip:    cmdFlip,
+  edit:    cmdEdit,
+  config:  cmdConfig,
   help:    async () => cmdHelp(),
 }
 
