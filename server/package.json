@@ -12,6 +12,7 @@
     "dev": "NODE_ENV=development nodemon --exec npm run restart",
     "import": "node dist/cli/import.js",
     "restart": "rimraf dist && npm run build && npm run start",
+    "prestart": "lsof -ti :3000 | xargs kill -9 2>/dev/null; exit 0",
     "start": "node dist/index.js"
   },
   "dependencies": {

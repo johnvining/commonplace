@@ -65,9 +65,15 @@ export const start = async () => {
     await Note.syncIndexes()
 
     console.log('Listening...')
-    app.listen(config.port, () => {
+    const server = app.listen(config.port, () => {
       console.log(`REST API on http://localhost:${config.port}/api`)
     })
+
+    const shutdown = () => {
+      server.close(() => process.exit(0))
+    }
+    process.on('SIGTERM', shutdown)
+    process.on('SIGINT', shutdown)
   } catch (e) {
     console.error(e)
   }

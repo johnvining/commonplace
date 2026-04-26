@@ -6,13 +6,15 @@ import { createInterface } from 'readline'
 import { exec } from 'child_process'
 
 const CONFIG_PATH = join(homedir(), '.commonplace.json')
-const DEFAULT_URL = 'http://localhost:3000/api/'
+const DEV_URL  = 'http://localhost:3000/api/'
+const PROD_URL = 'http://10.0.1.8:3000/api/'
+const DEFAULT_URL = process.env.NODE_ENV === 'development' ? DEV_URL : PROD_URL
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
 function loadConfig() {
-  if (!existsSync(CONFIG_PATH)) return { url: DEFAULT_URL, token: null }
-  try { return JSON.parse(readFileSync(CONFIG_PATH, 'utf8')) } catch { return { url: DEFAULT_URL, token: null } }
+  if (!existsSync(CONFIG_PATH)) return { token: null }
+  try { return JSON.parse(readFileSync(CONFIG_PATH, 'utf8')) } catch { return { token: null } }
 }
 
 function saveConfig(config) {
@@ -24,7 +26,7 @@ function saveConfig(config) {
 async function api(method, path, body, config) {
   const url = (config.url || DEFAULT_URL) + path
   const headers = { 'Content-Type': 'application/json' }
-  if (config.token) headers['Cookie'] = `token=${config.token}`
+  if (config.token) headers['Cookie'] = `jwt=${config.token}`
   const opts = { method, headers }
   if (body) opts.body = JSON.stringify(body)
   const res = await fetch(url, opts)
@@ -33,7 +35,7 @@ async function api(method, path, body, config) {
   // Capture Set-Cookie on login
   const setCookie = res.headers.get('set-cookie')
   if (setCookie) {
-    const match = setCookie.match(/token=([^;]+)/)
+    const match = setCookie.match(/jwt=([^;]+)/)
     if (match) config._newToken = match[1]
   }
   const text = await res.text()
