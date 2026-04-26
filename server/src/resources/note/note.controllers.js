@@ -17,6 +17,7 @@ import config from '../../config'
 import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
+import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
 
 const pageSize = 40
 
@@ -59,6 +60,7 @@ export const reqDeleteNote = async (req, res) => {
     )
   }
   await Note.deleteOne({ _id: id })
+  invalidateEmbedding(id)
   res.status(200).end()
 }
 
@@ -186,6 +188,7 @@ export const reqUpdateNote = async (req, res) => {
       .then(async (embeddingUpdate) => {
         if (embeddingUpdate) {
           await Note.findByIdAndUpdate(req.params.id, embeddingUpdate)
+          upsertEmbedding(req.params.id, embeddingUpdate.embedding)
         }
       })
       .catch((err) => console.error('[embed] error for note', req.params.id, err))
@@ -522,15 +525,12 @@ async function hybridSearch(query, limit = 20) {
     generateEmbedding(query),
   ])
 
-  const embeddedNotes = await Note.find(
-    { embedding: { $exists: true, $ne: [] } },
-    { embedding: 1, _id: 1 }
-  ).lean().exec()
+  const embeddingMap = await getEmbeddingCache()
 
-  const semanticScores = embeddedNotes.map((n) => ({
-    id: String(n._id),
-    score: cosineSimilarity(queryEmbedding, n.embedding),
-  }))
+  const semanticScores = []
+  for (const [id, embedding] of embeddingMap) {
+    semanticScores.push({ id, score: cosineSimilarity(queryEmbedding, embedding) })
+  }
   semanticScores.sort((a, b) => b.score - a.score)
   const top50Semantic = semanticScores.slice(0, 50)
 
