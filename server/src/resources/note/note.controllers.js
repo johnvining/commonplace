@@ -19,6 +19,9 @@ import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../uti
 
 const pageSize = 40
 
+// Fields that are large and not needed in list views
+const LIST_OMIT = '-embedding -ocrText -embeddingHash'
+
 export const reqFindNotesByString = async (req, res) => {
   const escaped = req.body.searchString.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
   const notes = await Note.find(
@@ -26,6 +29,7 @@ export const reqFindNotesByString = async (req, res) => {
     { score: { $meta: 'textScore' } }
   )
     .sort({ score: { $meta: 'textScore' } })
+    .select(LIST_OMIT)
     .populate('author')
     .populate('ideas')
     .populate('piles')
@@ -42,7 +46,7 @@ export const reqFindNotesByString = async (req, res) => {
 }
 
 export const reqGetNoteDetails = async (req, res) => {
-  return await findNotesAndPopulate({ _id: req.params.id })
+  return await findNotesAndPopulate({ _id: req.params.id }, null, false, null, null, null)
 }
 
 export const reqDeleteNote = async (req, res) => {
@@ -504,6 +508,7 @@ export const reqHybridSearch = async (req, res) => {
     )
       .sort({ score: { $meta: 'textScore' } })
       .limit(50)
+      .select(LIST_OMIT)
       .populate('author')
       .populate('ideas')
       .populate('piles')
@@ -546,6 +551,7 @@ export const reqHybridSearch = async (req, res) => {
   let semanticOnlyNotes = []
   if (semanticOnlyIds.length > 0) {
     semanticOnlyNotes = await Note.find({ _id: { $in: semanticOnlyIds } })
+      .select(LIST_OMIT)
       .populate('author')
       .populate('ideas')
       .populate('piles')
@@ -629,7 +635,8 @@ export const findNotesAndPopulate = async function (
   sortObject,
   slim = false,
   skip = null,
-  limit = null
+  limit = null,
+  projection = LIST_OMIT
 ) {
   let notes
   if (slim) {
@@ -637,6 +644,7 @@ export const findNotesAndPopulate = async function (
       .sort(sortObject)
       .skip(skip)
       .limit(limit)
+      .select(projection)
       .lean()
       .exec()
   } else {
@@ -644,6 +652,7 @@ export const findNotesAndPopulate = async function (
       .sort(sortObject)
       .skip(skip)
       .limit(limit)
+      .select(projection)
       .populate('author')
       .populate('ideas')
       .populate('piles')
