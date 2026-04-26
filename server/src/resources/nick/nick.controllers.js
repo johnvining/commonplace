@@ -44,6 +44,36 @@ export const reqGetNick = async (req, res) => {
   return Nick.findOne({ key: req.params.nick })
 }
 
+export const reqBackfillNicks = async (req, res) => {
+  const { default: Note } = await import('../note/note.model.js')
+  const { default: Work } = await import('../work/work.model.js')
+  const { default: Idea } = await import('../idea/idea.model.js')
+  const { default: Pile } = await import('../pile/pile.model.js')
+
+  const types = [
+    { type: 'note', Model: Note },
+    { type: 'work', Model: Work },
+    { type: 'idea', Model: Idea },
+    { type: 'pile', Model: Pile },
+  ]
+
+  const results = {}
+  for (const { type, Model } of types) {
+    const all = await Model.find({}, { _id: 1 }).lean().exec()
+    const existing = await Nick.find({ [type]: { $exists: true } }, { [type]: 1 }).lean().exec()
+    const covered = new Set(existing.map(n => String(n[type])))
+    const missing = all.filter(doc => !covered.has(String(doc._id)))
+
+    let created = 0, failed = 0
+    for (const doc of missing) {
+      try { await generateNick(type, doc._id); created++ }
+      catch { failed++ }
+    }
+    results[type] = { total: all.length, already_had_nick: all.length - missing.length, created, failed }
+  }
+  return results
+}
+
 export const reqGetNickForNote = async (req, res) => Nick.findOne({ note: req.params.id }).lean().exec()
 export const reqGetNickForWork = async (req, res) => Nick.findOne({ work: req.params.id }).lean().exec()
 export const reqGetNickForIdea = async (req, res) => Nick.findOne({ idea: req.params.id }).lean().exec()

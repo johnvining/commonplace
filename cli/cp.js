@@ -503,6 +503,16 @@ async function cmdNick(args, config) {
   }
 }
 
+async function cmdBackfillNicks(args, config) {
+  console.log('Backfilling nicks...')
+  const res = await api('POST', 'nick/backfill', null, config)
+  const results = res?.data
+  if (!results) { console.error('No response.'); return }
+  for (const [type, r] of Object.entries(results)) {
+    console.log(`${BOLD}${type}${RESET}  total=${r.total}  had_nick=${r.already_had_nick}  created=${r.created}  failed=${r.failed}`)
+  }
+}
+
 function cmdHelp() {
   console.log(`
 ${BOLD}cplace${RESET} — Commonplace CLI
@@ -560,6 +570,7 @@ const commands = {
   stats:   cmdStats,
   capture: cmdCapture,
   set:     cmdSet,
+  'backfill-nicks': cmdBackfillNicks,
   help:    async () => cmdHelp(),
 }
 

@@ -9,7 +9,6 @@
   "scripts": {
     "build": "swc src -d dist --strip-leading-paths",
     "cli": "node dist/cli/cli.js",
-    "backfill-nicks": "npm run build && node dist/cli/backfill-nicks.js",
     "dev": "NODE_ENV=development nodemon --exec npm run restart",
     "import": "node dist/cli/import.js",
     "restart": "rimraf dist && npm run build && npm run start",
