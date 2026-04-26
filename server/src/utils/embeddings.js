@@ -36,7 +36,7 @@ export function cosineSimilarity(a, b) {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB))
 }
 
-const MAX_CHARS = 30000 // ~8k tokens at ~4 chars/token with headroom
+const MAX_CHARS = 20000 // conservative limit; dense content (code, CJK) tokenizes at fewer chars/token
 
 export async function generateEmbedding(text) {
   const response = await openai().embeddings.create({
