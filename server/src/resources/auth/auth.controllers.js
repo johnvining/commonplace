@@ -70,30 +70,26 @@ export const findAuthorsByString = async function (str, withCounts) {
   let authors = await Auth.find({ name: new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
-  if (!withCounts) {
-    return authors
-  } else {
-    let notePromises = [],
-      workPromises = []
-    authors.map((author) => {
-      notePromises.push(Note.find({ author: author._id }).countDocuments())
-      workPromises.push(Work.find({ author: author._id }).countDocuments())
-    })
+  if (!withCounts || !authors.length) return authors
 
-    let noteFiler = Promise.all(notePromises).then((result) => {
-      result.map((val, idx) => {
-        authors[idx] = { ...authors[idx], note_count: val }
-      })
-    })
-    let workFiler = Promise.all(workPromises).then((result) => {
-      result.map((val, idx) => {
-        authors[idx] = { ...authors[idx], work_count: val }
-      })
-    })
-
-    await Promise.all([noteFiler, workFiler])
-    return authors
-  }
+  const authorIds = authors.map(a => a._id)
+  const [noteCounts, workCounts] = await Promise.all([
+    Note.aggregate([
+      { $match: { author: { $in: authorIds } } },
+      { $group: { _id: '$author', count: { $sum: 1 } } },
+    ]),
+    Work.aggregate([
+      { $match: { author: { $in: authorIds } } },
+      { $group: { _id: '$author', count: { $sum: 1 } } },
+    ]),
+  ])
+  const noteMap = Object.fromEntries(noteCounts.map(x => [String(x._id), x.count]))
+  const workMap = Object.fromEntries(workCounts.map(x => [String(x._id), x.count]))
+  return authors.map(a => ({
+    ...a,
+    note_count: noteMap[String(a._id)] || 0,
+    work_count: workMap[String(a._id)] || 0,
+  }))
 }
 
 export const reqCreateAuthor = async (req, res) => {

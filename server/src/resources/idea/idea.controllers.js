@@ -60,22 +60,17 @@ export const findIdeasByString = async function(string, withCounts = false) {
   let ideas = await Idea.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
-  if (!withCounts) {
-    return ideas
-  } else {
-    let notePromises = []
-    ideas.map(idea => {
-      notePromises.push(Note.find({ ideas: idea._id }).countDocuments())
-    })
+  if (!withCounts || !ideas.length) return ideas
 
-    await Promise.all(notePromises).then(result => {
-      result.map((val, idx) => {
-        ideas[idx] = { ...ideas[idx], note_count: val }
-      })
-    })
-
-    return ideas
-  }
+  const ideaIds = ideas.map(i => i._id)
+  const noteCounts = await Note.aggregate([
+    { $match: { ideas: { $in: ideaIds } } },
+    { $unwind: '$ideas' },
+    { $match: { ideas: { $in: ideaIds } } },
+    { $group: { _id: '$ideas', count: { $sum: 1 } } },
+  ])
+  const noteMap = Object.fromEntries(noteCounts.map(x => [String(x._id), x.count]))
+  return ideas.map(i => ({ ...i, note_count: noteMap[String(i._id)] || 0 }))
 }
 
 export const reqCreateIdea = async (req, res) => {
