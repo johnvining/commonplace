@@ -33,14 +33,20 @@ export const reqLinkNoteToNote = async (req, res) => {
 
 export const reqGetLinksForNote = async (req, res) => {
   const noteId = req.params.id
-  const findFromLeft = await Link.find({ left_note: noteId })
-  const findFromRight = await Link.find({ right_note: noteId })
-  let combinedResults = findFromLeft.concat(findFromRight)
-  combinedResults = combinedResults
-    .map((result) => [result.left_note, result.right_note])
-    .flat()
-    .filter((result) => result != noteId)
+  const [fromLeft, fromRight] = await Promise.all([
+    Link.find({ left_note: noteId }),
+    Link.find({ right_note: noteId }),
+  ])
+  const linkedIds = fromLeft.concat(fromRight)
+    .flatMap(r => [r.left_note, r.right_note])
+    .filter(id => String(id) !== String(noteId))
 
-  let resultsToReturn = await Note.find({ _id: { $in: combinedResults } })
-  return resultsToReturn
+  const [notes, nicks] = await Promise.all([
+    Note.find({ _id: { $in: linkedIds } }).lean().exec(),
+    Nick.find({ note: { $in: linkedIds } }).lean().exec(),
+  ])
+
+  const nickMap = Object.fromEntries(nicks.map(n => [String(n.note), n.key]))
+  notes.forEach(n => { n.nick = nickMap[String(n._id)] || null })
+  return notes
 }
