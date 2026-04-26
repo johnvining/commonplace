@@ -1,99 +1,55 @@
 import Nick from '../nick/nick.model.js'
 
-export const reqGenerateNickForNote = async (req, res) => {
-  return generateNickForType(req, res, 'note')
-}
-export const reqGenerateNickForWork = async (req, res) => {
-  return generateNickForType(req, res, 'work')
-}
-export const reqGenerateNickForIdea = async (req, res) => {
-  return generateNickForType(req, res, 'idea')
-}
-export const reqGenerateNickForPile = async (req, res) => {
-  return generateNickForType(req, res, 'pile')
-}
+const PREFIX = { note: 'n', work: 'w', idea: 'i', pile: 'p' }
 
-export const generateNickForType = async (req, res, type) => {
-  if (type == 'note') {
-    var existingNick = await Nick.findOne({ note: req.params.id })
-    var prefix = 'n'
-  } else if (type == 'work') {
-    var existingNick = await Nick.findOne({ work: req.params.id })
-    var prefix = 'w'
-  } else if (type == 'idea') {
-    var existingNick = await Nick.findOne({ idea: req.params.id })
-    var prefix = 'i'
-  } else if (type == 'pile') {
-    var existingNick = await Nick.findOne({ pile: req.params.id })
-    var prefix = 'p'
-  } else {
-    return null
-  }
+export const generateNick = async (type, id) => {
+  const prefix = PREFIX[type]
+  if (!prefix) return null
 
-  if (!existingNick || existingNick._id == null) {
-    var hash = hashFunc(req.params.id)
+  const existing = await Nick.findOne({ [type]: id })
+  if (existing?._id) return existing
 
-    const MAX_ATTEMPTS = 100
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      let hashString = ('000000' + hash).slice(-6)
-      let dupe = await Nick.findOne({ key: prefix + hashString })
-
-      if (!dupe) {
-        if (type == 'note') {
-          return await Nick.create({
-            key: prefix + hashString,
-            note: req.params.id,
-          })
-        } else if (type == 'work') {
-          return await Nick.create({
-            key: prefix + hashString,
-            work: req.params.id,
-          })
-        } else if (type == 'idea') {
-          return await Nick.create({
-            key: prefix + hashString,
-            idea: req.params.id,
-          })
-        } else if (type == 'pile') {
-          return await Nick.create({
-            key: prefix + hashString,
-            pile: req.params.id,
-          })
-        }
-      } else {
-        hash = hashFunc(hash.toString())
-      }
+  // 100 hash-chain attempts
+  let hash = hashFunc(String(id))
+  for (let i = 0; i < 100; i++) {
+    const key = prefix + ('000000' + Math.abs(hash)).slice(-6)
+    if (!await Nick.findOne({ key })) {
+      return Nick.create({ key, [type]: id })
     }
-    throw new Error('Nick generation failed: could not find a unique hash after 100 attempts')
-  } else {
-    return existingNick
+    hash = hashFunc(String(hash))
   }
+
+  // 100 random fallback attempts
+  for (let i = 0; i < 100; i++) {
+    const key = prefix + ('000000' + Math.floor(Math.random() * 1000000)).slice(-6)
+    if (!await Nick.findOne({ key })) {
+      return Nick.create({ key, [type]: id })
+    }
+  }
+
+  throw new Error(`Nick generation failed for ${type} ${id} after 200 attempts`)
 }
+
+export const reqGenerateNickForNote = async (req, res) => generateNick('note', req.params.id)
+export const reqGenerateNickForWork = async (req, res) => generateNick('work', req.params.id)
+export const reqGenerateNickForIdea = async (req, res) => generateNick('idea', req.params.id)
+export const reqGenerateNickForPile = async (req, res) => generateNick('pile', req.params.id)
 
 export const reqGetNick = async (req, res) => {
-  const nick = await Nick.findOne({ key: req.params.nick })
-  return nick
+  return Nick.findOne({ key: req.params.nick })
 }
 
-export const reqGetNickForNote = async (req, res) => {
-  return Nick.findOne({ note: req.params.id }).lean().exec()
-}
-export const reqGetNickForWork = async (req, res) => {
-  return Nick.findOne({ work: req.params.id }).lean().exec()
-}
-export const reqGetNickForIdea = async (req, res) => {
-  return Nick.findOne({ idea: req.params.id }).lean().exec()
-}
-export const reqGetNickForPile = async (req, res) => {
-  return Nick.findOne({ pile: req.params.id }).lean().exec()
-}
+export const reqGetNickForNote = async (req, res) => Nick.findOne({ note: req.params.id }).lean().exec()
+export const reqGetNickForWork = async (req, res) => Nick.findOne({ work: req.params.id }).lean().exec()
+export const reqGetNickForIdea = async (req, res) => Nick.findOne({ idea: req.params.id }).lean().exec()
+export const reqGetNickForPile = async (req, res) => Nick.findOne({ pile: req.params.id }).lean().exec()
 
 export const hashFunc = function hash(str) {
   let hash = 0
   for (let i = 0, len = str.length; i < len; i++) {
     let chr = str.charCodeAt(i)
     hash = (hash << 5) - hash + chr
-    hash |= 0 // Convert to 32bit integer
+    hash |= 0
   }
   return hash
 }
