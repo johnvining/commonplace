@@ -27,18 +27,30 @@ class NoteResult extends React.PureComponent {
     const hl = this.props.highlight
     const author = <NoteAuthorSpan note={note} separator=": " />
 
-    let contentText = null
-    if (note.title?.length) {
-      contentText = note.title
-    } else if (note.text?.length) {
-      contentText = note.text
-    } else if (note.take?.length) {
-      contentText = note.take
+    const title = note.title?.length ? note.title : null
+    const body = note.text?.length ? note.text : note.take?.length ? note.take : null
+
+    const titleContainsHl = hl && title && title.toLowerCase().includes(hl.toLowerCase())
+    const bodyContainsHl = hl && body && body.toLowerCase().includes(hl.toLowerCase())
+
+    let primaryText = title || body
+    let secondaryText = null
+
+    if (title && hl && !titleContainsHl && bodyContainsHl) {
+      secondaryText = body
+    } else if (!title && body) {
+      primaryText = body
     }
 
-    const content = hl && contentText
-      ? snippetAround(contentText, hl)
-      : contentText
+    const primaryContent = hl && primaryText
+      ? snippetAround(primaryText, hl)
+      : primaryText
+
+    const secondaryContent = secondaryText
+      ? snippetAround(secondaryText, hl)
+      : null
+
+    const labelText = title || body || 'Untitled Note'
 
     return (
       <Link to={`/note/${note._id}`} key={'note-list-' + note._id}>
@@ -47,18 +59,21 @@ class NoteResult extends React.PureComponent {
             <img src={note_img} />
             <span className="truncate">
               {author}
-              {content}
+              {primaryContent}
             </span>
             {this.props.semantic ? <span className="semantic-badge">~</span> : null}
             <PinButton
               type="note"
               id={note._id}
-              label={contentText || 'Untitled Note'}
+              label={labelText}
               href={`/note/${note._id}`}
               compact={true}
               className="pin-button-inline"
             />
           </div>
+          {secondaryContent ? (
+            <div className="result-box-snippet">{secondaryContent}</div>
+          ) : null}
         </div>
       </Link>
     )
