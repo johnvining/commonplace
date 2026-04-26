@@ -647,6 +647,7 @@ export const reqBulkEmbedNotes = async (req, res) => {
           const update = await embedNoteIfStale(note)
           if (update) {
             await Note.findByIdAndUpdate(note._id, update)
+            upsertEmbedding(note._id, update.embedding)
             processed++
           } else {
             skipped++
