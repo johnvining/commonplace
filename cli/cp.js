@@ -162,8 +162,15 @@ async function cmdSearch(args, config) {
 }
 
 async function cmdNote(args, config) {
-  const id = args[0]
-  if (!id) { console.error('Usage: cp note <id>'); return }
+  let id = args[0]
+  if (!id) { console.error('Usage: cplace note <id|nick>'); return }
+  // If it looks like a nick (letter + digits), resolve it first
+  if (/^[nwip]\d+$/.test(id)) {
+    const nickRes = await api('GET', `nick/${id}`, null, config)
+    const noteId = nickRes?.data?.note
+    if (!noteId) { console.log('Nick not found.'); return }
+    id = noteId
+  }
   const res = await api('GET', `note/${id}`, null, config)
   const note = res?.data
   if (!note) { console.log('Not found.'); return }
