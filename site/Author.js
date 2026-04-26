@@ -15,7 +15,8 @@ import {
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
 import PinButton, { TopLevelStarButton } from './PinButton'
-import useEntityKeyboardShortcuts from './useEntityKeyboardShortcuts'
+import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
+import { togglePinned } from './pinned'
 
 function Author(props) {
   const { id } = useParams()
@@ -60,6 +61,7 @@ function Author(props) {
     onEdit: () => setEdit(true),
     onSave: handleAcceptUpdates,
     onExitEdit: () => setEdit(false),
+    onToggleStar: () => togglePinned({ type: 'auth', id, label: pendingName, href: `/auth/${id}` }),
   })
 
   const deleteAuthor = async () => {
