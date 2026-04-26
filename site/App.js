@@ -9,6 +9,26 @@ import axios from 'axios'
 import * as constants from './constants'
 import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
+class ErrorBoundary extends React.Component {
+  state = { error: null }
+  static getDerivedStateFromError(error) { return { error } }
+  componentDidCatch(error, info) { console.error('Route error:', error, info) }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: '32px', fontFamily: 'monospace' }}>
+          <p><strong>Something went wrong.</strong></p>
+          <p style={{ opacity: 0.6, fontSize: '12px' }}>{this.state.error?.message}</p>
+          <button onClick={() => { this.setState({ error: null }); window.history.back() }}>
+            Go back
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 // Always-visible shell components — kept eager so the chrome renders immediately
 import Login from './Login'
 import RecentList from './RecentList'
@@ -171,6 +191,7 @@ class App extends React.Component {
         <div className="app-shell">
           <Sidebar />
           <div className="app-content">
+            <ErrorBoundary>
             <Suspense fallback={null}>
             <Routes>
               <Route
@@ -325,6 +346,7 @@ class App extends React.Component {
               />
             </Routes>
             </Suspense>
+            </ErrorBoundary>
           </div>
         </div>
       </div>
