@@ -503,6 +503,16 @@ async function cmdNick(args, config) {
   }
 }
 
+async function cmdBackfillEmbeddings(args, config) {
+  console.log('Backfilling embeddings (this may take a while)...')
+  const res = await api('POST', 'note/bulk-embed', null, config)
+  const results = res?.data
+  if (!results) { console.error('No response.'); return }
+  console.log(`${BOLD}processed${RESET}  ${results.processed}`)
+  console.log(`${BOLD}skipped${RESET}    ${results.skipped}`)
+  console.log(`${BOLD}failed${RESET}     ${results.failed}`)
+}
+
 async function cmdBackfillNicks(args, config) {
   console.log('Backfilling nicks...')
   const res = await api('POST', 'nick/backfill', null, config)
@@ -571,6 +581,7 @@ const commands = {
   capture: cmdCapture,
   set:     cmdSet,
   'backfill-nicks': cmdBackfillNicks,
+  'backfill-embeddings': cmdBackfillEmbeddings,
   help:    async () => cmdHelp(),
 }
 
