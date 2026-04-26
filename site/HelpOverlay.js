@@ -47,10 +47,9 @@ function HelpOverlay({ isVisible, onClose, currentContext }) {
         shortcuts: [
           { key: 'Ctrl+E', action: 'Edit details' },
           { key: 'Ctrl+A', action: 'Save changes' },
+          { key: 'Ctrl+S', action: 'Star / unstar' },
           { key: 'Ctrl+N', action: 'Create new note' },
-          ...(currentContext.entityPage === 'Work'
-            ? [{ key: 'Ctrl+P', action: 'Edit piles' }]
-            : []),
+          { key: 'Ctrl+P', action: 'Edit piles' },
           { key: 'Escape', action: 'Exit edit mode' },
         ],
       })
@@ -106,6 +105,7 @@ function HelpOverlay({ isVisible, onClose, currentContext }) {
       }
 
       if (currentContext.noteMode === constants.note_modes.SELECTED) {
+        noteShortcuts.push({ key: 'Ctrl+S', action: 'Star / unstar note' })
         noteShortcuts.push({ key: 'Ctrl+L', action: 'Add link' })
       }
 
