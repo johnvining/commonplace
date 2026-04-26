@@ -72,6 +72,7 @@ class NoteResult extends React.PureComponent {
                     workTitle={workTitle}
                     workID={workID}
                     spaceAfter={false}
+                    plain={true}
                   />
                   {': '}
                 </>

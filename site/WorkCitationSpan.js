@@ -26,7 +26,7 @@ function WorkCitationSpan(props) {
     <>
       {props.authorName && (
         <span>
-          {props.authorID ? (
+          {props.authorID && !props.plain ? (
             <span onClick={handleAuthorClick} style={linkStyle}>
               {props.authorName}
             </span>
@@ -36,14 +36,14 @@ function WorkCitationSpan(props) {
         </span>
       )}
       {props.workTitle && props.authorName && <span>,&nbsp;</span>}
-      {props.workTitle && props.workID && (
+      {props.workTitle && props.workID && !props.plain && (
         <span className="italic">
           <span onClick={handleWorkClick} style={linkStyle}>
             {props.workTitle}
           </span>
         </span>
       )}
-      {props.workTitle && !props.workID && (
+      {props.workTitle && (props.plain || !props.workID) && (
         <span className="italic">{props.workTitle}</span>
       )}
       {props.spaceAfter && <>&nbsp;</>}
