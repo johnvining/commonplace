@@ -1,3 +1,4 @@
+import compression from 'compression'
 import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import morgan from 'morgan'
@@ -21,6 +22,7 @@ import fileUpload from 'express-fileupload'
 export const app = express()
 
 app.disable('x-powered-by')
+app.use(compression())
 
 app.use(
   fileUpload({

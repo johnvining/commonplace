@@ -19,6 +19,7 @@
     "@swc/core": "^1.15.26",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+    "compression": "^1.8.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "csv-parse": "^5.5.3",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9",
+    "@types/compression": "^1.8.1",
     "eslint": "^9",
     "globals": "^17",
     "nodemon": "^3.0.2",
