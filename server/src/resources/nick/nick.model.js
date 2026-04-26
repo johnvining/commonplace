@@ -23,7 +23,10 @@ const nickSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-nickSchema.index({ note: 1 })
 nickSchema.index({ key: 1 }, { unique: true, sparse: true })
+nickSchema.index({ note: 1 }, { unique: true, sparse: true })
+nickSchema.index({ work: 1 }, { unique: true, sparse: true })
+nickSchema.index({ idea: 1 }, { unique: true, sparse: true })
+nickSchema.index({ pile: 1 }, { unique: true, sparse: true })
 
 export default mongoose.model('nick', nickSchema)
