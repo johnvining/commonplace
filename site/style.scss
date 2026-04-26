@@ -1175,6 +1175,13 @@ mark.search-highlight {
   font-style: italic;
 }
 
+.search-loading-state {
+  padding: 8px;
+  color: $grey3;
+  font-size: var(--font-size-md);
+  font-style: italic;
+}
+
 .result-box {
   padding: 8px;
   margin: 8px;
