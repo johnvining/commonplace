@@ -719,10 +719,10 @@ export const findNotesAndPopulate = async function (
 
 export const findRandomNotesAndPopulate = async function (
   searchObject,
-  limit = null
+  limit = pageSize
 ) {
   const random_notes = await Note.aggregate([
-    { $sample: { size: pageSize } },
+    { $sample: { size: limit } },
   ]).exec()
 
   const populated_notes = await Note.populate(random_notes, [
