@@ -355,7 +355,7 @@ class Note extends React.Component {
     this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
     await db
       .updateRecord(db.types.note, this.props.id, updateObject)
-      .then(this.props.refetchMe(this.props.index))
+      .then(() => this.props.refetchMe(this.props.index))
       .catch((error) => {
         console.error(error)
       })
