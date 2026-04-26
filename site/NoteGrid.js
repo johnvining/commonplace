@@ -52,7 +52,7 @@ class NoteGrid extends React.Component {
         </div>
 
         <div className="grid-link">
-          <Link to={'/note/' + this.props.id}>
+          <Link to={'/note/' + this.props.id} tabIndex={this.props.tabIndex}>
             <div className="grid-nick">
               <ClickToCopyNick nick={this.state.nick} disableClick={true} />
               <span className="grid-unprintable">|</span>
