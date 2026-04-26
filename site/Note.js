@@ -518,6 +518,7 @@ class Note extends React.Component {
       edit_piles = false,
       selected = false,
       no_selection = false,
+      not_selected = false,
       edit_links = false
 
     var class_name = 'note-full '
@@ -526,6 +527,7 @@ class Note extends React.Component {
         no_selection = true
         break
       case constants.note_modes.NOT_SELECTED:
+        not_selected = true
         class_name = 'note-full not-selected '
         break
       case constants.note_modes.SELECTED:
@@ -560,7 +562,7 @@ class Note extends React.Component {
         key={this.props.id}
         id={this.props.id}
         data-note-id={this.props.id}
-        tabIndex={no_selection ? this.props.tabIndex : '-1'}
+        tabIndex={no_selection || not_selected ? this.props.tabIndex : '-1'}
         onKeyDown={this.handleSelectKeyDown}
       >
         {this.state.largeImage >= 0 ? (
