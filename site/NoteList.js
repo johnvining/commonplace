@@ -21,7 +21,7 @@ class NoteList extends React.Component {
     inFocus: null,
     focusType: constants.note_modes.NO_SELECTION,
     selectedNote: '',
-    notes: [],
+    notes: undefined,
     selectedArray: [],
     deleted: [],
     anchorIndex: 0,
@@ -655,7 +655,9 @@ class NoteList extends React.Component {
             </TopLevelStandardButtonContainer>
           </div>
         )}
-        {this.state.notes !== undefined && this.state.notes.length === 0 ? (
+        {this.state.notes === undefined ? (
+          <div className="search-loading-state">Loading...</div>
+        ) : this.state.notes.length === 0 ? (
           <div className="search-empty-state">No notes found.</div>
         ) : null}
         {this.state.notes === undefined || this.state.notes.length === 0 ? null : (
