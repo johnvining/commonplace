@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import * as db from './Database'
 import { getPinnedItems, unpinItem } from './pinned'
 import starSmall from 'url:./icons/star-small.svg'
@@ -11,8 +11,6 @@ function Sidebar() {
   const [recentPiles, setRecentPiles] = useState([])
   const [pinnedItems, setPinnedItems] = useState([])
   const [loading, setLoading] = useState(true)
-  const location = useLocation()
-
   useEffect(() => {
     let isMounted = true
 
@@ -45,7 +43,7 @@ function Sidebar() {
     return () => {
       isMounted = false
     }
-  }, [location.pathname])
+  }, [])
 
   useEffect(() => {
     const refreshPinned = () => setPinnedItems(getPinnedItems())
