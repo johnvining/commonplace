@@ -2,6 +2,14 @@ import Nick from '../nick/nick.model.js'
 
 const PREFIX = { note: 'n', work: 'w', idea: 'i', pile: 'p' }
 
+async function generateRandomNickKey(prefix) {
+  for (let i = 0; i < 100; i++) {
+    const key = prefix + ('000000' + Math.floor(Math.random() * 1000000)).slice(-6)
+    if (!await Nick.findOne({ key })) return key
+  }
+  throw new Error(`generateRandomNickKey exhausted 100 attempts for prefix "${prefix}"`)
+}
+
 export const generateNick = async (type, id) => {
   const prefix = PREFIX[type]
   if (!prefix) return null
@@ -9,25 +17,22 @@ export const generateNick = async (type, id) => {
   const existing = await Nick.findOne({ [type]: id })
   if (existing?._id) return existing
 
-  // 100 hash-chain attempts
+  // find an unused key via hash chain, fall back to random
+  let key
   let hash = hashFunc(String(id))
   for (let i = 0; i < 100; i++) {
-    const key = prefix + ('000000' + Math.abs(hash)).slice(-6)
-    if (!await Nick.findOne({ key })) {
-      return Nick.create({ key, [type]: id })
-    }
+    const candidate = prefix + ('000000' + Math.abs(hash)).slice(-6)
+    if (!await Nick.findOne({ key: candidate })) { key = candidate; break }
     hash = hashFunc(String(hash))
   }
+  if (!key) key = await generateRandomNickKey(prefix)
 
-  // 100 random fallback attempts
-  for (let i = 0; i < 100; i++) {
-    const key = prefix + ('000000' + Math.floor(Math.random() * 1000000)).slice(-6)
-    if (!await Nick.findOne({ key })) {
-      return Nick.create({ key, [type]: id })
-    }
+  try {
+    return await Nick.create({ key, [type]: id })
+  } catch (e) {
+    if (e.code === 11000) return Nick.findOne({ [type]: id })
+    throw e
   }
-
-  throw new Error(`Nick generation failed for ${type} ${id} after 200 attempts`)
 }
 
 export const reqGenerateNickForNote = async (req, res) => generateNick('note', req.params.id)
