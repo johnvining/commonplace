@@ -36,10 +36,12 @@ export function cosineSimilarity(a, b) {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB))
 }
 
+const MAX_CHARS = 30000 // ~8k tokens at ~4 chars/token with headroom
+
 export async function generateEmbedding(text) {
   const response = await openai().embeddings.create({
     model: 'text-embedding-3-small',
-    input: text,
+    input: text.slice(0, MAX_CHARS),
     dimensions: 256,
   })
   return response.data[0].embedding
