@@ -839,9 +839,6 @@ class Note extends React.Component {
                   </Link>
                 )
               )}
-              <Link key={note} to={'/note/' + note}>
-                {this.state.linkedNotes[note]}
-              </Link>
               {Object.keys(this.state.linkedNotes).length > 0 &&
                 Object.keys(this.state.linkedNotes).map((note) => (
                   <Link key={note} to={'/note/' + note}>
