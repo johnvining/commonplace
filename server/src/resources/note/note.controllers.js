@@ -532,16 +532,15 @@ async function hybridSearch(query, limit = 20) {
     semanticScores.push({ id, score: cosineSimilarity(queryEmbedding, embedding) })
   }
   semanticScores.sort((a, b) => b.score - a.score)
-  const top50Semantic = semanticScores.slice(0, 50)
+  const topSemantic = semanticScores.filter((s) => s.score >= 0.38)
 
   const maxKeyword = keywordNotes.length > 0 ? Math.max(...keywordNotes.map((n) => n.score || 0)) : 1
   const keywordMap = new Map(keywordNotes.map((n) => [String(n._id), n]))
   const keywordScoreMap = new Map(keywordNotes.map((n) => [String(n._id), (n.score || 0) / (maxKeyword || 1)]))
 
-  const semanticOnlyIds = top50Semantic
+  const semanticOnlyIds = topSemantic
     .map((s) => s.id)
     .filter((id) => !keywordMap.has(id))
-    .slice(0, 30)
 
   let semanticOnlyNotes = []
   if (semanticOnlyIds.length > 0) {
@@ -555,7 +554,7 @@ async function hybridSearch(query, limit = 20) {
       .exec()
   }
 
-  const semanticScoreMap = new Map(top50Semantic.map((s) => [s.id, s.score]))
+  const semanticScoreMap = new Map(topSemantic.map((s) => [s.id, s.score]))
 
   const allNotes = [...keywordNotes, ...semanticOnlyNotes]
   const seen = new Set()
@@ -569,7 +568,7 @@ async function hybridSearch(query, limit = 20) {
     scored.push({ ...note, _hybridScore: 0.6 * kw + 0.4 * sem, _semantic: sem > 0 && kw === 0 })
   }
   scored.sort((a, b) => b._hybridScore - a._hybridScore)
-  const top = scored.slice(0, limit)
+  const top = scored.filter((n) => n._hybridScore >= 0.15).slice(0, limit)
 
   const noteIds = top.map((n) => n._id)
   const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
