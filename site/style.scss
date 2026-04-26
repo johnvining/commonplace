@@ -1110,35 +1110,6 @@ mark.search-highlight {
   border-radius: 2px;
 }
 
-.search-group {
-  margin-bottom: 8px;
-}
-
-.search-group-header {
-  display: flex;
-  align-items: center;
-  padding: 4px 8px;
-}
-
-.search-group-label {
-  font-family: $sans_font;
-  font-size: var(--font-size-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: $grey3;
-}
-
-.search-group-see-all {
-  margin-left: auto;
-  font-family: $sans_font;
-  font-size: var(--font-size-xs);
-  color: $grey3;
-
-  &:hover {
-    color: $font_color;
-  }
-}
-
 .semantic-badge {
   font-size: var(--font-size-xs);
   color: $grey3;
