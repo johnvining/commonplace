@@ -244,7 +244,7 @@ async function cmdCapture(args, config) {
   if (flags.work) {
     const workId = await resolveOrCreate('work', flags.work, config)
     if (workId) {
-      await api('PUT', `note/${id}/work`, { id: workId }, config)
+      await api('PUT', `note/${id}/work`, { newWork: workId }, config)
       console.log(`${DIM}  work → ${flags.work}${RESET}`)
     }
   }
@@ -287,7 +287,7 @@ async function cmdSet(args, config) {
   if (flags.work) {
     const workId = await resolveOrCreate('work', flags.work, config)
     if (workId) {
-      await api('PUT', `note/${id}/work`, { id: workId }, config)
+      await api('PUT', `note/${id}/work`, { newWork: workId }, config)
       console.log(`${DIM}  work → ${flags.work}${RESET}`)
     }
   }
