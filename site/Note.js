@@ -635,6 +635,7 @@ class Note extends React.Component {
                       src={this.props.note.imageUrls[index]}
                       className={'image-row'}
                       id={index}
+                      loading="lazy"
                     />
                   ) : null}
                 </div>
