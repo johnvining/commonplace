@@ -10,16 +10,25 @@ import * as constants from './constants'
 import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
 class ErrorBoundary extends React.Component {
-  state = { error: null }
+  state = { error: null, info: null }
   static getDerivedStateFromError(error) { return { error } }
-  componentDidCatch(error, info) { console.error('Route error:', error, info) }
+  componentDidCatch(error, info) {
+    console.error('Route error:', error, info)
+    this.setState({ info })
+  }
   render() {
     if (this.state.error) {
       return (
-        <div style={{ padding: '32px', fontFamily: 'monospace' }}>
+        <div style={{ padding: '32px', fontFamily: 'monospace', maxWidth: '900px' }}>
           <p><strong>Something went wrong.</strong></p>
-          <p style={{ opacity: 0.6, fontSize: '12px' }}>{this.state.error?.message}</p>
-          <button onClick={() => { this.setState({ error: null }); window.history.back() }}>
+          <p style={{ opacity: 0.8, fontSize: '12px' }}>{this.state.error?.message}</p>
+          <pre style={{ opacity: 0.6, fontSize: '10px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+            {this.state.error?.stack}
+          </pre>
+          <pre style={{ opacity: 0.6, fontSize: '10px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+            {this.state.info?.componentStack}
+          </pre>
+          <button onClick={() => { this.setState({ error: null, info: null }); window.history.back() }}>
             Go back
           </button>
         </div>
