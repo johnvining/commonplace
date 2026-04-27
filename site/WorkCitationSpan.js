@@ -1,35 +1,15 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 function WorkCitationSpan(props) {
-  const navigate = useNavigate()
-
-  const handleAuthorClick = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (props.authorID) {
-      navigate('/auth/' + props.authorID)
-    }
-  }
-
-  const handleWorkClick = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (props.workID) {
-      navigate('/work/' + props.workID)
-    }
-  }
-
-  const linkStyle = { cursor: 'pointer', textDecoration: 'none' }
-
   return (
     <>
       {props.authorName && (
         <span>
           {props.authorID && !props.plain ? (
-            <span onClick={handleAuthorClick} style={linkStyle}>
+            <Link to={'/auth/' + props.authorID} style={{ textDecoration: 'none' }}>
               {props.authorName}
-            </span>
+            </Link>
           ) : (
             props.authorName
           )}
@@ -37,11 +17,9 @@ function WorkCitationSpan(props) {
       )}
       {props.workTitle && props.authorName && <span>,&nbsp;</span>}
       {props.workTitle && props.workID && !props.plain && (
-        <span className="italic">
-          <span onClick={handleWorkClick} style={linkStyle}>
-            {props.workTitle}
-          </span>
-        </span>
+        <Link to={'/work/' + props.workID} className="italic" style={{ textDecoration: 'none' }}>
+          {props.workTitle}
+        </Link>
       )}
       {props.workTitle && (props.plain || !props.workID) && (
         <span className="italic">{props.workTitle}</span>

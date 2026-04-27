@@ -21,7 +21,7 @@ class ErrorBoundary extends React.Component {
       return (
         <div style={{ padding: '32px', fontFamily: 'monospace', maxWidth: '900px' }}>
           <p><strong>Something went wrong.</strong></p>
-          <p style={{ opacity: 0.8, fontSize: '12px' }}>{this.state.error?.message}</p>
+          <p style={{ fontSize: '12px' }}>{this.state.error?.message}</p>
           <pre style={{ opacity: 0.6, fontSize: '10px', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
             {this.state.error?.stack}
           </pre>
