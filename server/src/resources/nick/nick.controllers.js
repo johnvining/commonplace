@@ -44,9 +44,7 @@ export const reqGetNick = async (req, res) => {
   return Nick.findOne({ key: req.params.nick })
 }
 
-let _backfillNicksState = { status: 'idle', results: null, error: null, startedAt: null, finishedAt: null }
-
-async function runBackfillNicks() {
+export const reqBackfillNicks = async (req, res) => {
   const { default: Note } = await import('../note/note.model.js')
   const { default: Work } = await import('../work/work.model.js')
   const { default: Idea } = await import('../idea/idea.model.js')
@@ -72,23 +70,9 @@ async function runBackfillNicks() {
       catch { failed++ }
     }
     results[type] = { total: all.length, already_had_nick: all.length - missing.length, created, failed }
-    _backfillNicksState.results = { ...results }
   }
   return results
 }
-
-export const reqBackfillNicks = async (req, res) => {
-  if (_backfillNicksState.status === 'running') {
-    return { status: 'running', startedAt: _backfillNicksState.startedAt, results: _backfillNicksState.results }
-  }
-  _backfillNicksState = { status: 'running', results: null, error: null, startedAt: new Date().toISOString(), finishedAt: null }
-  runBackfillNicks()
-    .then(results => { _backfillNicksState = { status: 'done', results, error: null, startedAt: _backfillNicksState.startedAt, finishedAt: new Date().toISOString() } })
-    .catch(err => { _backfillNicksState = { status: 'error', results: _backfillNicksState.results, error: err.message, startedAt: _backfillNicksState.startedAt, finishedAt: new Date().toISOString() } })
-  return { status: 'running', startedAt: _backfillNicksState.startedAt }
-}
-
-export const reqBackfillNicksStatus = async (req, res) => _backfillNicksState
 
 export const reqGetNickForNote = async (req, res) => Nick.findOne({ note: req.params.id }).lean().exec()
 export const reqGetNickForWork = async (req, res) => Nick.findOne({ work: req.params.id }).lean().exec()

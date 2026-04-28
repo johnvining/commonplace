@@ -8,6 +8,8 @@ import cross_circle from 'url:./icons/cross_circle.svg'
 // import clipboard from 'url:./icons/clipboard.svg'
 // import clipboard_check from 'url:./icons/clipboard_check.svg'
 import document_image from 'url:./icons/document.svg'
+import left_arrow from 'url:./icons/left.svg'
+import right_arrow from 'url:./icons/right.svg'
 import ImageUploader from './ImageUploader'
 import tags from 'url:./icons/tags.svg'
 import eye from 'url:./icons/eye.svg'
@@ -31,6 +33,9 @@ import PinButton from './PinButton'
 class Note extends React.Component {
   state = {
     largeImage: -1,
+    lightboxOpen: false,
+    overlayMode: false,
+    focusEdit: false,
     pendingAuthorId: null,
     pendingAuthorName: '',
     pendingPage: '',
@@ -125,6 +130,13 @@ class Note extends React.Component {
     // Only handle if this note is selected or in edit mode
     if (!selected && !anyEditMode) {
       return false
+    }
+
+    // Close lightbox, focusEdit, or overlay with Escape
+    if (event.keyCode === constants.keyCodes.esc) {
+      if (this.state.lightboxOpen) { this.setState({ lightboxOpen: false }); return true }
+      if (this.state.focusEdit) { this.setState({ focusEdit: false }); return true }
+      if (this.state.overlayMode) { this.setState({ overlayMode: false, largeImage: -1 }); return true }
     }
 
     // Section 5.1: Save and Exit
@@ -413,49 +425,37 @@ class Note extends React.Component {
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
-  handleFocusImage(click) {
-    if (
-      this.props.mode == constants.note_modes.EDIT &&
-      confirm('Are you sure you want to delete this image?')
-    ) {
-      if (click.target.id == this.state.largeImage) {
-        this.setState({ largeImage: -1 })
-      }
-      db.deleteImage(
-        this.props.id,
-        this.props.note.images[click.target.id]
-      ).then(() => {
-        // TODO: Update refetchMe to handle a response from the database if we've already gotten it
-        this.props.getImagesForNoteAtIndex(this.props.index, true)
-      })
+  handleFocusImage(index) {
+    if (this.isInEditMode()) {
+      this.setState({ largeImage: index, focusEdit: true, lightboxOpen: false, overlayMode: false })
     } else {
-      this.setState({
-        largeImage: click.target.id,
-      })
+      this.setState({ largeImage: index, lightboxOpen: false, overlayMode: true })
     }
   }
 
+  handleDeleteImage(index) {
+    if (!confirm('Delete this image?')) return
+    if (index === this.state.largeImage) this.setState({ largeImage: -1 })
+    db.deleteImage(this.props.id, this.props.note.images[index]).then(() => {
+      this.props.getImagesForNoteAtIndex(this.props.index, true)
+    })
+  }
+
   toggleFocusImage() {
-    if (this.state.largeImage >= 0) {
-      this.setState({ largeImage: -1 })
+    if (this.state.lightboxOpen) {
+      this.setState({ lightboxOpen: false })
+    } else if (this.state.overlayMode) {
+      this.setState({ overlayMode: false, largeImage: -1 })
     } else if (this.props.note.imageUrls?.length > 0) {
-      this.setState({ largeImage: 0 })
+      this.setState({ overlayMode: true, largeImage: 0 })
     }
   }
 
   moveFocusedImage(val) {
-    if (this.state.largeImage < 0 || this.props.note.imageUrls?.length <= 0) {
-      return
-    }
-
-    let max = this.props.note.imageUrls?.length + 1
-    let current = this.state.largeImage
-    let newVal = current + val
-
-    if (newVal < 0 || newVal > max) {
-      return
-    }
-
+    const urls = this.props.note.imageUrls
+    if (this.state.largeImage < 0 || !urls?.length) return
+    const newVal = this.state.largeImage + val
+    if (newVal < 0 || newVal >= urls.length) return
     this.setState({ largeImage: newVal })
   }
 
@@ -552,7 +552,7 @@ class Note extends React.Component {
         className={
           class_name +
           'outer' +
-          (this.state.largeImage >= 0 ? ' show-full-image' : '')
+          ''
         }
         key={this.props.id}
         id={this.props.id}
@@ -560,22 +560,94 @@ class Note extends React.Component {
         tabIndex={no_selection || not_selected ? this.props.tabIndex : '-1'}
         onKeyDown={this.handleSelectKeyDown}
       >
-        {this.state.largeImage >= 0 ? (
-          <div
-            className="half-width image-div"
-            onClick={() => {
-              this.setState({ largeImage: -1 })
-            }}
-          >
-            <img
-              className="large-image"
-              src={this.props.note.imageUrls[this.state.largeImage]}
-            />
+
+        {this.state.lightboxOpen && this.state.largeImage >= 0 ? (
+          <div className="lightbox-backdrop" onClick={() => this.setState({ lightboxOpen: false })}>
+            <div className="lightbox-content" onClick={e => e.stopPropagation()}>
+              {this.props.note.imageUrls.length > 1 && (
+                <button
+                  className="lightbox-nav lightbox-prev"
+                  onClick={() => this.moveFocusedImage(-1)}
+                  disabled={this.state.largeImage === 0}
+                >‹</button>
+              )}
+              <img
+                className="lightbox-image"
+                src={this.props.note.imageUrls[this.state.largeImage]}
+              />
+              {this.props.note.imageUrls.length > 1 && (
+                <button
+                  className="lightbox-nav lightbox-next"
+                  onClick={() => this.moveFocusedImage(1)}
+                  disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
+                >›</button>
+              )}
+              <button className="lightbox-close" onClick={() => this.setState({ lightboxOpen: false })}>×</button>
+              {this.props.note.imageUrls.length > 1 && (
+                <div className="lightbox-counter">
+                  {this.state.largeImage + 1} / {this.props.note.imageUrls.length}
+                </div>
+              )}
+            </div>
           </div>
         ) : null}
-        <div
-          className={this.state.largeImage >= 0 ? 'half-width' : 'full-width'}
-        >
+
+        {this.state.focusEdit && this.state.largeImage >= 0 && this.props.note.imageUrls?.length > 0 ? (
+          <div className="focus-edit-backdrop" onClick={() => this.setState({ focusEdit: false })}>
+            <div className="focus-edit-panel" onClick={e => e.stopPropagation()}>
+              <div className="focus-edit-image-side">
+                {this.props.note.imageUrls.length > 1 && (
+                  <button
+                    className="lightbox-nav lightbox-prev"
+                    onClick={() => this.moveFocusedImage(-1)}
+                    disabled={this.state.largeImage === 0}
+                  >‹</button>
+                )}
+                <img
+                  className="focus-edit-image"
+                  src={this.props.note.imageUrls[this.state.largeImage]}
+                />
+                {this.props.note.imageUrls.length > 1 && (
+                  <button
+                    className="lightbox-nav lightbox-next"
+                    onClick={() => this.moveFocusedImage(1)}
+                    disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
+                  >›</button>
+                )}
+              </div>
+              <div className="focus-edit-text-side">
+                <button className="focus-edit-close" onClick={() => this.setState({ focusEdit: false })}>×</button>
+                <label className="note-full form-label">
+                  Text
+                  <ClickableLabelButton onClick={() => this.runOCROnText()}>
+                    {this.state.fetchingOcr ? 'Fetching' : 'OCR'}
+                  </ClickableLabelButton>
+                  <ClickableLabelButton onClick={() => this.formatMainText()}>Format</ClickableLabelButton>
+                </label>
+                <textarea
+                  className="focus-edit-textarea"
+                  value={this.state.pendingText}
+                  onChange={this.handleTextChange}
+                  autoFocus
+                />
+                <label className="note-full form-label" style={{ marginTop: 8 }}>Take</label>
+                <textarea
+                  className="focus-edit-textarea"
+                  value={this.state.pendingTake}
+                  onChange={this.handleTakeChange}
+                />
+                <button
+                  className="button focus-edit-save"
+                  onClick={() => { this.handleAccept(); this.setState({ focusEdit: false }) }}
+                >
+                  <img src={check_circle} /> Save
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="full-width">
           {/* Title */}
           {edit ? (
             <>
@@ -610,31 +682,96 @@ class Note extends React.Component {
 
           {/* Images */}
           {this.props.note?.images?.length > 0 ? (
-            <div className="note-full image-row width-100">
+            <div className="note-full image-row width-100" style={{ alignItems: 'center' }}>
               {this.props.note?.images?.map((image, index) => (
                 <div
-                  className={
-                    edit
-                      ? 'image-row image-frame remove'
-                      : this.state.largeImage == index
-                      ? 'image-row image-frame selected'
-                      : 'image-row image-frame'
-                  }
+                  className={`image-row image-frame${this.state.largeImage == index ? ' selected' : ''}`}
                   key={this.props.id + index + 'div-img'}
-                  onClick={this.handleFocusImage.bind(this)}
-                  id={index}
+                  onClick={() => this.handleFocusImage(index)}
                 >
                   {this.props.note.imageUrls ? (
                     <img
                       key={this.props.id + index + 'img'}
                       src={this.props.note.imageUrls[index]}
-                      className={'image-row'}
-                      id={index}
+                      className="image-row"
                       loading="lazy"
                     />
                   ) : null}
+                  {edit ? (
+                    <button
+                      className="image-delete-btn"
+                      onClick={(e) => { e.stopPropagation(); this.handleDeleteImage(index) }}
+                      title="Delete image"
+                    >×</button>
+                  ) : null}
                 </div>
               ))}
+            </div>
+          ) : null}
+
+          {/* Overlay mode */}
+          {this.state.overlayMode && !edit && this.props.note.imageUrls?.length > 0 && this.state.largeImage >= 0 ? (
+            <div className="note-overlay-wrapper width-100" onClick={() => this.setState({ lightboxOpen: true })}>
+              <button
+                className="overlay-close-btn"
+                onClick={(e) => { e.stopPropagation(); this.setState({ overlayMode: false, largeImage: -1 }) }}
+                title="Close"
+              >×</button>
+              <img
+                className="note-overlay-image"
+                src={this.props.note.imageUrls[this.state.largeImage]}
+              />
+              <div className="note-overlay-gradient">
+                {this.props.note.imageUrls.length > 1 ? (
+                  <button
+                    className="overlay-nav-btn overlay-nav-prev"
+                    onClick={(e) => { e.stopPropagation(); this.moveFocusedImage(-1) }}
+                    disabled={this.state.largeImage === 0}
+                  >
+                    <img src={left_arrow} />
+                  </button>
+                ) : null}
+                <div className="note-overlay-text-panel" onClick={(e) => e.stopPropagation()}>
+                  {this.state.pendingTitle ? (
+                    <div className="note-overlay-title">{this.state.pendingTitle}</div>
+                  ) : null}
+                  {this.state.pendingText ? (
+                    <div
+                      className="note-overlay-text"
+                      dangerouslySetInnerHTML={{ __html: marked(this.state.pendingText) }}
+                    />
+                  ) : null}
+                  {(this.state.pendingAuthorName || this.state.pendingWorkName) ? (
+                    <div className="note-overlay-citation">
+                      <WorkCitationSpan
+                        plain={true}
+                        authorName={this.state.pendingAuthorName ?? this.props.note?.work?.author?.name}
+                        workTitle={this.state.pendingWorkName}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+                {this.props.note.imageUrls.length > 1 ? (
+                  <button
+                    className="overlay-nav-btn overlay-nav-next"
+                    onClick={(e) => { e.stopPropagation(); this.moveFocusedImage(1) }}
+                    disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
+                  >
+                    <img src={right_arrow} />
+                  </button>
+                ) : null}
+              </div>
+              {this.props.note.imageUrls.length > 1 ? (
+                <div className="note-overlay-dots" onClick={(e) => e.stopPropagation()}>
+                  {this.props.note.imageUrls.map((_, i) => (
+                    <button
+                      key={i}
+                      className={`overlay-dot${i === this.state.largeImage ? ' active' : ''}`}
+                      onClick={() => this.setState({ largeImage: i })}
+                    />
+                  ))}
+                </div>
+              ) : null}
             </div>
           ) : null}
 
@@ -666,7 +803,7 @@ class Note extends React.Component {
                 value={this.state.pendingText}
               ></textarea>
             </div>
-          ) : this.state.pendingText ? (
+          ) : !this.state.overlayMode && this.state.pendingText ? (
             <div name="text" className="width-100">
               <div
                 className={
@@ -683,7 +820,7 @@ class Note extends React.Component {
           ) : null}
 
           {/* Take */}
-          {edit && !this.state.compactEdit ? (
+          {!this.state.overlayMode && edit && !this.state.compactEdit ? (
             <div name="take" className="width-100">
               <label htmlFor="take" className="note-full form-label">
                 Take
@@ -695,7 +832,7 @@ class Note extends React.Component {
                 value={this.state.pendingTake}
               ></textarea>
             </div>
-          ) : this.state.pendingTake ? (
+          ) : !this.state.overlayMode && this.state.pendingTake ? (
             <div name="take" className="width-100">
               <div
                 className="note-full note-take markdown"
@@ -742,12 +879,12 @@ class Note extends React.Component {
                 />
               </div>
             </>
-          ) : this.state.pendingAuthorId ||
+          ) : !this.state.overlayMode && (this.state.pendingAuthorId ||
             this.props.note?.work?.author ||
             this.state.pendingWorkId ||
             this.state.pendingYear ||
             this.state.pendingUrl ||
-            this.props.note?.work?.url ? (
+            this.props.note?.work?.url) ? (
             <div name="work" className="width-100">
               <div className="citation">
                 <WorkCitationSpan

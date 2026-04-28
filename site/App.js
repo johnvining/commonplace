@@ -62,7 +62,6 @@ const PileHome    = React.lazy(() => import('./PileHome'))
 const RecentItems = React.lazy(() => import('./RecentItems'))
 const Work        = React.lazy(() => import('./Work'))
 const Read        = React.lazy(() => import('./Read'))
-const Admin       = React.lazy(() => import('./Admin'))
 
 class App extends React.Component {
   state = { barOpen: false, viewMode: 1, hasToken: false }
@@ -353,10 +352,6 @@ class App extends React.Component {
                     setPageTitle={this.setPageTitle.bind(this)}
                   />
                 }
-              />
-              <Route
-                path="/admin"
-                element={<Admin setPageTitle={this.setPageTitle.bind(this)} />}
               />
             </Routes>
             </Suspense>

@@ -28,7 +28,6 @@ import controllers, {
   reqBulkImportInstapaper,
   reqBulkImportNotesCSV,
   reqBulkEmbedNotes,
-  reqBulkEmbedNotesStatus,
   reqHybridSearch,
   reqUnifiedSearch,
 } from './note.controllers'
@@ -88,7 +87,6 @@ router.route('/import/csv').put(asyncWrapper(reqBulkImportNotesCSV, 200))
 router.route('/import/instapaper').put(asyncWrapper(reqBulkImportInstapaper, 200))
 
 router.route('/bulk-embed').post(asyncWrapper(reqBulkEmbedNotes, 200))
-router.route('/bulk-embed/status').get(asyncWrapper(reqBulkEmbedNotesStatus, 200))
 
 router.route('/hybrid-search').post(asyncWrapper(reqHybridSearch, 200))
 router.route('/unified-search').post(asyncWrapper(reqUnifiedSearch, 200))

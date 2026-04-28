@@ -50,7 +50,36 @@
       &.image-div {
         align-content: center;
         min-height: 100%;
+        position: relative;
 
+        .large-image {
+          cursor: zoom-in;
+        }
+
+        .split-image-close {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background: rgba(0, 0, 0, 0.5);
+          color: #fff;
+          border: none;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          font-size: 16px;
+          line-height: 1;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+
+        &:hover .split-image-close {
+          opacity: 1;
+        }
       }
     }
 
