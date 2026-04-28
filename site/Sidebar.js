@@ -91,11 +91,6 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-section">
-        <Link to="/admin" className="sidebar-link sidebar-link-compact">
-          <span className="sidebar-item">Admin</span>
-        </Link>
-      </div>
-      <div className="sidebar-section">
         <div className="sidebar-title">Starred Items</div>
         {pinnedItems.length ? (
           <div className="sidebar-list sidebar-list-compact">
