@@ -625,7 +625,9 @@ export const reqUnifiedSearch = async (req, res) => {
   return results
 }
 
-export const reqBulkEmbedNotes = async (req, res) => {
+let _bulkEmbedState = { status: 'idle', results: null, error: null, startedAt: null, finishedAt: null }
+
+async function runBulkEmbed() {
   const BATCH = 100
   let skip = 0
   let processed = 0
@@ -663,11 +665,25 @@ export const reqBulkEmbedNotes = async (req, res) => {
       })
     )
 
+    _bulkEmbedState.results = { processed, skipped, failed }
     if (batch.length < BATCH) break
   }
 
   return { processed, skipped, failed }
 }
+
+export const reqBulkEmbedNotes = async (req, res) => {
+  if (_bulkEmbedState.status === 'running') {
+    return { status: 'running', startedAt: _bulkEmbedState.startedAt, results: _bulkEmbedState.results }
+  }
+  _bulkEmbedState = { status: 'running', results: null, error: null, startedAt: new Date().toISOString(), finishedAt: null }
+  runBulkEmbed()
+    .then(results => { _bulkEmbedState = { status: 'done', results, error: null, startedAt: _bulkEmbedState.startedAt, finishedAt: new Date().toISOString() } })
+    .catch(err => { _bulkEmbedState = { status: 'error', results: _bulkEmbedState.results, error: err.message, startedAt: _bulkEmbedState.startedAt, finishedAt: new Date().toISOString() } })
+  return { status: 'running', startedAt: _bulkEmbedState.startedAt }
+}
+
+export const reqBulkEmbedNotesStatus = async (req, res) => _bulkEmbedState
 
 export const findNotesAndPopulate = async function (
   searchObject,

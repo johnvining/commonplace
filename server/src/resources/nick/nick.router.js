@@ -10,12 +10,14 @@ import {
   reqGetNickForIdea,
   reqGetNickForPile,
   reqBackfillNicks,
+  reqBackfillNicksStatus,
 } from './nick.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
 const router = Router()
 
 router.route('/backfill').post(asyncWrapper(reqBackfillNicks, 200))
+router.route('/backfill/status').get(asyncWrapper(reqBackfillNicksStatus, 200))
 
 router.route('/note/:id').get(asyncWrapper(reqGetNickForNote, 200)).put(asyncWrapper(reqGenerateNickForNote, 200))
 router.route('/work/:id').get(asyncWrapper(reqGetNickForWork, 200)).put(asyncWrapper(reqGenerateNickForWork, 200))

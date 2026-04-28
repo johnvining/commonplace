@@ -193,6 +193,18 @@ export async function bulkEmbedNotes() {
   return axios.post(url_api + 'note/bulk-embed', {})
 }
 
+export async function bulkEmbedNotesStatus() {
+  return axios.get(url_api + 'note/bulk-embed/status')
+}
+
+export async function backfillNicks() {
+  return axios.post(url_api + 'nick/backfill', {})
+}
+
+export async function backfillNicksStatus() {
+  return axios.get(url_api + 'nick/backfill/status')
+}
+
 export async function getRecentNotes(page) {
   return axios.get(url_api + `note/all/` + page)
 }
