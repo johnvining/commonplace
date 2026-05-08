@@ -56,6 +56,18 @@ function Author(props) {
     fetchAuthorWorks(id)
   }, [id])
 
+  const handleAcceptUpdates = async () => {
+    var updateObject = {
+      name: pendingName,
+      birth_year: pendingBirthYear,
+      death_year: pendingDeathYear,
+      usernames: pendingUsernames.split(',').map(u => u.trim()).filter(Boolean),
+    }
+
+    db.updateRecord(db.types.auth, id, updateObject)
+    setEdit(false)
+  }
+
   useEntityKeyboardShortcuts({
     isEditing: edit,
     onEdit: () => setEdit(true),
@@ -71,18 +83,6 @@ function Author(props) {
 
     await db.deleteRecord(db.types.auth, id)
     navigate('/')
-  }
-
-  const handleAcceptUpdates = async () => {
-    var updateObject = {
-      name: pendingName,
-      birth_year: pendingBirthYear,
-      death_year: pendingDeathYear,
-      usernames: pendingUsernames.split(',').map(u => u.trim()).filter(Boolean),
-    }
-
-    db.updateRecord(db.types.auth, id, updateObject)
-    setEdit(false)
   }
 
   props.setPageTitle(pendingName)
