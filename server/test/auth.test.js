@@ -1,19 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { authedAgent } from './setup.js'
-
-async function createAuthor(agent, name = 'Test Author') {
-  const res = await agent.post('/api/auth/').send({ name }).expect(201)
-  return res.body.data
-}
-
-async function createWork(agent, { name = 'Test Work', author = null } = {}) {
-  const res = await agent.post('/api/work/').send({ name }).expect(201)
-  const work = res.body.data
-  if (author) {
-    await agent.put(`/api/work/${work._id}`).send({ author }).expect(200)
-  }
-  return work
-}
+import { authedAgent, createAuthor, createWork } from './setup.js'
 
 describe('auth (authors)', () => {
   describe('POST /api/auth/ (create)', () => {
