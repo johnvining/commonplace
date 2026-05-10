@@ -1,4 +1,4 @@
-export const guessYearFromUrl = function (url) {
+export const guessYearFromUrl = function (url: string): number | null {
   try {
     // Match a 4-digit year after a slash, not followed by another digit
     const matches = [...url.matchAll(/\/(\d{4})(?=\D|$)/g)]
