@@ -594,11 +594,6 @@ function scoreEntityName(name, query) {
   return 0.5
 }
 
-export const reqHybridSearch = async (req, res) => {
-  const { query, limit = 20 } = req.body
-  return hybridSearch(query, limit)
-}
-
 export const reqUnifiedSearch = async (req, res) => {
   const { query, limit = 50 } = req.body
   if (!query?.trim()) return []
