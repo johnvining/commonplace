@@ -5,7 +5,6 @@ import defaultControllers, {
   reqDeleteIdea,
   reqGetAutoComplete,
   reqGetAutoCompleteWithCounts,
-  reqGetIdeaInfo
 } from './idea.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
