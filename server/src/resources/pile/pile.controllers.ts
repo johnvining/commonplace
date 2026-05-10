@@ -74,12 +74,12 @@ export const filePilesByString = async function (string, withCounts) {
 
     let noteFiler = Promise.all(notePromises).then((result) => {
       result.map((val, idx) => {
-        piles[idx] = { ...piles[idx], note_count: val }
+        ;(piles as any)[idx] = { ...piles[idx], note_count: val }
       })
     })
     let workFiler = Promise.all(workPromises).then((result) => {
       result.map((val, idx) => {
-        piles[idx] = { ...piles[idx], work_count: val }
+        ;(piles as any)[idx] = { ...piles[idx], work_count: val }
       })
     })
 

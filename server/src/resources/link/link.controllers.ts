@@ -46,7 +46,7 @@ export const reqGetLinksForNote = async (req, res) => {
     Nick.find({ note: { $in: linkedIds } }).lean().exec(),
   ])
 
-  const nickMap = Object.fromEntries(nicks.map(n => [String(n.note), n.key]))
-  notes.forEach(n => { n.nick = nickMap[String(n._id)] || null })
+  const nickMap = Object.fromEntries(nicks.map((n: any) => [String(n.note), n.key]))
+  notes.forEach((n: any) => { n.nick = nickMap[String(n._id)] || null })
   return notes
 }

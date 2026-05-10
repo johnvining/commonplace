@@ -5,17 +5,10 @@ import { getOpenAiOCR } from './suggestions.js'
 
 type EmbeddingVector = number[]
 
-interface NoteForEmbedding {
-  title?: string
-  text?: string
-  take?: string
-  ocrText?: string | null
-  author?: { name?: string } | null
-  work?: { name?: string } | null
-  ideas?: Array<{ name?: string }>
-  images?: string[]
-  embeddingHash?: string
-}
+// Loose: callers pass populated/lean Mongoose docs whose typed shape varies
+// (some fields are ObjectIds, others are populated objects). We only access
+// optional name fields when present.
+type NoteForEmbedding = any
 
 interface EmbeddingUpdate {
   embedding: EmbeddingVector

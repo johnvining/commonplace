@@ -40,11 +40,11 @@ export const reqFindNotesByString = async (req, res) => {
     .lean()
     .exec()
 
-  const noteIds = notes.map((n) => n._id)
+  const noteIds = notes.map((n: any) => n._id)
   const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
-  const nickMap = {}
-  nicks.forEach((nick) => { nickMap[nick.note] = nick.key })
-  notes.forEach((note) => { note.nick = nickMap[note._id] || null })
+  const nickMap: Record<string, string> = {}
+  nicks.forEach((nick: any) => { nickMap[String(nick.note)] = nick.key })
+  notes.forEach((note: any) => { note.nick = nickMap[String(note._id)] || null })
   return notes
 }
 
@@ -103,12 +103,14 @@ export const reqAddNewIdea = async (req, res) => {
   return doc
 }
 
-export const reqRemoveIdeaFromNote = async (req, res) => {
-  const doc = await updateNote(req.params.id, {
-    $pull: { ideas: req.params.ideaId },
-  })
-  await touchIdea(req.params.ideaId)
+export const removeIdeaFromNote = async (noteId: any, ideaId: any) => {
+  const doc = await updateNote(noteId, { $pull: { ideas: ideaId } })
+  await touchIdea(ideaId)
   return doc
+}
+
+export const reqRemoveIdeaFromNote = async (req, res) => {
+  return removeIdeaFromNote(req.params.id, req.params.ideaId)
 }
 
 export const reqAddPile = async (req, res) => {
@@ -539,9 +541,9 @@ async function hybridSearch(query, limit = 20) {
   semanticScores.sort((a, b) => b.score - a.score)
   const topSemantic = semanticScores.filter((s) => s.score >= 0.38)
 
-  const maxKeyword = keywordNotes.length > 0 ? Math.max(...keywordNotes.map((n) => n.score || 0)) : 1
-  const keywordMap = new Map(keywordNotes.map((n) => [String(n._id), n]))
-  const keywordScoreMap = new Map(keywordNotes.map((n) => [String(n._id), (n.score || 0) / (maxKeyword || 1)]))
+  const maxKeyword = keywordNotes.length > 0 ? Math.max(...keywordNotes.map((n: any) => n.score || 0)) : 1
+  const keywordMap = new Map(keywordNotes.map((n: any) => [String(n._id), n]))
+  const keywordScoreMap = new Map(keywordNotes.map((n: any) => [String(n._id), (n.score || 0) / (maxKeyword || 1)]))
 
   const semanticOnlyIds = topSemantic
     .map((s) => s.id)
@@ -575,11 +577,11 @@ async function hybridSearch(query, limit = 20) {
   scored.sort((a, b) => b._hybridScore - a._hybridScore)
   const top = scored.filter((n) => n._hybridScore >= 0.15).slice(0, limit)
 
-  const noteIds = top.map((n) => n._id)
+  const noteIds = top.map((n: any) => n._id)
   const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
-  const nickMap = {}
-  nicks.forEach((nick) => { nickMap[nick.note] = nick.key })
-  top.forEach((note) => { note.nick = nickMap[note._id] || null })
+  const nickMap: Record<string, string> = {}
+  nicks.forEach((nick: any) => { nickMap[String(nick.note)] = nick.key })
+  top.forEach((note: any) => { note.nick = nickMap[String(note._id)] || null })
 
   return top
 }
@@ -641,12 +643,12 @@ export const reqBulkEmbedNotes = async (req, res) => {
     skip += batch.length
 
     await Promise.all(
-      batch.map(async (note) => {
+      batch.map(async (note: any) => {
         try {
           const update = await embedNoteIfStale(note)
           if (update) {
             await Note.findByIdAndUpdate(note._id, update)
-            upsertEmbedding(note._id, update.embedding)
+            upsertEmbedding(String(note._id), update.embedding)
             processed++
           } else {
             skipped++
@@ -665,12 +667,12 @@ export const reqBulkEmbedNotes = async (req, res) => {
 }
 
 export const findNotesAndPopulate = async function (
-  searchObject,
-  sortObject,
+  searchObject: any,
+  sortObject: any = null,
   slim = false,
-  skip = null,
-  limit = null,
-  projection = LIST_OMIT
+  skip: any = null,
+  limit: any = null,
+  projection: any = LIST_OMIT
 ) {
   let notes
   if (slim) {
@@ -700,18 +702,18 @@ export const findNotesAndPopulate = async function (
       .exec()
   }
 
-  const noteIds = notes.map((note) => note._id)
+  const noteIds = notes.map((note: any) => note._id)
   const nicks = await Nick.find({ note: { $in: noteIds } })
     .lean()
     .exec()
 
-  const nickMap = {}
-  nicks.forEach((nick) => {
-    nickMap[nick.note] = nick.key
+  const nickMap: Record<string, string> = {}
+  nicks.forEach((nick: any) => {
+    nickMap[String(nick.note)] = nick.key
   })
 
-  notes.forEach((note) => {
-    note.nick = nickMap[note._id] || null
+  notes.forEach((note: any) => {
+    note.nick = nickMap[String(note._id)] || null
   })
 
   return notes
@@ -732,18 +734,18 @@ export const findRandomNotesAndPopulate = async function (
     { path: 'work', populate: { path: 'author' } },
   ])
 
-  const noteIds = populated_notes.map((note) => note._id)
+  const noteIds = populated_notes.map((note: any) => note._id)
   const nicks = await Nick.find({ note: { $in: noteIds } })
     .lean()
     .exec()
 
-  const nickMap = {}
-  nicks.forEach((nick) => {
-    nickMap[nick.note] = nick.key
+  const nickMap: Record<string, string> = {}
+  nicks.forEach((nick: any) => {
+    nickMap[String(nick.note)] = nick.key
   })
 
-  populated_notes.forEach((note) => {
-    note.nick = nickMap[note._id] || null
+  populated_notes.forEach((note: any) => {
+    note.nick = nickMap[String(note._id)] || null
   })
 
   return populated_notes

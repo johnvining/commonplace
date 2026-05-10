@@ -62,7 +62,7 @@ export const reqAuthorizeUser = async (req, res) => {
       const result = await bcrypt.compare(password, user.password)
       if (result) {
         const token = jwt.sign(
-          { id: user._id, username, role: user.role },
+          { id: user._id, username, role: (user as any).role },
           config.secrets.jwt,
           { expiresIn: TOKEN_LIFETIME_SECONDS }
         )

@@ -32,7 +32,7 @@ export const reqGetIdeasByStringWithCounts = async (req, res) => {
 
     var responseData = []
     for (let i = 0; i < doc.length; i++) {
-      let idea = doc[i]._doc
+      let idea = (doc[i] as any)._doc
       let notesValues = { notes: notes[i] }
       idea = { ...idea, ...notesValues }
       responseData[i] = idea

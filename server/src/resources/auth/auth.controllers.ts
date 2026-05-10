@@ -40,7 +40,7 @@ export const getAutoComplete = async (req, res, withCounts = false) => {
 export const findAuthorByUrl = async function (url) {
   try {
     const parsed = new URL(url)
-    const candidates = new Set()
+    const candidates = new Set<string>()
 
     // subdomain: username.substack.com, username.github.io
     const hostParts = parsed.hostname.split('.')

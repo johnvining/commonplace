@@ -57,16 +57,16 @@ export const reqBackfillNicks = async (req, res) => {
     { type: 'pile', Model: Pile },
   ]
 
-  const results = {}
+  const results: Record<string, any> = {}
   for (const { type, Model } of types) {
-    const all = await Model.find({}, { _id: 1 }).lean().exec()
+    const all = await (Model as any).find({}, { _id: 1 }).lean().exec()
     const existing = await Nick.find({ [type]: { $exists: true } }, { [type]: 1 }).lean().exec()
-    const covered = new Set(existing.map(n => String(n[type])))
-    const missing = all.filter(doc => !covered.has(String(doc._id)))
+    const covered = new Set(existing.map((n: any) => String(n[type])))
+    const missing = all.filter((doc: any) => !covered.has(String(doc._id)))
 
     let created = 0, failed = 0
     for (const doc of missing) {
-      try { await generateNick(type, doc._id); created++ }
+      try { await generateNick(type, (doc as any)._id); created++ }
       catch { failed++ }
     }
     results[type] = { total: all.length, already_had_nick: all.length - missing.length, created, failed }

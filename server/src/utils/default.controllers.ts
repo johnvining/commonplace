@@ -1,7 +1,10 @@
 import type { Request, Response } from 'express'
 import type { Model } from 'mongoose'
 
-type AnyModel = Model<unknown>
+// Accept any Mongoose Model — controllers across resources pass concretely
+// typed models (Note, Auth, Work, ...) and inferred schema generics make a
+// strictly typed wrapper noisy with no real safety win for these CRUD shims.
+type AnyModel = Model<any>
 
 export const getOne = (model: AnyModel) => async (req: Request, res: Response) => {
   const doc = await model
