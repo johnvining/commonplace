@@ -43,7 +43,7 @@ function Work(props: any) {
   const [pendingSummary, setPendingSummary] = useState('')
   const [pendingCitationInfo, setPendingCitationInfo] = useState('')
   const [piles, setPiles] = useState<any[]>([])
-  const [nick, setNick] = useState()
+  const [nick, setNick] = useState<any>()
   const [notesRefreshKey, setNotesRefreshKey] = useState(0)
   const navigate = useNavigate()
 

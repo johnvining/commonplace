@@ -24,7 +24,7 @@ function Author(props: any) {
   const [pendingBirthYear, setPendingBirthYear] = useState('')
   const [pendingDeathYear, setPendingDeathYear] = useState('')
   const [pendingUsernames, setPendingUsernames] = useState('')
-  const [works, setWorks] = useState(null)
+  const [works, setWorks] = useState<any>(null)
   const navigate = useNavigate()
 
   const fetchAuthorInfo = (id) => {
@@ -72,7 +72,7 @@ function Author(props: any) {
     onEdit: () => setEdit(true),
     onSave: handleAcceptUpdates,
     onExitEdit: () => setEdit(false),
-    onToggleStar: () => togglePinned({ type: 'auth', id, label: pendingName, href: `/auth/${id}` }),
+    onToggleStar: () => id && togglePinned({ type: 'auth', id, label: pendingName, href: `/auth/${id}` }),
   })
 
   const deleteAuthor = async () => {

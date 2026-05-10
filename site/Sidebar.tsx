@@ -26,9 +26,9 @@ function writeSidebarCache(data) {
 
 function Sidebar() {
   const cached = readSidebarCache()
-  const [recentIdeas, setRecentIdeas] = useState(cached?.ideas || [])
-  const [recentPiles, setRecentPiles] = useState(cached?.piles || [])
-  const [pinnedItems, setPinnedItems] = useState([])
+  const [recentIdeas, setRecentIdeas] = useState<any[]>(cached?.ideas || [])
+  const [recentPiles, setRecentPiles] = useState<any[]>(cached?.piles || [])
+  const [pinnedItems, setPinnedItems] = useState<import('./pinned').PinnedItem[]>([])
   const [loading, setLoading] = useState(!cached)
   useEffect(() => {
     let isMounted = true

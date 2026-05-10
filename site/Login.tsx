@@ -16,7 +16,7 @@ function Login(props: any) {
     try {
       const response = await db.getAuthentication(password)
       props.onTokenReceived(response.data.token)
-    } catch (err) {
+    } catch (err: any) {
       const status = err?.response?.status
       const code = status ? ` (${status})` : ''
       if (status === 401 || status === 403) {

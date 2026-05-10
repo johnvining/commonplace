@@ -367,7 +367,7 @@ class App extends React.Component<any, any> {
 
 // Wrapper component that provides keyboard context and handles global shortcuts
 function AppWithKeyboard() {
-  const appRef = React.useRef(null)
+  const appRef = React.useRef<App | null>(null)
   const [helpOpen, setHelpOpen] = React.useState(false)
   const activeScopes = useKeyboardScopes()
   const navigate = useNavigate()
@@ -471,7 +471,9 @@ function AppWithKeyboard() {
   )
 }
 
-const root = createRoot(document.getElementById('root'))
+const rootEl = document.getElementById('root')
+if (!rootEl) throw new Error('#root not found')
+const root = createRoot(rootEl)
 root.render(
   <BrowserRouter>
     <KeyboardProvider>

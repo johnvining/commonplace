@@ -6,13 +6,18 @@ import * as constants from './constants'
 function HelpOverlay({ isVisible, onClose, currentContext }: any) {
   if (!isVisible) return null
 
+  interface ShortcutSection {
+    title: string
+    shortcuts: { key: string; action: string }[]
+  }
+
   // Determine which shortcuts to show based on context
   const getContextualShortcuts = () => {
-    const activeScopes = currentContext.activeScopes instanceof Set
+    const activeScopes: Set<string> = currentContext.activeScopes instanceof Set
       ? currentContext.activeScopes
       : new Set(currentContext.activeScopes || [])
-    const hasScope = (scope) => activeScopes.has(scope)
-    const sections = []
+    const hasScope = (scope: string) => activeScopes.has(scope)
+    const sections: ShortcutSection[] = []
 
     // Always show global shortcuts
     sections.push({

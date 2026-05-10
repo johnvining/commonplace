@@ -1,7 +1,15 @@
 import { createContext, useContext, useCallback, useRef, useEffect, useState } from 'react'
 import * as constants from './constants'
 
-const KeyboardContext = createContext(null)
+type KeyHandler = (event: KeyboardEvent) => boolean | void
+
+interface KeyboardContextShape {
+  register: (scope: string, handler: KeyHandler) => number
+  unregister: (id: number) => void
+  activeScopes: Set<string>
+}
+
+const KeyboardContext = createContext<KeyboardContextShape | null>(null)
 
 // Scope priority - lower number = higher priority (more specific)
 const scopePriority = {
@@ -22,7 +30,7 @@ export function KeyboardProvider({ children }: any) {
   const handlers = useRef(new Map())
   const handlerId = useRef(0)
   const scopeCounts = useRef(new Map())
-  const [activeScopes, setActiveScopes] = useState(new Set())
+  const [activeScopes, setActiveScopes] = useState<Set<string>>(new Set())
 
   const updateScopeCount = useCallback((scope, delta) => {
     const current = scopeCounts.current.get(scope) || 0
@@ -94,7 +102,7 @@ export function KeyboardProvider({ children }: any) {
 }
 
 // Hook for components to register keyboard handlers
-export function useKeyboardShortcuts(scope, handler, deps = []) {
+export function useKeyboardShortcuts(scope: string, handler: KeyHandler, deps: unknown[] = []) {
   const context = useContext(KeyboardContext)
   const register = context?.register
   const unregister = context?.unregister
@@ -109,7 +117,7 @@ export function useKeyboardShortcuts(scope, handler, deps = []) {
     if (!register || !unregister) return
 
     // Use a wrapper that calls the ref so we always get the latest handler
-    const wrappedHandler = (event) => handlerRef.current(event)
+    const wrappedHandler: KeyHandler = (event) => handlerRef.current(event)
     const id = register(scope, wrappedHandler)
     return () => unregister(id)
   }, [register, unregister, scope])
@@ -117,11 +125,11 @@ export function useKeyboardShortcuts(scope, handler, deps = []) {
 
 export function useKeyboardScopes() {
   const context = useContext(KeyboardContext)
-  return context?.activeScopes || new Set()
+  return context?.activeScopes || new Set<string>()
 }
 
 // Helper to check key combinations
-function isKey(event, keyCode, { ctrl = false, shift = false, alt = false } = {}) {
+function isKey(event: KeyboardEvent, keyCode: number, { ctrl = false, shift = false, alt = false }: { ctrl?: boolean; shift?: boolean; alt?: boolean } = {}) {
   return (
     event.keyCode === keyCode &&
     event.ctrlKey === ctrl &&

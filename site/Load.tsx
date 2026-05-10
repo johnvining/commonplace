@@ -14,8 +14,8 @@ function Load(props: any) {
   const [notesImported, setNotesImported] = useState(-1)
   const [importFormat, setImportFormat] = useState('csv')
   const [importing, setImporting] = useState(false)
-  const [importProgress, setImportProgress] = useState(null)
-  const [importError, setImportError] = useState(null)
+  const [importProgress, setImportProgress] = useState<any>(null)
+  const [importError, setImportError] = useState<any>(null)
   const cancelRef = React.useRef(false)
   const navigate = useNavigate()
 
@@ -107,7 +107,7 @@ function Load(props: any) {
       } else {
         await importUrlsAsNotes()
       }
-    } catch (e) {
+    } catch (e: any) {
       const status = e?.response?.status
       if (status === 413) {
         setImportError('The import text is too large. Try splitting it into smaller batches.')

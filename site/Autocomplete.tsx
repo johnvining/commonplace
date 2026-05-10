@@ -31,7 +31,7 @@ class Autocomplete extends React.Component<any, any> {
   }
 
   componentWillUnmount() {
-    clearTimeout(this._debounceTimer)
+    if (this._debounceTimer) clearTimeout(this._debounceTimer)
   }
 
   // Section 6: Autocomplete keyboard shortcuts - called from wrapper
@@ -82,13 +82,13 @@ class Autocomplete extends React.Component<any, any> {
     return false
   }
 
-  _debounceTimer = null
+  _debounceTimer: ReturnType<typeof setTimeout> | null = null
 
   handleTypingChange = (val) => {
     this.setState(
       { hideResults: false, currentTypedText: val.target.value },
       () => {
-        clearTimeout(this._debounceTimer)
+        if (this._debounceTimer) clearTimeout(this._debounceTimer)
         this._debounceTimer = setTimeout(() => this.handleTextUpdate(), 300)
       }
     )
@@ -153,9 +153,9 @@ class Autocomplete extends React.Component<any, any> {
     this.props
       .getSuggestions(this.props.apiType, this.state.currentTypedText)
       .then((response) => {
-        var options = response.data.data
-        for (var i = 0; i < options.length; i++) {
-          var hasExact = false
+        let options = response.data.data
+        let hasExact = false
+        for (let i = 0; i < options.length; i++) {
           if (this.state.currentTypedText == options[i].name) {
             hasExact = true
             break

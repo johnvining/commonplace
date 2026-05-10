@@ -25,7 +25,7 @@ function writeCache(data) {
 
 function Stats() {
   const [stats, setStats] = useState(() => readCache())
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<any>(null)
   const navigate = useNavigate()
 
   useEffect(() => {

@@ -96,6 +96,7 @@ function Idea(props: any) {
   }
 
   const toggleStar = () => {
+    if (!id) return
     togglePinned({
       type: 'idea',
       id,

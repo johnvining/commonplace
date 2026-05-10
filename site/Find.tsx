@@ -112,8 +112,8 @@ function UnifiedResult({ entry, query }: any) {
 }
 
 function Find(props: any) {
-  const { search, category } = useParams()
-  const [results, setResults] = React.useState(null)
+  const { search = '', category } = useParams()
+  const [results, setResults] = React.useState<any>(null)
   const [page, setPage] = React.useState(1)
 
   React.useEffect(() => {
