@@ -35,10 +35,10 @@ export const reqRegisterUser = async (req, res) => {
     })
     res.cookie('jwt', token, cookieOptions(config))
     res.status(201).json({ message: 'User successfully created', user: user._id })
-  } catch (error) {
+  } catch (error: any) {
     res.status(401).json({
       message: 'User not successfully created',
-      error: error.message,
+      error: error?.message,
     })
   }
 }

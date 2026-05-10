@@ -132,16 +132,15 @@ export const findOrCreateAuthor = async function (name) {
   return await createAuthor(name)
 }
 
-export const deleteAuthor = async function (id) {
-  let notes = await findNotesAndPopulate(
+export const deleteAuthor = async function (id: string) {
+  const notes = await findNotesAndPopulate(
     { author: id },
     { updatedAt: -1 },
     true
   )
-  let deletionPromises = []
-  notes.map((note) => {
-    deletionPromises.push(updateNote(note._id, { author: null }))
-  })
+  const deletionPromises: Promise<unknown>[] = notes.map((note) =>
+    updateNote(note._id, { author: null })
+  )
 
   await Promise.all(deletionPromises)
   await Auth.findOneAndDelete({ _id: id })

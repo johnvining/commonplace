@@ -29,8 +29,8 @@ export const generateNick = async (type, id) => {
 
   try {
     return await Nick.create({ key, [type]: id })
-  } catch (e) {
-    if (e.code === 11000) return Nick.findOne({ [type]: id })
+  } catch (e: any) {
+    if (e?.code === 11000) return Nick.findOne({ [type]: id })
     throw e
   }
 }

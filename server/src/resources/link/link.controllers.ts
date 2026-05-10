@@ -7,6 +7,10 @@ export const reqLinkNoteToNote = async (req, res) => {
   const rightNoteNick = await Nick.findOne({
     key: req.body.rightNoteNick,
   })
+  if (!leftNoteNick || !rightNoteNick) {
+    res.status(400).end()
+    return
+  }
   const leftNoteId = leftNoteNick.note
   const rightNoteId = rightNoteNick.note
 

@@ -148,12 +148,11 @@ export const findOrCreateWork = async function(name) {
   return await createWork(name)
 }
 
-export const deleteWork = async function(id) {
-  let notes = await findNotesAndPopulate({ work: id }, {}, true)
-  let deletionPromises = []
-  notes.map(note => {
-    deletionPromises.push(updateNote(note._id, { work: null }))
-  })
+export const deleteWork = async function(id: string) {
+  const notes = await findNotesAndPopulate({ work: id }, {}, true)
+  const deletionPromises: Promise<unknown>[] = notes.map((note) =>
+    updateNote(note._id, { work: null })
+  )
 
   await Promise.all(deletionPromises)
   await Work.findOneAndDelete({ _id: id })
