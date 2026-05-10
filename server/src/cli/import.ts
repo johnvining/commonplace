@@ -5,19 +5,19 @@ import https from 'https'
 import { parse } from 'csv-parse'
 import config from '../config'
 import Readable from 'stream'
-import * as utils from '../utils' //TODO: Fix duplicate code
+import { guessYearFromUrl } from '../utils/urls'
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
 import * as PileControllers from '../resources/pile/pile.controllers.js'
 
-export async function importCSV(filePath, recordType) {
+export async function importCSV(filePath: string, recordType: number) {
   console.log('Importing records from file ' + filePath)
   console.log('')
 
-  var entries = []
-  var parser = parse({ delimiter: ',' })
+  const entries: any[] = []
+  const parser = parse({ delimiter: ',' })
   fs.createReadStream(filePath)
     .pipe(parser)
     .on('data', async (data) => {
@@ -26,44 +26,45 @@ export async function importCSV(filePath, recordType) {
 
   await streamComplete(parser)
 
-  var totalImports = 0
-  const parseFunc = getParseFunction(recordType)
-  const importFunc = getImportFunction(recordType)
+  let totalImports = 0
+  const processor = getProcessor(recordType)
+  if (!processor) {
+    console.error('Unsupported record type', recordType)
+    return
+  }
 
-  for (let i = 0; i < entries.length; i++) {
-    let parsedObject = parseFunc(entries[i])
-    await importFunc(parsedObject)
+  for (const entry of entries) {
+    await processor(entry)
     totalImports++
   }
 
   console.log('Imported records: ' + totalImports)
 }
 
-export async function importCsvFromString(string, recordType) {
+export async function importCsvFromString(string: string, recordType: number) {
   if (recordType != 1 && recordType != 3) {
     return null // Unsupported
   }
 
   const Readable = require('stream').Readable
-  let stream = Readable.from(string)
-  var entries = []
+  const stream = Readable.from(string)
+  const entries: any[] = []
   const delimiter = recordType === 3 ? '\t' : ','
   const quote = recordType === 3 ? false : '"'
-  var parser = parse({ delimiter, relax_column_count: true, quote })
-  stream.pipe(parser).on('data', async (data) => {
+  const parser = parse({ delimiter, relax_column_count: true, quote })
+  stream.pipe(parser).on('data', async (data: any) => {
     entries.push(data)
-  }).on('error', (err) => {
+  }).on('error', (err: unknown) => {
     console.error('Import parse error:', err)
   })
   await streamComplete(parser)
 
-  var totalImports = 0
-  const parseFunc = getParseFunction(recordType)
-  const importFunc = getImportFunction(recordType)
+  let totalImports = 0
+  const processor = getProcessor(recordType)
+  if (!processor) return null
 
-  for (let i = 0; i < entries.length; i++) {
-    let parsedObject = parseFunc(entries[i])
-    await importFunc(parsedObject)
+  for (const entry of entries) {
+    await processor(entry)
     totalImports++
   }
 
@@ -78,64 +79,83 @@ function streamComplete(stream: any) {
   })
 }
 
-function getParseFunction(dataType) {
+// A processor pairs a parser with its matching importer so the type flows
+// through correctly per record type.
+type Processor = (row: CsvRow) => Promise<unknown>
+
+function getProcessor(dataType: number): Processor | null {
   switch (dataType) {
     case 1:
-      return parseNote
+      return (row) => importNote(parseNote(row))
     case 2:
-      return parseWork
+      return (row) => importWork(parseWork(row))
     case 3:
-      return parseInstapaper
+      return (row) => importInstapaperNote(parseInstapaper(row))
   }
   return null
 }
 
-function getImportFunction(dataType) {
-  switch (dataType) {
-    case 1:
-      return importNote
-    case 2:
-      return importWork
-    case 3:
-      return importInstapaperNote
-  }
-  return null
+// Shape produced by parseNote / parseInstapaper and consumed by importNote /
+// importInstapaperNote. `year` is whatever was in the CSV cell — string,
+// numeric string, or null — and gets normalized inside the importers.
+interface NoteImportObject {
+  authorName: string
+  title: string
+  text: string
+  workName: string
+  url: string
+  ideas: string[]
+  externalImageUrls: string[]
+  piles: string[]
+  year: string | number | null
+  page: string
+  take: string
 }
 
-function parseNote(csvLine: any): any {
-  var obj: any = {}
-  obj.authorName = csvLine[0]
-  obj.title = csvLine[1]
-  obj.text = csvLine[2]
-  obj.workName = csvLine[3]
-  obj.url = csvLine[4]
-  obj.ideas = csvLine[5]?.split(',')
-  obj.externalImageUrls = csvLine[6]?.split(',')
-  obj.piles = csvLine[7]?.split(',')
-  obj.year = csvLine[8]
-  obj.page = csvLine[9]
-  obj.take = csvLine[10]
-  return obj
+interface WorkImportObject {
+  title: string
+  authorName: string
+  year: string | number | null
+  url: string
+  piles: string[]
+}
+
+type CsvRow = string[]
+
+function parseNote(csvLine: CsvRow): NoteImportObject {
+  return {
+    authorName: csvLine[0],
+    title: csvLine[1],
+    text: csvLine[2],
+    workName: csvLine[3],
+    url: csvLine[4],
+    ideas: csvLine[5]?.split(',') ?? [],
+    externalImageUrls: csvLine[6]?.split(',') ?? [],
+    piles: csvLine[7]?.split(',') ?? [],
+    year: csvLine[8] ?? null,
+    page: csvLine[9],
+    take: csvLine[10],
+  }
 }
 
 // Columns from IFTTT Instapaper → Google Sheets: Article, Text, Note Url, Image Url, Title
-function parseInstapaper(tsvLine: any): any {
-  var obj: any = {}
-  obj.workName = tsvLine[0]
-  obj.text = tsvLine[1]
-  obj.url = tsvLine[2]
-  obj.externalImageUrls = tsvLine[3] ? [tsvLine[3]] : ['']
-  obj.title = tsvLine[4]
-  obj.authorName = ''
-  obj.ideas = ['']
-  obj.piles = ['']
-  obj.year = null
-  obj.page = ''
-  obj.take = ''
-  return obj
+function parseInstapaper(tsvLine: CsvRow): NoteImportObject {
+  return {
+    workName: tsvLine[0],
+    text: tsvLine[1],
+    url: tsvLine[2],
+    externalImageUrls: tsvLine[3] ? [tsvLine[3]] : [''],
+    title: tsvLine[4],
+    authorName: '',
+    ideas: [''],
+    piles: [''],
+    year: null,
+    page: '',
+    take: '',
+  }
 }
 
-export async function getImageFromURL(url, dest) {
+export async function getImageFromURL(url: string | undefined, dest: string) {
   if (!url) return
 
   var file = fs.createWriteStream(dest)
@@ -168,13 +188,13 @@ export async function getImageFromURL(url, dest) {
   return dest
 }
 
-async function createDirIfNeeded(path) {
-  let mask = 484 // https://chmodcommand.com/chmod-744/
+async function createDirIfNeeded(path: string) {
+  const mask = 484 // https://chmodcommand.com/chmod-744/
   return mkDirPromise(path, mask)
 }
 
-function mkDirPromise(path, mask) {
-  return new Promise(function (resolve, reject) {
+function mkDirPromise(path: string, mask: number) {
+  return new Promise<string>(function (resolve, reject) {
     fs.mkdir(path, mask, function (err) {
       if (err && err.code !== 'EEXIST') return reject(err)
       resolve(path)
@@ -183,9 +203,9 @@ function mkDirPromise(path, mask) {
 }
 
 export async function downloadImageForNote(
-  noteId,
-  imageN,
-  imageUrl,
+  noteId: string,
+  imageN: number,
+  imageUrl: string,
   useAirtableFormat = false
 ) {
   // airtable format: "filename.jpg (url/to/file.jpg)"
@@ -198,54 +218,60 @@ export async function downloadImageForNote(
 
   const fileName = imageUrl?.split('/').pop()
   // TODO: Switch on http/s
-  var dest = noteId + '/' + imageN + '-' + fileName
+  const dest = noteId + '/' + imageN + '-' + fileName
   await createDirIfNeeded(config.imageStorePath + '/' + noteId)
   await getImageFromURL(imageUrl, config.imageStorePath + '/' + dest)
   return dest
 }
 
-async function importNote(importObject) {
-  let authorPromise = AuthControllers.findOrCreateAuthor(
-    importObject.authorName
+interface NewNoteFields {
+  author?: string
+  work?: string
+  ideas: string[]
+  piles: string[]
+  text: string
+  title: string
+  url: string
+  year: number | null
+  page: string
+  take: string
+}
+
+async function importNote(importObject: NoteImportObject) {
+  const [author, work] = await Promise.all([
+    AuthControllers.findOrCreateAuthor(importObject.authorName),
+    WorkControllers.findOrCreateWork(importObject.workName),
+  ])
+  const ideas = await Promise.all(
+    importObject.ideas.map((idea) => IdeaControllers.findOrCreateIdea(idea))
+  )
+  const piles = await Promise.all(
+    importObject.piles.map((pile) => PileControllers.findOrCreatePile(pile))
   )
 
-  let workPromise = WorkControllers.findOrCreateWork(importObject.workName)
+  // Year normalization: NaN → null, otherwise prefer URL inference when present
+  const yearAsNumber = typeof importObject.year === 'number'
+    ? importObject.year
+    : Number(importObject.year)
+  let year: number | null = Number.isFinite(yearAsNumber) ? yearAsNumber : null
+  if (year !== null && importObject.url) {
+    year = guessYearFromUrl(importObject.url) ?? year
+  }
 
-  var ideaPromises = []
-  importObject.ideas.map((idea) => {
-    ideaPromises.push(IdeaControllers.findOrCreateIdea(idea))
-  })
-
-  var pilePromises = []
-  importObject.piles.map((pile) => {
-    pilePromises.push(PileControllers.findOrCreatePile(pile))
-  })
-
-  let dataPromise = Promise.all([authorPromise, workPromise])
-  let ideaPromise = Promise.all(ideaPromises)
-  let pilePromise = Promise.all(pilePromises)
-  let response = await Promise.all([dataPromise, ideaPromise, pilePromise])
-
-  let newNote = {
-    author: response[0][0]?._id,
-    work: response[0][1]?._id,
-    ideas: response[1].filter((x) => x),
-    piles: response[2].filter((x) => x),
+  const newNote: NewNoteFields = {
+    author: author?._id ? String(author._id) : undefined,
+    work: work?._id ? String(work._id) : undefined,
+    ideas: ideas.filter((x): x is NonNullable<typeof x> => Boolean(x)).map((i) => String(i._id)),
+    piles: piles.filter((x): x is NonNullable<typeof x> => Boolean(x)).map((p) => String(p._id)),
     text: importObject.text,
     title: importObject.title,
     url: importObject.url,
-    year: importObject.year,
+    year,
     page: importObject.page,
     take: importObject.take,
   }
 
-  if (!isNaN(newNote.year) && newNote.url) {
-    newNote.year = utils.guessYearFromURL(newNote.url)
-  } else if (isNaN(newNote.year)) {
-    newNote.year = null
-  }
-
-  let createdNote = await NoteControllers.createNoteObj(newNote)
+  const createdNote = await NoteControllers.createNoteObj(newNote)
 
   if (
     importObject.externalImageUrls.length == 1 &&
@@ -254,40 +280,36 @@ async function importNote(importObject) {
     return
   }
 
-  let imagePromises = []
-  importObject.externalImageUrls.map((url, idx) => {
-    imagePromises.push(
-      downloadImageForNote(createdNote._id, idx + 1, url, true)
-    )
-  })
+  const imagePromises = importObject.externalImageUrls.map((url, idx) =>
+    downloadImageForNote(String(createdNote._id), idx + 1, url, true)
+  )
 
-  let imagePromiseResp = await Promise.all(imagePromises)
+  const imagePromiseResp = await Promise.all(imagePromises)
   await NoteControllers.updateNote(createdNote._id, {
     images: imagePromiseResp,
   })
 }
 
-async function importInstapaperNote(importObject) {
-  let authorPromise = AuthControllers.findOrCreateAuthor(importObject.authorName)
-  let workPromise = WorkControllers.findOrCreateWork(importObject.workName)
-  let response = await Promise.all([authorPromise, workPromise])
+async function importInstapaperNote(importObject: NoteImportObject) {
+  const [author, work] = await Promise.all([
+    AuthControllers.findOrCreateAuthor(importObject.authorName),
+    WorkControllers.findOrCreateWork(importObject.workName),
+  ])
 
-  let newNote = {
-    author: response[0]?._id,
-    work: response[1]?._id,
+  const newNote: NewNoteFields = {
+    author: author?._id ? String(author._id) : undefined,
+    work: work?._id ? String(work._id) : undefined,
     ideas: [],
     piles: [],
     text: importObject.text,
     title: importObject.title,
     url: importObject.url,
-    year: null,
+    year: importObject.url ? guessYearFromUrl(importObject.url) : null,
+    page: '',
+    take: '',
   }
 
-  if (newNote.url) {
-    newNote.year = utils.guessYearFromURL(newNote.url)
-  }
-
-  let createdNote = await NoteControllers.createNoteObj(newNote)
+  const createdNote = await NoteControllers.createNoteObj(newNote)
 
   if (
     importObject.externalImageUrls.length == 1 &&
@@ -296,60 +318,66 @@ async function importInstapaperNote(importObject) {
     return
   }
 
-  let imagePromises = []
-  importObject.externalImageUrls.map((url, idx) => {
-    imagePromises.push(
-      downloadImageForNote(createdNote._id, idx + 1, url, false)
-    )
-  })
+  const imagePromises = importObject.externalImageUrls.map((url, idx) =>
+    downloadImageForNote(String(createdNote._id), idx + 1, url, false)
+  )
 
-  let imagePromiseResp = await Promise.all(imagePromises)
+  const imagePromiseResp = await Promise.all(imagePromises)
   await NoteControllers.updateNote(createdNote._id, {
     images: imagePromiseResp,
   })
 }
 
-function parseWork(csvLine: any): any {
-  var obj: any = {}
-  obj.title = csvLine[0]
-  obj.authorName = csvLine[1]
-  obj.year = csvLine[2]
-  obj.url = csvLine[3]
-  obj.piles = csvLine[4]?.split(',')
-  return obj
+function parseWork(csvLine: CsvRow): WorkImportObject {
+  return {
+    title: csvLine[0],
+    authorName: csvLine[1],
+    year: csvLine[2] ?? null,
+    url: csvLine[3],
+    piles: csvLine[4]?.split(',') ?? [],
+  }
 }
 
-async function importWork(importObject: any) {
+interface WorkUpdateFields {
+  author?: string
+  year?: number
+  url?: string
+  piles: string[]
+}
+
+async function importWork(importObject: WorkImportObject) {
   if (!importObject.title) return
 
-  let pilePromises: any[] = []
-  importObject.piles.map((pile: any) => {
-    if (pile) pilePromises.push(PileControllers.findOrCreatePile(pile))
-  })
+  const pilePromises = importObject.piles
+    .filter(Boolean)
+    .map((pile) => PileControllers.findOrCreatePile(pile))
 
-  // TODO: Support different update behaviors: Overwrite,Clear,FillIn
-  let updateObject: any = {}
-  updateObject.author = await AuthControllers.findOrCreateAuthor(
-    importObject.authorName
-  )
+  const author = await AuthControllers.findOrCreateAuthor(importObject.authorName)
+  const updateObject: WorkUpdateFields = {
+    author: author?._id ? String(author._id) : undefined,
+    piles: [],
+  }
 
   if (importObject.year) {
-    if (!isNaN(importObject.year)) {
-      updateObject.year = importObject.year
+    const yearNum = Number(importObject.year)
+    if (Number.isFinite(yearNum)) {
+      updateObject.year = yearNum
     }
   } else if (importObject.url) {
-    updateObject.year = (utils as any).guessYearFromURL(importObject.url)
+    const inferred = guessYearFromUrl(importObject.url)
+    if (inferred !== null) updateObject.year = inferred
   }
 
   if (importObject.url) {
     updateObject.url = importObject.url
   }
 
-  updateObject.piles = []
-  await Promise.all(pilePromises).then((response) => {
-    response.map((pile) => updateObject.piles.push(pile))
-  })
+  const piles = await Promise.all(pilePromises)
+  for (const pile of piles) {
+    if (pile?._id) updateObject.piles.push(String(pile._id))
+  }
 
-  let work = await WorkControllers.findOrCreateWork(importObject.title)
-  await WorkControllers.updateWorkInfo(work._id, updateObject)
+  const work = await WorkControllers.findOrCreateWork(importObject.title)
+  if (!work) return
+  await WorkControllers.updateWorkInfo(String(work._id), updateObject)
 }
