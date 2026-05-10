@@ -18,6 +18,15 @@ const cookieOptions = (config: ConfigForCookies) => ({
   maxAge: TOKEN_LIFETIME_SECONDS * 1000,
 })
 
+// res.clearCookie writes its own expiry — `maxAge` here is meaningless and
+// triggers an Express deprecation warning. Drop it, keep the rest so the
+// browser can match the cookie being cleared.
+const clearCookieOptions = (config: ConfigForCookies) => ({
+  httpOnly: true,
+  sameSite: 'strict' as const,
+  secure: !config.isDev,
+})
+
 function jwtSecret(): string {
   if (!config.secrets.jwt) throw new Error('JWT secret missing from config.secrets.jwt')
   return config.secrets.jwt
@@ -113,7 +122,7 @@ export const reqCheckAuth = (req: Request, res: Response) => {
 }
 
 export const reqLogout = (req: Request, res: Response) => {
-  res.clearCookie('jwt', cookieOptions(config))
+  res.clearCookie('jwt', clearCookieOptions(config))
   res.status(200).end()
 }
 
