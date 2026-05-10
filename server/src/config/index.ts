@@ -1,4 +1,23 @@
 import { merge } from 'lodash'
+
+interface Secrets {
+  jwt?: string
+  jwtExp: string
+  ngrokAuth: string
+  openaiorg?: string
+  openaikey?: string
+}
+
+interface Config {
+  env: string
+  isDev: boolean
+  port: number
+  secrets: Secrets
+  ngrokUrl: string
+  dbUrl: string
+  imageStorePath: string
+}
+
 const env = process.env.NODE_ENV || 'development'
 
 const baseConfig = {
@@ -13,7 +32,7 @@ const baseConfig = {
   ngrokUrl: '',
 }
 
-let envConfig = {}
+let envConfig: Partial<Config> = {}
 
 switch (env) {
   case 'dev':
@@ -31,4 +50,4 @@ switch (env) {
     envConfig = require('./devconfig').config
 }
 
-export default merge(baseConfig, envConfig)
+export default merge(baseConfig, envConfig) as Config

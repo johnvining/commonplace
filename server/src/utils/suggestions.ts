@@ -6,7 +6,9 @@ const openai = new OpenAI({
   apiKey: config.secrets.openaikey,
 })
 
-export const getSuggestedTitle = async function (note_text) {
+export const getSuggestedTitle = async function (
+  note_text: string
+): Promise<string | null> {
   const chatCompletion = await openai.chat.completions.create({
     messages: [
       {
@@ -22,7 +24,10 @@ export const getSuggestedTitle = async function (note_text) {
   return chatCompletion.choices[0].message.content
 }
 
-export const getSuggestedIdeas = async function (note_title, note_text) {
+export const getSuggestedIdeas = async function (
+  note_title: string,
+  note_text: string
+): Promise<string[]> {
   const chatCompletion = await openai.chat.completions.create({
     messages: [
       {
@@ -47,17 +52,19 @@ export const getSuggestedIdeas = async function (note_title, note_text) {
     response_format: { type: 'json_object' },
   })
 
-  let suggested_tags = chatCompletion.choices[0].message.content
+  const suggested_tags = chatCompletion.choices[0].message.content
   try {
-    let tags_json = JSON.parse(suggested_tags)
+    const tags_json = JSON.parse(suggested_tags ?? '{}')
     return tags_json.tags
   } catch (e) {
     return ['Not Valid JSON']
   }
 }
 
-export const getOpenAiOCR = async function (image_location) {
-  var imageAsBase64 = fs.readFileSync(image_location, 'base64')
+export const getOpenAiOCR = async function (
+  image_location: string
+): Promise<string | null> {
+  const imageAsBase64 = fs.readFileSync(image_location, 'base64')
   const chatCompletion = await openai.chat.completions.create({
     messages: [
       {
