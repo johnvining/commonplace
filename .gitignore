@@ -16,3 +16,4 @@ server/src/config/devconfig.js
 server/src/config/prodconfig.js
 site/.env.development
 site/.env.production
+server/.env
