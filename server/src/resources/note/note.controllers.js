@@ -139,7 +139,7 @@ export const reqAddWork = async (req, res) => {
 
 export const reqAddNewWork = async (req, res) => {
   const newWork = await WorkControllers.createWork(req.body.newWork)
-  return await addWorkToId(req.params.id, newWork._id)
+  return await updateNote(req.params.id, { work: newWork._id })
 }
 
 const inferWorkUrl = async function (workId, noteUrl) {
