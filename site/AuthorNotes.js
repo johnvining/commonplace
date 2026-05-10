@@ -1,8 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import * as constants from './constants'
 import * as db from './Database'
 import NoteList from './NoteList'
-import React from 'react'
 import { useState, useEffect } from 'react'
 import {
   TopLevelStandardButtonContainer,

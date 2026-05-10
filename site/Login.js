@@ -1,6 +1,5 @@
 import * as db from './Database'
 import { useState } from 'react'
-import React from 'react'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,

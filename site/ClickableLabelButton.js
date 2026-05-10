@@ -1,5 +1,3 @@
-import React from 'react'
-
 function ClickableLabelButton({ onClick, children, className = '', ...props }) {
   return (
     <span

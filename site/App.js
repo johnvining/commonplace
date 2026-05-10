@@ -5,7 +5,6 @@ import plus from 'url:./icons/plus.svg'
 import React, { Suspense } from 'react'
 import search from 'url:./icons/search.svg'
 import home_door from 'url:./icons/home_door.svg'
-import axios from 'axios'
 import * as constants from './constants'
 import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 

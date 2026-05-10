@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isPinned, togglePinned } from './pinned'
 import { TopLevelStandardButton } from './TopLevelStandardButton'
 import star from 'url:./icons/star.svg'

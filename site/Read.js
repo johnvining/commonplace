@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
-import React from 'react'
 import { useState, useEffect } from 'react'
 import YearUrlComboSpan from './YearUrlComboSpan'
 import * as constants from './constants'

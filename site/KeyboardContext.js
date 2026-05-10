@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback, useRef, useEffect, useState } from 'react'
+import { createContext, useContext, useCallback, useRef, useEffect, useState } from 'react'
 import * as constants from './constants'
 
 const KeyboardContext = createContext(null)

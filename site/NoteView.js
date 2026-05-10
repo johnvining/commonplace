@@ -1,7 +1,6 @@
 import * as constants from './constants'
 import * as db from './Database'
 import NoteList from './NoteList'
-import React from 'react'
 import { useParams } from 'react-router-dom'
 
 function NoteView(props) {

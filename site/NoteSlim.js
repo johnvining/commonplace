@@ -2,7 +2,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import circle from 'url:./icons/circle.svg'
 import check_circle from 'url:./icons/check_circle.svg'
-import NoteAuthorSpan from './NoteAuthorSpan'
 import WorkCitationSpan from './WorkCitationSpan'
 
 class NoteSlim extends React.PureComponent {

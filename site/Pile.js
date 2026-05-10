@@ -2,7 +2,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import * as constants from './constants'
 import * as db from './Database'
 import NoteList from './NoteList'
-import React from 'react'
 import WorkList from './WorkList'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
@@ -17,7 +16,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
-import PinButton, { TopLevelStarButton } from './PinButton'
+import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
 function Pile(props) {

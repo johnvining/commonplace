@@ -1,4 +1,3 @@
-import React from 'react'
 import * as constants from './constants'
 
 // Help overlay component that displays context-sensitive keyboard shortcuts

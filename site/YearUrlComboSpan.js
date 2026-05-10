@@ -1,4 +1,3 @@
-import React from 'react'
 import YearSpan from './YearSpan'
 
 function YearUrlComboSpan(props) {

@@ -1,4 +1,3 @@
-import React from 'react'
 import { useParams } from 'react-router-dom'
 import * as db from './Database'
 import NoteList from './NoteList'
@@ -6,7 +5,6 @@ import AuthorList from './AuthorList'
 import WorkList from './WorkList'
 import IdeaList from './IdeaList'
 import PileList from './PileList'
-import * as constants from './constants'
 
 function RecentItems(props) {
   const { type } = useParams()

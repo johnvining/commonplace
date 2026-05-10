@@ -1,5 +1,3 @@
-import React from 'react'
-
 export function TopLevelTitleContainer(props) {
   return <div className="top-level container">{props.children}</div>
 }

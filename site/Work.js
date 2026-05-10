@@ -1,12 +1,10 @@
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
 import PileListForItem from './PileListForItem'
 import YearUrlComboSpan from './YearUrlComboSpan'
-import React from 'react'
 import { useState, useEffect, useCallback } from 'react'
-import * as constants from './constants'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import { marked } from 'marked'
@@ -27,7 +25,7 @@ import {
   TopLevelTitle,
   TopLevelPostButtonContent,
 } from './TopLevelHeadings'
-import PinButton, { TopLevelStarButton } from './PinButton'
+import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
 function Work(props) {

@@ -1,4 +1,3 @@
-import React from 'react'
 import Autocomplete from './Autocomplete'
 import { useNavigate } from 'react-router-dom'
 import * as db from './Database'

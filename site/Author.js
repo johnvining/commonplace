@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
-import React from 'react'
 import ResultWork from './ResultWork'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
@@ -14,7 +13,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
-import PinButton, { TopLevelStarButton } from './PinButton'
+import { TopLevelStarButton } from './PinButton'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { togglePinned } from './pinned'
 

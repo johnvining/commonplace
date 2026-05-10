@@ -1,4 +1,3 @@
-import React from 'react'
 import ClickToCopyNick from './ClickToCopyNick'
 
 export function TopLevelStandardButton(props) {
