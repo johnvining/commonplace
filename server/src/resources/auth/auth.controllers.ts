@@ -3,8 +3,10 @@ import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
+import type { Request, Response } from 'express'
 
-export const reqGetNotesForAuthor = async (req, res) => {
+
+export const reqGetNotesForAuthor = async (req: Request, res: Response) => {
   const doc = await findNotesAndPopulate(
     { author: req.params.id },
     { updatedAt: -1 }
@@ -15,7 +17,7 @@ export const reqGetNotesForAuthor = async (req, res) => {
   return doc
 }
 
-export const reqGetAllNotesForAuthor = async (req, res) => {
+export const reqGetAllNotesForAuthor = async (req: Request, res: Response) => {
   const authorId = req.params.id
   const works = await Work.find({ author: authorId }, { _id: 1 }).lean().exec()
   const workIds = works.map(w => w._id)
@@ -25,7 +27,7 @@ export const reqGetAllNotesForAuthor = async (req, res) => {
   return findNotesAndPopulate(query, { updatedAt: -1 })
 }
 
-export const getAutoCompleteWithCounts = async (req, res) => {
+export const getAutoCompleteWithCounts = async (req: Request, res: Response) => {
   return getAutoComplete(req, res, true)
 }
 
@@ -92,7 +94,7 @@ export const findAuthorsByString = async function (str, withCounts) {
   }))
 }
 
-export const reqCreateAuthor = async (req, res) => {
+export const reqCreateAuthor = async (req: Request, res: Response) => {
   const doc = await createAuthor(req.body.name)
   if (!doc) {
     return res.status(400).end()
@@ -100,7 +102,7 @@ export const reqCreateAuthor = async (req, res) => {
   return doc
 }
 
-export const reqGetWorksForAuthor = async (req, res) => {
+export const reqGetWorksForAuthor = async (req: Request, res: Response) => {
   const doc = await Work.find({ author: req.params.id }).sort({ year: 1 })
   if (!doc) {
     return res.status(400).end()
@@ -108,7 +110,7 @@ export const reqGetWorksForAuthor = async (req, res) => {
   return doc
 }
 
-export const reqDeleteAuthor = async (req, res) => {
+export const reqDeleteAuthor = async (req: Request, res: Response) => {
   await deleteAuthor(req.params.id)
 }
 

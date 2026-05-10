@@ -6,8 +6,9 @@ import {
   removeIdeaFromNote,
   findNotesAndPopulate
 } from '../note/note.controllers'
+import type { Request, Response } from 'express'
 
-export const reqGetNotesForIdea = async (req, res) => {
+export const reqGetNotesForIdea = async (req: Request, res: Response) => {
   const doc = await findNotesAndPopulate({ ideas: req.params.id })
   if (!doc) {
     return res.status(400).end()
@@ -15,7 +16,7 @@ export const reqGetNotesForIdea = async (req, res) => {
   return doc
 }
 
-export const reqGetIdeasByStringWithCounts = async (req, res) => {
+export const reqGetIdeasByStringWithCounts = async (req: Request, res: Response) => {
   try {
     var doc = await findIdeasByString(req.body.string)
     if (!doc) {
@@ -45,7 +46,7 @@ export const reqGetIdeasByStringWithCounts = async (req, res) => {
   }
 }
 
-export const reqGetAutoCompleteWithCounts = async (req, res) => {
+export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) => {
   return await reqGetAutoComplete(req, res, true)
 }
 
@@ -74,7 +75,7 @@ export const findIdeasByString = async function(string, withCounts = false) {
   return ideas.map(i => ({ ...i, note_count: noteMap[String(i._id)] || 0 }))
 }
 
-export const reqCreateIdea = async (req, res) => {
+export const reqCreateIdea = async (req: Request, res: Response) => {
   const doc = await createIdea(req.body.name)
   if (!doc) {
     return res.status(400).end()
@@ -82,7 +83,7 @@ export const reqCreateIdea = async (req, res) => {
   return doc
 }
 
-export const reqDeleteIdea = async (req, res) => {
+export const reqDeleteIdea = async (req: Request, res: Response) => {
   await deleteIdea(req.params.id)
 }
 

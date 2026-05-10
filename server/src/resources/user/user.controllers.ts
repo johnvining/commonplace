@@ -2,6 +2,8 @@ import User from '../user/user.model.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import config from '../../config'
+import type { Request, Response, NextFunction } from 'express'
+
 
 const TOKEN_LIFETIME_SECONDS = 30 * 24 * 60 * 60
 
@@ -12,7 +14,7 @@ const cookieOptions = (config) => ({
   maxAge: TOKEN_LIFETIME_SECONDS * 1000,
 })
 
-export const reqRegisterUser = async (req, res) => {
+export const reqRegisterUser = async (req: Request, res: Response) => {
   const { username, password } = req.body
   if (username != 'commonplace' || !password) {
     return res.status(400).json({
@@ -43,7 +45,7 @@ export const reqRegisterUser = async (req, res) => {
   }
 }
 
-export const reqAuthorizeUser = async (req, res) => {
+export const reqAuthorizeUser = async (req: Request, res: Response) => {
   const { username, password } = req.body
   if (!username || !password) {
     return res.status(400).json({
@@ -81,7 +83,7 @@ export const reqAuthorizeUser = async (req, res) => {
   }
 }
 
-export const reqAuthenticate = async (req, res, next) => {
+export const reqAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.jwt
   if (!token) {
     return res.status(401).json({ message: 'Not authorized, token not available' })
@@ -97,16 +99,16 @@ export const reqAuthenticate = async (req, res, next) => {
   })
 }
 
-export const reqCheckAuth = (req, res) => {
+export const reqCheckAuth = (req: Request, res: Response) => {
   res.status(200).end()
 }
 
-export const reqLogout = (req, res) => {
+export const reqLogout = (req: Request, res: Response) => {
   res.clearCookie('jwt', cookieOptions(config))
   res.status(200).end()
 }
 
-export const reqChangePassword = async (req, res) => {
+export const reqChangePassword = async (req: Request, res: Response) => {
   const { username, oldPassword, newPassword } = req.body
   let existingUser = await User.findOne({ username: username }).exec()
   if (

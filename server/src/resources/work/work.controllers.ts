@@ -6,9 +6,11 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { generateNick } from '../nick/nick.controllers.js'
+import type { Request, Response } from 'express'
+
 
 // Request response
-export const reqGetNotesForWork = async (req, res) => {
+export const reqGetNotesForWork = async (req: Request, res: Response) => {
   const doc = await findNotesAndPopulate({ work: req.params.id }, {})
   if (!doc) {
     return res.status(400).end()
@@ -16,7 +18,7 @@ export const reqGetNotesForWork = async (req, res) => {
   return doc
 }
 
-export const reqGetWorkInfo = async (req, res) => {
+export const reqGetWorkInfo = async (req: Request, res: Response) => {
   const doc = await getWorkInfo(req.params.id)
   if (!doc) {
     return res.status(400).end()
@@ -24,7 +26,7 @@ export const reqGetWorkInfo = async (req, res) => {
   return doc
 }
 
-export const reqCreateWork = async (req, res) => {
+export const reqCreateWork = async (req: Request, res: Response) => {
   const doc = await createWork(req.body.name)
   if (!doc) {
     return res.status(400).end()
@@ -32,7 +34,7 @@ export const reqCreateWork = async (req, res) => {
   return doc
 }
 
-export const reqUpdateWork = async (req, res) => {
+export const reqUpdateWork = async (req: Request, res: Response) => {
   const updates = { ...req.body }
 
   if (updates.url) {
@@ -52,7 +54,7 @@ export const reqUpdateWork = async (req, res) => {
   return doc
 }
 
-export const reqCreateAndAddAuth = async (req, res) => {
+export const reqCreateAndAddAuth = async (req: Request, res: Response) => {
   const newAuth = await createAuthor(req.body.name)
   const updateObject = { author: newAuth.id }
   const doc = await updateWorkInfo(req.params.id, updateObject)
@@ -62,23 +64,23 @@ export const reqCreateAndAddAuth = async (req, res) => {
   return doc
 }
 
-export const reqDeleteWork = async (req, res) => {
+export const reqDeleteWork = async (req: Request, res: Response) => {
   await deleteWork(req.params.id)
 }
 
-export const reqAddPile = async (req, res) => {
+export const reqAddPile = async (req: Request, res: Response) => {
   const doc = await addPileToId(req.params.id, req.body.id)
   return doc
 }
 
-export const reqAddNewPile = async (req, res) => {
+export const reqAddNewPile = async (req: Request, res: Response) => {
   const newPile = await Pile.create({ name: req.body.name })
   generateNick('pile', newPile._id).catch(() => {})
   const doc = await addPileToId(req.params.id, newPile._id)
   return doc
 }
 
-export const reqGetAutoCompleteWithCounts = async (req, res) => {
+export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) => {
   return await reqAutocompleteOnName(req, res, true)
 }
 
@@ -90,7 +92,7 @@ export const reqAutocompleteOnName = async (req, res, withCounts = false) => {
   return doc
 }
 
-export const reqRemovePileFromWork = async (req, res) => {
+export const reqRemovePileFromWork = async (req: Request, res: Response) => {
   const doc = await removePileFromWork(req.params.id, req.params.pileId)
   if (!doc) {
     return res.status(400).end()

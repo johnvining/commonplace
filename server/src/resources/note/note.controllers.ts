@@ -19,6 +19,8 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
 import { generateNick } from '../nick/nick.controllers.js'
+import type { Request, Response } from 'express'
+
 
 const pageSize = 40
 
@@ -37,7 +39,7 @@ type PopulatedNote = Record<string, unknown> & {
   _semantic?: boolean
 }
 
-export const reqFindNotesByString = async (req, res) => {
+export const reqFindNotesByString = async (req: Request, res: Response) => {
   const escaped = req.body.searchString.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
   const notes = (await Note.find(
     { $text: { $search: escaped } },
@@ -62,11 +64,11 @@ export const reqFindNotesByString = async (req, res) => {
   return notes
 }
 
-export const reqGetNoteDetails = async (req, res) => {
+export const reqGetNoteDetails = async (req: Request, res: Response) => {
   return await findNotesAndPopulate({ _id: req.params.id }, null, false, null, null, null)
 }
 
-export const reqDeleteNote = async (req, res) => {
+export const reqDeleteNote = async (req: Request, res: Response) => {
   const id = req.params.id
   const note = await Note.findOne({ _id: id }).lean()
   if (note?.images?.length) {
@@ -79,7 +81,7 @@ export const reqDeleteNote = async (req, res) => {
   res.status(200).end()
 }
 
-export const reqGetRecentNotes = async (req, res) => {
+export const reqGetRecentNotes = async (req: Request, res: Response) => {
   return findNotesAndPopulate(
     {},
     { updatedAt: -1 },
@@ -89,7 +91,7 @@ export const reqGetRecentNotes = async (req, res) => {
   )
 }
 
-export const reqGetEarliestNotesToFile = async (req, res) => {
+export const reqGetEarliestNotesToFile = async (req: Request, res: Response) => {
   // TODO: Faster way to do this? -- size: 0 may be slow
   return findNotesAndPopulate(
     { ideas: { $size: 0 } },
@@ -100,17 +102,17 @@ export const reqGetEarliestNotesToFile = async (req, res) => {
   )
 }
 
-export const reqGetRandomNotes = async (req, res) => {
+export const reqGetRandomNotes = async (req: Request, res: Response) => {
   return findRandomNotesAndPopulate({}, pageSize)
 }
 
-export const reqAddIdea = async (req, res) => {
+export const reqAddIdea = async (req: Request, res: Response) => {
   const doc = await updateNote(req.params.id, { $addToSet: { ideas: req.body.id } })
   await touchIdea(req.body.id)
   return doc
 }
 
-export const reqAddNewIdea = async (req, res) => {
+export const reqAddNewIdea = async (req: Request, res: Response) => {
   const newIdea = await IdeaControllers.createIdea(req.body.name)
   const doc = await updateNote(req.params.id, { $addToSet: { ideas: newIdea._id } })
   await touchIdea(newIdea._id)
@@ -123,24 +125,24 @@ export const removeIdeaFromNote = async (noteId: any, ideaId: any) => {
   return doc
 }
 
-export const reqRemoveIdeaFromNote = async (req, res) => {
+export const reqRemoveIdeaFromNote = async (req: Request, res: Response) => {
   return removeIdeaFromNote(req.params.id, req.params.ideaId)
 }
 
-export const reqAddPile = async (req, res) => {
+export const reqAddPile = async (req: Request, res: Response) => {
   const doc = await updateNote(req.params.id, { $addToSet: { piles: req.body.id } })
   await touchPile(req.body.id)
   return doc
 }
 
-export const reqAddNewPile = async (req, res) => {
+export const reqAddNewPile = async (req: Request, res: Response) => {
   const newPile = await Pile.create({ name: req.body.name })
   const doc = await updateNote(req.params.id, { $addToSet: { piles: newPile._id } })
   await touchPile(newPile._id)
   return doc
 }
 
-export const reqRemovePileFromNote = async (req, res) => {
+export const reqRemovePileFromNote = async (req: Request, res: Response) => {
   const doc = await updateNote(req.params.id, { $pull: { piles: req.params.pileId } })
   if (!doc) {
     return res.status(400).end()
@@ -149,11 +151,11 @@ export const reqRemovePileFromNote = async (req, res) => {
   return doc
 }
 
-export const reqAddWork = async (req, res) => {
+export const reqAddWork = async (req: Request, res: Response) => {
   return await updateNote(req.params.id, { work: req.body.newWork })
 }
 
-export const reqAddNewWork = async (req, res) => {
+export const reqAddNewWork = async (req: Request, res: Response) => {
   const newWork = await WorkControllers.createWork(req.body.newWork)
   return await updateNote(req.params.id, { work: newWork._id })
 }
@@ -178,7 +180,7 @@ const inferWorkUrl = async function (workId, noteUrl) {
   } catch {}
 }
 
-export const reqUpdateNote = async (req, res) => {
+export const reqUpdateNote = async (req: Request, res: Response) => {
   const updates = { ...req.body }
 
   if (updates.url) {
@@ -216,7 +218,7 @@ export const reqUpdateNote = async (req, res) => {
 
 
 // TODO: Create specific file for note.image.controllers
-export const reqAddImageToNote = async (req, res) => {
+export const reqAddImageToNote = async (req: Request, res: Response) => {
   try {
     if (!req.files) {
       res.send({ status: false, message: 'No file' })
@@ -257,7 +259,7 @@ export const reqAddImageToNote = async (req, res) => {
   }
 }
 
-export const reqRemoveImageFromNote = async function (req, res) {
+export const reqRemoveImageFromNote = async function (req: Request, res: Response) {
   try {
     const filename = req.body.filename
     const noteId = req.params.id
@@ -285,7 +287,7 @@ export const reqRemoveImageFromNote = async function (req, res) {
   }
 }
 
-export const reqGetImageForNote = async function (req, res) {
+export const reqGetImageForNote = async function (req: Request, res: Response) {
   try {
     const note = await Note.findOne({ _id: req.params.id })
     if (!note) {
@@ -301,7 +303,7 @@ export const reqGetImageForNote = async function (req, res) {
   }
 }
 
-export const reqGetSuggestionForNoteTitle = async function (req, res) {
+export const reqGetSuggestionForNoteTitle = async function (req: Request, res: Response) {
   try {
     const note = await Note.findOne({ _id: req.params.id })
     if (!note) {
@@ -316,7 +318,7 @@ export const reqGetSuggestionForNoteTitle = async function (req, res) {
   }
 }
 
-export const reqGetSuggestedIdeasForNote = async function (req, res) {
+export const reqGetSuggestedIdeasForNote = async function (req: Request, res: Response) {
   try {
     const note = await Note.findOne({ _id: req.params.id })
     if (!note) {
@@ -368,7 +370,7 @@ const touchPile = async (pileId) => {
   await Pile.findByIdAndUpdate(pileId, { $set: { updatedAt: new Date() } })
 }
 
-export const reqOcrForNote = async (req, res) => {
+export const reqOcrForNote = async (req: Request, res: Response) => {
   const note = await Note.findOne({ _id: req.params.id })
   if (!note) return ''
 
@@ -383,7 +385,7 @@ export const reqOcrForNote = async (req, res) => {
   return result
 }
 
-export const reqBulkImportForWork = async (req, res) => {
+export const reqBulkImportForWork = async (req: Request, res: Response) => {
   // TODO: Validate work ID
   const input: string = req.body.notesText
   const lines = input.split(/\r?\n/)
@@ -395,19 +397,19 @@ export const reqBulkImportForWork = async (req, res) => {
   return null
 }
 
-export const reqBulkImportNotesCSV = async (req, res) => {
+export const reqBulkImportNotesCSV = async (req: Request, res: Response) => {
   let csv = req.body.importList
   const recordsImported = await importCsvFromString(csv, 1)
   return recordsImported
 }
 
-export const reqBulkImportInstapaper = async (req, res) => {
+export const reqBulkImportInstapaper = async (req: Request, res: Response) => {
   let tsv = req.body.importList
   const recordsImported = await importCsvFromString(tsv, 3)
   return recordsImported
 }
 
-export const reqBulkOcrForNotes = async (req, res) => {
+export const reqBulkOcrForNotes = async (req: Request, res: Response) => {
   const noteIds = req.body.noteIds
   const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
   const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
@@ -453,7 +455,7 @@ export const reqBulkOcrForNotes = async (req, res) => {
   return results
 }
 
-export const reqBulkSuggestTitlesForNotes = async (req, res) => {
+export const reqBulkSuggestTitlesForNotes = async (req: Request, res: Response) => {
   const noteIds = req.body.noteIds
   const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
   const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
@@ -496,7 +498,7 @@ export const reqBulkSuggestTitlesForNotes = async (req, res) => {
   return results
 }
 
-export const reqBulkGetNotesForMarkdown = async (req, res) => {
+export const reqBulkGetNotesForMarkdown = async (req: Request, res: Response) => {
   const noteIds = req.body.noteIds
 
   const notePromises = noteIds.map(async (noteId) => {
@@ -628,7 +630,7 @@ function scoreEntityName(name: string | undefined, query: string): number {
   return 0.5
 }
 
-export const reqUnifiedSearch = async (req, res) => {
+export const reqUnifiedSearch = async (req: Request, res: Response) => {
   const { query, limit = 50 } = req.body
   if (!query?.trim()) return []
 
@@ -659,7 +661,7 @@ export const reqUnifiedSearch = async (req, res) => {
   return results
 }
 
-export const reqBulkEmbedNotes = async (req, res) => {
+export const reqBulkEmbedNotes = async (req: Request, res: Response) => {
   const BATCH = 100
   let skip = 0
   let processed = 0

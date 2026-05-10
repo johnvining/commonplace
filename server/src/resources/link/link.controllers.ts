@@ -1,8 +1,10 @@
 import Link from '../link/link.model.js'
 import Nick from '../nick/nick.model.js'
 import Note from '../note/note.model.js'
+import type { Request, Response } from 'express'
 
-export const reqLinkNoteToNote = async (req, res) => {
+
+export const reqLinkNoteToNote = async (req: Request, res: Response) => {
   const leftNoteNick = await Nick.findOne({ key: req.body.leftNoteNick })
   const rightNoteNick = await Nick.findOne({
     key: req.body.rightNoteNick,
@@ -35,7 +37,7 @@ export const reqLinkNoteToNote = async (req, res) => {
   return new_link
 }
 
-export const reqGetLinksForNote = async (req, res) => {
+export const reqGetLinksForNote = async (req: Request, res: Response) => {
   const noteId = req.params.id
   const [fromLeft, fromRight] = await Promise.all([
     Link.find({ left_note: noteId }),

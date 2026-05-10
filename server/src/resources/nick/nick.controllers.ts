@@ -1,4 +1,6 @@
 import Nick from '../nick/nick.model.js'
+import type { Request, Response } from 'express'
+
 
 const PREFIX = { note: 'n', work: 'w', idea: 'i', pile: 'p' }
 
@@ -35,16 +37,16 @@ export const generateNick = async (type, id) => {
   }
 }
 
-export const reqGenerateNickForNote = async (req, res) => generateNick('note', req.params.id)
-export const reqGenerateNickForWork = async (req, res) => generateNick('work', req.params.id)
-export const reqGenerateNickForIdea = async (req, res) => generateNick('idea', req.params.id)
-export const reqGenerateNickForPile = async (req, res) => generateNick('pile', req.params.id)
+export const reqGenerateNickForNote = async (req: Request, res: Response) => generateNick('note', req.params.id)
+export const reqGenerateNickForWork = async (req: Request, res: Response) => generateNick('work', req.params.id)
+export const reqGenerateNickForIdea = async (req: Request, res: Response) => generateNick('idea', req.params.id)
+export const reqGenerateNickForPile = async (req: Request, res: Response) => generateNick('pile', req.params.id)
 
-export const reqGetNick = async (req, res) => {
+export const reqGetNick = async (req: Request, res: Response) => {
   return Nick.findOne({ key: req.params.nick })
 }
 
-export const reqBackfillNicks = async (req, res) => {
+export const reqBackfillNicks = async (req: Request, res: Response) => {
   const { default: Note } = await import('../note/note.model.js')
   const { default: Work } = await import('../work/work.model.js')
   const { default: Idea } = await import('../idea/idea.model.js')
@@ -74,10 +76,10 @@ export const reqBackfillNicks = async (req, res) => {
   return results
 }
 
-export const reqGetNickForNote = async (req, res) => Nick.findOne({ note: req.params.id }).lean().exec()
-export const reqGetNickForWork = async (req, res) => Nick.findOne({ work: req.params.id }).lean().exec()
-export const reqGetNickForIdea = async (req, res) => Nick.findOne({ idea: req.params.id }).lean().exec()
-export const reqGetNickForPile = async (req, res) => Nick.findOne({ pile: req.params.id }).lean().exec()
+export const reqGetNickForNote = async (req: Request, res: Response) => Nick.findOne({ note: req.params.id }).lean().exec()
+export const reqGetNickForWork = async (req: Request, res: Response) => Nick.findOne({ work: req.params.id }).lean().exec()
+export const reqGetNickForIdea = async (req: Request, res: Response) => Nick.findOne({ idea: req.params.id }).lean().exec()
+export const reqGetNickForPile = async (req: Request, res: Response) => Nick.findOne({ pile: req.params.id }).lean().exec()
 
 export const hashFunc = function hash(str) {
   let hash = 0

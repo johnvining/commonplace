@@ -5,8 +5,10 @@ import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { removePileFromWork } from '../work/work.controllers.js'
 import { generateNick } from '../nick/nick.controllers.js'
+import type { Request, Response } from 'express'
 
-export const reqGetNotesForPile = async (req, res) => {
+
+export const reqGetNotesForPile = async (req: Request, res: Response) => {
   const doc = await findNotesAndPopulate(
     { piles: req.params.id },
     { updatedAt: -1 }
@@ -17,7 +19,7 @@ export const reqGetNotesForPile = async (req, res) => {
   return doc
 }
 
-export const reqGetPileList = async (req, res) => {
+export const reqGetPileList = async (req: Request, res: Response) => {
   const doc = await findPiles({}, { name: 1 })
   if (!doc) {
     return res.status(400).end()
@@ -25,7 +27,7 @@ export const reqGetPileList = async (req, res) => {
   return doc
 }
 
-export const reqGetWorksForPile = async (req, res) => {
+export const reqGetWorksForPile = async (req: Request, res: Response) => {
   const doc = await getWorksForPile(req.params.id)
   if (!doc) {
     return res.status(400).end()
@@ -33,7 +35,7 @@ export const reqGetWorksForPile = async (req, res) => {
   return doc
 }
 
-export const reqGetAutoCompleteWithCounts = async (req, res) => {
+export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) => {
   return reqGetAutoComplete(req, res, true)
 }
 
@@ -45,7 +47,7 @@ export const reqGetAutoComplete = async (req, res, withCounts = false) => {
   return doc
 }
 
-export const reqCreatePile = async (req, res) => {
+export const reqCreatePile = async (req: Request, res: Response) => {
   const doc = await findOrCreatePile(req.body.name)
   if (!doc) {
     return res.status(400).end()
@@ -53,7 +55,7 @@ export const reqCreatePile = async (req, res) => {
   return doc
 }
 
-export const reqDeletePile = async (req, res) => {
+export const reqDeletePile = async (req: Request, res: Response) => {
   await deletePile(req.params.id)
 }
 
