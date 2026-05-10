@@ -1,17 +1,30 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 
-const workSchema = new mongoose.Schema(
+export interface WorkDoc {
+  _id: Types.ObjectId
+  name?: string
+  author?: Types.ObjectId
+  url?: string
+  year?: number
+  citation_information?: string
+  summary?: string
+  piles: Types.ObjectId[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+const workSchema = new Schema<WorkDoc>(
   {
     name: String,
     author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'author'
+      type: Schema.Types.ObjectId,
+      ref: 'author',
     },
     url: String,
     year: Number,
     citation_information: String,
     summary: String,
-    piles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'pile' }]
+    piles: [{ type: Schema.Types.ObjectId, ref: 'pile' }],
   },
   { timestamps: true }
 )
@@ -19,4 +32,4 @@ const workSchema = new mongoose.Schema(
 workSchema.index({ name: 1 })
 workSchema.index({ author: 1 })
 
-export default mongoose.model('work', workSchema)
+export default mongoose.model<WorkDoc>('work', workSchema)

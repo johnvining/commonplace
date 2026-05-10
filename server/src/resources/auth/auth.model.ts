@@ -1,11 +1,21 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 
-const authSchema = new mongoose.Schema(
+export interface AuthDoc {
+  _id: Types.ObjectId
+  name?: string
+  birth_year?: number
+  death_year?: number
+  usernames: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+const authSchema = new Schema<AuthDoc>(
   {
     name: String,
     birth_year: Number,
     death_year: Number,
-    usernames: [{ type: String }]
+    usernames: [{ type: String }],
   },
   { timestamps: true }
 )
@@ -13,4 +23,4 @@ const authSchema = new mongoose.Schema(
 authSchema.index({ name: 1 })
 authSchema.index({ usernames: 1 })
 
-export const Auth = mongoose.model('author', authSchema)
+export const Auth = mongoose.model<AuthDoc>('author', authSchema)

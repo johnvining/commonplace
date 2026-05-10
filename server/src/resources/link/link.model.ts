@@ -1,15 +1,17 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema, Types } from 'mongoose'
 
-const linkSchema = new mongoose.Schema(
+export interface LinkDoc {
+  _id: Types.ObjectId
+  left_note?: Types.ObjectId
+  right_note?: Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+const linkSchema = new Schema<LinkDoc>(
   {
-    left_note: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'note',
-    },
-    right_note: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'note',
-    },
+    left_note: { type: Schema.Types.ObjectId, ref: 'note' },
+    right_note: { type: Schema.Types.ObjectId, ref: 'note' },
   },
   { timestamps: true }
 )
@@ -17,4 +19,4 @@ const linkSchema = new mongoose.Schema(
 linkSchema.index({ left_note: 1 })
 linkSchema.index({ right_note: 1 })
 
-export default mongoose.model('link', linkSchema)
+export default mongoose.model<LinkDoc>('link', linkSchema)
