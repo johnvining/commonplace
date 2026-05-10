@@ -6,7 +6,7 @@ import WorkList from './WorkList'
 import IdeaList from './IdeaList'
 import PileList from './PileList'
 
-function RecentItems(props) {
+function RecentItems(props: any) {
   const { type } = useParams()
 
   const getListOfNotes = async () => {

@@ -1,6 +1,6 @@
 import Autocomplete from './Autocomplete'
 
-export function TopLevelFormInput(props) {
+export function TopLevelFormInput(props: any) {
   return (
     <>
       <label htmlFor={props.id} className="top-level form-label">
@@ -17,7 +17,7 @@ export function TopLevelFormInput(props) {
   )
 }
 
-export function TopLevelFormTextArea(props) {
+export function TopLevelFormTextArea(props: any) {
   return (
     <>
       <label htmlFor={props.id} className="top-level form-label">
@@ -33,7 +33,7 @@ export function TopLevelFormTextArea(props) {
   )
 }
 
-export function TopLevelFormAutocomplete(props) {
+export function TopLevelFormAutocomplete(props: any) {
   return (
     <>
       <label htmlFor={props.id} className="top-level form-label">
@@ -55,6 +55,6 @@ export function TopLevelFormAutocomplete(props) {
   )
 }
 
-export function TopLevelFormContainer(props) {
+export function TopLevelFormContainer(props: any) {
   return <div>{props.children}</div>
 }

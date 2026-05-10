@@ -8,8 +8,8 @@ import home_door from 'url:./icons/home_door.svg'
 import * as constants from './constants'
 import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
-class ErrorBoundary extends React.Component {
-  state = { error: null, info: null }
+class ErrorBoundary extends React.Component<any, any> {
+  state: any = { error: null, info: null }
   static getDerivedStateFromError(error) { return { error } }
   componentDidCatch(error, info) {
     console.error('Route error:', error, info)
@@ -62,10 +62,13 @@ const RecentItems = React.lazy(() => import('./RecentItems'))
 const Work        = React.lazy(() => import('./Work'))
 const Read        = React.lazy(() => import('./Read'))
 
-class App extends React.Component {
-  state = { barOpen: false, viewMode: 1, hasToken: false }
+declare const process: { env: Record<string, string | undefined> }
 
-  constructor(props) {
+class App extends React.Component<any, any> {
+  state: any = { barOpen: false, viewMode: 1, hasToken: false }
+  redirectTo: string | null = null
+
+  constructor(props: any) {
     super(props)
     this.redirectTo = null
   }

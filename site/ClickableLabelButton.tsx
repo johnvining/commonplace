@@ -1,4 +1,4 @@
-function ClickableLabelButton({ onClick, children, className = '', ...props }) {
+function ClickableLabelButton({ onClick, children, className = '', ...props }: any) {
   return (
     <span
       className={`clickable-label-button ${className}`}

@@ -41,7 +41,7 @@ function highlight(text, query) {
 const PAGE_SIZE = 20
 
 
-function UnifiedResult({ entry, query }) {
+function UnifiedResult({ entry, query }: any) {
   const { type, item } = entry
 
   if (type === 'note') {
@@ -111,7 +111,7 @@ function UnifiedResult({ entry, query }) {
   return null
 }
 
-function Find(props) {
+function Find(props: any) {
   const { search, category } = useParams()
   const [results, setResults] = React.useState(null)
   const [page, setPage] = React.useState(1)

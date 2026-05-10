@@ -9,7 +9,7 @@ import {
 } from './TopLevelStandardButton'
 import { TopLevelFormTextArea } from './TopLevelFormItems'
 
-function Load(props) {
+function Load(props: any) {
   const [pendingImportText, setPendingImportText] = useState('')
   const [notesImported, setNotesImported] = useState(-1)
   const [importFormat, setImportFormat] = useState('csv')
@@ -70,7 +70,7 @@ function Load(props) {
         console.error('Create note response missing id', noteResponse)
         continue
       }
-      const update = { url }
+      const update: any = { url }
       update.title = url
       await db.updateRecord(db.types.note, noteId, update)
       if (reviewPileId) {
@@ -127,7 +127,7 @@ function Load(props) {
 
   return (
     <div className="full-width">
-      <div name="text" className="width-100">
+      <div data-name="text" className="width-100">
         {importFormat === 'csv' ? (
           <pre>
             author,title,text,workName,url,ideas,externalImageUrls,piles,year,page,take
@@ -144,7 +144,7 @@ function Load(props) {
           </pre>
         )}
       </div>
-      <div name="import-format" className="width-100">
+      <div data-name="import-format" className="width-100">
         <label className="note-full form-label">
           <input
             type="radio"
@@ -176,7 +176,7 @@ function Load(props) {
           URL List (one per line)
         </label>
       </div>
-      <div name="text" className="width-100">
+      <div data-name="text" className="width-100">
         <TopLevelFormTextArea
           name={importFormat === 'csv' ? 'Import CSV' : importFormat === 'instapaper' ? 'Import Instapaper TSV' : 'Import URLs'}
           id="import-text"

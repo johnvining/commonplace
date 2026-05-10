@@ -16,8 +16,9 @@ import {
 } from './TopLevelStandardButton'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
-class NoteList extends React.Component {
-  state = {
+class NoteList extends React.Component<any, any> {
+  _imageObserver: IntersectionObserver | null = null
+  state: any = {
     inFocus: null,
     focusType: constants.note_modes.NO_SELECTION,
     selectedNote: '',
@@ -220,21 +221,21 @@ class NoteList extends React.Component {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const index = parseInt(entry.target.dataset.noteIndex, 10)
+            const index = parseInt((entry.target as HTMLElement).dataset.noteIndex || '', 10)
             if (!isNaN(index)) {
               this.getImagesForNoteAtIndex(index, false)
-              this._imageObserver.unobserve(entry.target)
+              this._imageObserver?.unobserve(entry.target)
             }
           }
         })
       },
       { rootMargin: '200px' }
     )
-    this.state.notes.forEach((note, index) => {
+    this.state.notes.forEach((note: any, index: number) => {
       const el = document.getElementById(note._id)
       if (el) {
-        el.dataset.noteIndex = index
-        this._imageObserver.observe(el)
+        el.dataset.noteIndex = String(index)
+        this._imageObserver?.observe(el)
       }
     })
   }
@@ -320,7 +321,7 @@ class NoteList extends React.Component {
 
   markChecked(noteIndex) {
     const tempSelectedArray = [...this.state.selectedArray]
-    tempSelectedArray[noteIndex] = !tempSelectedArray[noteIndex] ?? false
+    tempSelectedArray[noteIndex] = !tempSelectedArray[noteIndex]
     this.setState({ selectedArray: tempSelectedArray, anchorIndex: noteIndex })
   }
 
@@ -755,7 +756,7 @@ class NoteList extends React.Component {
 }
 
 // Wrapper component that provides keyboard shortcuts
-function NoteListWithKeyboard(props) {
+function NoteListWithKeyboard(props: any) {
   const noteListRef = React.useRef(null)
 
   // Section 4: Note List keyboard shortcuts

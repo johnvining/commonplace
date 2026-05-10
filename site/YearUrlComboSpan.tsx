@@ -1,6 +1,6 @@
 import YearSpan from './YearSpan'
 
-function YearUrlComboSpan(props) {
+function YearUrlComboSpan(props: any) {
   return (
     <>
       {props.year && !props.url && (

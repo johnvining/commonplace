@@ -4,8 +4,8 @@ import loader from 'url:./icons/loader.svg'
 import * as constants from './constants'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
-class Autocomplete extends React.Component {
-  state = {
+class Autocomplete extends React.Component<any, any> {
+  state: any = {
     loading: true,
     currentTypedText: '',
     hideResults: false,
@@ -13,7 +13,7 @@ class Autocomplete extends React.Component {
     fetchingIdeaSuggestions: false,
     suggested_ideas: [],
   }
-  containerRef = React.createRef()
+  containerRef = React.createRef<HTMLDivElement>()
   className = this.props.className
   style = {
     searchBox: this.className + ' search-box',
@@ -61,7 +61,7 @@ class Autocomplete extends React.Component {
         activeElement?.tagName === 'BUTTON' &&
         activeElement?.classList?.contains('option')
       if (isOption) {
-        activeElement.click()
+        ;(activeElement as HTMLElement).click()
         return true
       }
 
@@ -97,7 +97,7 @@ class Autocomplete extends React.Component {
   handleInputKeyDown = (event) => {
     if (event.keyCode === 9) {
       const container = this.containerRef.current
-      const firstOption = container?.querySelector('button.option')
+      const firstOption = container?.querySelector('button.option') as HTMLElement | null
       if (firstOption) {
         event.preventDefault()
         event.stopPropagation()
@@ -126,7 +126,7 @@ class Autocomplete extends React.Component {
     const container = this.containerRef.current
     const options = Array.from(
       container?.querySelectorAll('button.option') || []
-    )
+    ) as HTMLElement[]
     if (!options.length) {
       return
     }
@@ -215,7 +215,7 @@ class Autocomplete extends React.Component {
       },
       () => {
         this.props.onSelect(this.state.selectedId, this.state.currentTypedText)
-        const input = document.getElementById(this.props.inputName)
+        const input = document.getElementById(this.props.inputName) as HTMLInputElement | null
         if (input) {
           input.value = this.state.currentTypedText
         }
@@ -223,8 +223,8 @@ class Autocomplete extends React.Component {
     )
 
     if (this.props.clearOnSelect) {
-      document.getElementById(this.props.inputName).value = ''
-      document.getElementById(this.props.inputName).focus()
+      ;(document.getElementById(this.props.inputName) as HTMLInputElement).value = ''
+      ;(document.getElementById(this.props.inputName) as HTMLInputElement).focus()
       this.setState({ currentTypedText: '' })
     }
   }
@@ -245,11 +245,11 @@ class Autocomplete extends React.Component {
     this.props.handleNewSelect(this.state.currentTypedText)
     this.setState({ hideResults: true })
     if (this.props.clearOnSelect) {
-      document.getElementById(this.props.inputName).value = ''
-      document.getElementById(this.props.inputName).focus()
+      ;(document.getElementById(this.props.inputName) as HTMLInputElement).value = ''
+      ;(document.getElementById(this.props.inputName) as HTMLInputElement).focus()
       this.setState({ currentTypedText: '' })
     } else {
-      document.getElementById(this.props.inputName).value =
+      ;(document.getElementById(this.props.inputName) as HTMLInputElement).value =
         this.state.currentTypedText
     }
   }
@@ -264,7 +264,7 @@ class Autocomplete extends React.Component {
         {this.props.showSuggestedIdeas ? (
           <button
             className={'button action-button'}
-            tabIndex="-1"
+            tabIndex={-1}
             onClick={() => {
               this.handleFetchIdeaSuggestions()
             }}
@@ -356,7 +356,7 @@ class Autocomplete extends React.Component {
 }
 
 // Wrapper component that provides keyboard shortcuts
-function AutocompleteWithKeyboard(props) {
+function AutocompleteWithKeyboard(props: any) {
   const autocompleteRef = React.useRef(null)
 
   // Section 6: Autocomplete keyboard shortcuts

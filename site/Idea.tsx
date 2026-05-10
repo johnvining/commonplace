@@ -17,7 +17,7 @@ import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
-function Idea(props) {
+function Idea(props: any) {
   const { id } = useParams()
   const [edit, setEdit] = useState(false)
   const [pendingName, setPendingName] = useState('')

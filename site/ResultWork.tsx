@@ -5,8 +5,8 @@ import note_img from 'url:./icons/write.svg'
 import PileListForItem from './PileListForItem'
 import PinButton from './PinButton'
 
-class ResultWork extends React.Component {
-  state = {}
+class ResultWork extends React.Component<any, any> {
+  state: any = {}
 
   render() {
     var work = this.props.work

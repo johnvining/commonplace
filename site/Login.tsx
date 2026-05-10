@@ -6,7 +6,7 @@ import {
 } from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
-function Login(props) {
+function Login(props: any) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 

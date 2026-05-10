@@ -4,8 +4,8 @@ import idea_img from 'url:./icons/idea.svg'
 import note_img from 'url:./icons/write.svg'
 import PinButton from './PinButton'
 
-class IdeaList extends React.Component {
-  state = {}
+class IdeaList extends React.Component<any, any> {
+  state: any = {}
 
   async componentDidMount() {
     const response = await this.props.getListOfIdeas()

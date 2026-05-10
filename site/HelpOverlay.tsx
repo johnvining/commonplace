@@ -3,7 +3,7 @@ import * as constants from './constants'
 // Help overlay component that displays context-sensitive keyboard shortcuts
 // Triggered by Ctrl+H globally
 
-function HelpOverlay({ isVisible, onClose, currentContext }) {
+function HelpOverlay({ isVisible, onClose, currentContext }: any) {
   if (!isVisible) return null
 
   // Determine which shortcuts to show based on context

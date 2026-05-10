@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 
-function NickView(props) {
+function NickView(props: any) {
   const { nick } = useParams()
   const navigate = useNavigate()
   const { setPageTitle } = props

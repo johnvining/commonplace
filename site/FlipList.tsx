@@ -2,7 +2,7 @@ import React from 'react'
 import NoteList from './NoteList'
 import * as db from './Database'
 
-class FlipList extends React.Component {
+class FlipList extends React.Component<any, any> {
   // eslint-disable-next-line no-unused-vars
   async getListOfNotes(_index, _page) {
     var notesResponse

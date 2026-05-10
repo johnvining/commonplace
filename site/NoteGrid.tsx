@@ -5,8 +5,8 @@ import check_circle from 'url:./icons/check_circle.svg'
 import * as db from './Database'
 import ClickToCopyNick from './ClickToCopyNick'
 
-class NoteGrid extends React.Component {
-  state = {}
+class NoteGrid extends React.Component<any, any> {
+  state: any = {}
 
   componentDidMount() {
     if (this.props.note && this.props.note.nick) {

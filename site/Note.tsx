@@ -30,8 +30,8 @@ import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import { togglePinned } from './pinned'
 import PinButton from './PinButton'
 
-class Note extends React.Component {
-  state = {
+class Note extends React.Component<any, any> {
+  state: any = {
     largeImage: -1,
     lightboxOpen: false,
     overlayMode: false,
@@ -348,7 +348,7 @@ class Note extends React.Component {
   }
 
   async handleAccept() {
-    const updateObject = {
+    const updateObject: any = {
       author: this.state.pendingAuthorId,
       page: this.state.pendingPage,
       take: this.state.pendingTake,
@@ -777,7 +777,7 @@ class Note extends React.Component {
 
           {/* Text area */}
           {edit ? (
-            <div name="text" className="width-100">
+            <div data-name="text" className="width-100">
               <label htmlFor="text" className="note-full form-label">
                 Text
                 <ClickableLabelButton
@@ -804,7 +804,7 @@ class Note extends React.Component {
               ></textarea>
             </div>
           ) : !this.state.overlayMode && this.state.pendingText ? (
-            <div name="text" className="width-100">
+            <div data-name="text" className="width-100">
               <div
                 className={
                   'note-full note-text markdown' +
@@ -821,7 +821,7 @@ class Note extends React.Component {
 
           {/* Take */}
           {!this.state.overlayMode && edit && !this.state.compactEdit ? (
-            <div name="take" className="width-100">
+            <div data-name="take" className="width-100">
               <label htmlFor="take" className="note-full form-label">
                 Take
               </label>
@@ -833,7 +833,7 @@ class Note extends React.Component {
               ></textarea>
             </div>
           ) : !this.state.overlayMode && this.state.pendingTake ? (
-            <div name="take" className="width-100">
+            <div data-name="take" className="width-100">
               <div
                 className="note-full note-take markdown"
                 dangerouslySetInnerHTML={{
@@ -846,7 +846,7 @@ class Note extends React.Component {
           {/* Author, Work */}
           {edit ? (
             <>
-              <div name="author" className="width-100">
+              <div data-name="author" className="width-100">
                 <label htmlFor="author" className="note-full form-label">
                   Author
                 </label>
@@ -862,7 +862,7 @@ class Note extends React.Component {
                   onClearText={this.handleClearAuthor.bind(this)}
                 />
               </div>
-              <div name="work" className="width-100">
+              <div data-name="work" className="width-100">
                 <label htmlFor="work" className="note-full form-label">
                   Work
                 </label>
@@ -885,7 +885,7 @@ class Note extends React.Component {
             this.state.pendingYear ||
             this.state.pendingUrl ||
             this.props.note?.work?.url) ? (
-            <div name="work" className="width-100">
+            <div data-name="work" className="width-100">
               <div className="citation">
                 <WorkCitationSpan
                   authorName={
@@ -957,7 +957,7 @@ class Note extends React.Component {
                   <button
                     className="idea label edit"
                     key={'idea-button' + idea._id}
-                    tabIndex="-1"
+                    tabIndex={-1}
                     onClick={() => {
                       this.removeIdea(idea._id)
                     }}
@@ -969,7 +969,7 @@ class Note extends React.Component {
                     <button
                       className="idea label"
                       key={'idea-button' + idea._id}
-                      tabIndex={selected || edit_ideas ? null : '-1'}
+                      tabIndex={selected || edit_ideas ? undefined : -1}
                     >
                       {idea.name}
                     </button>
@@ -982,7 +982,7 @@ class Note extends React.Component {
                     <button
                       className="link label"
                       key={'link-button' + note}
-                      tabIndex={selected || edit_ideas ? null : '-1'}
+                      tabIndex={selected || edit_ideas ? undefined : -1}
                     >
                       {this.state.linkedNotes[note]}
                     </button>
@@ -1211,7 +1211,7 @@ class Note extends React.Component {
 }
 
 // Wrapper component that provides keyboard shortcuts
-function NoteWithKeyboard(props) {
+function NoteWithKeyboard(props: any) {
   const noteRef = React.useRef(null)
 
   // Determine the keyboard scope based on the current mode

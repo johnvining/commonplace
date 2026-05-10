@@ -5,8 +5,8 @@ import note_img from 'url:./icons/write.svg'
 import work_img from 'url:./icons/work.svg'
 import PinButton from './PinButton'
 
-class AuthorList extends React.Component {
-  state = {}
+class AuthorList extends React.Component<any, any> {
+  state: any = {}
 
   async componentDidMount() {
     const response = await this.props.getListOfAuthors()

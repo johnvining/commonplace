@@ -18,7 +18,7 @@ const scopePriority = {
   [constants.keyboardScopes.GLOBAL]: 10,
 }
 
-export function KeyboardProvider({ children }) {
+export function KeyboardProvider({ children }: any) {
   const handlers = useRef(new Map())
   const handlerId = useRef(0)
   const scopeCounts = useRef(new Map())

@@ -3,7 +3,7 @@ import * as db from './Database'
 import NoteList from './NoteList'
 import { useParams } from 'react-router-dom'
 
-function NoteView(props) {
+function NoteView(props: any) {
   const { id, nick } = useParams()
 
   const getListOfOneNote = async () => {

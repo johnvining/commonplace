@@ -28,7 +28,7 @@ import {
 import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
-function Work(props) {
+function Work(props: any) {
   const { id } = useParams()
   const [edit, setEdit] = useState(false)
   const [importMode, setImportMode] = useState(false)
@@ -42,7 +42,7 @@ function Work(props) {
   const [pendingAuthorId, setPendingAuthorId] = useState('')
   const [pendingSummary, setPendingSummary] = useState('')
   const [pendingCitationInfo, setPendingCitationInfo] = useState('')
-  const [piles, setPiles] = useState()
+  const [piles, setPiles] = useState<any[]>([])
   const [nick, setNick] = useState()
   const [notesRefreshKey, setNotesRefreshKey] = useState(0)
   const navigate = useNavigate()

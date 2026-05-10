@@ -15,7 +15,7 @@ declare const process: { env: Record<string, string | undefined> }
 const url_api = process.env.SERVER_API
 
 // Supported types: idea, auth, work, pile
-export async function getSuggestions(type, search, withCounts = false, signal) {
+export async function getSuggestions(type: string, search: string, withCounts = false, signal?: AbortSignal) {
   const data = { string: search }
   const opts = signal ? { signal } : {}
 

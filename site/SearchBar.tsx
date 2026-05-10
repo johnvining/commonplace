@@ -5,7 +5,7 @@ import * as db from './Database'
 import * as constants from './constants'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
-function SearchBar(props) {
+function SearchBar(props: any) {
   const [modifier, setModifier] = useState('')
   const [typedText, setTypedText] = useState('')
   const [searchError, setSearchError] = useState('')

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-function WorkCitationSpan(props) {
+function WorkCitationSpan(props: any) {
   return (
     <>
       {props.authorName && (

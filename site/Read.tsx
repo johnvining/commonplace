@@ -13,7 +13,7 @@ import {
 import { TopLevelTitle, TopLevelTitleContainer } from './TopLevelHeadings'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 
-function Read(props) {
+function Read(props: any) {
   const { id } = useParams()
   const [workTitle, setWorkTitle] = useState('')
   const [authorName, setAuthorName] = useState('')

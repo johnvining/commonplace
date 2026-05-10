@@ -5,7 +5,7 @@ import check_circle from 'url:./icons/check_circle.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 
 class NoteSlim extends React.PureComponent<any> {
-  state = {}
+  state: any = {}
 
   markChecked(e) {
     if (e.shiftKey) {

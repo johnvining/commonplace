@@ -19,7 +19,7 @@ import {
 import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
-function Pile(props) {
+function Pile(props: any) {
   const { id } = useParams()
   const [edit, setEdit] = useState(false)
   const [pendingName, setPendingName] = useState('')

@@ -12,7 +12,7 @@ import {
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
 
-function AuthorNotes(props) {
+function AuthorNotes(props: any) {
   const { id } = useParams()
   const [authorName, setAuthorName] = useState('')
   const navigate = useNavigate()

@@ -2,15 +2,15 @@ import React from 'react'
 import NoteList from './NoteList'
 import * as db from './Database'
 
-class RecentList extends React.Component {
+class FileList extends React.Component<any, any> {
   async getListOfNotes(index, page) {
     var notesResponse
     await db
-      .getRecentNotes(page)
-      .then((response) => {
+      .getEarliestNotesToFile(page)
+      .then(response => {
         notesResponse = response
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error)
       })
 
@@ -18,7 +18,7 @@ class RecentList extends React.Component {
   }
 
   render() {
-    this.props.setPageTitle('Commonplace')
+    this.props.setPageTitle('Notes to file')
     return (
       <div>
         <NoteList
@@ -31,4 +31,4 @@ class RecentList extends React.Component {
   }
 }
 
-export default RecentList
+export default FileList

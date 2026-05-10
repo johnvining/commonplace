@@ -2,7 +2,7 @@ import Autocomplete from './Autocomplete'
 import { useNavigate } from 'react-router-dom'
 import * as db from './Database'
 
-function PileListForItem(props) {
+function PileListForItem(props: any) {
   const navigate = useNavigate()
   return (
     <>
@@ -25,7 +25,7 @@ function PileListForItem(props) {
                 navigate('/pile/' + pile._id)
               }
             }}
-            tabIndex={!props.allowTabbing ? '-1' : null}
+            tabIndex={!props.allowTabbing ? -1 : undefined}
           >
             <>
               {pre ? <span className="pile pre">{pre}</span> : null}

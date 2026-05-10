@@ -1,8 +1,8 @@
 import React from 'react'
 import ResultWork from './ResultWork'
 
-class WorkList extends React.Component {
-  state = {}
+class WorkList extends React.Component<any, any> {
+  state: any = {}
 
   async componentDidMount() {
     const response = await this.props.getListOfWorks()

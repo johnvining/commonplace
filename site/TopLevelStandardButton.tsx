@@ -1,6 +1,6 @@
 import ClickToCopyNick from './ClickToCopyNick'
 
-export function TopLevelStandardButton(props) {
+export function TopLevelStandardButton(props: any) {
   let className = 'button'
   switch (props.position) {
     case 'left':
@@ -34,7 +34,7 @@ export function TopLevelStandardButton(props) {
   )
 }
 
-export function TopLevelStandardButtonContainer(props) {
+export function TopLevelStandardButtonContainer(props: any) {
   const containerClassName = props.className
     ? `top-level-button-container ${props.className}`
     : 'top-level-button-container'

@@ -1,6 +1,16 @@
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import * as constants from './constants'
 
+interface EntityKeyboardShortcutsOptions {
+  isEditing?: boolean
+  onEdit?: () => void
+  onSave?: () => unknown
+  onExitEdit?: () => void
+  onNewNote?: () => unknown
+  onEditPiles?: () => void
+  onToggleStar?: () => void
+}
+
 // Shared keyboard shortcuts for entity pages (Work, Pile, Idea, Read)
 // Section 3 in documentation
 export function useEntityKeyboardShortcuts({
@@ -11,7 +21,7 @@ export function useEntityKeyboardShortcuts({
   onNewNote,
   onEditPiles,
   onToggleStar,
-}) {
+}: EntityKeyboardShortcutsOptions) {
   // Entity edit mode shortcuts (Section 3.1)
   useKeyboardShortcuts(
     constants.keyboardScopes.ENTITY_EDIT,

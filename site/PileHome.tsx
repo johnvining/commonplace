@@ -2,7 +2,7 @@ import React from 'react'
 import * as db from './Database'
 import PileList from './PileList'
 
-class PileHome extends React.Component {
+class PileHome extends React.Component<any, any> {
   async componentDidMount() {}
 
   getListOfPiles() {
