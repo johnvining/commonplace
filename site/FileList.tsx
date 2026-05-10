@@ -3,7 +3,7 @@ import NoteList from './NoteList'
 import * as db from './Database'
 
 class FileList extends React.Component<any, any> {
-  async getListOfNotes(index, page) {
+  async getListOfNotes(index: any, page: any) {
     var notesResponse
     await db
       .getEarliestNotesToFile(page)

@@ -4,7 +4,7 @@ import note_img from 'url:./icons/write.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 import PinButton from './PinButton'
 
-function snippetAround(text, query) {
+function snippetAround(text: any, query: any) {
   const idx = text.toLowerCase().indexOf(query.toLowerCase())
   if (idx === -1) return <>{text}</>
   const BEFORE = 40
@@ -94,7 +94,7 @@ class NoteResult extends React.PureComponent<any> {
           ) : null}
           {ideas ? (
             <div className="result-box-ideas">
-              {ideas.map(i => (
+              {ideas.map((i: any) => (
                 <span key={i._id} className="idea">{i.name}</span>
               ))}
             </div>

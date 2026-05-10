@@ -6,7 +6,7 @@ function PileListForItem(props: any) {
   const navigate = useNavigate()
   return (
     <>
-      {props.piles?.map((pile) => {
+      {props.piles?.map((pile: any) => {
         let pileName = pile.name
         let parts = pileName.split(':')
         let pre = ''
@@ -46,7 +46,7 @@ function PileListForItem(props: any) {
           handleNewSelect={props.handleNewSelect}
           inputName="work-pile"
           onSelect={props.onSelect}
-          excludeIds={props.piles?.map((pile) => pile._id)}
+          excludeIds={props.piles?.map((pile: any) => pile._id)}
         />
       ) : (
         ''

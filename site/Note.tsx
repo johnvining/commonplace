@@ -56,7 +56,7 @@ class Note extends React.Component<any, any> {
     linkedNotes: {},
   }
 
-  _beforeUnloadHandler = (e) => {
+  _beforeUnloadHandler = (e: any) => {
     e.preventDefault()
     e.returnValue = ''
   }
@@ -70,7 +70,7 @@ class Note extends React.Component<any, any> {
     ].includes(this.props.mode)
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: any) {
     const wasEditing = [
       constants.note_modes.EDIT,
       constants.note_modes.EDIT_IDEAS,
@@ -93,7 +93,7 @@ class Note extends React.Component<any, any> {
     if (this.props.note.nick) {
       this.setState({ nick: this.props.note.nick })
     } else {
-      db.getNoteNick(this.props.id).then((response) => {
+      db.getNoteNick(this.props.id).then((response: any) => {
         this.setState({ nick: response.data.data.key })
       })
     }
@@ -119,7 +119,7 @@ class Note extends React.Component<any, any> {
   }
 
   // Section 5: Note Editing keyboard shortcuts - called from wrapper
-  handleKeyboardShortcut(event) {
+  handleKeyboardShortcut(event: any) {
     const selected = this.props.mode === constants.note_modes.SELECTED
     const editMode = this.props.mode === constants.note_modes.EDIT
     const editIdeas = this.props.mode === constants.note_modes.EDIT_IDEAS
@@ -219,7 +219,7 @@ class Note extends React.Component<any, any> {
     })
   }
 
-  handleSelectKeyDown = (event) => {
+  handleSelectKeyDown = (event: any) => {
     if (event.keyCode !== constants.keyCodes.enter) {
       return
     }
@@ -246,35 +246,35 @@ class Note extends React.Component<any, any> {
         .then(() => {
           this.setState({ deleted: true })
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error(error)
         })
     }
   }
 
-  handleTitleChange = (val) => {
+  handleTitleChange = (val: any) => {
     this.setState({ pendingTitle: val.target.value })
   }
 
-  handlePageChange = (val) => {
+  handlePageChange = (val: any) => {
     this.setState({ pendingPage: val.target.value })
   }
 
-  handleYearChange = (val) => {
+  handleYearChange = (val: any) => {
     this.setState({ pendingYear: val.target.value })
   }
 
-  handleTextChange = (val) => {
-    autosize(document.querySelector('#text'))
+  handleTextChange = (val: any) => {
+    autosize(document.querySelector('#text') as HTMLElement)
     this.setState({ pendingText: val.target.value })
   }
 
-  handleTakeChange = (val) => {
-    autosize(document.querySelector('#take'))
+  handleTakeChange = (val: any) => {
+    autosize(document.querySelector('#take') as HTMLElement)
     this.setState({ pendingTake: val.target.value })
   }
 
-  handleUrlChange = (val) => {
+  handleUrlChange = (val: any) => {
     var year = guessYearFromURL(val.target.value)
     if (!this.state.pendingYear && year) {
       this.setState({ pendingUrl: val.target.value, pendingYear: year })
@@ -284,14 +284,14 @@ class Note extends React.Component<any, any> {
   }
 
   fetchLinkedNotes() {
-    db.getLinkedNotes(this.props.id).then((response) => {
-      const entries = response.data.data.map((note) => [note._id, note.nick])
+    db.getLinkedNotes(this.props.id).then((response: any) => {
+      const entries = response.data.data.map((note: any) => [note._id, note.nick])
       this.setState({ linkedNotes: Object.fromEntries(entries) })
     })
   }
 
   // TODO: Clear entry after assignment
-  handleCreateIdeaAndAddToNote = (ideaName) => {
+  handleCreateIdeaAndAddToNote = (ideaName: any) => {
     db.createAndLinkToRecord(
       db.types.idea,
       ideaName,
@@ -301,12 +301,12 @@ class Note extends React.Component<any, any> {
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch((e) => {
+      .catch((e: any) => {
         console.error(e)
       })
   }
 
-  handleCreatePileAndAssign(pileName) {
+  handleCreatePileAndAssign(pileName: any) {
     db.createAndLinkToRecord(
       db.types.pile,
       pileName,
@@ -316,17 +316,17 @@ class Note extends React.Component<any, any> {
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch((e) => {
+      .catch((e: any) => {
         console.error(e)
       })
   }
 
-  handleUpdateAuthor = (authorId, authorName) => {
+  handleUpdateAuthor = (authorId: any, authorName: any) => {
     this.setState({ pendingAuthorName: authorName, pendingAuthorId: authorId })
   }
 
-  handleCreateAuthorAndAssign = (authorName) => {
-    db.createRecord(db.types.auth, authorName).then((response) => {
+  handleCreateAuthorAndAssign = (authorName: any) => {
+    db.createRecord(db.types.auth, authorName).then((response: any) => {
       this.setState({
         pendingAuthorId: response.data.data._id,
         pendingAuthorName: authorName,
@@ -334,12 +334,12 @@ class Note extends React.Component<any, any> {
     })
   }
 
-  handleUpdateWork = (workId, workName) => {
+  handleUpdateWork = (workId: any, workName: any) => {
     this.setState({ pendingWorkId: workId, pendingWorkName: workName })
   }
 
-  handleCreateWorkAndAssign = (workName) => {
-    db.createRecord(db.types.work, workName).then((response) => {
+  handleCreateWorkAndAssign = (workName: any) => {
+    db.createRecord(db.types.work, workName).then((response: any) => {
       this.setState({
         pendingWorkId: response.data.data._id,
         pendingWorkName: workName,
@@ -368,7 +368,7 @@ class Note extends React.Component<any, any> {
     await db
       .updateRecord(db.types.note, this.props.id, updateObject)
       .then(() => this.props.refetchMe(this.props.index))
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
   }
@@ -384,7 +384,7 @@ class Note extends React.Component<any, any> {
     this.setState({ compactEdit: !this.state.compactEdit })
   }
 
-  removeIdea(ideaId) {
+  removeIdea(ideaId: any) {
     // TODO: Support passing the new version of a note back to parent instead of refetch
     db.removeFromRecord(db.types.idea, ideaId, db.types.note, this.props.id)
     this.props.refetchMe(this.props.index)
@@ -392,7 +392,7 @@ class Note extends React.Component<any, any> {
 
   async generateTitleSuggestion() {
     this.setState({ fetchingTitleSuggestion: true })
-    await db.getTitleSuggestion(this.props.id).then((response) => {
+    await db.getTitleSuggestion(this.props.id).then((response: any) => {
       this.setState({
         pendingTitle: response.data.suggested_title,
         fetchingTitleSuggestion: false,
@@ -402,7 +402,7 @@ class Note extends React.Component<any, any> {
 
   async runOCROnText() {
     this.setState({ fetchingOcr: true })
-    db.getNoteTextOCR(this.props.id).then((response) => {
+    db.getNoteTextOCR(this.props.id).then((response: any) => {
       const newText = response.data.data
       this.setState({
         pendingText: newText,
@@ -420,12 +420,12 @@ class Note extends React.Component<any, any> {
     return db.getIdeaSuggestions(this.props.id)
   }
 
-  async onImageUpload(image) {
+  async onImageUpload(image: any) {
     await db.addImageToNote(this.props.id, image)
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
-  handleFocusImage(index) {
+  handleFocusImage(index: any) {
     if (this.isInEditMode()) {
       this.setState({ largeImage: index, focusEdit: true, lightboxOpen: false, overlayMode: false })
     } else {
@@ -433,7 +433,7 @@ class Note extends React.Component<any, any> {
     }
   }
 
-  handleDeleteImage(index) {
+  handleDeleteImage(index: any) {
     if (!confirm('Delete this image?')) return
     if (index === this.state.largeImage) this.setState({ largeImage: -1 })
     db.deleteImage(this.props.id, this.props.note.images[index]).then(() => {
@@ -451,7 +451,7 @@ class Note extends React.Component<any, any> {
     }
   }
 
-  moveFocusedImage(val) {
+  moveFocusedImage(val: any) {
     const urls = this.props.note.imageUrls
     if (this.state.largeImage < 0 || !urls?.length) return
     const newVal = this.state.largeImage + val
@@ -459,27 +459,27 @@ class Note extends React.Component<any, any> {
     this.setState({ largeImage: newVal })
   }
 
-  handleNewPile = (pileId) => {
+  handleNewPile = (pileId: any) => {
     db.addLinkToRecord(db.types.pile, pileId, db.types.note, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch((e) => {
+      .catch((e: any) => {
         console.error(e)
       })
   }
 
-  handleNewIdea = (ideaId) => {
+  handleNewIdea = (ideaId: any) => {
     db.addLinkToRecord(db.types.idea, ideaId, db.types.note, this.props.id)
       .then(() => {
         this.props.refetchMe(this.props.index)
       })
-      .catch((e) => {
+      .catch((e: any) => {
         console.error(e)
       })
   }
 
-  async handlePileRemove(pileId) {
+  async handlePileRemove(pileId: any) {
     db.removeFromRecord(
       db.types.pile,
       pileId,
@@ -683,7 +683,7 @@ class Note extends React.Component<any, any> {
           {/* Images */}
           {this.props.note?.images?.length > 0 ? (
             <div className="note-full image-row width-100" style={{ alignItems: 'center' }}>
-              {this.props.note?.images?.map((image, index) => (
+              {this.props.note?.images?.map((image: any, index: any) => (
                 <div
                   className={`image-row image-frame${this.state.largeImage == index ? ' selected' : ''}`}
                   key={this.props.id + index + 'div-img'}
@@ -700,7 +700,7 @@ class Note extends React.Component<any, any> {
                   {edit ? (
                     <button
                       className="image-delete-btn"
-                      onClick={(e) => { e.stopPropagation(); this.handleDeleteImage(index) }}
+                      onClick={(e: any) => { e.stopPropagation(); this.handleDeleteImage(index) }}
                       title="Delete image"
                     >×</button>
                   ) : null}
@@ -714,7 +714,7 @@ class Note extends React.Component<any, any> {
             <div className="note-overlay-wrapper width-100" onClick={() => this.setState({ lightboxOpen: true })}>
               <button
                 className="overlay-close-btn"
-                onClick={(e) => { e.stopPropagation(); this.setState({ overlayMode: false, largeImage: -1 }) }}
+                onClick={(e: any) => { e.stopPropagation(); this.setState({ overlayMode: false, largeImage: -1 }) }}
                 title="Close"
               >×</button>
               <img
@@ -725,13 +725,13 @@ class Note extends React.Component<any, any> {
                 {this.props.note.imageUrls.length > 1 ? (
                   <button
                     className="overlay-nav-btn overlay-nav-prev"
-                    onClick={(e) => { e.stopPropagation(); this.moveFocusedImage(-1) }}
+                    onClick={(e: any) => { e.stopPropagation(); this.moveFocusedImage(-1) }}
                     disabled={this.state.largeImage === 0}
                   >
                     <img src={left_arrow} />
                   </button>
                 ) : null}
-                <div className="note-overlay-text-panel" onClick={(e) => e.stopPropagation()}>
+                <div className="note-overlay-text-panel" onClick={(e: any) => e.stopPropagation()}>
                   {this.state.pendingTitle ? (
                     <div className="note-overlay-title">{this.state.pendingTitle}</div>
                   ) : null}
@@ -754,7 +754,7 @@ class Note extends React.Component<any, any> {
                 {this.props.note.imageUrls.length > 1 ? (
                   <button
                     className="overlay-nav-btn overlay-nav-next"
-                    onClick={(e) => { e.stopPropagation(); this.moveFocusedImage(1) }}
+                    onClick={(e: any) => { e.stopPropagation(); this.moveFocusedImage(1) }}
                     disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
                   >
                     <img src={right_arrow} />
@@ -762,8 +762,8 @@ class Note extends React.Component<any, any> {
                 ) : null}
               </div>
               {this.props.note.imageUrls.length > 1 ? (
-                <div className="note-overlay-dots" onClick={(e) => e.stopPropagation()}>
-                  {this.props.note.imageUrls.map((_, i) => (
+                <div className="note-overlay-dots" onClick={(e: any) => e.stopPropagation()}>
+                  {this.props.note.imageUrls.map((_: any, i: any) => (
                     <button
                       key={i}
                       className={`overlay-dot${i === this.state.largeImage ? ' active' : ''}`}
@@ -952,7 +952,7 @@ class Note extends React.Component<any, any> {
                   this.props.onStartPileEdit(note._id)
                 }}
               />
-              {note.ideas?.map((idea) =>
+              {note.ideas?.map((idea: any) =>
                 edit_ideas ? (
                   <button
                     className="idea label edit"
@@ -977,7 +977,7 @@ class Note extends React.Component<any, any> {
                 )
               )}
               {Object.keys(this.state.linkedNotes).length > 0 &&
-                Object.keys(this.state.linkedNotes).map((note) => (
+                Object.keys(this.state.linkedNotes).map((note: any) => (
                   <Link key={note} to={'/note/' + note}>
                     <button
                       className="link label"
@@ -1086,11 +1086,11 @@ class Note extends React.Component<any, any> {
                     apiType={edit_ideas ? db.types.idea : db.types.pile}
                     excludeIds={
                       edit_ideas
-                        ? note.ideas?.map((idea) => idea._id)
-                        : note.piles?.map((pile) => pile._id)
+                        ? note.ideas?.map((idea: any) => idea._id)
+                        : note.piles?.map((pile: any) => pile._id)
                     }
                     excludeNames={
-                      edit_ideas ? note.ideas?.map((idea) => idea.name) : null
+                      edit_ideas ? note.ideas?.map((idea: any) => idea.name) : null
                     }
                   />
                 </>
@@ -1101,7 +1101,7 @@ class Note extends React.Component<any, any> {
                       className="note-link-input"
                       autoFocus
                       value={this.state.linkToAdd}
-                      onChange={(e) => {
+                      onChange={(e: any) => {
                         this.setState({
                           linkToAdd: e.target.value,
                         })
@@ -1237,7 +1237,7 @@ function NoteWithKeyboard(props: any) {
   // Section 5: Note Editing keyboard shortcuts
   useKeyboardShortcuts(
     scope || constants.keyboardScopes.NOTE_EDIT, // fallback scope, won't match if null
-    (event) => {
+    (event: any) => {
       if (!noteRef.current || !scope) return false
       return noteRef.current.handleKeyboardShortcut(event)
     },

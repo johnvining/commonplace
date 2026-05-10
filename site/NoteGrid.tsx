@@ -12,13 +12,13 @@ class NoteGrid extends React.Component<any, any> {
     if (this.props.note && this.props.note.nick) {
       this.setState({ nick: this.props.note.nick })
     } else {
-      db.getNoteNick(this.props.id).then((response) => {
+      db.getNoteNick(this.props.id).then((response: any) => {
         this.setState({ nick: response.data.data.key })
       })
     }
   }
 
-  markChecked(e) {
+  markChecked(e: any) {
     if (e.shiftKey) {
       this.props.markShiftChecked(this.props.index)
     } else {

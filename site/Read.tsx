@@ -14,7 +14,7 @@ import { TopLevelTitle, TopLevelTitleContainer } from './TopLevelHeadings'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 
 function Read(props: any) {
-  const { id } = useParams()
+  const { id = '' } = useParams()
   const [workTitle, setWorkTitle] = useState('')
   const [authorName, setAuthorName] = useState('')
   const [authorId, setAuthorId] = useState<any>(null)
@@ -23,7 +23,7 @@ function Read(props: any) {
   const [year, setYear] = useState('')
   const navigate = useNavigate()
 
-  const fetchWorkInfo = (workId) => {
+  const fetchWorkInfo = (workId: any) => {
     Promise.all([
       db.getInfo(db.types.work, workId),
       db.getWorkNick(workId),
@@ -35,7 +35,7 @@ function Read(props: any) {
       setUrl(work.url)
       setYear(work.year)
       setNick(nickResponse.data.data.key)
-    }).catch((error) => {
+    }).catch((error: any) => {
       console.error(error)
     })
   }
@@ -48,17 +48,17 @@ function Read(props: any) {
     var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.work, id)
-      .then((response) => {
+      .then((response: any) => {
         notesResponse = response
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
 
     return notesResponse
   }
 
-  const createNoteWithImageForWork = async (image) => {
+  const createNoteWithImageForWork = async (image: any) => {
     let now = new Date()
     let title =
       'Quick Photo Note — ' +
@@ -80,7 +80,7 @@ function Read(props: any) {
         return
       }
       navigate('/note/' + noteId + '/edit')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating note', error)
     }
   }

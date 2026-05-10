@@ -20,7 +20,7 @@ class PileList extends React.Component<any, any> {
       <div className="pile-list">
         {this.state.piles === undefined ? null : this.state.piles.length === 0 ? (
           <div className="search-empty-state">No piles found.</div>
-        ) : (this.props.limit ? this.state.piles.slice(0, this.props.limit) : this.state.piles).map((pile) => {
+        ) : (this.props.limit ? this.state.piles.slice(0, this.props.limit) : this.state.piles).map((pile: any) => {
               return (
                 <Link to={`/pile/${pile._id}`} key={'pile-list-' + pile._id}>
                   <div className="result-box">

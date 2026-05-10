@@ -32,7 +32,7 @@ class NoteList extends React.Component<any, any> {
     pageLoading: false,
   }
 
-  getActiveNoteId(event) {
+  getActiveNoteId(event: any) {
     const target = event?.target || document.activeElement
     if (!target || typeof target.closest !== 'function') return null
     const noteElement = target.closest('[data-note-id]')
@@ -65,8 +65,8 @@ class NoteList extends React.Component<any, any> {
 
         if (this.props.editFirst) {
           this.setNoteMode(firstNoteId, constants.note_modes.EDIT)
-          autosize(document.querySelector('#text'))
-          autosize(document.querySelector('#take'))
+          autosize(document.querySelector('#text') as HTMLElement)
+          autosize(document.querySelector('#take') as HTMLElement)
           return
         }
 
@@ -78,7 +78,7 @@ class NoteList extends React.Component<any, any> {
   }
 
   // Section 4: Note List keyboard shortcuts - called from wrapper
-  handleKeyboardShortcut(event) {
+  handleKeyboardShortcut(event: any) {
     // Only handle shortcuts in Full view mode
     if (this.props.viewMode !== constants.view_modes.FULL) {
       return false
@@ -108,8 +108,8 @@ class NoteList extends React.Component<any, any> {
       switch (event.keyCode) {
         case constants.keyCodes.edit:
           this.setNoteMode(activeNoteId, constants.note_modes.EDIT)
-          autosize(document.querySelector('#text'))
-          autosize(document.querySelector('#take'))
+          autosize(document.querySelector('#text') as HTMLElement)
+          autosize(document.querySelector('#take') as HTMLElement)
           return true
         case constants.keyCodes.ideas:
           this.setNoteMode(activeNoteId, constants.note_modes.EDIT_IDEAS)
@@ -200,7 +200,7 @@ class NoteList extends React.Component<any, any> {
     })
   }
 
-  async refetchNoteAtIndex(index) {
+  async refetchNoteAtIndex(index: any) {
     var notes = this.state.notes
     const response = await db.getInfo(db.types.note, notes[index]._id)
     var note = response.data.data[0]
@@ -218,8 +218,8 @@ class NoteList extends React.Component<any, any> {
       this._imageObserver.disconnect()
     }
     this._imageObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      (entries: any) => {
+        entries.forEach((entry: any) => {
           if (entry.isIntersecting) {
             const index = parseInt((entry.target as HTMLElement).dataset.noteIndex || '', 10)
             if (!isNaN(index)) {
@@ -244,7 +244,7 @@ class NoteList extends React.Component<any, any> {
     if (this._imageObserver) this._imageObserver.disconnect()
   }
 
-  async getImagesForNoteAtIndex(index, refetch) {
+  async getImagesForNoteAtIndex(index: any, refetch: any) {
     if (refetch) {
       // Need to refetch so we have the correct number of images to fetch
       await this.refetchNoteAtIndex(index)
@@ -267,10 +267,10 @@ class NoteList extends React.Component<any, any> {
       )
     }
 
-    await Promise.all(imagePromises).then((responses) => {
+    await Promise.all(imagePromises).then((responses: any) => {
       const imagesArray: string[] = []
       const note = notes[index]
-      responses.forEach((response) => {
+      responses.forEach((response: any) => {
         if (response?.data) {
           imagesArray.push(URL.createObjectURL(response.data))
         }
@@ -281,7 +281,7 @@ class NoteList extends React.Component<any, any> {
     })
   }
 
-  setNoteMode(noteId, mode) {
+  setNoteMode(noteId: any, mode: any) {
     this.setState(
       {
         selectedNote: noteId,
@@ -307,7 +307,7 @@ class NoteList extends React.Component<any, any> {
     )
   }
 
-  onStartPileEdit(noteId) {
+  onStartPileEdit(noteId: any) {
     this.setNoteMode(noteId, constants.note_modes.EDIT_PILES)
   }
 
@@ -319,13 +319,13 @@ class NoteList extends React.Component<any, any> {
     this.setState({ selectedArray: tempSelectedArray, anchorIndex: 0 })
   }
 
-  markChecked(noteIndex) {
+  markChecked(noteIndex: any) {
     const tempSelectedArray = [...this.state.selectedArray]
     tempSelectedArray[noteIndex] = !tempSelectedArray[noteIndex]
     this.setState({ selectedArray: tempSelectedArray, anchorIndex: noteIndex })
   }
 
-  markShiftChecked(noteIndex) {
+  markShiftChecked(noteIndex: any) {
     const tempSelectedArray = [...this.state.selectedArray]
     if (noteIndex > this.state.anchorIndex) {
       if (noteIndex > this.state.lastTouchedIndex) {
@@ -386,7 +386,7 @@ class NoteList extends React.Component<any, any> {
     this.clearSelection()
   }
 
-  handleAddNew(idToAdd) {
+  handleAddNew(idToAdd: any) {
     var linkType = this.state.toAdd
 
     let indicesToBeModified = this.getSelectedIndices()
@@ -403,7 +403,7 @@ class NoteList extends React.Component<any, any> {
     }
   }
 
-  async handleCreateAndAdd(name) {
+  async handleCreateAndAdd(name: any) {
     var newIdToAssign = await db.createRecord(this.state.toAdd, name)
     this.handleAddNew(newIdToAssign.data.data._id)
   }
@@ -425,7 +425,7 @@ class NoteList extends React.Component<any, any> {
     }
 
     let noteIds = indicesToBeProcessed.map(
-      (index) => this.state.notes[index]._id
+      (index: any) => this.state.notes[index]._id
     )
 
     try {
@@ -435,10 +435,10 @@ class NoteList extends React.Component<any, any> {
       let updatedNotes = [...this.state.notes]
       let updatedCount = 0
 
-      results.forEach((result) => {
+      results.forEach((result: any) => {
         if (result.success && result.textUpdated) {
           const noteIndex = updatedNotes.findIndex(
-            (note) => note._id === result.noteId
+            (note: any) => note._id === result.noteId
           )
           if (noteIndex !== -1) {
             updatedNotes[noteIndex].text = result.ocrText
@@ -448,7 +448,7 @@ class NoteList extends React.Component<any, any> {
       })
 
       this.setState({ notes: updatedNotes })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bulk OCR error:', error)
       alert('Error processing OCR. Please try again.')
     }
@@ -469,7 +469,7 @@ class NoteList extends React.Component<any, any> {
     }
 
     let noteIds = indicesToBeProcessed.map(
-      (index) => this.state.notes[index]._id
+      (index: any) => this.state.notes[index]._id
     )
 
     try {
@@ -479,10 +479,10 @@ class NoteList extends React.Component<any, any> {
       let updatedNotes = [...this.state.notes]
       let updatedCount = 0
 
-      results.forEach((result) => {
+      results.forEach((result: any) => {
         if (result.success && result.titleUpdated) {
           const noteIndex = updatedNotes.findIndex(
-            (note) => note._id === result.noteId
+            (note: any) => note._id === result.noteId
           )
           if (noteIndex !== -1) {
             updatedNotes[noteIndex].title = result.suggestedTitle
@@ -492,7 +492,7 @@ class NoteList extends React.Component<any, any> {
       })
 
       this.setState({ notes: updatedNotes })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bulk Suggest Titles error:', error)
       alert('Error suggesting titles. Please try again.')
     }
@@ -509,14 +509,14 @@ class NoteList extends React.Component<any, any> {
     }
 
     let noteIds = indicesToBeProcessed.map(
-      (index) => this.state.notes[index]._id
+      (index: any) => this.state.notes[index]._id
     )
 
     try {
       const response = await db.bulkGetNotesForMarkdown(noteIds)
       const results = response.data.data
 
-      const successfulResults = results.filter((result) => result.success)
+      const successfulResults = results.filter((result: any) => result.success)
 
       if (successfulResults.length === 0) {
         alert('No notes could be processed for markdown export')
@@ -524,7 +524,7 @@ class NoteList extends React.Component<any, any> {
       }
 
       const markdownLines = successfulResults.map(
-        (result) => `- \`${result.nick}\` ${result.title}`
+        (result: any) => `- \`${result.nick}\` ${result.title}`
       )
 
       const markdownText = markdownLines.join('\n')
@@ -534,7 +534,7 @@ class NoteList extends React.Component<any, any> {
       alert(
         `Exported ${successfulResults.length} notes to clipboard as markdown`
       )
-    } catch (error) {
+    } catch (error: any) {
       console.error('Bulk Markdown Export error:', error)
       alert('Error exporting notes to markdown. Please try again.')
     }
@@ -549,7 +549,7 @@ class NoteList extends React.Component<any, any> {
     var isTileView = this.props.viewMode == constants.view_modes.TILE
     return (
       <div className="multi-select">
-        {showMultiselect ? null : this.state.selectedArray.some((x) => x) ? (
+        {showMultiselect ? null : this.state.selectedArray.some((x: any) => x) ? (
           <div className="multi-select-top-bar">
             {this.state.addSomething ? (
               <Autocomplete
@@ -665,7 +665,7 @@ class NoteList extends React.Component<any, any> {
         ) : null}
         {this.state.notes === undefined || this.state.notes.length === 0 ? null : (
           <div className={isTileView ? 'note-tile-grid' : ''}>
-            {this.state.notes.map((note, index) => {
+            {this.state.notes.map((note: any, index: any) => {
               return (
                 <div
                   key={'note-view-' + note._id}
@@ -762,7 +762,7 @@ function NoteListWithKeyboard(props: any) {
   // Section 4: Note List keyboard shortcuts
   useKeyboardShortcuts(
     constants.keyboardScopes.NOTE_LIST,
-    (event) => {
+    (event: any) => {
       if (!noteListRef.current) return false
       return noteListRef.current.handleKeyboardShortcut(event)
     },

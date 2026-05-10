@@ -18,7 +18,7 @@ function readSidebarCache() {
   } catch { return null }
 }
 
-function writeSidebarCache(data) {
+function writeSidebarCache(data: any) {
   try {
     localStorage.setItem(SIDEBAR_CACHE_KEY, JSON.stringify({ data, ts: Date.now() }))
   } catch {}
@@ -47,7 +47,7 @@ function Sidebar() {
         setRecentIdeas(ideas)
         setRecentPiles(piles)
         writeSidebarCache({ ideas, piles })
-      } catch (error) {
+      } catch (error: any) {
         console.error('Sidebar recent load error:', error)
         if (isMounted && !cached) {
           setRecentIdeas([])
@@ -74,7 +74,7 @@ function Sidebar() {
     return () => window.removeEventListener('pinned-items-updated', refreshPinned)
   }, [])
 
-  const typeLabels = {
+  const typeLabels: Record<string, string> = {
     note: 'Note',
     work: 'Work',
     idea: 'Idea',
@@ -82,7 +82,7 @@ function Sidebar() {
     auth: 'Author',
   }
 
-  const getPileItemCount = (pile) => {
+  const getPileItemCount = (pile: any) => {
     const noteCount = pile?.note_count ?? 0
     const workCount = pile?.work_count ?? 0
     return noteCount + workCount
@@ -94,7 +94,7 @@ function Sidebar() {
         <div className="sidebar-title">Starred Items</div>
         {pinnedItems.length ? (
           <div className="sidebar-list sidebar-list-compact">
-            {pinnedItems.map((item) => (
+            {pinnedItems.map((item: any) => (
               <div className="sidebar-pin-row" key={`${item.type}-${item.id}`}>
                 <Link
                   to={item.href ?? '#'}
@@ -109,7 +109,7 @@ function Sidebar() {
                 </Link>
                 <button
                   className="button pin-button pin-button-compact pin-button-inline pin-button-icon-only starred"
-                  onClick={(event) => {
+                  onClick={(event: any) => {
                     event.preventDefault()
                     event.stopPropagation()
                     unpinItem(item.type, item.id)
@@ -136,7 +136,7 @@ function Sidebar() {
         ) : (
           <div className="sidebar-list sidebar-list-compact">
             {recentIdeas.length ? (
-              recentIdeas.map((idea) => (
+              recentIdeas.map((idea: any) => (
                 <Link
                   key={idea._id}
                   to={`/idea/${idea._id}`}
@@ -161,7 +161,7 @@ function Sidebar() {
         ) : (
           <div className="sidebar-list sidebar-list-compact">
             {recentPiles.length ? (
-              recentPiles.map((pile) => (
+              recentPiles.map((pile: any) => (
                 <Link
                   key={pile._id}
                   to={`/pile/${pile._id}`}

@@ -25,7 +25,7 @@ import {
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
 
-function highlight(text, query) {
+function highlight(text: any, query: any) {
   if (!text || !query) return text
   const idx = text.toLowerCase().indexOf(query.toLowerCase())
   if (idx === -1) return text
@@ -215,7 +215,7 @@ function Find(props: any) {
         <div className="search-no-results">No results for "{search}"</div>
       ) : (
         <>
-          {pageItems.map((entry) => (
+          {pageItems.map((entry: any) => (
             <UnifiedResult key={entry.type + '-' + String(entry.item._id)} entry={entry} query={search} />
           ))}
 

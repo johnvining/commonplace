@@ -10,11 +10,11 @@ class ImageUploader extends React.Component<any, any> {
   }
   inputRef = React.createRef<HTMLInputElement>()
 
-  onFileSelect(event) {
+  onFileSelect(event: any) {
     this.handleFiles(event.target.files)
   }
 
-  handleFiles(filesList) {
+  handleFiles(filesList: any) {
     const files = Array.from(filesList || [])
     if (!files.length) {
       return
@@ -25,7 +25,7 @@ class ImageUploader extends React.Component<any, any> {
       async () => {
         try {
           if (this.props.onImagesUpload) {
-            const onProgress = (done, total = files.length) => {
+            const onProgress = (done: number, total: number = files.length) => {
               this.setState({ uploadDone: done, uploadTotal: total })
             }
             await this.props.onImagesUpload(files, onProgress)
@@ -33,7 +33,7 @@ class ImageUploader extends React.Component<any, any> {
           } else if (this.props.onImageUpload) {
             for (const file of files) {
               await this.props.onImageUpload(file)
-              this.setState((prevState) => ({
+              this.setState((prevState: any) => ({
                 uploadDone: prevState.uploadDone + 1,
               }))
             }
@@ -53,22 +53,22 @@ class ImageUploader extends React.Component<any, any> {
     )
   }
 
-  handleDragEnter(e) {
+  handleDragEnter(e: any) {
     this.setState({ dragActive: true })
     e.preventDefault()
     e.stopPropagation()
   }
-  handleDragLeave(e) {
+  handleDragLeave(e: any) {
     this.setState({ dragActive: false })
     e.preventDefault()
     e.stopPropagation()
   }
-  handleDragOver(e) {
+  handleDragOver(e: any) {
     this.setState({ dragActive: true })
     e.preventDefault()
     e.stopPropagation()
   }
-  handleDrop(e) {
+  handleDrop(e: any) {
     this.setState({ dragActive: false })
     e.preventDefault()
     e.stopPropagation()

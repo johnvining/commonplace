@@ -20,7 +20,7 @@ class WorkList extends React.Component<any, any> {
       <div className="work-list">
         {works === undefined ? null : works.length === 0 ? (
           <div className="search-empty-state">No works found.</div>
-        ) : display.map(work => (
+        ) : display.map((work: any) => (
           <ResultWork work={work} key={'work-list-' + work._id} />
         ))}
       </div>

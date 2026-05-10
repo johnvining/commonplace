@@ -25,7 +25,7 @@ export function useEntityKeyboardShortcuts({
   // Entity edit mode shortcuts (Section 3.1)
   useKeyboardShortcuts(
     constants.keyboardScopes.ENTITY_EDIT,
-    (event) => {
+    (event: any) => {
       if (!isEditing) return false
 
       // Ctrl+A: Save changes
@@ -48,7 +48,7 @@ export function useEntityKeyboardShortcuts({
   // Entity page shortcuts (Section 3.1 - 3.5)
   useKeyboardShortcuts(
     constants.keyboardScopes.ENTITY_PAGE,
-    (event) => {
+    (event: any) => {
       // Only handle these when NOT editing
       if (isEditing) return false
 

@@ -17,7 +17,7 @@ function readCache() {
   }
 }
 
-function writeCache(data) {
+function writeCache(data: any) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }))
   } catch {}
@@ -36,7 +36,7 @@ function Stats() {
         setStats(response.data.data)
         setError(null)
         writeCache(response.data.data)
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching stats:', err)
         if (!stats) setError('Failed to load statistics')
       }
@@ -45,7 +45,7 @@ function Stats() {
     fetchStats()
   }, [])
 
-  const handleStatClick = (type) => {
+  const handleStatClick = (type: any) => {
     navigate(`/recent/${type}`)
   }
 

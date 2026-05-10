@@ -10,8 +10,8 @@ import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } 
 
 class ErrorBoundary extends React.Component<any, any> {
   state: any = { error: null, info: null }
-  static getDerivedStateFromError(error) { return { error } }
-  componentDidCatch(error, info) {
+  static getDerivedStateFromError(error: any) { return { error } }
+  componentDidCatch(error: any, info: any) {
     console.error('Route error:', error, info)
     this.setState({ info })
   }
@@ -87,12 +87,12 @@ class App extends React.Component<any, any> {
     this.setState({ barOpen: false })
   }
 
-  setView(view) {
+  setView(view: any) {
     this.setState({ viewMode: view })
     localStorage.viewMode = view
   }
 
-  setPageTitle(title) {
+  setPageTitle(title: any) {
     document.title = title
   }
 
@@ -187,7 +187,7 @@ class App extends React.Component<any, any> {
           >
             <div
               className="search-overlay-content"
-              onClick={(event) => event.stopPropagation()}
+              onClick={(event: any) => event.stopPropagation()}
             >
               <SearchBar
                 beforeNavigate={this.beforeSearchNavigate.bind(this)}
@@ -375,10 +375,10 @@ function AppWithKeyboard() {
   // Global shortcuts (Section 1 in docs)
   useKeyboardShortcuts(
     constants.keyboardScopes.GLOBAL,
-    (event) => {
+    (event: any) => {
       // 1.1 Help Toggle (Ctrl+H) - always available
       if (shortcuts.global.toggleHelp(event)) {
-        setHelpOpen((prev) => {
+        setHelpOpen((prev: any) => {
           const next = !prev
           console.log('[help-overlay] toggle', { open: next })
           return next
@@ -404,7 +404,7 @@ function AppWithKeyboard() {
 
       // 1.1 Search Bar Toggle (Ctrl+O)
       if (shortcuts.global.toggleSearchBar(event)) {
-        appRef.current.setState((state) => ({ barOpen: !state.barOpen }))
+        appRef.current.setState((state: any) => ({ barOpen: !state.barOpen }))
         return true
       }
 
@@ -435,7 +435,7 @@ function AppWithKeyboard() {
   const getCurrentContext = () => {
     if (!appRef.current) return {}
     const state = appRef.current.state || {}
-    const hasScope = (scope) => activeScopes.has(scope)
+    const hasScope = (scope: any) => activeScopes.has(scope)
     const noteMode = hasScope(constants.keyboardScopes.NOTE_EDIT_LINKS)
       ? constants.note_modes.EDIT_LINKS
       : hasScope(constants.keyboardScopes.NOTE_EDIT_IDEAS)

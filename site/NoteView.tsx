@@ -4,29 +4,30 @@ import NoteList from './NoteList'
 import { useParams } from 'react-router-dom'
 
 function NoteView(props: any) {
-  const { id, nick } = useParams()
+  const { id = '', nick } = useParams()
 
   const getListOfOneNote = async () => {
-    var notesResponse
-    
+    let notesResponse: any
+
     if (!id) {
       // Access by nick - use single request
+      if (!nick) return null
       await db
         .getNoteByNick(nick)
-        .then((response) => {
+        .then((response: any) => {
           notesResponse = response
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error(error)
         })
     } else {
       // Access by ID - use existing method
       await db
         .getInfo(db.types.note, id)
-        .then((response) => {
+        .then((response: any) => {
           notesResponse = response
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error(error)
         })
     }

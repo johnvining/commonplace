@@ -4,14 +4,14 @@ import * as db from './Database'
 
 class FlipList extends React.Component<any, any> {
   // eslint-disable-next-line no-unused-vars
-  async getListOfNotes(_index, _page) {
+  async getListOfNotes(_index: any, _page: any) {
     var notesResponse
     await db
       .getRandomNotes()
-      .then((response) => {
+      .then((response: any) => {
         notesResponse = response
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
 

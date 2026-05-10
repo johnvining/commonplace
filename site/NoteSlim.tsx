@@ -7,7 +7,7 @@ import WorkCitationSpan from './WorkCitationSpan'
 class NoteSlim extends React.PureComponent<any> {
   state: any = {}
 
-  markChecked(e) {
+  markChecked(e: any) {
     if (e.shiftKey) {
       this.props.markShiftChecked(this.props.index)
     } else {
@@ -84,12 +84,12 @@ class NoteSlim extends React.PureComponent<any> {
               </div>
 
               <div className="note-slim inner">
-                {this.props.note.piles?.map((pile, idx) => (
+                {this.props.note.piles?.map((pile: any, idx: any) => (
                   <span className="pile" key={'pile-' + this.props.id + idx}>
                     {pile.name}
                   </span>
                 ))}
-                {this.props.note.ideas?.map((idea, idx) => (
+                {this.props.note.ideas?.map((idea: any, idx: any) => (
                   <span className="idea" key={'idea-' + this.props.id + idx}>
                     {idea.name}
                   </span>

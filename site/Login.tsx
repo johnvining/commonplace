@@ -10,7 +10,7 @@ function Login(props: any) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleSubmitPassword = async (e) => {
+  const handleSubmitPassword = async (e: any) => {
     e.preventDefault()
     setError('')
     try {
@@ -34,7 +34,7 @@ function Login(props: any) {
           <TopLevelFormInput
             name="Password"
             id="password"
-            onChange={(e) => {
+            onChange={(e: any) => {
               setPassword(e.target.value)
             }}
             type="password"

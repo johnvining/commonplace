@@ -7,7 +7,7 @@ function ClickToCopyNick({
   className = '',
   style = {},
   disableClick = false,
-}) {
+}: any) {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -17,7 +17,7 @@ function ClickToCopyNick({
       await navigator.clipboard.writeText(nick)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to copy nick:', err)
     }
   }

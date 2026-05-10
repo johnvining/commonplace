@@ -21,7 +21,7 @@ class IdeaList extends React.Component<any, any> {
           <div className="search-empty-state">No ideas found.</div>
         ) : (
           <div>
-            {(this.props.limit ? this.state.ideas.slice(0, this.props.limit) : this.state.ideas).map((idea) => {
+            {(this.props.limit ? this.state.ideas.slice(0, this.props.limit) : this.state.ideas).map((idea: any) => {
               return (
                 <Link to={`/idea/${idea._id}`} key={'idea-list-' + idea._id}>
                   <div className="result-box">

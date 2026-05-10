@@ -5,7 +5,7 @@ import check_circle from 'url:./icons/check_circle.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 
 class NoteTile extends React.PureComponent<any> {
-  markChecked(e) {
+  markChecked(e: any) {
     if (e.shiftKey) {
       this.props.markShiftChecked(this.props.index)
     } else {
@@ -64,7 +64,7 @@ class NoteTile extends React.PureComponent<any> {
                 <div
                   className={`note-slim tile-images has-images ${imageLayoutClass}`}
                 >
-                  {this.props.note.imageUrls.slice(0, 4).map((url, idx) => (
+                  {this.props.note.imageUrls.slice(0, 4).map((url: any, idx: any) => (
                     <div
                       className="note-slim tile-image-frame"
                       key={`${this.props.id}-tile-image-${idx}`}
@@ -80,12 +80,12 @@ class NoteTile extends React.PureComponent<any> {
             </div>
           </Link>
           <div className="note-slim tile-tags">
-            {this.props.note.piles?.map((pile, idx) => (
+            {this.props.note.piles?.map((pile: any, idx: any) => (
               <span className="pile" key={'pile-' + this.props.id + idx}>
                 {pile.name}
               </span>
             ))}
-            {this.props.note.ideas?.map((idea, idx) => (
+            {this.props.note.ideas?.map((idea: any, idx: any) => (
               <span className="idea" key={'idea-' + this.props.id + idx}>
                 {idea.name}
               </span>

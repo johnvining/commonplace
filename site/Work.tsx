@@ -29,7 +29,7 @@ import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
 function Work(props: any) {
-  const { id } = useParams()
+  const { id = '' } = useParams()
   const [edit, setEdit] = useState(false)
   const [importMode, setImportMode] = useState(false)
   const [pendingImportText, setPendingImportText] = useState('')
@@ -49,7 +49,7 @@ function Work(props: any) {
 
   // Function to handle nick navigation
   const handleNickClick = useCallback(
-    async (nickValue, e) => {
+    async (nickValue: any, e: any) => {
       e.preventDefault()
       try {
         const nickResponse = await db.getNick(nickValue)
@@ -72,7 +72,7 @@ function Work(props: any) {
               break
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching nick:', error)
       }
     },
@@ -80,20 +80,20 @@ function Work(props: any) {
   )
 
   // Function to process HTML string and convert nicks to links (including in code blocks)
-  const processHtmlForNicks = (html) => {
+  const processHtmlForNicks = (html: any) => {
     if (!html) return html
     // Match nick patterns: letter (n, w, i, p) followed by digits
     const nickPattern = /\b([nwip]\d+)\b/g
 
     // Process the HTML string, replacing nicks with anchor tags
     // We need to handle both regular text and text inside code/pre tags
-    return html.replace(nickPattern, (match) => {
+    return html.replace(nickPattern, (match: any) => {
       // Create an anchor tag with a special data attribute
       return `<a href="#" data-nick="${match}" class="nick-link">${match}</a>`
     })
   }
 
-  const fetchWorkInfo = (workId) => {
+  const fetchWorkInfo = (workId: any) => {
     Promise.all([
       db.getInfo(db.types.work, workId),
       db.getWorkNick(workId),
@@ -108,7 +108,7 @@ function Work(props: any) {
       setPendingSummary(work.summary)
       setPendingCitationInfo(work.citation_information)
       setNick(nickResponse.data.data.key)
-    }).catch((error) => {
+    }).catch((error: any) => {
       console.error(error)
     })
   }
@@ -119,7 +119,7 @@ function Work(props: any) {
 
   // Handle click events on nick links using event delegation
   useEffect(() => {
-    const handleNickLinkClick = (e) => {
+    const handleNickLinkClick = (e: any) => {
       const target = e.target.closest('.nick-link')
       if (target && target.dataset.nick) {
         e.preventDefault()
@@ -150,25 +150,25 @@ function Work(props: any) {
     var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.work, id)
-      .then((response) => {
+      .then((response: any) => {
         notesResponse = response
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
 
     return notesResponse
   }
 
-  const handleUpdateAuthor = (authorId, authorName) => {
+  const handleUpdateAuthor = (authorId: any, authorName: any) => {
     setPendingAuthorName(authorName)
     setPendingAuthorId(authorId)
   }
 
-  const handleCreateAuthorAndAssign = (authorName) => {
+  const handleCreateAuthorAndAssign = (authorName: any) => {
     setPendingAuthorName(authorName)
     db.createAndLinkToRecord(db.types.auth, authorName, db.types.work, id).then(
-      (response) => {
+      (response: any) => {
         setPendingAuthorId(response.data.data.id)
       },
     )
@@ -206,13 +206,13 @@ function Work(props: any) {
     })
   }
 
-  const handleNewPile = async (pile) => {
+  const handleNewPile = async (pile: any) => {
     db.addLinkToRecord(db.types.pile, pile, db.types.work, id).then(() => {
       fetchWorkInfo(id)
     })
   }
 
-  const handleCreatePileAndAssign = (pileName) => {
+  const handleCreatePileAndAssign = (pileName: any) => {
     db.createAndLinkToRecord(db.types.pile, pileName, db.types.work, id).then(
       () => {
         fetchWorkInfo(id)
@@ -230,7 +230,7 @@ function Work(props: any) {
     setEditPiles(false)
   }
 
-  const handlePileRemove = async (pileId) => {
+  const handlePileRemove = async (pileId: any) => {
     db.removeFromRecord(db.types.pile, pileId, db.types.work, id).then(() => {
       fetchWorkInfo(id)
     })
@@ -245,12 +245,12 @@ function Work(props: any) {
         return
       }
       navigate('/note/' + noteId + '/edit')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating note', error)
     }
   }
 
-  const createNotesForWorkFromImages = async (images, onProgress) => {
+  const createNotesForWorkFromImages = async (images: any, onProgress: any) => {
     if (!images?.length) {
       return
     }
@@ -270,14 +270,14 @@ function Work(props: any) {
         await db.getNoteTextOCR(noteId)
         completed += 1
         if (onProgress) onProgress(completed, images.length)
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating note from image', error)
         completed += 1
         if (onProgress) onProgress(completed, images.length)
       }
     }
 
-    setNotesRefreshKey((prev) => prev + 1)
+    setNotesRefreshKey((prev: any) => prev + 1)
   }
 
   const toggleStar = () => {
@@ -317,7 +317,7 @@ function Work(props: any) {
             name="Title"
             id="title"
             defaultValue={pendingWorkTitle}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setPendingWorkTitle(e.target.value)
             }}
           />
@@ -336,7 +336,7 @@ function Work(props: any) {
             name="Citation Information"
             id="citation-info"
             defaultValue={pendingCitationInfo}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setPendingCitationInfo(e.target.value)
             }}
           />
@@ -345,7 +345,7 @@ function Work(props: any) {
             name="URL"
             id="url"
             defaultValue={pendingUrl}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setPendingUrl(e.target.value)
             }}
           />
@@ -353,7 +353,7 @@ function Work(props: any) {
             name="Year"
             id="year"
             defaultValue={pendingYear}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setPendingYear(e.target.value)
             }}
           />
@@ -361,9 +361,9 @@ function Work(props: any) {
             name="Summary"
             id="summary"
             value={pendingSummary}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setPendingSummary(e.target.value)
-              autosize(document.querySelector('#summary'))
+              autosize(document.querySelector('#summary') as HTMLElement)
             }}
           />
         </TopLevelFormContainer>
@@ -407,7 +407,7 @@ function Work(props: any) {
               apiType={db.types.pile}
               handleNewSelect={handleCreatePileAndAssign}
               clearOnSelect={true}
-              excludeIds={piles?.map((pile) => pile._id)}
+              excludeIds={piles?.map((pile: any) => pile._id)}
             />
           </TopLevelStandardButtonContainer>
           <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1 }}>
@@ -522,9 +522,9 @@ function Work(props: any) {
             name="Import Notes"
             id="import-text"
             value={pendingImportText}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setPendingImportText(e.target.value)
-              autosize(document.querySelector('#import-text'))
+              autosize(document.querySelector('#import-text') as HTMLElement)
             }}
           />
           <TopLevelStandardButtonContainer>

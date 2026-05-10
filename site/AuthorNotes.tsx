@@ -13,16 +13,16 @@ import {
 } from './TopLevelHeadings'
 
 function AuthorNotes(props: any) {
-  const { id } = useParams()
+  const { id = '' } = useParams()
   const [authorName, setAuthorName] = useState('')
   const navigate = useNavigate()
 
-  const fetchAuthorInfo = (id) => {
+  const fetchAuthorInfo = (id: any) => {
     db.getInfo(db.types.auth, id)
-      .then((response) => {
+      .then((response: any) => {
         setAuthorName(response.data.data.name)
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
   }

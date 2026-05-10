@@ -25,7 +25,7 @@ function PinButton({
     return () => window.removeEventListener('pinned-items-updated', handleUpdate)
   }, [type, id])
 
-  const handleClick = (event) => {
+  const handleClick = (event: any) => {
     if (stopPropagation && event) {
       event.preventDefault()
       event.stopPropagation()
@@ -76,7 +76,7 @@ export function TopLevelStarButton({ type, id, label, href }: any) {
     return () => window.removeEventListener('pinned-items-updated', handleUpdate)
   }, [type, id])
 
-  const handleClick = (event) => {
+  const handleClick = (event: any) => {
     if (event) {
       event.preventDefault()
       event.stopPropagation()

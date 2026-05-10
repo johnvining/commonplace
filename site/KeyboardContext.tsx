@@ -27,12 +27,18 @@ const scopePriority = {
 }
 
 export function KeyboardProvider({ children }: any) {
-  const handlers = useRef(new Map())
+  interface HandlerEntry {
+    scope: string
+    handler: KeyHandler
+    priority: number
+  }
+
+  const handlers = useRef<Map<number, HandlerEntry>>(new Map())
   const handlerId = useRef(0)
-  const scopeCounts = useRef(new Map())
+  const scopeCounts = useRef<Map<string, number>>(new Map())
   const [activeScopes, setActiveScopes] = useState<Set<string>>(new Set())
 
-  const updateScopeCount = useCallback((scope, delta) => {
+  const updateScopeCount = useCallback((scope: string, delta: number) => {
     const current = scopeCounts.current.get(scope) || 0
     const next = current + delta
     if (next <= 0) {
@@ -43,25 +49,33 @@ export function KeyboardProvider({ children }: any) {
     setActiveScopes(new Set(scopeCounts.current.keys()))
   }, [])
 
-  const register = useCallback((scope, handler) => {
+  const register = useCallback((scope: string, handler: KeyHandler) => {
     const id = ++handlerId.current
-    handlers.current.set(id, { scope, handler, priority: scopePriority[scope] || 10 })
+    handlers.current.set(id, {
+      scope,
+      handler,
+      priority: scopePriority[scope] ?? 10,
+    })
     updateScopeCount(scope, 1)
     return id
   }, [updateScopeCount])
 
-  const unregister = useCallback((id) => {
+  const unregister = useCallback((id: number) => {
     const entry = handlers.current.get(id)
     if (!entry) return
     handlers.current.delete(id)
     updateScopeCount(entry.scope, -1)
   }, [updateScopeCount])
 
-  const handleKeyDown = useCallback((event) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
     // Skip if user is typing in a non-shortcut input
-    const target = event.target
-    const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable
-    const allowInputShortcuts = target?.dataset?.allowShortcuts === 'true'
+    const target = event.target as HTMLElement | null
+    if (!target) return
+    const isInput =
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable
+    const allowInputShortcuts = target.dataset?.allowShortcuts === 'true'
 
     // For inputs, only process Escape, Enter, and Ctrl+key combinations
     if (
@@ -76,7 +90,7 @@ export function KeyboardProvider({ children }: any) {
 
     // Sort handlers by priority (most specific first)
     const sortedHandlers = Array.from(handlers.current.values())
-      .sort((a, b) => a.priority - b.priority)
+      .sort((a: any, b: any) => a.priority - b.priority)
 
     // Try each handler until one handles the event
     for (const { handler } of sortedHandlers) {
@@ -117,7 +131,7 @@ export function useKeyboardShortcuts(scope: string, handler: KeyHandler, deps: u
     if (!register || !unregister) return
 
     // Use a wrapper that calls the ref so we always get the latest handler
-    const wrappedHandler: KeyHandler = (event) => handlerRef.current(event)
+    const wrappedHandler: KeyHandler = (event: any) => handlerRef.current(event)
     const id = register(scope, wrappedHandler)
     return () => unregister(id)
   }, [register, unregister, scope])
@@ -138,7 +152,7 @@ function isKey(event: KeyboardEvent, keyCode: number, { ctrl = false, shift = fa
   )
 }
 
-function isHelpToggle(event) {
+function isHelpToggle(event: KeyboardEvent) {
   if (!event.ctrlKey) return false
   if (event.key === '/' || event.key === '?') return true
   if (event.code === 'Slash') return true
@@ -149,60 +163,60 @@ function isHelpToggle(event) {
 export const shortcuts = {
   // 1. Global
   global: {
-    toggleSearchBar: (e) => isKey(e, constants.keyCodes.open, { ctrl: true }),
-    toggleHelp: (e) => isHelpToggle(e),
-    viewFull: (e) => isKey(e, constants.keyCodes.full, { ctrl: true, shift: true }),
-    viewSlim: (e) => isKey(e, constants.keyCodes.slim, { ctrl: true, shift: true }),
-    viewGrid: (e) => isKey(e, constants.keyCodes.grid, { ctrl: true, shift: true }),
-    viewTile: (e) => isKey(e, constants.keyCodes.tile, { ctrl: true, shift: true }),
+    toggleSearchBar: (e: KeyboardEvent) => isKey(e, constants.keyCodes.open, { ctrl: true }),
+    toggleHelp: (e: KeyboardEvent) => isHelpToggle(e),
+    viewFull: (e: KeyboardEvent) => isKey(e, constants.keyCodes.full, { ctrl: true, shift: true }),
+    viewSlim: (e: KeyboardEvent) => isKey(e, constants.keyCodes.slim, { ctrl: true, shift: true }),
+    viewGrid: (e: KeyboardEvent) => isKey(e, constants.keyCodes.grid, { ctrl: true, shift: true }),
+    viewTile: (e: KeyboardEvent) => isKey(e, constants.keyCodes.tile, { ctrl: true, shift: true }),
   },
 
   // 2. Search Bar
   searchBar: {
-    close: (e) => isKey(e, constants.keyCodes.esc),
-    execute: (e) => isKey(e, constants.keyCodes.enter),
-    back: (e) => isKey(e, constants.keyCodes.delete),
+    close: (e: KeyboardEvent) => isKey(e, constants.keyCodes.esc),
+    execute: (e: KeyboardEvent) => isKey(e, constants.keyCodes.enter),
+    back: (e: KeyboardEvent) => isKey(e, constants.keyCodes.delete),
   },
 
   // 3. Entity Pages
   entity: {
-    edit: (e) => isKey(e, constants.keyCodes.edit, { ctrl: true }),
-    save: (e) => isKey(e, constants.keyCodes.accept, { ctrl: true }),
-    exitEdit: (e) => isKey(e, constants.keyCodes.esc),
-    newNote: (e) => isKey(e, constants.keyCodes.new, { ctrl: true }),
-    editPiles: (e) => isKey(e, constants.keyCodes.piles, { ctrl: true }),
-    star: (e) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
+    edit: (e: KeyboardEvent) => isKey(e, constants.keyCodes.edit, { ctrl: true }),
+    save: (e: KeyboardEvent) => isKey(e, constants.keyCodes.accept, { ctrl: true }),
+    exitEdit: (e: KeyboardEvent) => isKey(e, constants.keyCodes.esc),
+    newNote: (e: KeyboardEvent) => isKey(e, constants.keyCodes.new, { ctrl: true }),
+    editPiles: (e: KeyboardEvent) => isKey(e, constants.keyCodes.piles, { ctrl: true }),
+    star: (e: KeyboardEvent) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
   },
 
   // 4. Note List
   noteList: {
-    select: (e) => isKey(e, constants.keyCodes.enter),
-    deselect: (e) => isKey(e, constants.keyCodes.esc),
-    edit: (e) => isKey(e, constants.keyCodes.edit, { ctrl: true }),
-    editIdeas: (e) => isKey(e, constants.keyCodes.ideas, { ctrl: true }),
-    editPiles: (e) => isKey(e, constants.keyCodes.piles, { ctrl: true }),
+    select: (e: KeyboardEvent) => isKey(e, constants.keyCodes.enter),
+    deselect: (e: KeyboardEvent) => isKey(e, constants.keyCodes.esc),
+    edit: (e: KeyboardEvent) => isKey(e, constants.keyCodes.edit, { ctrl: true }),
+    editIdeas: (e: KeyboardEvent) => isKey(e, constants.keyCodes.ideas, { ctrl: true }),
+    editPiles: (e: KeyboardEvent) => isKey(e, constants.keyCodes.piles, { ctrl: true }),
   },
 
   // 5. Note Editing
   note: {
-    save: (e) => isKey(e, constants.keyCodes.accept, { ctrl: true }),
-    exitEdit: (e) => isKey(e, constants.keyCodes.esc),
-    format: (e) => isKey(e, constants.keyCodes.format, { ctrl: true }),
-    suggestTitle: (e) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
-    ocr: (e) => isKey(e, constants.keyCodes.ocr, { ctrl: true }),
-    toggleImage: (e) => isKey(e, constants.keyCodes.image, { ctrl: true }),
-    prevImage: (e) => isKey(e, constants.keyCodes.prevImage, { ctrl: true }),
-    nextImage: (e) => isKey(e, constants.keyCodes.nextImage, { ctrl: true }),
-    editLinks: (e) => isKey(e, constants.keyCodes.link, { ctrl: true }),
-    addLink: (e) => isKey(e, constants.keyCodes.enter),
-    star: (e) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
+    save: (e: KeyboardEvent) => isKey(e, constants.keyCodes.accept, { ctrl: true }),
+    exitEdit: (e: KeyboardEvent) => isKey(e, constants.keyCodes.esc),
+    format: (e: KeyboardEvent) => isKey(e, constants.keyCodes.format, { ctrl: true }),
+    suggestTitle: (e: KeyboardEvent) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
+    ocr: (e: KeyboardEvent) => isKey(e, constants.keyCodes.ocr, { ctrl: true }),
+    toggleImage: (e: KeyboardEvent) => isKey(e, constants.keyCodes.image, { ctrl: true }),
+    prevImage: (e: KeyboardEvent) => isKey(e, constants.keyCodes.prevImage, { ctrl: true }),
+    nextImage: (e: KeyboardEvent) => isKey(e, constants.keyCodes.nextImage, { ctrl: true }),
+    editLinks: (e: KeyboardEvent) => isKey(e, constants.keyCodes.link, { ctrl: true }),
+    addLink: (e: KeyboardEvent) => isKey(e, constants.keyCodes.enter),
+    star: (e: KeyboardEvent) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
   },
 
   // 6. Autocomplete
   autocomplete: {
-    close: (e) => isKey(e, constants.keyCodes.esc),
-    back: (e) => isKey(e, constants.keyCodes.delete),
-    suggestIdeas: (e) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
+    close: (e: KeyboardEvent) => isKey(e, constants.keyCodes.esc),
+    back: (e: KeyboardEvent) => isKey(e, constants.keyCodes.delete),
+    suggestIdeas: (e: KeyboardEvent) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
   },
 }
 

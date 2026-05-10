@@ -126,18 +126,18 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
 
   return (
     <div className="help-overlay" onClick={onClose}>
-      <div className="help-overlay-content" onClick={(e) => e.stopPropagation()}>
+      <div className="help-overlay-content" onClick={(e: any) => e.stopPropagation()}>
         <div className="help-overlay-header">
           <h2>Keyboard Shortcuts</h2>
           <span className="help-overlay-hint">Press Ctrl+/ or Escape or click outside to close</span>
         </div>
         <div className="help-overlay-sections">
-          {sections.map((section) => (
+          {sections.map((section: any) => (
             <div key={section.title} className="help-section">
               <h3>{section.title}</h3>
               <table>
                 <tbody>
-                  {section.shortcuts.map((shortcut) => (
+                  {section.shortcuts.map((shortcut: any) => (
                     <tr key={shortcut.key + shortcut.action}>
                       <td className="help-key">
                         <kbd>{shortcut.key}</kbd>

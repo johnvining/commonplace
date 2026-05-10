@@ -18,7 +18,7 @@ import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
 function Idea(props: any) {
-  const { id } = useParams()
+  const { id = '' } = useParams()
   const [edit, setEdit] = useState(false)
   const [pendingName, setPendingName] = useState('')
   const [pendingStartYear, setPendingStartYear] = useState('')
@@ -26,7 +26,7 @@ function Idea(props: any) {
   const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
-  const fetchIdeaInfo = (ideaId) => {
+  const fetchIdeaInfo = (ideaId: any) => {
     Promise.all([
       db.getInfo(db.types.idea, ideaId),
       db.getIdeaNick(ideaId),
@@ -36,7 +36,7 @@ function Idea(props: any) {
       setPendingStartYear(idea.start_year)
       setPendingEndYear(idea.end_year)
       setNick(nickResponse.data.data.key)
-    }).catch((error) => {
+    }).catch((error: any) => {
       console.error(error)
     })
   }
@@ -49,10 +49,10 @@ function Idea(props: any) {
     var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.idea, id)
-      .then((response) => {
+      .then((response: any) => {
         notesResponse = response
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
 
@@ -90,7 +90,7 @@ function Idea(props: any) {
       // Add the idea to the new note
       await db.addLinkToRecord(db.types.idea, id, db.types.note, noteId)
       navigate('/note/' + noteId + '/edit')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating note for idea', error)
     }
   }
@@ -126,7 +126,7 @@ function Idea(props: any) {
               name="Name"
               id="title"
               defaultValue={pendingName}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingName(e.target.value)
               }}
             />
@@ -134,7 +134,7 @@ function Idea(props: any) {
               name="Start Year"
               id="startYear"
               defaultValue={pendingStartYear}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingStartYear(e.target.value)
               }}
             />
@@ -142,7 +142,7 @@ function Idea(props: any) {
               name="End Year"
               id="endYear"
               defaultValue={pendingEndYear}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingEndYear(e.target.value)
               }}
             />

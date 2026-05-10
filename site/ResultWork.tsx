@@ -12,12 +12,12 @@ class ResultWork extends React.Component<any, any> {
     var work = this.props.work
     var pilesToShow = this.props.work.piles
       ?.filter(
-        (pile) =>
+        (pile: any) =>
           pile.name?.includes('Location: ') ||
           pile.name?.includes('Status: ') ||
           pile.name?.includes('Reading: '),
       )
-      .sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
+      .sort((a: any, b: any) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
 
     return (
       <Link to={`/work/${work._id}`}>

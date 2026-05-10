@@ -19,7 +19,7 @@ function Load(props: any) {
   const cancelRef = React.useRef(false)
   const navigate = useNavigate()
 
-  const parseUrlLine = (line) => {
+  const parseUrlLine = (line: any) => {
     const trimmed = line.trim()
     if (!trimmed) return null
     if (/^https?:\/\//i.test(trimmed)) {
@@ -31,7 +31,7 @@ function Load(props: any) {
   const importUrlsAsNotes = async () => {
     const lines = pendingImportText
       .split(/\r?\n/)
-      .map((line) => line.trim())
+      .map((line: any) => line.trim())
       .filter(Boolean)
     setPendingImportText('')
     let importedCount = 0
@@ -42,11 +42,11 @@ function Load(props: any) {
       const suggestions = await db.getSuggestions(db.types.pile, reviewPileName)
       const options = suggestions?.data?.data || []
       const exactMatch = options.find(
-        (item) =>
+        (item: any) =>
           item?.name?.toLowerCase() === reviewPileName.toLowerCase()
       )
       reviewPileId = exactMatch?._id || exactMatch?.id || null
-    } catch (error) {
+    } catch (error: any) {
       reviewPileId = null
     }
 
@@ -54,7 +54,7 @@ function Load(props: any) {
       try {
         const created = await db.createRecord(db.types.pile, reviewPileName)
         reviewPileId = created?.data?.data?._id || null
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating review pile', error)
       }
     }
@@ -181,9 +181,9 @@ function Load(props: any) {
           name={importFormat === 'csv' ? 'Import CSV' : importFormat === 'instapaper' ? 'Import Instapaper TSV' : 'Import URLs'}
           id="import-text"
           defaultValue={pendingImportText}
-          onChange={(e) => {
+          onChange={(e: any) => {
             setPendingImportText(e.target.value)
-            autosize(document.querySelector('#import-text'))
+            autosize(document.querySelector('#import-text') as HTMLElement)
           }}
         />
         <TopLevelStandardButtonContainer>

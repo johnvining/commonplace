@@ -18,7 +18,7 @@ import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { togglePinned } from './pinned'
 
 function Author(props: any) {
-  const { id } = useParams()
+  const { id = '' } = useParams()
   const [edit, setEdit] = useState(false)
   const [pendingName, setPendingName] = useState('')
   const [pendingBirthYear, setPendingBirthYear] = useState('')
@@ -27,25 +27,25 @@ function Author(props: any) {
   const [works, setWorks] = useState<any>(null)
   const navigate = useNavigate()
 
-  const fetchAuthorInfo = (id) => {
+  const fetchAuthorInfo = (id: any) => {
     db.getInfo(db.types.auth, id)
-      .then((response) => {
+      .then((response: any) => {
         setPendingName(response.data.data.name)
         setPendingBirthYear(response.data.data.birth_year)
         setPendingDeathYear(response.data.data.death_year)
         setPendingUsernames((response.data.data.usernames ?? []).join(', '))
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
   }
 
-  const fetchAuthorWorks = (id) => {
+  const fetchAuthorWorks = (id: any) => {
     db.getRecordsWithFilter(db.types.work, db.types.auth, id)
-      .then((response) => {
+      .then((response: any) => {
         setWorks(response.data.data)
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
   }
@@ -95,7 +95,7 @@ function Author(props: any) {
               id="name"
               name="Name"
               defaultValue={pendingName}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingName(e.target.value)
               }}
             />
@@ -103,7 +103,7 @@ function Author(props: any) {
               id="birth-year"
               name="Birth Year"
               defaultValue={pendingBirthYear}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingBirthYear(e.target.value)
               }}
             />
@@ -111,7 +111,7 @@ function Author(props: any) {
               id="death-year"
               name="Death Year"
               defaultValue={pendingDeathYear}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingDeathYear(e.target.value)
               }}
             />
@@ -119,7 +119,7 @@ function Author(props: any) {
               id="usernames"
               name="Usernames"
               defaultValue={pendingUsernames}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingUsernames(e.target.value)
               }}
             />
@@ -174,7 +174,7 @@ function Author(props: any) {
       </div>
 
       {/* Work List */}
-      {works?.map((work, workindex) => (
+      {works?.map((work: any, workindex: any) => (
         <div key={'work-listing-' + workindex}>
           <ResultWork work={work} key={'work-' + work._id} />
         </div>

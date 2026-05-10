@@ -46,7 +46,7 @@ function NickView(props: any) {
             }
             return
         }
-      } catch (resolveError) {
+      } catch (resolveError: any) {
         console.error('Error fetching nick', resolveError)
         if (isMounted) {
           setError(true)

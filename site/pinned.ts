@@ -23,7 +23,7 @@ const readStorage = (): StoragePayload => {
       return { items: [] }
     }
     return parsed
-  } catch (error) {
+  } catch (error: any) {
     console.error('Pinned storage parse error:', error)
     return { items: [] }
   }
@@ -39,7 +39,7 @@ export const getPinnedItems = (): PinnedItem[] => {
 }
 
 export const isPinned = (type: EntityType, id: EntityId): boolean => {
-  return getPinnedItems().some((item) => item.type === type && item.id === id)
+  return getPinnedItems().some((item: any) => item.type === type && item.id === id)
 }
 
 const pinItem = ({ type, id, label, href }: PinnedItem): void => {
@@ -47,7 +47,7 @@ const pinItem = ({ type, id, label, href }: PinnedItem): void => {
   const items = getPinnedItems()
   const next: PinnedItem[] = [
     { type, id, label, href, pinnedAt: Date.now() },
-    ...items.filter((item) => !(item.type === type && item.id === id)),
+    ...items.filter((item: any) => !(item.type === type && item.id === id)),
   ]
   writeStorage(next)
   window.dispatchEvent(new Event('pinned-items-updated'))
@@ -55,7 +55,7 @@ const pinItem = ({ type, id, label, href }: PinnedItem): void => {
 
 export const unpinItem = (type: EntityType, id: EntityId): void => {
   const items = getPinnedItems()
-  const next = items.filter((item) => !(item.type === type && item.id === id))
+  const next = items.filter((item: any) => !(item.type === type && item.id === id))
   writeStorage(next)
   window.dispatchEvent(new Event('pinned-items-updated'))
 }

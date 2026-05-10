@@ -20,7 +20,7 @@ import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
 
 function Pile(props: any) {
-  const { id } = useParams()
+  const { id = '' } = useParams()
   const [edit, setEdit] = useState(false)
   const [pendingName, setPendingName] = useState('')
   const [pendingStartYear, setPendingStartYear] = useState('')
@@ -28,7 +28,7 @@ function Pile(props: any) {
   const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
-  const fetchPileInfo = (pileId) => {
+  const fetchPileInfo = (pileId: any) => {
     Promise.all([
       db.getInfo(db.types.pile, pileId),
       db.getPileNick(pileId),
@@ -38,7 +38,7 @@ function Pile(props: any) {
       setPendingStartYear(pile.start_year)
       setPendingEndYear(pile.end_year)
       setNick(nickResponse.data.data.key)
-    }).catch((error) => {
+    }).catch((error: any) => {
       console.error(error)
     })
   }
@@ -60,10 +60,10 @@ function Pile(props: any) {
     var notesResponse
     await db
       .getRecordsWithFilter(db.types.note, db.types.pile, id)
-      .then((response) => {
+      .then((response: any) => {
         notesResponse = response
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
 
@@ -74,10 +74,10 @@ function Pile(props: any) {
     var worksResponse
     await db
       .getRecordsWithFilter(db.types.work, db.types.pile, id)
-      .then((response) => {
+      .then((response: any) => {
         worksResponse = response
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
 
@@ -106,7 +106,7 @@ function Pile(props: any) {
       // Add the pile to the new note
       await db.addLinkToRecord(db.types.pile, id, db.types.note, noteId)
       navigate('/note/' + noteId + '/edit')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating note for pile', error)
     }
   }
@@ -142,7 +142,7 @@ function Pile(props: any) {
               name="Name"
               id="title"
               defaultValue={pendingName}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingName(e.target.value)
               }}
             />
@@ -150,7 +150,7 @@ function Pile(props: any) {
               name="Start Year"
               id="startYear"
               defaultValue={pendingStartYear}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingStartYear(e.target.value)
               }}
             />
@@ -158,7 +158,7 @@ function Pile(props: any) {
               name="End Year"
               id="endYear"
               defaultValue={pendingEndYear}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setPendingEndYear(e.target.value)
               }}
             />

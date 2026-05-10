@@ -28,7 +28,7 @@ function SearchBar(props: any) {
         }
         props.beforeNavigate()
         navigate('/note/' + noteId + '/edit')
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error creating note', error)
       }
       return
@@ -121,7 +121,7 @@ function SearchBar(props: any) {
         }
         const normalized = currentText.trim().toLowerCase()
         const exactMatch =
-          options.find((item) => item?.name?.toLowerCase() === normalized) ||
+          options.find((item: any) => item?.name?.toLowerCase() === normalized) ||
           options[0]
         const id = exactMatch?._id || exactMatch?.id
         if (!id) {
@@ -130,7 +130,7 @@ function SearchBar(props: any) {
         props.beforeNavigate()
         navigate('/' + currentModifier + '/' + id)
         return
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching suggestions', error)
         return
       }
@@ -165,7 +165,7 @@ function SearchBar(props: any) {
         default:
           setSearchError('Nick not found')
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching nick', error)
       setSearchError('Nick not found')
     }
@@ -174,7 +174,7 @@ function SearchBar(props: any) {
   // Section 2: Search Bar keyboard shortcuts
   useKeyboardShortcuts(
     constants.keyboardScopes.SEARCH_BAR,
-    (event) => {
+    (event: any) => {
       const target = event.target as HTMLElement | null
       const isAutocompleteOption = target?.tagName === 'BUTTON' &&
         target?.classList?.contains('option')
@@ -208,7 +208,7 @@ function SearchBar(props: any) {
     [modifier, typedText]
   )
 
-  const handleTextChange = (input) => {
+  const handleTextChange = (input: any) => {
     setSearchError('')
     setTypedText(input.target.value)
     if (!modifier) {
@@ -229,7 +229,7 @@ function SearchBar(props: any) {
     }
   }
 
-  const handleUpdate = (id) => {
+  const handleUpdate = (id: any) => {
     switch (modifier) {
       case constants.modifiers.auth:
       case constants.modifiers.idea:
@@ -244,7 +244,7 @@ function SearchBar(props: any) {
     return
   }
 
-  const getSuggestions = (type, val) => {
+  const getSuggestions = (type: any, val: any) => {
     var dbType = modifierToDbTypes(modifier)
     if (dbType) {
       return db.getSuggestions(dbType, val)
@@ -253,10 +253,11 @@ function SearchBar(props: any) {
     return null
   }
 
-  const handleCreate = async (typedValue) => {
-    var dbType = modifierToDbTypes(modifier)
+  const handleCreate = async (typedValue: any) => {
+    const dbType = modifierToDbTypes(modifier)
+    if (!dbType) return
     try {
-      var newRecord = await db.createRecord(dbType, typedValue)
+      const newRecord = await db.createRecord(dbType, typedValue)
       const newId = newRecord?.data?.data?._id
       if (!newId) {
         console.error('Create record response missing id', newRecord)
@@ -264,12 +265,12 @@ function SearchBar(props: any) {
       }
       props.beforeNavigate()
       navigate('/' + dbType + '/' + newId)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating record', error)
     }
   }
 
-  const modifierToDbTypes = (modifier) => {
+  const modifierToDbTypes = (modifier: any) => {
     switch (modifier) {
       case constants.modifiers.auth:
         return db.types.auth
@@ -328,7 +329,7 @@ function SearchBar(props: any) {
           data-allow-shortcuts="true"
           autoFocus
           value={typedText}
-          onChange={(event) => handleTextChange(event)}
+          onChange={(event: any) => handleTextChange(event)}
         ></input>
       )}
     </div>

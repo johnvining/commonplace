@@ -35,7 +35,7 @@ class Autocomplete extends React.Component<any, any> {
   }
 
   // Section 6: Autocomplete keyboard shortcuts - called from wrapper
-  handleKeyboardShortcut(event) {
+  handleKeyboardShortcut(event: any) {
     // Section 6.1: Navigation
     if (shortcuts.autocomplete.close(event)) {
       if (this.props.onClose) {
@@ -84,7 +84,7 @@ class Autocomplete extends React.Component<any, any> {
 
   _debounceTimer: ReturnType<typeof setTimeout> | null = null
 
-  handleTypingChange = (val) => {
+  handleTypingChange = (val: any) => {
     this.setState(
       { hideResults: false, currentTypedText: val.target.value },
       () => {
@@ -94,7 +94,7 @@ class Autocomplete extends React.Component<any, any> {
     )
   }
 
-  handleInputKeyDown = (event) => {
+  handleInputKeyDown = (event: any) => {
     if (event.keyCode === 9) {
       const container = this.containerRef.current
       const firstOption = container?.querySelector('button.option') as HTMLElement | null
@@ -112,7 +112,7 @@ class Autocomplete extends React.Component<any, any> {
     }
   }
 
-  handleOptionKeyDown = (event) => {
+  handleOptionKeyDown = (event: any) => {
     if (event.keyCode === constants.keyCodes.enter) {
       event.preventDefault()
       event.stopPropagation()
@@ -152,7 +152,7 @@ class Autocomplete extends React.Component<any, any> {
     }
     this.props
       .getSuggestions(this.props.apiType, this.state.currentTypedText)
-      .then((response) => {
+      .then((response: any) => {
         let options = response.data.data
         let hasExact = false
         for (let i = 0; i < options.length; i++) {
@@ -163,13 +163,13 @@ class Autocomplete extends React.Component<any, any> {
         }
         if (this.props.excludeIds) {
           options = options.filter(
-            (item) => !this.props.excludeIds.includes(item._id)
+            (item: any) => !this.props.excludeIds.includes(item._id)
           )
         }
 
         if (this.props.excludeNames) {
           options = options.filter(
-            (item) => !this.props.excludeNames.includes(item.name)
+            (item: any) => !this.props.excludeNames.includes(item.name)
           )
         }
         this.setState({
@@ -177,18 +177,18 @@ class Autocomplete extends React.Component<any, any> {
           responseIncludesExactMatch: hasExact,
         })
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error(error)
       })
   }
 
   handleFetchIdeaSuggestions = () => {
     this.setState({ fetchingIdeaSuggestions: true, hideResults: true })
-    this.props.getIdeaSuggestions().then((response) => {
+    this.props.getIdeaSuggestions().then((response: any) => {
       let suggested_ideas = response.data.suggested_ideas
       if (this.props.excludeNames) {
         suggested_ideas = suggested_ideas.filter(
-          (item) => !this.props.excludeNames.includes(item)
+          (item: any) => !this.props.excludeNames.includes(item)
         )
       }
       this.setState({
@@ -198,7 +198,7 @@ class Autocomplete extends React.Component<any, any> {
     })
   }
 
-  handleOptionSelect = (val) => {
+  handleOptionSelect = (val: any) => {
     if (val?.preventDefault) {
       val.preventDefault()
     }
@@ -229,7 +229,7 @@ class Autocomplete extends React.Component<any, any> {
     }
   }
 
-  handleSuggestionSelect = (val) => {
+  handleSuggestionSelect = (val: any) => {
     this.setState(
       {
         currentTypedText: val.target.name,
@@ -292,7 +292,7 @@ class Autocomplete extends React.Component<any, any> {
             {/* Generated Options */}
             {this.state.suggested_ideas != null ? (
               <ul className={this.style.ul}>
-                {this.state.suggested_ideas?.map((val) => {
+                {this.state.suggested_ideas?.map((val: any) => {
                   return (
                     <li key={val} className={this.style.li}>
                       <button
@@ -315,7 +315,7 @@ class Autocomplete extends React.Component<any, any> {
           <>
             {/* Options */}
             <ul className={this.style.ul}>
-              {responses?.map((res) => {
+              {responses?.map((res: any) => {
                 const optionId = res?._id || res?.id
                 return (
                   <li key={optionId} className={this.style.li}>
@@ -362,7 +362,7 @@ function AutocompleteWithKeyboard(props: any) {
   // Section 6: Autocomplete keyboard shortcuts
   useKeyboardShortcuts(
     constants.keyboardScopes.AUTOCOMPLETE,
-    (event) => {
+    (event: any) => {
       if (!autocompleteRef.current) return false
       return autocompleteRef.current.handleKeyboardShortcut(event)
     },
