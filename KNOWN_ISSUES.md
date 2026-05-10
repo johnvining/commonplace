@@ -34,6 +34,20 @@ Issues discovered during cleanup and TypeScript migration that are out of scope 
 
 **Suggested fix.** Move secrets to environment variables (or a `.env` file with `dotenv`, which is already in deps). The config layer would read from `process.env.JWT_SECRET`, `process.env.OPENAI_API_KEY`, etc.
 
+## Internal `server/src/cli/cli.ts` is broken / stale
+
+**Symptom.** `server/src/cli/cli.ts` (run via `npm run cli`) references identifiers that don't exist in the current codebase: `getTenMostRecentNotes`, `addIdeaToID`, bare `database`, `schemata`, `i`. The file would crash at runtime if invoked.
+
+**Suggested fix.** Either rewrite to the current controller surface or delete entirely. The user-facing CLI is `cplace` in `cli/cp.js` — that one is alive and well. The internal one in `server/src/cli/` looks superseded.
+
+For now `// @ts-nocheck` is on the file so the TS migration can proceed.
+
+## `cli/cp.js` and `cli/import.js` reference `utils.guessYearFromURL` (uppercase URL) which doesn't exist
+
+**Symptom.** `server/src/cli/import.ts` calls `utils.guessYearFromURL(url)` but the actual export in `server/src/utils/urls.ts` is `guessYearFromUrl` (lowercase `Url`). The call returns undefined. Year-from-URL inference doesn't work in CSV imports.
+
+**Suggested fix.** Either rename the export to match (`guessYearFromURL`) or fix the callers to use `guessYearFromUrl`. Watch out for the namespace import at the top: `import * as utils from '../utils'` — that's importing from a directory, not from `urls.ts`, so it's broken too. The proper import is `import { guessYearFromUrl } from '../utils/urls'`.
+
 ## Cookie behavior is environment-aware in a way that breaks tests by default
 
 **Symptom.** When `NODE_ENV !== 'development'`, the JWT cookie is set with `secure: true`. Vitest defaults `NODE_ENV` to `'test'`, which silently breaks all authenticated requests in tests because supertest doesn't use HTTPS.

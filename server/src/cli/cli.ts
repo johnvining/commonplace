@@ -1,3 +1,6 @@
+// @ts-nocheck - this internal CLI predates the current shape of the controllers and references
+// functions/variables that no longer exist (database, schemata, getTenMostRecentNotes, addIdeaToID).
+// The user-facing CLI is `cplace` in /cli/; this file is effectively dead. Tracked in KNOWN_ISSUES.
 import promptFunc from 'prompt-sync'
 const prompt = promptFunc()
 import mongoose from 'mongoose'

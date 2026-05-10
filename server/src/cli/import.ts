@@ -70,8 +70,8 @@ export async function importCsvFromString(string, recordType) {
   return totalImports
 }
 
-function streamComplete(stream) {
-  return new Promise(function c(res) {
+function streamComplete(stream: any) {
+  return new Promise<void>(function c(res) {
     stream.on('end', function () {
       res()
     })
@@ -102,8 +102,8 @@ function getImportFunction(dataType) {
   return null
 }
 
-function parseNote(csvLine) {
-  var obj = {}
+function parseNote(csvLine: any): any {
+  var obj: any = {}
   obj.authorName = csvLine[0]
   obj.title = csvLine[1]
   obj.text = csvLine[2]
@@ -119,8 +119,8 @@ function parseNote(csvLine) {
 }
 
 // Columns from IFTTT Instapaper → Google Sheets: Article, Text, Note Url, Image Url, Title
-function parseInstapaper(tsvLine) {
-  var obj = {}
+function parseInstapaper(tsvLine: any): any {
+  var obj: any = {}
   obj.workName = tsvLine[0]
   obj.text = tsvLine[1]
   obj.url = tsvLine[2]
@@ -139,7 +139,7 @@ export async function getImageFromURL(url, dest) {
   if (!url) return
 
   var file = fs.createWriteStream(dest)
-  let htPromise = new Promise((resolve, reject) => {
+  let htPromise = new Promise<void>((resolve, reject) => {
     try {
       https.get(url, function (response) {
         response.pipe(file)
@@ -309,8 +309,8 @@ async function importInstapaperNote(importObject) {
   })
 }
 
-function parseWork(csvLine) {
-  var obj = {}
+function parseWork(csvLine: any): any {
+  var obj: any = {}
   obj.title = csvLine[0]
   obj.authorName = csvLine[1]
   obj.year = csvLine[2]
@@ -319,16 +319,16 @@ function parseWork(csvLine) {
   return obj
 }
 
-async function importWork(importObject) {
+async function importWork(importObject: any) {
   if (!importObject.title) return
 
-  let pilePromises = []
-  importObject.piles.map((pile) => {
+  let pilePromises: any[] = []
+  importObject.piles.map((pile: any) => {
     if (pile) pilePromises.push(PileControllers.findOrCreatePile(pile))
   })
 
   // TODO: Support different update behaviors: Overwrite,Clear,FillIn
-  let updateObject = {}
+  let updateObject: any = {}
   updateObject.author = await AuthControllers.findOrCreateAuthor(
     importObject.authorName
   )
@@ -338,7 +338,7 @@ async function importWork(importObject) {
       updateObject.year = importObject.year
     }
   } else if (importObject.url) {
-    updateObject.year = utils.guessYearFromURL(importObject.url)
+    updateObject.year = (utils as any).guessYearFromURL(importObject.url)
   }
 
   if (importObject.url) {
