@@ -65,11 +65,11 @@ export const filePilesByString = async function (string, withCounts) {
   if (!withCounts) {
     return piles
   } else {
-    let notePromises = [],
-      workPromises = []
+    const notePromises: Promise<number>[] = []
+    const workPromises: Promise<number>[] = []
     piles.map((pile) => {
-      notePromises.push(Note.find({ piles: pile._id }).countDocuments())
-      workPromises.push(Work.find({ piles: pile._id }).countDocuments())
+      notePromises.push(Note.find({ piles: pile._id }).countDocuments().exec())
+      workPromises.push(Work.find({ piles: pile._id }).countDocuments().exec())
     })
 
     let noteFiler = Promise.all(notePromises).then((result) => {
@@ -88,15 +88,15 @@ export const filePilesByString = async function (string, withCounts) {
   }
 }
 
-export const deletePile = async function (pileId) {
+export const deletePile = async function (pileId: string) {
   // TODO: Parallel
-  let notes = await findNotesAndPopulate(
+  const notes = await findNotesAndPopulate(
     { piles: pileId },
     { updatedAt: -1 },
     true
   )
-  let works = await getWorksForPile(pileId)
-  let deletionPromises = []
+  const works = await getWorksForPile(pileId)
+  const deletionPromises: Promise<unknown>[] = []
   notes.map((note) => {
     deletionPromises.push(updateNote(note._id, { $pull: { piles: pileId } }))
   })

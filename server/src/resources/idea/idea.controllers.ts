@@ -23,14 +23,14 @@ export const reqGetIdeasByStringWithCounts = async (req, res) => {
     }
 
     // TODO: Can we use slim here?
-    var notePromises = []
+    const notePromises: Promise<unknown[]>[] = []
     for (let i = 0; i < doc.length; i++) {
       notePromises.push(findNotesAndPopulate({ ideas: doc[i]._id }))
     }
 
     const notes = await Promise.all(notePromises)
 
-    var responseData = []
+    const responseData: any[] = []
     for (let i = 0; i < doc.length; i++) {
       let idea = (doc[i] as any)._doc
       let notesValues = { notes: notes[i] }
@@ -109,12 +109,11 @@ export const findOrCreateIdea = async function(name) {
   return await createIdea(name)
 }
 
-export const deleteIdea = async function(ideaId) {
-  let notes = await findNotesAndPopulate({ ideas: ideaId }, {}, true)
-  let deletionPromises = []
-  notes.map(note => {
-    deletionPromises.push(removeIdeaFromNote(note._id, ideaId))
-  })
+export const deleteIdea = async function(ideaId: string) {
+  const notes = await findNotesAndPopulate({ ideas: ideaId }, {}, true)
+  const deletionPromises: Promise<unknown>[] = notes.map((note) =>
+    removeIdeaFromNote(note._id, ideaId)
+  )
 
   await Promise.all(deletionPromises)
   await Idea.findOneAndDelete({ _id: ideaId })
