@@ -11,6 +11,7 @@ import controllers, {
   reqFindNotesByString,
   reqGetEarliestNotesToFile,
   reqGetImageForNote,
+  reqGetNoteByNick,
   reqGetNoteDetails,
   reqGetRandomNotes,
   reqGetRecentNotes,
@@ -43,6 +44,8 @@ router.route('/all/:skip').get(asyncWrapper(reqGetRecentNotes, 200))
 router.route('/file/:skip').get(asyncWrapper(reqGetEarliestNotesToFile, 200))
 
 router.route('/flip').get(asyncWrapper(reqGetRandomNotes, 200))
+
+router.route('/nick/:nick').get(asyncWrapper(reqGetNoteByNick, 200))
 
 router.route('/:id/idea').put(asyncWrapper(reqAddIdea, 200))
 router.route('/:id/idea/create').put(asyncWrapper(reqAddNewIdea, 201))

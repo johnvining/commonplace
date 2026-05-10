@@ -68,6 +68,14 @@ export const reqGetNoteDetails = async (req: Request, res: Response) => {
   return await findNotesAndPopulate({ _id: req.params.id }, null, false, null, null, null)
 }
 
+// Resolves a nick string → the populated note. Mirrors the shape returned by
+// reqGetNoteDetails so the frontend can swap calls transparently.
+export const reqGetNoteByNick = async (req: Request, res: Response) => {
+  const nickDoc = await Nick.findOne({ key: req.params.nick }).lean().exec()
+  if (!nickDoc?.note) return []
+  return await findNotesAndPopulate({ _id: nickDoc.note }, null, false, null, null, null)
+}
+
 export const reqDeleteNote = async (req: Request, res: Response) => {
   const id = req.params.id
   const note = await Note.findOne({ _id: id }).lean()

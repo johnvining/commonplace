@@ -42,6 +42,26 @@ describe('note CRUD', () => {
     })
   })
 
+  describe('GET /api/note/nick/:nick', () => {
+    it('resolves a nick to its note', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'NickMe' })
+      const nickRes = await agent.put(`/api/nick/note/${note._id}`).expect(200)
+      const nick = nickRes.body.data.key
+
+      const res = await agent.get(`/api/note/nick/${nick}`).expect(200)
+      expect(Array.isArray(res.body.data)).toBe(true)
+      expect(res.body.data[0]._id).toBe(String(note._id))
+      expect(res.body.data[0].title).toBe('NickMe')
+    })
+
+    it('returns empty array for unknown nick', async () => {
+      const agent = await authedAgent()
+      const res = await agent.get('/api/note/nick/n999999').expect(200)
+      expect(res.body.data).toEqual([])
+    })
+  })
+
   describe('PUT /api/note/:id (update)', () => {
     it('updates note fields', async () => {
       const agent = await authedAgent()
