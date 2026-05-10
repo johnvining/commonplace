@@ -521,12 +521,6 @@ a {
   display: inline-block;
 }
 
-.view-icon-placeholder {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-}
-
 .top-level-button-container {
   .button {
     font-size: var(--font-size-lg);
@@ -993,8 +987,7 @@ a.grid-link {
     padding: 0px;
   }
 
-  &.option,
-  &.option-new {
+  &.option {
     font-family: $main_font;
     padding: 8px;
     margin: 2px;
@@ -1006,19 +999,8 @@ a.grid-link {
     text-align: left;
   }
 
-  &.option:focus,
-  &.option-new:focus {
+  &.option:focus {
     border-color: $high_intensity_border;
-  }
-
-  // TODO: Create a mixin for the add button
-  &.option-new::before {
-    background-image: url($image_add_background);
-    background-size: 17px 17px;
-    display: inline-block;
-    width: 15px;
-    height: 13px;
-    content: '';
   }
 }
 
@@ -1098,26 +1080,6 @@ a.grid-link {
     margin: auto;
     display: block;
   }
-}
-
-.overlay-toggle-btn {
-  margin-left: 8px;
-  opacity: 0.4;
-  width: 28px;
-  height: 28px;
-  padding: 4px;
-  flex-shrink: 0;
-  align-self: center;
-  border-radius: 4px;
-
-  img { width: 18px; height: 18px; }
-
-  &.active {
-    opacity: 1;
-    background-color: $button_input_background_selected;
-  }
-
-  &:hover { opacity: 1; }
 }
 
 .overlay-close-btn {
@@ -1248,12 +1210,6 @@ a.grid-link {
       &:hover { background: rgba(255,255,255,0.7); }
     }
   }
-}
-
-.large-image {
-  max-width: 98%;
-  margin: auto;
-  max-height: 98%
 }
 
 .focus-edit-backdrop {
@@ -1596,15 +1552,6 @@ mark.search-highlight {
     margin-bottom: 16px;
   }
 
-  &.pre-title {
-    font-size: var(--font-size-sm);
-    align-self: center;
-    font-family: $sans_font;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: $grey3;
-  }
-
   &.title {
     font-size: 30px;
     text-align: center;
@@ -1649,10 +1596,6 @@ mark.search-highlight {
     letter-spacing: 0.04em;
     display: block;
     color: $grey3;
-  }
-
-  &.form-container {
-    padding: 4px;
   }
 
   &.input {
