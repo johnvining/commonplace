@@ -2,6 +2,8 @@
 FROM node:20-bookworm-slim
 WORKDIR /app
 
+RUN corepack enable && corepack prepare npm@11 --activate
+
 COPY package*.json ./
 ###  Installing dependencies
 RUN apt-get update \
