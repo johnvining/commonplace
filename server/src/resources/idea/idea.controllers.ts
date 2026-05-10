@@ -50,7 +50,7 @@ export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) 
   return await reqGetAutoComplete(req, res, true)
 }
 
-export const reqGetAutoComplete = async (req, res, withCounts = false) => {
+export const reqGetAutoComplete = async (req: Request, res: Response, withCounts = false) => {
   const doc = await findIdeasByString(req.body.string, withCounts)
   if (!doc) {
     return res.status(400).end()
@@ -58,7 +58,7 @@ export const reqGetAutoComplete = async (req, res, withCounts = false) => {
   return doc
 }
 
-export const findIdeasByString = async function(string, withCounts = false) {
+export const findIdeasByString = async function(string: string, withCounts = false) {
   let ideas = await Idea.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
@@ -84,21 +84,21 @@ export const reqCreateIdea = async (req: Request, res: Response) => {
 }
 
 export const reqDeleteIdea = async (req: Request, res: Response) => {
-  await deleteIdea(req.params.id)
+  await deleteIdea(String(req.params.id))
 }
 
 // Idea
-export const createIdea = async function(name) {
+export const createIdea = async function(name: string) {
   const idea = await Idea.create({ name: name })
   generateNick('idea', idea._id).catch(() => {})
   return idea
 }
 
-export const findIdeaByString = async function(string) {
+export const findIdeaByString = async function(string: string) {
   return await Idea.findOne({ name: string })
 }
 
-export const findOrCreateIdea = async function(name) {
+export const findOrCreateIdea = async function(name: string) {
   if (name == '') return
   // TODO: Can this be done with a single mongo call?
   const idea = await findIdeaByString(name)

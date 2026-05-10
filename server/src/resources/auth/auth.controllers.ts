@@ -31,7 +31,7 @@ export const getAutoCompleteWithCounts = async (req: Request, res: Response) => 
   return getAutoComplete(req, res, true)
 }
 
-export const getAutoComplete = async (req, res, withCounts = false) => {
+export const getAutoComplete = async (req: Request, res: Response, withCounts = false) => {
   const doc = await findAuthorsByString(req.body.string, withCounts)
   if (!doc) {
     return res.status(400).end()
@@ -39,7 +39,7 @@ export const getAutoComplete = async (req, res, withCounts = false) => {
   return doc
 }
 
-export const findAuthorByUrl = async function (url) {
+export const findAuthorByUrl = async function (url: string) {
   try {
     const parsed = new URL(url)
     const candidates = new Set<string>()
@@ -68,7 +68,7 @@ export const findAuthorByUrl = async function (url) {
   }
 }
 
-export const findAuthorsByString = async function (str, withCounts) {
+export const findAuthorsByString = async function (str: string, withCounts: boolean) {
   let authors = await Auth.find({ name: new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
@@ -111,18 +111,18 @@ export const reqGetWorksForAuthor = async (req: Request, res: Response) => {
 }
 
 export const reqDeleteAuthor = async (req: Request, res: Response) => {
-  await deleteAuthor(req.params.id)
+  await deleteAuthor(String(req.params.id))
 }
 
-export const createAuthor = async function (name) {
+export const createAuthor = async function (name: string) {
   return await Auth.create({ name: name })
 }
 
-export const findAuthorByString = async function (str) {
+export const findAuthorByString = async function (str: string) {
   return await Auth.findOne({ name: str }).exec()
 }
 
-export const findOrCreateAuthor = async function (name) {
+export const findOrCreateAuthor = async function (name: string) {
   if (name == '') return
   // TODO: Can this be done with a single mongo call?
   const author = await findAuthorByString(name)

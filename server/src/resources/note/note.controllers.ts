@@ -86,7 +86,7 @@ export const reqGetRecentNotes = async (req: Request, res: Response) => {
     {},
     { updatedAt: -1 },
     false,
-    (req.params.skip - 1) * pageSize,
+    (Number(req.params.skip) - 1) * pageSize,
     pageSize
   )
 }
@@ -97,7 +97,7 @@ export const reqGetEarliestNotesToFile = async (req: Request, res: Response) => 
     { ideas: { $size: 0 } },
     { updatedAt: 1 },
     false,
-    (req.params.skip - 1) * pageSize,
+    (Number(req.params.skip) - 1) * pageSize,
     pageSize
   )
 }
@@ -160,7 +160,7 @@ export const reqAddNewWork = async (req: Request, res: Response) => {
   return await updateNote(req.params.id, { work: newWork._id })
 }
 
-const inferWorkUrl = async function (workId, noteUrl) {
+const inferWorkUrl = async function (workId: unknown, noteUrl: string) {
   if (!workId) return
   const work = await Work.findById(workId).lean()
   if (!work || work.url) return
@@ -223,7 +223,13 @@ export const reqAddImageToNote = async (req: Request, res: Response) => {
     if (!req.files) {
       res.send({ status: false, message: 'No file' })
     } else {
-      const image = req.files.image
+      const imageField = req.files.image
+      // The route only handles single uploads — collapse the array form just in case.
+      const image = Array.isArray(imageField) ? imageField[0] : imageField
+      if (!image) {
+        res.send({ status: false, message: 'No file' })
+        return
+      }
       const currentNote = await Note.findOne({ _id: req.params.id })
       if (!currentNote) {
         res.status(404).end()
@@ -295,7 +301,7 @@ export const reqGetImageForNote = async function (req: Request, res: Response) {
       return
     }
     res.sendFile(
-      config.imageStorePath + '/' + note.images[req.params.image - 1]
+      config.imageStorePath + '/' + note.images[Number(req.params.image) - 1]
     )
   } catch (e) {
     console.error(e)
@@ -333,19 +339,22 @@ export const reqGetSuggestedIdeasForNote = async function (req: Request, res: Re
   }
 }
 
-export const createNote = async function (title, author) {
+export const createNote = async function (title: string, author: unknown) {
   const note = await Note.create({ title: title, author: author })
   generateNick('note', note._id).catch(() => {})
   return note
 }
 
-export const createNoteObj = async function (obj) {
+// Accepts any plain object; the schema decides which fields land. Callers
+// (importers, CLI scripts) construct heterogeneous shapes and Mongoose
+// silently drops anything not in the schema.
+export const createNoteObj = async function (obj: object) {
   const note = await Note.create(obj)
   generateNick('note', note._id).catch(() => {})
   return note
 }
 
-export const updateNote = async (noteId, updateObj) => {
+export const updateNote = async (noteId: unknown, updateObj: Record<string, unknown>) => {
   return await Note.findOneAndUpdate({ _id: noteId }, updateObj, { new: true })
     .populate('author')
     .populate('ideas')
@@ -360,12 +369,12 @@ export const updateNote = async (noteId, updateObj) => {
     .exec()
 }
 
-const touchIdea = async (ideaId) => {
+const touchIdea = async (ideaId: unknown) => {
   if (!ideaId) return
   await Idea.findByIdAndUpdate(ideaId, { $set: { updatedAt: new Date() } })
 }
 
-const touchPile = async (pileId) => {
+const touchPile = async (pileId: unknown) => {
   if (!pileId) return
   await Pile.findByIdAndUpdate(pileId, { $set: { updatedAt: new Date() } })
 }
@@ -414,7 +423,7 @@ export const reqBulkOcrForNotes = async (req: Request, res: Response) => {
   const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
   const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
 
-  const notePromises = noteIds.map(async (noteId) => {
+  const notePromises = noteIds.map(async (noteId: unknown) => {
     try {
       let note = noteMap[String(noteId)]
 
@@ -460,7 +469,7 @@ export const reqBulkSuggestTitlesForNotes = async (req: Request, res: Response) 
   const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
   const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
 
-  const notePromises = noteIds.map(async (noteId) => {
+  const notePromises = noteIds.map(async (noteId: unknown) => {
     try {
       let note = noteMap[String(noteId)]
 
@@ -501,7 +510,7 @@ export const reqBulkSuggestTitlesForNotes = async (req: Request, res: Response) 
 export const reqBulkGetNotesForMarkdown = async (req: Request, res: Response) => {
   const noteIds = req.body.noteIds
 
-  const notePromises = noteIds.map(async (noteId) => {
+  const notePromises = noteIds.map(async (noteId: unknown) => {
     try {
       let note = await Note.findOne({ _id: noteId })
 
@@ -755,7 +764,7 @@ export const findNotesAndPopulate = async function (
 }
 
 export const findRandomNotesAndPopulate = async function (
-  searchObject,
+  searchObject: Record<string, unknown>,
   limit = pageSize
 ) {
   const random_notes = await Note.aggregate([

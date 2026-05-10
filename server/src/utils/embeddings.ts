@@ -5,10 +5,27 @@ import { getOpenAiOCR } from './suggestions.js'
 
 type EmbeddingVector = number[]
 
-// Loose: callers pass populated/lean Mongoose docs whose typed shape varies
-// (some fields are ObjectIds, others are populated objects). We only access
-// optional name fields when present.
-type NoteForEmbedding = any
+// Callers pass populated/lean Mongoose docs whose shape varies — author/work
+// may be ObjectIds or populated objects. This shape covers what we read.
+interface NoteForEmbedding {
+  title?: string | null
+  text?: string | null
+  take?: string | null
+  ocrText?: string | null
+  author?: { name?: string | null } | unknown
+  work?: { name?: string | null } | unknown
+  ideas?: Array<{ name?: string | null } | unknown>
+  images?: string[]
+  embeddingHash?: string | null
+}
+
+function maybeName(x: unknown): string | undefined {
+  if (x && typeof x === 'object' && 'name' in x) {
+    const n = (x as { name?: unknown }).name
+    if (typeof n === 'string') return n
+  }
+  return undefined
+}
 
 interface EmbeddingUpdate {
   embedding: EmbeddingVector
@@ -28,9 +45,9 @@ export function buildEmbeddingInput(note: NoteForEmbedding): string {
     note.text,
     note.take,
     note.ocrText,
-    note.author?.name,
-    note.work?.name,
-    note.ideas?.map((i) => i.name).join(', '),
+    maybeName(note.author),
+    maybeName(note.work),
+    note.ideas?.map((i) => maybeName(i)).filter(Boolean).join(', '),
   ]
     .filter(Boolean)
     .join('. ')
@@ -81,7 +98,7 @@ export async function generateOcrTextIfNeeded(
 ): Promise<string | null> {
   if (note.text || !note.images?.length) return null
   const results = await Promise.all(
-    note.images.map((img) =>
+    note.images.map((img: string) =>
       getOpenAiOCR(config.imageStorePath + '/' + img).catch(() => '')
     )
   )

@@ -2,9 +2,11 @@ import Nick from '../nick/nick.model.js'
 import type { Request, Response } from 'express'
 
 
-const PREFIX = { note: 'n', work: 'w', idea: 'i', pile: 'p' }
+type NickEntityType = 'note' | 'work' | 'idea' | 'pile'
 
-async function generateRandomNickKey(prefix) {
+const PREFIX: Record<NickEntityType, string> = { note: 'n', work: 'w', idea: 'i', pile: 'p' }
+
+async function generateRandomNickKey(prefix: string): Promise<string> {
   for (let i = 0; i < 100; i++) {
     const key = prefix + ('000000' + Math.floor(Math.random() * 1000000)).slice(-6)
     if (!await Nick.findOne({ key })) return key
@@ -12,7 +14,7 @@ async function generateRandomNickKey(prefix) {
   throw new Error(`generateRandomNickKey exhausted 100 attempts for prefix "${prefix}"`)
 }
 
-export const generateNick = async (type, id) => {
+export const generateNick = async (type: NickEntityType, id: unknown) => {
   const prefix = PREFIX[type]
   if (!prefix) return null
 
@@ -52,7 +54,7 @@ export const reqBackfillNicks = async (req: Request, res: Response) => {
   const { default: Idea } = await import('../idea/idea.model.js')
   const { default: Pile } = await import('../pile/pile.model.js')
 
-  const types = [
+  const types: { type: NickEntityType; Model: any }[] = [
     { type: 'note', Model: Note },
     { type: 'work', Model: Work },
     { type: 'idea', Model: Idea },
@@ -81,7 +83,7 @@ export const reqGetNickForWork = async (req: Request, res: Response) => Nick.fin
 export const reqGetNickForIdea = async (req: Request, res: Response) => Nick.findOne({ idea: req.params.id }).lean().exec()
 export const reqGetNickForPile = async (req: Request, res: Response) => Nick.findOne({ pile: req.params.id }).lean().exec()
 
-export const hashFunc = function hash(str) {
+export const hashFunc = function hash(str: string): number {
   let hash = 0
   for (let i = 0, len = str.length; i < len; i++) {
     let chr = str.charCodeAt(i)

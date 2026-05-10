@@ -39,7 +39,7 @@ export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) 
   return reqGetAutoComplete(req, res, true)
 }
 
-export const reqGetAutoComplete = async (req, res, withCounts = false) => {
+export const reqGetAutoComplete = async (req: Request, res: Response, withCounts = false) => {
   const doc = await filePilesByString(req.body.string, withCounts)
   if (!doc) {
     return res.status(400).end()
@@ -60,7 +60,7 @@ export const reqDeletePile = async (req: Request, res: Response) => {
 }
 
 // TODO: Duplicative of whats in work.controllers.js
-export const filePilesByString = async function (string, withCounts) {
+export const filePilesByString = async function (string: string, withCounts: boolean) {
   let piles = await Pile.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .lean()
     .exec()
@@ -104,14 +104,14 @@ export const deletePile = async function (pileId: string) {
   })
 
   works.map((work) => {
-    deletionPromises.push(removePileFromWork(work._id, pileId))
+    deletionPromises.push(removePileFromWork(String(work._id), pileId))
   })
 
   await Promise.all(deletionPromises)
   await Pile.findOneAndDelete({ _id: pileId })
 }
 
-export const findOrCreatePile = async (name) => {
+export const findOrCreatePile = async (name: string) => {
   if (!name) return
   const pile = await Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
   generateNick('pile', pile._id).catch(() => {})
@@ -119,8 +119,8 @@ export const findOrCreatePile = async (name) => {
 }
 
 export const findPiles = async function (
-  searchObject,
-  sortObject,
+  searchObject: Record<string, unknown>,
+  sortObject: Record<string, 1 | -1>,
   skip = 0,
   limit = 100
 ) {
@@ -132,7 +132,7 @@ export const findPiles = async function (
     .exec()
 }
 
-export const getWorksForPile = async function (pileId) {
+export const getWorksForPile = async function (pileId: string) {
   return Work.find({ piles: pileId })
     .populate('author')
     .populate('piles')

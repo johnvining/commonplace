@@ -84,7 +84,7 @@ export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) 
   return await reqAutocompleteOnName(req, res, true)
 }
 
-export const reqAutocompleteOnName = async (req, res, withCounts = false) => {
+export const reqAutocompleteOnName = async (req: Request, res: Response, withCounts = false) => {
   const doc = await findWorksByString(req.body.string, withCounts)
   if (!doc) {
     return res.status(400).end()
@@ -100,7 +100,7 @@ export const reqRemovePileFromWork = async (req: Request, res: Response) => {
   return doc
 }
 
-export const findWorksByString = async function(string, withCounts = false) {
+export const findWorksByString = async function(string: string, withCounts = false) {
   let works = await Work.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
     .populate('author')
     .lean()
@@ -116,13 +116,13 @@ export const findWorksByString = async function(string, withCounts = false) {
   return works.map(w => ({ ...w, note_count: noteMap[String(w._id)] || 0 }))
 }
 
-export const createWork = async function(name) {
+export const createWork = async function(name: string) {
   const work = await Work.create({ name: name })
   generateNick('work', work._id).catch(() => {})
   return work
 }
 
-export const getWorkInfo = async function(workId) {
+export const getWorkInfo = async function(workId: string) {
   const results = await Work.findOne({ _id: workId })
     .populate('author')
     .populate('piles')
@@ -131,15 +131,15 @@ export const getWorkInfo = async function(workId) {
   return results
 }
 
-export const updateWorkInfo = async function(workId, updateObject) {
+export const updateWorkInfo = async function(workId: string, updateObject: object) {
   return await Work.findOneAndUpdate({ _id: workId }, updateObject)
 }
 
-export const findWorkByString = async function(name) {
+export const findWorkByString = async function(name: string) {
   return await Work.findOne({ name: name }).exec()
 }
 
-export const findOrCreateWork = async function(name) {
+export const findOrCreateWork = async function(name: string) {
   if (name == '') return null
   // TODO: Can this be done with a single mongo call?
   const work = await findWorkByString(name)
@@ -160,7 +160,7 @@ export const deleteWork = async function(id: string) {
   await Work.findOneAndDelete({ _id: id })
 }
 
-export const addPileToId = async (workId, pileId) => {
+export const addPileToId = async (workId: string, pileId: unknown) => {
   const doc = await Work.findOneAndUpdate(
     { _id: workId },
     { $addToSet: { piles: pileId } },
@@ -173,7 +173,7 @@ export const addPileToId = async (workId, pileId) => {
   return doc
 }
 
-export const removePileFromWork = async (workId, pileId) => {
+export const removePileFromWork = async (workId: string, pileId: unknown) => {
   const doc = await Work.findOneAndUpdate(
     { _id: workId },
     { $pull: { piles: pileId } },
@@ -187,7 +187,7 @@ export const removePileFromWork = async (workId, pileId) => {
 
 export default defaultControllers(Work)
 
-const touchPile = async (pileId) => {
+const touchPile = async (pileId: unknown) => {
   if (!pileId) return
   await Pile.findByIdAndUpdate(pileId, { $set: { updatedAt: new Date() } })
 }

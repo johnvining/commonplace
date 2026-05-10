@@ -1,18 +1,27 @@
 import User from '../user/user.model.js'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import jwt, { type VerifyErrors, type JwtPayload } from 'jsonwebtoken'
 import config from '../../config'
 import type { Request, Response, NextFunction } from 'express'
 
 
 const TOKEN_LIFETIME_SECONDS = 30 * 24 * 60 * 60
 
-const cookieOptions = (config) => ({
+interface ConfigForCookies {
+  isDev: boolean
+}
+
+const cookieOptions = (config: ConfigForCookies) => ({
   httpOnly: true,
-  sameSite: 'strict',
+  sameSite: 'strict' as const,
   secure: !config.isDev,
   maxAge: TOKEN_LIFETIME_SECONDS * 1000,
 })
+
+function jwtSecret(): string {
+  if (!config.secrets.jwt) throw new Error('JWT secret missing from config.secrets.jwt')
+  return config.secrets.jwt
+}
 
 export const reqRegisterUser = async (req: Request, res: Response) => {
   const { username, password } = req.body
@@ -32,7 +41,7 @@ export const reqRegisterUser = async (req: Request, res: Response) => {
   try {
     const hash = await bcrypt.hash(password, 10)
     const user = await User.create({ username, password: hash })
-    const token = jwt.sign({ id: user._id, username }, config.secrets.jwt, {
+    const token = jwt.sign({ id: user._id, username }, jwtSecret(), {
       expiresIn: TOKEN_LIFETIME_SECONDS,
     })
     res.cookie('jwt', token, cookieOptions(config))
@@ -65,7 +74,7 @@ export const reqAuthorizeUser = async (req: Request, res: Response) => {
       if (result) {
         const token = jwt.sign(
           { id: user._id, username, role: (user as any).role },
-          config.secrets.jwt,
+          jwtSecret(),
           { expiresIn: TOKEN_LIFETIME_SECONDS }
         )
         res.cookie('jwt', token, cookieOptions(config))
@@ -88,8 +97,8 @@ export const reqAuthenticate = async (req: Request, res: Response, next: NextFun
   if (!token) {
     return res.status(401).json({ message: 'Not authorized, token not available' })
   }
-  jwt.verify(token, config.secrets.jwt, (err, decodedToken) => {
-    if (err) {
+  jwt.verify(token, jwtSecret(), (err: VerifyErrors | null, decodedToken: JwtPayload | string | undefined) => {
+    if (err || !decodedToken || typeof decodedToken === 'string') {
       return res.status(401).json({ message: 'Not authorized' })
     } else if (decodedToken.username != 'commonplace') {
       return res.status(401).json({ message: 'Wrong username' })
