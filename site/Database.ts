@@ -10,7 +10,8 @@ export const types = {
   pile: 'pile',
 }
 
-// eslint-disable-next-line no-undef
+// Parcel inlines `process.env.X` at build time; declared loosely for TS.
+declare const process: { env: Record<string, string | undefined> }
 const url_api = process.env.SERVER_API
 
 // Supported types: idea, auth, work, pile
