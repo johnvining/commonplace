@@ -357,7 +357,7 @@ class Autocomplete extends React.Component<any, any> {
 
 // Wrapper component that provides keyboard shortcuts
 function AutocompleteWithKeyboard(props: any) {
-  const autocompleteRef = React.useRef(null)
+  const autocompleteRef = React.useRef<Autocomplete | null>(null)
 
   // Section 6: Autocomplete keyboard shortcuts
   useKeyboardShortcuts(

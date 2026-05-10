@@ -255,10 +255,10 @@ class NoteList extends React.Component<any, any> {
 
     if (numberImages == 0) return
 
-    var imagePromises = []
-    for (var i = 1; i <= numberImages; i++) {
+    const imagePromises: Array<Promise<{ data: Blob } | null>> = []
+    for (let i = 1; i <= numberImages; i++) {
       imagePromises.push(
-        db.getImagesForNote(notes[index]._id, i).catch((error) => {
+        db.getImagesForNote(notes[index]._id, i).catch((error: any) => {
           if (error?.response?.status !== 404) {
             console.error('Error fetching image', error)
           }
@@ -268,8 +268,8 @@ class NoteList extends React.Component<any, any> {
     }
 
     await Promise.all(imagePromises).then((responses) => {
-      var imagesArray = []
-      var note = notes[index]
+      const imagesArray: string[] = []
+      const note = notes[index]
       responses.forEach((response) => {
         if (response?.data) {
           imagesArray.push(URL.createObjectURL(response.data))
@@ -312,8 +312,8 @@ class NoteList extends React.Component<any, any> {
   }
 
   clearSelection() {
-    let tempSelectedArray = []
-    for (var i = 0; i < this.state.notes.length; i++) {
+    const tempSelectedArray: boolean[] = []
+    for (let i = 0; i < this.state.notes.length; i++) {
       tempSelectedArray[i] = false
     }
     this.setState({ selectedArray: tempSelectedArray, anchorIndex: 0 })
@@ -348,15 +348,15 @@ class NoteList extends React.Component<any, any> {
   }
 
   selectAll() {
-    var selected = []
-    for (var i = 0; i < this.state.notes.length; i++) {
+    const selected: boolean[] = []
+    for (let i = 0; i < this.state.notes.length; i++) {
       selected[i] = true
     }
     this.setState({ selectedArray: selected })
   }
 
   getSelectedIndices() {
-    var selectedIndices = []
+    const selectedIndices: number[] = []
     for (let i = 0; i < this.state.selectedArray.length; i++) {
       if (this.state.selectedArray[i]) {
         selectedIndices.push(i)
@@ -393,8 +393,8 @@ class NoteList extends React.Component<any, any> {
     for (let i = 0; i < indicesToBeModified.length; i++) {
       var noteId = this.state.notes[indicesToBeModified[i]]._id
       db.addLinkToRecord(linkType, idToAdd, db.types.note, noteId).then(
-        (response) => {
-          var tempNotes = this.state.notes
+        (response: any) => {
+          const tempNotes = this.state.notes
           const note = response.data.data
           tempNotes[indicesToBeModified[i]] = note
           this.setState({ notes: tempNotes })
@@ -757,7 +757,7 @@ class NoteList extends React.Component<any, any> {
 
 // Wrapper component that provides keyboard shortcuts
 function NoteListWithKeyboard(props: any) {
-  const noteListRef = React.useRef(null)
+  const noteListRef = React.useRef<NoteList | null>(null)
 
   // Section 4: Note List keyboard shortcuts
   useKeyboardShortcuts(

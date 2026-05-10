@@ -175,7 +175,7 @@ function SearchBar(props: any) {
   useKeyboardShortcuts(
     constants.keyboardScopes.SEARCH_BAR,
     (event) => {
-      const target = event.target
+      const target = event.target as HTMLElement | null
       const isAutocompleteOption = target?.tagName === 'BUTTON' &&
         target?.classList?.contains('option')
 

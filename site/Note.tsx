@@ -114,7 +114,7 @@ class Note extends React.Component<any, any> {
     })
 
     if (this.props.mode == constants.note_modes.EDIT_LINKS) {
-      document.getElementById('linkInput').focus()
+      document.getElementById('linkInput')?.focus()
     }
   }
 
@@ -408,10 +408,10 @@ class Note extends React.Component<any, any> {
         pendingText: newText,
         fetchingOcr: false,
       })
-      let input = document.querySelector('#text')
+      const input = document.querySelector('#text')
 
-      var event = new Event('input', { bubbles: true })
-      input.dispatchEvent(event)
+      const event = new Event('input', { bubbles: true })
+      input?.dispatchEvent(event)
       this.handleTextChange
     })
   }
@@ -1212,7 +1212,7 @@ class Note extends React.Component<any, any> {
 
 // Wrapper component that provides keyboard shortcuts
 function NoteWithKeyboard(props: any) {
-  const noteRef = React.useRef(null)
+  const noteRef = React.useRef<Note | null>(null)
 
   // Determine the keyboard scope based on the current mode
   const getScope = () => {

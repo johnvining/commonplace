@@ -37,7 +37,7 @@ function RecentItems(props: any) {
     piles: 'Recent Piles'
   }
 
-  props.setPageTitle(titles[type] || 'Recent Items')
+  props.setPageTitle((type && titles[type as keyof typeof titles]) || 'Recent Items')
 
   switch (type) {
     case 'notes':

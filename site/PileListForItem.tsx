@@ -43,9 +43,9 @@ function PileListForItem(props: any) {
           escape={props.escape}
           getSuggestions={props.getSuggestions}
           apiType={db.types.pile}
-          handleNewSelect={props.handleNewSelect.bind(this)}
+          handleNewSelect={props.handleNewSelect}
           inputName="work-pile"
-          onSelect={props.onSelect.bind(this)}
+          onSelect={props.onSelect}
           excludeIds={props.piles?.map((pile) => pile._id)}
         />
       ) : (

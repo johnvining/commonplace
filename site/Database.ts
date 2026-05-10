@@ -27,28 +27,28 @@ export async function getSuggestions(type: string, search: string, withCounts = 
 }
 
 // Supported types: idea, auth, work, pile, note
-export async function getInfo(type, Id) {
+export async function getInfo(type: string, Id: string) {
   return axios.get(url_api + type + `/${Id}`)
 }
 
 // Get note by nick in a single request
-export async function getNoteByNick(nick) {
+export async function getNoteByNick(nick: string) {
   return axios.get(url_api + 'note/nick/' + nick)
 }
 
 // Supported types: idea, auth, work, pile
-export async function createRecord(type, name) {
+export async function createRecord(type: string, name: string) {
   const data = { name: name }
   return axios.post(url_api + type, data)
 }
 
 // Supported types: note, work, idea, pile, auth
-export async function updateRecord(type, id, params) {
+export async function updateRecord(type: string, id: string, params: object) {
   return axios.put(url_api + type + `/${id}`, params)
 }
 
 // Supported types: note, work, auth, idea, pile
-export async function deleteRecord(type, id) {
+export async function deleteRecord(type: string, id: string) {
   return axios.delete(url_api + type + `/${id}`)
 }
 
@@ -56,7 +56,7 @@ export async function deleteRecord(type, id) {
 //   - idea from note
 //   - pile from note
 //   - pile from work
-export async function removeFromRecord(removeType, removeId, fromType, fromId) {
+export async function removeFromRecord(removeType: string, removeId: string, fromType: string, fromId: string) {
   return axios.delete(
     url_api + fromType + '/' + fromId + '/' + removeType + '/' + removeId
   )
@@ -69,14 +69,14 @@ export async function removeFromRecord(removeType, removeId, fromType, fromId) {
 //   - notes filtered by work
 //   - works filtered by auth
 //   - works filtered by pile
-export async function getRecordsWithFilter(recordType, filterType, filterId) {
+export async function getRecordsWithFilter(recordType: string, filterType: string, filterId: string) {
   return axios.get(
     url_api + filterType + '/' + filterId + '/' + recordType + 's'
   )
 }
 
 // All notes for an author, including notes on their works
-export async function getAllNotesForAuthor(authorId) {
+export async function getAllNotesForAuthor(authorId: string) {
   return axios.get(url_api + 'auth/' + authorId + '/all-notes')
 }
 
@@ -86,10 +86,10 @@ export async function getAllNotesForAuthor(authorId) {
 //   - create idea and add to note
 //   - create pile and add to note
 export async function createAndLinkToRecord(
-  createType,
-  createName,
-  recordType,
-  recordId
+  createType: string,
+  createName: string,
+  recordType: string,
+  recordId: string
 ) {
   const data = { name: createName }
   return axios.put(
@@ -99,7 +99,7 @@ export async function createAndLinkToRecord(
 }
 
 // See appendLinkToRecord and setLinkOnRecord for supported combinations
-export async function addLinkToRecord(linkType, linkId, recordType, recordId) {
+export async function addLinkToRecord(linkType: string, linkId: string, recordType: string, recordId: string) {
   if (linkType == types.idea || linkType == types.pile) {
     return appendLinkToRecord(linkType, linkId, recordType, recordId)
   } else if (linkType == types.work || linkType == types.auth) {
@@ -113,10 +113,10 @@ export async function addLinkToRecord(linkType, linkId, recordType, recordId) {
 //   - add pile to note
 //   - add pile to work
 async function appendLinkToRecord(
-  appendType,
-  appendId,
-  recordType,
-  recordId
+  appendType: string,
+  appendId: string,
+  recordType: string,
+  recordId: string
 ) {
   const data = { id: appendId }
   return axios.put(
@@ -129,7 +129,7 @@ async function appendLinkToRecord(
 //   - set work on note
 //   - set auth on note
 //   - set auth on work
-async function setLinkOnRecord(linkType, linkId, recordType, recordId) {
+async function setLinkOnRecord(linkType: string, linkId: string, recordType: string, recordId: string) {
   var data = {}
   if (linkType == types.auth) {
     data = { author: linkId }
@@ -140,52 +140,52 @@ async function setLinkOnRecord(linkType, linkId, recordType, recordId) {
 }
 
 // Image handling
-export async function addImageToNote(noteId, image) {
+export async function addImageToNote(noteId: string, image: File | Blob) {
   const data = new FormData()
   data.append('image', image)
   return axios.put(url_api + 'note/' + noteId + '/image', data)
 }
 
-export async function deleteImage(noteId, imagePath) {
+export async function deleteImage(noteId: string, imagePath: string) {
   const data = { filename: imagePath }
   return axios.delete(url_api + `note/${noteId}/image/`, { data: data })
 }
 
-export async function getImagesForNote(noteId, imageN) {
+export async function getImagesForNote(noteId: string, imageN: number) {
   return axios.get(url_api + 'note/' + noteId + '/images/' + imageN, {
     responseType: 'blob',
   })
 }
 
 // Generic Note Functions
-export async function createNewNoteFromTitle(title) {
+export async function createNewNoteFromTitle(title: string) {
   const data = { title: title }
   return axios.post(url_api + 'note', data)
 }
 
-export async function createNewNoteForWork(workId) {
+export async function createNewNoteForWork(workId: string) {
   const data = { work: workId }
   return axios.post(url_api + 'note', data)
 }
 
 // TODO: Create a one-request version of this
-export async function createNewNoteWithImageForWork(workId, image, title) {
+export async function createNewNoteWithImageForWork(workId: string, image: File | Blob, title: string) {
   const data = { title: title, work: workId }
   const createdNote = await axios.post(url_api + 'note', data)
   return addImageToNote(createdNote.data._id, image)
 }
 
-export async function searchNotes(searchString) {
+export async function searchNotes(searchString: string) {
   const data = { searchString: searchString }
   return axios.put(url_api + 'note/find', data)
 }
 
-export async function unifiedSearch(query, limit = 50, signal) {
+export async function unifiedSearch(query: string, limit = 50, signal?: AbortSignal) {
   const opts = signal ? { signal } : {}
   return axios.post(url_api + 'note/unified-search', { query, limit }, opts)
 }
 
-export async function getRecentNotes(page) {
+export async function getRecentNotes(page: number | string) {
   return axios.get(url_api + `note/all/` + page)
 }
 
@@ -193,7 +193,7 @@ export async function getAllPiles() {
   return axios.get(url_api + `pile/all`)
 }
 
-export async function getEarliestNotesToFile(page) {
+export async function getEarliestNotesToFile(page: number | string) {
   return axios.get(url_api + `note/file/` + page)
 }
 
@@ -201,19 +201,19 @@ export async function getRandomNotes() {
   return axios.get(url_api + `note/flip`)
 }
 
-export async function getTitleSuggestion(noteID) {
+export async function getTitleSuggestion(noteID: string) {
   return axios.get(url_api + `note/` + noteID + `/title/suggest`)
 }
 
-export async function getIdeaSuggestions(noteID) {
+export async function getIdeaSuggestions(noteID: string) {
   return axios.get(url_api + `note/` + noteID + `/ideas/suggest`)
 }
 
-export async function getNoteTextOCR(noteID) {
+export async function getNoteTextOCR(noteID: string) {
   return axios.get(url_api + `note/` + noteID + `/ocr`)
 }
 
-export async function bulkOcrForNotes(noteIds) {
+export async function bulkOcrForNotes(noteIds: string[]) {
   const data = { noteIds: noteIds }
   return axios.post(url_api + 'note/bulk-ocr', data)
 }
@@ -222,41 +222,41 @@ export async function getStats() {
   return axios.get(url_api + 'stats')
 }
 
-export async function getRecentItems(type) {
+export async function getRecentItems(type: string) {
   return axios.get(url_api + 'stats/recent/' + type)
 }
 
-export async function bulkSuggestTitlesForNotes(noteIds) {
+export async function bulkSuggestTitlesForNotes(noteIds: string[]) {
   const data = { noteIds: noteIds }
   return axios.post(url_api + 'note/bulk-suggest-titles', data)
 }
 
-export async function bulkGetNotesForMarkdown(noteIds) {
+export async function bulkGetNotesForMarkdown(noteIds: string[]) {
   const data = { noteIds: noteIds }
   return axios.post(url_api + 'note/bulk-markdown', data)
 }
 
-export async function getNoteNick(noteID) {
+export async function getNoteNick(noteID: string) {
   return axios.put(url_api + `nick/note/` + noteID)
 }
 
-export async function getWorkNick(workID) {
+export async function getWorkNick(workID: string) {
   return axios.put(url_api + `nick/work/` + workID)
 }
 
-export async function getIdeaNick(ideaID) {
+export async function getIdeaNick(ideaID: string) {
   return axios.put(url_api + `nick/idea/` + ideaID)
 }
 
-export async function getPileNick(pileID) {
+export async function getPileNick(pileID: string) {
   return axios.put(url_api + `nick/pile/` + pileID)
 }
 
-export async function getNick(nick) {
+export async function getNick(nick: string) {
   return axios.get(url_api + `nick/` + nick)
 }
 
-export async function getAuthentication(password) {
+export async function getAuthentication(password: string) {
   const data = { username: 'commonplace', password: password }
   return axios.post(url_api + `user/auth`, data)
 }
@@ -269,27 +269,27 @@ export async function logout() {
   return axios.post(url_api + `user/logout`)
 }
 
-export async function importNotesForWork(notesText, workID) {
+export async function importNotesForWork(notesText: string, workID: string) {
   const data = { notesText: notesText }
   return axios.put(url_api + 'note/import/work/' + workID, data)
 }
 
-export async function importNotesCsv(importList) {
+export async function importNotesCsv(importList: string) {
   const data = { importList: importList }
   return axios.put(url_api + 'note/import/csv', data)
 }
 
-export async function importNotesInstapaper(importList) {
+export async function importNotesInstapaper(importList: string) {
   const data = { importList: importList }
   return axios.put(url_api + 'note/import/instapaper', data)
 }
 
 
-export async function addNoteLinkToNote(leftNick, rightNick) {
+export async function addNoteLinkToNote(leftNick: string, rightNick: string) {
   const data = { leftNoteNick: leftNick, rightNoteNick: rightNick }
   return axios.put(url_api + 'link/', data)
 }
 
-export async function getLinkedNotes(noteId) {
+export async function getLinkedNotes(noteId: string) {
   return axios.get(url_api + 'link/note/' + noteId)
 }

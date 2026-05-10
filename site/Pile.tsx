@@ -112,6 +112,7 @@ function Pile(props: any) {
   }
 
   const toggleStar = () => {
+    if (!id) return
     togglePinned({
       type: 'pile',
       id,

@@ -39,7 +39,7 @@ function Work(props: any) {
   const [pendingUrl, setPendingUrl] = useState('')
   const [pendingYear, setPendingYear] = useState('')
   const [pendingAuthorName, setPendingAuthorName] = useState('')
-  const [pendingAuthorId, setPendingAuthorId] = useState('')
+  const [pendingAuthorId, setPendingAuthorId] = useState<string | null>('')
   const [pendingSummary, setPendingSummary] = useState('')
   const [pendingCitationInfo, setPendingCitationInfo] = useState('')
   const [piles, setPiles] = useState<any[]>([])
@@ -281,6 +281,7 @@ function Work(props: any) {
   }
 
   const toggleStar = () => {
+    if (!id) return
     togglePinned({
       type: 'work',
       id,

@@ -97,7 +97,7 @@ function Sidebar() {
             {pinnedItems.map((item) => (
               <div className="sidebar-pin-row" key={`${item.type}-${item.id}`}>
                 <Link
-                  to={item.href}
+                  to={item.href ?? '#'}
                   className="sidebar-link sidebar-link-compact"
                 >
                   <span className="sidebar-item">
