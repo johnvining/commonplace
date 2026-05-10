@@ -41,7 +41,7 @@ app.use(cors({
 }))
 app.use(json({ limit: '5mb' }))
 app.use(urlencoded({ extended: true, limit: '5mb' }))
-app.use(morgan('dev'))
+if (!process.env.VITEST) app.use(morgan('dev'))
 
 app.use(cookieParser())
 
