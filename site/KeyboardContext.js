@@ -121,7 +121,7 @@ export function useKeyboardScopes() {
 }
 
 // Helper to check key combinations
-export function isKey(event, keyCode, { ctrl = false, shift = false, alt = false } = {}) {
+function isKey(event, keyCode, { ctrl = false, shift = false, alt = false } = {}) {
   return (
     event.keyCode === keyCode &&
     event.ctrlKey === ctrl &&

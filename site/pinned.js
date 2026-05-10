@@ -28,7 +28,7 @@ export const isPinned = (type, id) => {
   return getPinnedItems().some((item) => item.type === type && item.id === id)
 }
 
-export const pinItem = ({ type, id, label, href }) => {
+const pinItem = ({ type, id, label, href }) => {
   if (!type || !id) return
   const items = getPinnedItems()
   const next = [

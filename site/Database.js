@@ -11,7 +11,7 @@ export const types = {
 }
 
 // eslint-disable-next-line no-undef
-export const url_api = process.env.SERVER_API
+const url_api = process.env.SERVER_API
 
 // Supported types: idea, auth, work, pile
 export async function getSuggestions(type, search, withCounts = false, signal) {
@@ -111,7 +111,7 @@ export async function addLinkToRecord(linkType, linkId, recordType, recordId) {
 //   - add idea to note
 //   - add pile to note
 //   - add pile to work
-export async function appendLinkToRecord(
+async function appendLinkToRecord(
   appendType,
   appendId,
   recordType,
@@ -128,7 +128,7 @@ export async function appendLinkToRecord(
 //   - set work on note
 //   - set auth on note
 //   - set auth on work
-export async function setLinkOnRecord(linkType, linkId, recordType, recordId) {
+async function setLinkOnRecord(linkType, linkId, recordType, recordId) {
   var data = {}
   if (linkType == types.auth) {
     data = { author: linkId }
@@ -179,20 +179,10 @@ export async function searchNotes(searchString) {
   return axios.put(url_api + 'note/find', data)
 }
 
-export async function hybridSearchNotes(query, limit = 20, signal) {
-  const opts = signal ? { signal } : {}
-  return axios.post(url_api + 'note/hybrid-search', { query, limit }, opts)
-}
-
 export async function unifiedSearch(query, limit = 50, signal) {
   const opts = signal ? { signal } : {}
   return axios.post(url_api + 'note/unified-search', { query, limit }, opts)
 }
-
-export async function bulkEmbedNotes() {
-  return axios.post(url_api + 'note/bulk-embed', {})
-}
-
 
 export async function getRecentNotes(page) {
   return axios.get(url_api + `note/all/` + page)
