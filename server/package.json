@@ -31,13 +31,11 @@
     "mongoose": "^8.23.1",
     "morgan": "^1.10.0",
     "openai": "^5",
-    "picomatch": "^4.0.4",
     "prompt-sync": "^4.2.0",
     "rimraf": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9",
-    "@types/compression": "^1.8.1",
     "eslint": "^9",
     "globals": "^17",
     "nodemon": "^3.0.2",
