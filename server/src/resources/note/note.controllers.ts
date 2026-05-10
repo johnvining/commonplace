@@ -172,7 +172,7 @@ const inferWorkUrl = async function (workId, noteUrl) {
 
   // If all notes share the same hostname, use that origin; otherwise use the triggering URL
   try {
-    const origins = notesWithUrl.map(n => new URL(n.url).origin)
+    const origins = notesWithUrl.map((n) => new URL(n.url ?? '').origin)
     const unique = [...new Set(origins)]
     await Work.findByIdAndUpdate(workId, { url: unique.length === 1 ? unique[0] : noteUrl })
   } catch {}
@@ -221,9 +221,13 @@ export const reqAddImageToNote = async (req, res) => {
     if (!req.files) {
       res.send({ status: false, message: 'No file' })
     } else {
-      let image = req.files.image
-      let currentNote = await Note.findOne({ _id: req.params.id })
-      let numberNotes = currentNote.images.length + 1
+      const image = req.files.image
+      const currentNote = await Note.findOne({ _id: req.params.id })
+      if (!currentNote) {
+        res.status(404).end()
+        return
+      }
+      const numberNotes = currentNote.images.length + 1
 
       const safeName = image.name.replace(/[^a-zA-Z0-9._-]/g, '_')
       let localPath = req.params.id + '/' + numberNotes + '-' + safeName
@@ -255,9 +259,13 @@ export const reqAddImageToNote = async (req, res) => {
 
 export const reqRemoveImageFromNote = async function (req, res) {
   try {
-    var filename = req.body.filename
+    const filename = req.body.filename
     const noteId = req.params.id
     const note = await Note.findById(noteId)
+    if (!note) {
+      res.status(404).end()
+      return
+    }
 
     if (!note.images.includes(filename)) {
       res.status(400).end()
@@ -279,7 +287,11 @@ export const reqRemoveImageFromNote = async function (req, res) {
 
 export const reqGetImageForNote = async function (req, res) {
   try {
-    let note = await Note.findOne({ _id: req.params.id })
+    const note = await Note.findOne({ _id: req.params.id })
+    if (!note) {
+      res.status(404).end()
+      return
+    }
     res.sendFile(
       config.imageStorePath + '/' + note.images[req.params.image - 1]
     )
@@ -291,8 +303,12 @@ export const reqGetImageForNote = async function (req, res) {
 
 export const reqGetSuggestionForNoteTitle = async function (req, res) {
   try {
-    let note = await Note.findOne({ _id: req.params.id })
-    let suggestion = await getSuggestedTitle(note.text)
+    const note = await Note.findOne({ _id: req.params.id })
+    if (!note) {
+      res.status(404).end()
+      return
+    }
+    const suggestion = await getSuggestedTitle(note.text ?? '')
     res.send({ suggested_title: suggestion })
   } catch (e) {
     console.error(e)
@@ -302,8 +318,12 @@ export const reqGetSuggestionForNoteTitle = async function (req, res) {
 
 export const reqGetSuggestedIdeasForNote = async function (req, res) {
   try {
-    let note = await Note.findOne({ _id: req.params.id })
-    let suggestion = await getSuggestedIdeas(note.title, note.text)
+    const note = await Note.findOne({ _id: req.params.id })
+    if (!note) {
+      res.status(404).end()
+      return
+    }
+    const suggestion = await getSuggestedIdeas(note.title ?? '', note.text ?? '')
     res.send({ suggested_ideas: suggestion })
   } catch (e) {
     console.error(e)
@@ -349,9 +369,10 @@ const touchPile = async (pileId) => {
 }
 
 export const reqOcrForNote = async (req, res) => {
-  let note = await Note.findOne({ _id: req.params.id })
+  const note = await Note.findOne({ _id: req.params.id })
+  if (!note) return ''
 
-  var result = ''
+  let result = ''
   // TODO: Serial await
   for (let i = 0; i < note.images.length; i++) {
     result +=
@@ -364,16 +385,11 @@ export const reqOcrForNote = async (req, res) => {
 
 export const reqBulkImportForWork = async (req, res) => {
   // TODO: Validate work ID
-  let input = req.body.notesText
-  let lines = input.split(/\r?\n/)
-  let notePromises = []
-  lines.map((line) => {
-    if (line) {
-      notePromises.push(
-        Note.create({ title: '', work: req.params.work, text: line })
-      )
-    }
-  })
+  const input: string = req.body.notesText
+  const lines = input.split(/\r?\n/)
+  const notePromises = lines
+    .filter((line) => line)
+    .map((line) => Note.create({ title: '', work: req.params.work, text: line }))
 
   await Promise.all(notePromises)
   return null
@@ -428,7 +444,7 @@ export const reqBulkOcrForNotes = async (req, res) => {
       return {
         noteId: noteId,
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       }
     }
   })
@@ -471,7 +487,7 @@ export const reqBulkSuggestTitlesForNotes = async (req, res) => {
       return {
         noteId: noteId,
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       }
     }
   })
@@ -517,7 +533,7 @@ export const reqBulkGetNotesForMarkdown = async (req, res) => {
       return {
         noteId: noteId,
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       }
     }
   })
@@ -602,7 +618,7 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
   return top
 }
 
-function scoreEntityName(name, query) {
+function scoreEntityName(name: string | undefined, query: string): number {
   if (!name) return 0.3
   const n = name.toLowerCase()
   const q = query.toLowerCase()
@@ -627,7 +643,12 @@ export const reqUnifiedSearch = async (req, res) => {
     Pile.find({ name: regex }).lean().exec(),
   ])
 
-  const results = []
+  interface SearchResult {
+    type: 'note' | 'auth' | 'work' | 'idea' | 'pile'
+    item: unknown
+    score: number
+  }
+  const results: SearchResult[] = []
   for (const note of notes)   results.push({ type: 'note', item: note, score: note._hybridScore || 0.5 })
   for (const a of authors)    results.push({ type: 'auth', item: a, score: scoreEntityName(a.name, query) })
   for (const w of works)      results.push({ type: 'work', item: w, score: scoreEntityName(w.name, query) })
