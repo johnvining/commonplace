@@ -1,5 +1,18 @@
 # Known Issues
 
+## TypeScript: enable `strict: true` after migration
+
+**Status.** Both `server/tsconfig.json` and `site/tsconfig.json` currently run with `strict: false`. This was a deliberate migration choice — flipping strict on surfaces ~71 errors in the server alone, mostly from `strictNullChecks` (Mongoose `findOne()` can return null but the code accesses properties without checking) and `let foo = []` inferred as `never[]` then pushed into.
+
+**Suggested fix.** Tighten in stages:
+1. Enable `strict` on the server, with `noImplicitAny: false` to keep the migration's `: any` parameters. Fix null-check sites by adding guards or `!` assertions where invariant; type empty arrays explicitly (`const promises: Promise<X>[] = []`).
+2. Repeat on the site. Most class component states and function-component props are typed `: any` — Phase 3 work item to type them properly.
+3. Once strict-clean, drop `noImplicitAny: false` and address the residual `: any` decorations on parameters.
+
+The biggest cluster of `: any` casts in the server is in `note.controllers.ts` — these mostly handle runtime augmentations (`note.nick`, `_hybridScore`) on lean Mongoose results. The `PopulatedNote` type at the top of that file already captures these; further tightening means propagating it through the helper functions that currently take/return `any`.
+
+
+
 Issues discovered during cleanup and TypeScript migration that are out of scope for the immediate task. Each entry has the symptom, the root cause, and a suggested fix so they can be picked up cleanly later.
 
 ## Frontend `getNoteByNick` is broken — backend route does not exist
