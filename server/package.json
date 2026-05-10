@@ -12,7 +12,9 @@
     "dev": "NODE_ENV=development nodemon --exec npm run restart",
     "import": "node dist/cli/import.js",
     "restart": "rimraf dist && npm run build && npm run start",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "NODE_ENV=development vitest run",
+    "test:watch": "NODE_ENV=development vitest"
   },
   "dependencies": {
     "@swc/cli": "^0.8.1",
@@ -38,7 +40,10 @@
     "@eslint/js": "^9",
     "eslint": "^9",
     "globals": "^17",
+    "mongodb-memory-server": "^11.1.0",
     "nodemon": "^3.0.2",
-    "prettier": "^3.1.0"
+    "prettier": "^3.1.0",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.5"
   }
 }
