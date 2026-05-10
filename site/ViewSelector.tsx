@@ -8,7 +8,7 @@ import gridSmall from 'url:./icons/grid_small.svg'
 // View mode shortcuts (Ctrl+Shift+1/2/3/4) are handled globally in App.js
 // This component only renders the view mode buttons
 
-class ViewSelector extends React.Component {
+class ViewSelector extends React.Component<any> {
   render() {
     return (
       <>

@@ -21,7 +21,7 @@ function snippetAround(text, query) {
   )
 }
 
-class NoteResult extends React.PureComponent {
+class NoteResult extends React.PureComponent<any> {
   render() {
     const note = this.props.note
     const hl = this.props.highlight

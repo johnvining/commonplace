@@ -1,6 +1,13 @@
 import React from 'react'
-class YearSpan extends React.Component {
-  formatYear(year) {
+
+interface YearSpanProps {
+  year?: number | string
+  parens?: boolean
+  spanStyle?: string
+}
+
+class YearSpan extends React.Component<YearSpanProps> {
+  formatYear(year: any) {
     if (year < 0) {
       year = year * -1 + ' BC'
     }

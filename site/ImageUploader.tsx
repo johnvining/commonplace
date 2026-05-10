@@ -1,14 +1,14 @@
 import React from 'react'
 import upload from 'url:./icons/upload.svg'
 
-class ImageUploader extends React.Component {
+class ImageUploader extends React.Component<any, any> {
   state = {
     uploading: false,
     dragActive: false,
     uploadTotal: 0,
     uploadDone: 0,
   }
-  inputRef = React.createRef()
+  inputRef = React.createRef<HTMLInputElement>()
 
   onFileSelect(event) {
     this.handleFiles(event.target.files)

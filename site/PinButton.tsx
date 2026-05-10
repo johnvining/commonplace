@@ -14,7 +14,7 @@ function PinButton({
   showLabel,
   stopPropagation = true,
   tabIndex,
-}) {
+}: any) {
   const [pinned, setPinned] = useState(isPinned(type, id))
   const shouldShowLabel = showLabel ?? !compact
   const iconOnly = compact && !shouldShowLabel
@@ -67,7 +67,7 @@ function PinButton({
 
 export default PinButton
 
-export function TopLevelStarButton({ type, id, label, href }) {
+export function TopLevelStarButton({ type, id, label, href }: any) {
   const [pinned, setPinned] = useState(isPinned(type, id))
 
   useEffect(() => {
