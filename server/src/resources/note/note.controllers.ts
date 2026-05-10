@@ -25,9 +25,21 @@ const pageSize = 40
 // Fields that are large and not needed in list views
 const LIST_OMIT = '-embedding -ocrText -embeddingHash'
 
+// Lean note + runtime augmentations added across the request pipeline:
+// `nick` from a Nick lookup, `score`/`_hybridScore`/`_semantic` from search
+// rankers. Fields like author/ideas/piles/work may be ObjectIds or populated
+// objects depending on the call.
+type PopulatedNote = Record<string, unknown> & {
+  _id: any
+  nick?: string | null
+  score?: number
+  _hybridScore?: number
+  _semantic?: boolean
+}
+
 export const reqFindNotesByString = async (req, res) => {
   const escaped = req.body.searchString.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-  const notes = await Note.find(
+  const notes = (await Note.find(
     { $text: { $search: escaped } },
     { score: { $meta: 'textScore' } }
   )
@@ -38,13 +50,15 @@ export const reqFindNotesByString = async (req, res) => {
     .populate('piles')
     .populate({ path: 'work', populate: { path: 'author' } })
     .lean()
-    .exec()
+    .exec()) as PopulatedNote[]
 
-  const noteIds = notes.map((n: any) => n._id)
+  const noteIds = notes.map((n) => n._id)
   const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
   const nickMap: Record<string, string> = {}
-  nicks.forEach((nick: any) => { nickMap[String(nick.note)] = nick.key })
-  notes.forEach((note: any) => { note.nick = nickMap[String(note._id)] || null })
+  nicks.forEach((nick) => {
+    if (nick.note && nick.key) nickMap[String(nick.note)] = nick.key
+  })
+  notes.forEach((note) => { note.nick = nickMap[String(note._id)] || null })
   return notes
 }
 
@@ -512,7 +526,7 @@ export const reqBulkGetNotesForMarkdown = async (req, res) => {
   return results
 }
 
-async function hybridSearch(query, limit = 20) {
+async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]> {
   if (!query?.trim()) return []
 
   const [keywordNotes, queryEmbedding] = await Promise.all([
@@ -528,44 +542,44 @@ async function hybridSearch(query, limit = 20) {
       .populate('piles')
       .populate({ path: 'work', populate: { path: 'author' } })
       .lean()
-      .exec(),
+      .exec() as Promise<PopulatedNote[]>,
     generateEmbedding(query),
   ])
 
   const embeddingMap = await getEmbeddingCache()
 
-  const semanticScores = []
+  const semanticScores: { id: string; score: number }[] = []
   for (const [id, embedding] of embeddingMap) {
     semanticScores.push({ id, score: cosineSimilarity(queryEmbedding, embedding) })
   }
   semanticScores.sort((a, b) => b.score - a.score)
   const topSemantic = semanticScores.filter((s) => s.score >= 0.38)
 
-  const maxKeyword = keywordNotes.length > 0 ? Math.max(...keywordNotes.map((n: any) => n.score || 0)) : 1
-  const keywordMap = new Map(keywordNotes.map((n: any) => [String(n._id), n]))
-  const keywordScoreMap = new Map(keywordNotes.map((n: any) => [String(n._id), (n.score || 0) / (maxKeyword || 1)]))
+  const maxKeyword = keywordNotes.length > 0 ? Math.max(...keywordNotes.map((n) => n.score || 0)) : 1
+  const keywordMap = new Map(keywordNotes.map((n) => [String(n._id), n]))
+  const keywordScoreMap = new Map(keywordNotes.map((n) => [String(n._id), (n.score || 0) / (maxKeyword || 1)]))
 
   const semanticOnlyIds = topSemantic
     .map((s) => s.id)
     .filter((id) => !keywordMap.has(id))
 
-  let semanticOnlyNotes = []
+  let semanticOnlyNotes: PopulatedNote[] = []
   if (semanticOnlyIds.length > 0) {
-    semanticOnlyNotes = await Note.find({ _id: { $in: semanticOnlyIds } })
+    semanticOnlyNotes = (await Note.find({ _id: { $in: semanticOnlyIds } })
       .select(LIST_OMIT)
       .populate('author')
       .populate('ideas')
       .populate('piles')
       .populate({ path: 'work', populate: { path: 'author' } })
       .lean()
-      .exec()
+      .exec()) as PopulatedNote[]
   }
 
   const semanticScoreMap = new Map(topSemantic.map((s) => [s.id, s.score]))
 
-  const allNotes = [...keywordNotes, ...semanticOnlyNotes]
-  const seen = new Set()
-  const scored = []
+  const allNotes: PopulatedNote[] = [...keywordNotes, ...semanticOnlyNotes]
+  const seen = new Set<string>()
+  const scored: PopulatedNote[] = []
   for (const note of allNotes) {
     const id = String(note._id)
     if (seen.has(id)) continue
@@ -574,14 +588,16 @@ async function hybridSearch(query, limit = 20) {
     const sem = semanticScoreMap.get(id) ?? 0
     scored.push({ ...note, _hybridScore: 0.6 * kw + 0.4 * sem, _semantic: sem > 0 && kw === 0 })
   }
-  scored.sort((a, b) => b._hybridScore - a._hybridScore)
-  const top = scored.filter((n) => n._hybridScore >= 0.15).slice(0, limit)
+  scored.sort((a, b) => (b._hybridScore ?? 0) - (a._hybridScore ?? 0))
+  const top = scored.filter((n) => (n._hybridScore ?? 0) >= 0.15).slice(0, limit)
 
-  const noteIds = top.map((n: any) => n._id)
+  const noteIds = top.map((n) => n._id)
   const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
   const nickMap: Record<string, string> = {}
-  nicks.forEach((nick: any) => { nickMap[String(nick.note)] = nick.key })
-  top.forEach((note: any) => { note.nick = nickMap[String(note._id)] || null })
+  nicks.forEach((nick) => {
+    if (nick.note && nick.key) nickMap[String(nick.note)] = nick.key
+  })
+  top.forEach((note) => { note.nick = nickMap[String(note._id)] || null })
 
   return top
 }
@@ -673,18 +689,18 @@ export const findNotesAndPopulate = async function (
   skip: any = null,
   limit: any = null,
   projection: any = LIST_OMIT
-) {
-  let notes
+): Promise<PopulatedNote[]> {
+  let notes: PopulatedNote[]
   if (slim) {
-    notes = await Note.find(searchObject)
+    notes = (await Note.find(searchObject)
       .sort(sortObject)
       .skip(skip)
       .limit(limit)
       .select(projection)
       .lean()
-      .exec()
+      .exec()) as PopulatedNote[]
   } else {
-    notes = await Note.find(searchObject)
+    notes = (await Note.find(searchObject)
       .sort(sortObject)
       .skip(skip)
       .limit(limit)
@@ -694,25 +710,21 @@ export const findNotesAndPopulate = async function (
       .populate('piles')
       .populate({
         path: 'work',
-        populate: {
-          path: 'author',
-        },
+        populate: { path: 'author' },
       })
       .lean()
-      .exec()
+      .exec()) as PopulatedNote[]
   }
 
-  const noteIds = notes.map((note: any) => note._id)
-  const nicks = await Nick.find({ note: { $in: noteIds } })
-    .lean()
-    .exec()
+  const noteIds = notes.map((note) => note._id)
+  const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
 
   const nickMap: Record<string, string> = {}
-  nicks.forEach((nick: any) => {
-    nickMap[String(nick.note)] = nick.key
+  nicks.forEach((nick) => {
+    if (nick.note && nick.key) nickMap[String(nick.note)] = nick.key
   })
 
-  notes.forEach((note: any) => {
+  notes.forEach((note) => {
     note.nick = nickMap[String(note._id)] || null
   })
 
