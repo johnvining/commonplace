@@ -7,7 +7,7 @@ import YearUrlComboSpan from './YearUrlComboSpan'
 import { useState, useEffect, useCallback } from 'react'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
-import { marked } from 'marked'
+import { renderMarkdown } from './safeMarkdown'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import ImageUploader from './ImageUploader'
 import {
@@ -511,7 +511,7 @@ function Work(props: any) {
           <div
             className="work-summary"
             dangerouslySetInnerHTML={{
-              __html: processHtmlForNicks(marked(pendingSummary || '')),
+              __html: processHtmlForNicks(renderMarkdown(pendingSummary)),
             }}
           />
         </TopLevelPostButtonContent>

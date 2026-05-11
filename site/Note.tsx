@@ -23,7 +23,7 @@ import * as constants from './constants'
 import autosize from 'autosize'
 import YearUrlComboSpan from './YearUrlComboSpan'
 import WorkCitationSpan from './WorkCitationSpan'
-import { marked } from 'marked'
+import { renderMarkdown } from './safeMarkdown'
 import ClickToCopyNick from './ClickToCopyNick'
 import ClickableLabelButton from './ClickableLabelButton'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
@@ -738,7 +738,7 @@ class Note extends React.Component<any, any> {
                   {this.state.pendingText ? (
                     <div
                       className="note-overlay-text"
-                      dangerouslySetInnerHTML={{ __html: marked(this.state.pendingText) }}
+                      dangerouslySetInnerHTML={{ __html: renderMarkdown(this.state.pendingText) }}
                     />
                   ) : null}
                   {(this.state.pendingAuthorName || this.state.pendingWorkName) ? (
@@ -813,7 +813,7 @@ class Note extends React.Component<any, any> {
                     : '')
                 }
                 dangerouslySetInnerHTML={{
-                  __html: marked(this.state.pendingText || ''),
+                  __html: renderMarkdown(this.state.pendingText),
                 }}
               />
             </div>
@@ -837,7 +837,7 @@ class Note extends React.Component<any, any> {
               <div
                 className="note-full note-take markdown"
                 dangerouslySetInnerHTML={{
-                  __html: marked(this.state.pendingTake || ''),
+                  __html: renderMarkdown(this.state.pendingTake),
                 }}
               />
             </div>
