@@ -19,6 +19,7 @@ import statsRouter from './resources/stats/stats.router'
 import { reqAuthenticate } from './resources/user/user.controllers.js'
 import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
+import { requireXhr } from './utils/requireXhr.js'
 
 export const app = express()
 
@@ -62,6 +63,7 @@ app.use(urlencoded({ extended: true, limit: '5mb' }))
 if (!process.env.VITEST) app.use(morgan('dev'))
 
 app.use(cookieParser())
+app.use('/api', requireXhr)
 
 app.use('/api/user', userRouter)
 app.all('*', reqAuthenticate) // TODO: Callback function

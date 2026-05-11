@@ -1,6 +1,10 @@
 import axios from 'axios'
 
 axios.defaults.withCredentials = true
+// CSRF defence-in-depth: server rejects state-changing requests without
+// this header (set automatically only by same-origin JS, never by a CSRF
+// form post).
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
 export const types = {
   auth: 'auth',
