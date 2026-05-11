@@ -12,8 +12,8 @@
     "import": "node dist/cli/import.js",
     "restart": "rimraf dist && npm run build && npm run start",
     "start": "node dist/index.js",
-    "test": "NODE_ENV=development vitest run",
-    "test:watch": "NODE_ENV=development vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
