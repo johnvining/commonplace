@@ -2,6 +2,7 @@ import compression from 'compression'
 import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import morgan from 'morgan'
+import helmet from 'helmet'
 import config from './config'
 import cors from 'cors'
 import { connect } from './utils/db'
@@ -22,6 +23,23 @@ import fileUpload from 'express-fileupload'
 export const app = express()
 
 app.disable('x-powered-by')
+// helmet sets a sensible default of security headers (X-Content-Type-Options,
+// Referrer-Policy, etc.). The API only serves JSON + images, never inline HTML,
+// so we can be aggressive with the CSP. The frontend is served separately by
+// nginx (or Parcel in dev) — that bundle's index.html has its own scripts.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'none'"],
+        // Image responses come from this API; everything else is denied.
+        imgSrc: ["'self'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    crossOriginResourcePolicy: { policy: 'same-site' },
+  })
+)
 app.use(compression())
 
 app.use(
