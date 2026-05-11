@@ -33,6 +33,7 @@ import controllers, {
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 import { requireObjectIdParam } from '../../utils/validateObjectId.js'
+import { expensiveRateLimiter } from '../../utils/rateLimits.js'
 
 const router = Router()
 
@@ -70,16 +71,16 @@ router.route('/:id/image').put(requireObjectIdParam('id'), reqAddImageToNote)
 router.route('/:id/images/:image').get(requireObjectIdParam('id'), reqGetImageForNote)
 router.route('/:id/image/').delete(requireObjectIdParam('id'), reqRemoveImageFromNote)
 
-router.route('/:id/title/suggest').get(reqGetSuggestionForNoteTitle)
-router.route('/:id/ideas/suggest').get(reqGetSuggestedIdeasForNote)
+router.route('/:id/title/suggest').get(expensiveRateLimiter, reqGetSuggestionForNoteTitle)
+router.route('/:id/ideas/suggest').get(expensiveRateLimiter, reqGetSuggestedIdeasForNote)
 
-router.route('/:id/ocr').get(asyncWrapper(reqOcrForNote, 200))
+router.route('/:id/ocr').get(expensiveRateLimiter, asyncWrapper(reqOcrForNote, 200))
 
-router.route('/bulk-ocr').post(asyncWrapper(reqBulkOcrForNotes, 200))
+router.route('/bulk-ocr').post(expensiveRateLimiter, asyncWrapper(reqBulkOcrForNotes, 200))
 
 router
   .route('/bulk-suggest-titles')
-  .post(asyncWrapper(reqBulkSuggestTitlesForNotes, 200))
+  .post(expensiveRateLimiter, asyncWrapper(reqBulkSuggestTitlesForNotes, 200))
 
 router
   .route('/bulk-markdown')
@@ -91,9 +92,9 @@ router.route('/import/csv').put(asyncWrapper(reqBulkImportNotesCSV, 200))
 
 router.route('/import/instapaper').put(asyncWrapper(reqBulkImportInstapaper, 200))
 
-router.route('/bulk-embed').post(asyncWrapper(reqBulkEmbedNotes, 200))
+router.route('/bulk-embed').post(expensiveRateLimiter, asyncWrapper(reqBulkEmbedNotes, 200))
 
-router.route('/unified-search').post(asyncWrapper(reqUnifiedSearch, 200))
+router.route('/unified-search').post(expensiveRateLimiter, asyncWrapper(reqUnifiedSearch, 200))
 
 router
   .route('/:id')
