@@ -63,8 +63,12 @@ function Author(props: any) {
       usernames: pendingUsernames.split(',').map(u => u.trim()).filter(Boolean),
     }
 
-    db.updateRecord(db.types.auth, id, updateObject)
-    setEdit(false)
+    try {
+      await db.updateRecord(db.types.auth, id, updateObject)
+      setEdit(false)
+    } catch {
+      // Toast surfaced by axios interceptor; stay in edit mode for retry.
+    }
   }
 
   useEntityKeyboardShortcuts({

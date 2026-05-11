@@ -193,8 +193,12 @@ function Work(props: any) {
       citation_information: pendingCitationInfo,
     }
 
-    db.updateRecord(db.types.work, id, updateObject)
-    setEdit(false)
+    try {
+      await db.updateRecord(db.types.work, id, updateObject)
+      setEdit(false)
+    } catch {
+      // Toast surfaced by axios interceptor; stay in edit mode for retry.
+    }
   }
 
   const handleImport = async () => {

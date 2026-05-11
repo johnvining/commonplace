@@ -364,13 +364,17 @@ class Note extends React.Component<any, any> {
     }
 
     this.setState({ keep: true })
+    const previousMode = this.props.mode
     this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
-    await db
-      .updateRecord(db.types.note, this.props.id, updateObject)
-      .then(() => this.props.refetchMe(this.props.index))
-      .catch((error: any) => {
-        console.error(error)
-      })
+    try {
+      await db.updateRecord(db.types.note, this.props.id, updateObject)
+      this.props.refetchMe(this.props.index)
+    } catch (error) {
+      // Stay in edit mode so the user can retry; the axios interceptor
+      // already surfaces a toast with the server message.
+      this.props.setNoteMode(this.props.id, previousMode)
+      console.error(error)
+    }
   }
 
   async handleNewNoteLink() {

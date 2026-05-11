@@ -91,8 +91,12 @@ function Pile(props: any) {
       end_year: pendingEndYear,
     }
 
-    db.updateRecord(db.types.pile, id, updateObject)
-    setEdit(false)
+    try {
+      await db.updateRecord(db.types.pile, id, updateObject)
+      setEdit(false)
+    } catch {
+      // Toast surfaced by axios interceptor; stay in edit mode for retry.
+    }
   }
 
   const createNoteForPile = async () => {
