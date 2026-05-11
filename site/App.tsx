@@ -108,9 +108,14 @@ class App extends React.Component<any, any> {
   validateAuth() {
     getAuthStatus()
       .then(() => this.setState({ authorized: true }))
-      .catch(() => {
-        this.redirectTo = window.location.pathname + window.location.search
-        this.setState({ authorized: false })
+      .catch((error: any) => {
+        // Only kick to login on a real auth failure. Network errors or
+        // server outages used to log the user out and lose their place;
+        // now they stay where they are and the toast surfaces the issue.
+        if (error?.response?.status === 401) {
+          this.redirectTo = window.location.pathname + window.location.search
+          this.setState({ authorized: false })
+        }
       })
   }
 
