@@ -405,12 +405,15 @@ export const reqOcrForNote = async (req: Request, res: Response) => {
   return result
 }
 
+// Cap on bulk operations — prevents a runaway request from creating a million
+// rows or burning the OpenAI bill via a giant noteIds list.
+const BULK_LIMIT = 1000
+
 export const reqBulkImportForWork = async (req: Request, res: Response) => {
   // TODO: Validate work ID
   const input: string = req.body.notesText
-  const lines = input.split(/\r?\n/)
+  const lines = input.split(/\r?\n/).filter((line) => line).slice(0, BULK_LIMIT)
   const notePromises = lines
-    .filter((line) => line)
     .map((line) => Note.create({ title: '', work: req.params.work, text: line }))
 
   await Promise.all(notePromises)
@@ -430,7 +433,7 @@ export const reqBulkImportInstapaper = async (req: Request, res: Response) => {
 }
 
 export const reqBulkOcrForNotes = async (req: Request, res: Response) => {
-  const noteIds = req.body.noteIds
+  const noteIds = Array.isArray(req.body.noteIds) ? req.body.noteIds.slice(0, BULK_LIMIT) : []
   const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
   const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
 
@@ -476,7 +479,7 @@ export const reqBulkOcrForNotes = async (req: Request, res: Response) => {
 }
 
 export const reqBulkSuggestTitlesForNotes = async (req: Request, res: Response) => {
-  const noteIds = req.body.noteIds
+  const noteIds = Array.isArray(req.body.noteIds) ? req.body.noteIds.slice(0, BULK_LIMIT) : []
   const noteDocs = await Note.find({ _id: { $in: noteIds } }).lean()
   const noteMap = Object.fromEntries(noteDocs.map(n => [String(n._id), n]))
 
@@ -519,7 +522,7 @@ export const reqBulkSuggestTitlesForNotes = async (req: Request, res: Response) 
 }
 
 export const reqBulkGetNotesForMarkdown = async (req: Request, res: Response) => {
-  const noteIds = req.body.noteIds
+  const noteIds = Array.isArray(req.body.noteIds) ? req.body.noteIds.slice(0, BULK_LIMIT) : []
 
   const notePromises = noteIds.map(async (noteId: unknown) => {
     try {
