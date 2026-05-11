@@ -3,6 +3,7 @@ import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
+import { escapeRegexInput } from '../../utils/searchInput.js'
 import type { Request, Response } from 'express'
 
 
@@ -69,7 +70,7 @@ export const findAuthorByUrl = async function (url: string) {
 }
 
 export const findAuthorsByString = async function (str: string, withCounts: boolean) {
-  let authors = await Auth.find({ name: new RegExp(str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+  const authors = await Auth.find({ name: new RegExp(escapeRegexInput(str), 'i') })
     .lean()
     .exec()
   if (!withCounts || !authors.length) return authors

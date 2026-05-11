@@ -6,6 +6,7 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { generateNick } from '../nick/nick.controllers.js'
+import { escapeRegexInput } from '../../utils/searchInput.js'
 import type { Request, Response } from 'express'
 
 
@@ -101,7 +102,7 @@ export const reqRemovePileFromWork = async (req: Request, res: Response) => {
 }
 
 export const findWorksByString = async function(string: string, withCounts = false) {
-  let works = await Work.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+  const works = await Work.find({ name: new RegExp(escapeRegexInput(string), 'i') })
     .populate('author')
     .lean()
     .exec()

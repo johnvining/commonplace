@@ -6,6 +6,7 @@ import {
   removeIdeaFromNote,
   findNotesAndPopulate
 } from '../note/note.controllers'
+import { escapeRegexInput } from '../../utils/searchInput.js'
 import type { Request, Response } from 'express'
 
 export const reqGetNotesForIdea = async (req: Request, res: Response) => {
@@ -59,7 +60,7 @@ export const reqGetAutoComplete = async (req: Request, res: Response, withCounts
 }
 
 export const findIdeasByString = async function(string: string, withCounts = false) {
-  let ideas = await Idea.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+  const ideas = await Idea.find({ name: new RegExp(escapeRegexInput(string), 'i') })
     .lean()
     .exec()
   if (!withCounts || !ideas.length) return ideas

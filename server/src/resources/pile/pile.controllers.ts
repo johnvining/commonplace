@@ -5,6 +5,7 @@ import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { removePileFromWork } from '../work/work.controllers.js'
 import { generateNick } from '../nick/nick.controllers.js'
+import { escapeRegexInput } from '../../utils/searchInput.js'
 import type { Request, Response } from 'express'
 
 
@@ -61,7 +62,7 @@ export const reqDeletePile = async (req: Request, res: Response) => {
 
 // TODO: Duplicative of whats in work.controllers.js
 export const filePilesByString = async function (string: string, withCounts: boolean) {
-  let piles = await Pile.find({ name: new RegExp(string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') })
+  const piles = await Pile.find({ name: new RegExp(escapeRegexInput(string), 'i') })
     .lean()
     .exec()
   if (!withCounts) {

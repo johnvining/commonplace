@@ -19,6 +19,7 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
 import { generateNick } from '../nick/nick.controllers.js'
+import { sanitizeSearchInput, escapeRegexInput } from '../../utils/searchInput.js'
 import type { Request, Response } from 'express'
 
 
@@ -40,7 +41,9 @@ type PopulatedNote = Record<string, unknown> & {
 }
 
 export const reqFindNotesByString = async (req: Request, res: Response) => {
-  const escaped = req.body.searchString.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+  const escaped = sanitizeSearchInput(req.body.searchString)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
   const notes = (await Note.find(
     { $text: { $search: escaped } },
     { score: { $meta: 'textScore' } }
@@ -562,7 +565,8 @@ export const reqBulkGetNotesForMarkdown = async (req: Request, res: Response) =>
 }
 
 async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]> {
-  if (!query?.trim()) return []
+  query = sanitizeSearchInput(query)
+  if (!query.trim()) return []
 
   const [keywordNotes, queryEmbedding] = await Promise.all([
     Note.find(
@@ -648,11 +652,11 @@ function scoreEntityName(name: string | undefined, query: string): number {
 }
 
 export const reqUnifiedSearch = async (req: Request, res: Response) => {
-  const { query, limit = 50 } = req.body
-  if (!query?.trim()) return []
+  const query = sanitizeSearchInput(req.body.query)
+  const limit = req.body.limit ?? 50
+  if (!query.trim()) return []
 
-  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const regex = new RegExp(escaped, 'i')
+  const regex = new RegExp(escapeRegexInput(query), 'i')
 
   const [notes, authors, works, ideas, piles] = await Promise.all([
     hybridSearch(query, limit),
