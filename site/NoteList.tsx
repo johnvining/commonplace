@@ -240,9 +240,6 @@ class NoteList extends React.Component<any, any> {
     })
   }
 
-  componentWillUnmount() {
-    if (this._imageObserver) this._imageObserver.disconnect()
-  }
 
   async getImagesForNoteAtIndex(index: any, refetch: any) {
     if (refetch) {
@@ -275,10 +272,24 @@ class NoteList extends React.Component<any, any> {
           imagesArray.push(URL.createObjectURL(response.data))
         }
       })
+      // Revoke the previous batch's URLs before overwriting — blob URLs hold
+      // refs to the underlying Blob forever otherwise.
+      if (Array.isArray(note.imageUrls)) {
+        for (const u of note.imageUrls) URL.revokeObjectURL(u)
+      }
       note.imageUrls = imagesArray
       notes[index] = note
       this.setState({ notes: notes })
     })
+  }
+
+  componentWillUnmount() {
+    if (this._imageObserver) this._imageObserver.disconnect()
+    for (const note of this.state.notes ?? []) {
+      if (Array.isArray(note.imageUrls)) {
+        for (const u of note.imageUrls) URL.revokeObjectURL(u)
+      }
+    }
   }
 
   setNoteMode(noteId: any, mode: any) {
