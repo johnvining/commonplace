@@ -96,9 +96,26 @@ export const start = async () => {
     console.log(`REST API on http://localhost:${config.port}/api`)
   })
 
-  const shutdown = () => {
-    server.close(() => process.exit(0))
+  // server.close() refuses to terminate while a request is in flight —
+  // long OpenAI calls (OCR / bulk embed) can hold the socket for tens of
+  // seconds. Force-exit after the timeout so a stuck request never blocks
+  // a deploy or reboot indefinitely.
+  const SHUTDOWN_TIMEOUT_MS = 15_000
+  let shuttingDown = false
+  const shutdown = (signal: string) => {
+    if (shuttingDown) return
+    shuttingDown = true
+    console.log(`Received ${signal}, shutting down...`)
+    const killer = setTimeout(() => {
+      console.error('Shutdown timeout reached, forcing exit')
+      process.exit(1)
+    }, SHUTDOWN_TIMEOUT_MS)
+    killer.unref()
+    server.close(() => {
+      clearTimeout(killer)
+      process.exit(0)
+    })
   }
-  process.on('SIGTERM', shutdown)
-  process.on('SIGINT', shutdown)
+  process.on('SIGTERM', () => shutdown('SIGTERM'))
+  process.on('SIGINT', () => shutdown('SIGINT'))
 }
