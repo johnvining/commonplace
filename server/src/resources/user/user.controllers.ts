@@ -40,8 +40,11 @@ export const reqRegisterUser = async (req: Request, res: Response) => {
     })
   }
 
-  let existingUser = await User.findOne({ username: username }).exec()
-  if (existingUser != null) {
+  // Registration is single-shot: once *any* user exists the endpoint is
+  // closed. Independent of the username check above so a future regression
+  // that drops it doesn't accidentally re-open the door.
+  const existing = await User.countDocuments().exec()
+  if (existing > 0) {
     return res.status(401).json({
       message: 'User already exists',
     })
