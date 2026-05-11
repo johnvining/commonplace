@@ -121,4 +121,5 @@ export const deleteIdea = async function(ideaId: string) {
   await Idea.findOneAndDelete({ _id: ideaId })
 }
 
-export default defaultControllers(Idea)
+const IDEA_WRITABLE = ['name', 'start_year', 'end_year'] as const
+export default defaultControllers(Idea, { writable: IDEA_WRITABLE })

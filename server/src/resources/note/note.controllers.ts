@@ -20,6 +20,7 @@ import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../uti
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
 import { generateNick } from '../nick/nick.controllers.js'
 import { sanitizeSearchInput, escapeRegexInput } from '../../utils/searchInput.js'
+import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
 
 
@@ -27,6 +28,13 @@ const pageSize = 40
 
 // Fields that are large and not needed in list views
 const LIST_OMIT = '-embedding -ocrText -embeddingHash'
+
+// Embeddings and their hash are server-controlled; nothing in the client
+// payload should be able to overwrite them.
+const NOTE_WRITABLE = [
+  'title', 'author', 'text', 'ideas', 'work', 'year', 'url',
+  'images', 'page', 'piles', 'take', 'ocrText',
+] as const
 
 // Lean note + runtime augmentations added across the request pipeline:
 // `nick` from a Nick lookup, `score`/`_hybridScore`/`_semantic` from search
@@ -192,25 +200,26 @@ const inferWorkUrl = async function (workId: unknown, noteUrl: string) {
 }
 
 export const reqUpdateNote = async (req: Request, res: Response) => {
-  const updates = { ...req.body }
+  const updates: Record<string, unknown> = pickAllowed(req.body, NOTE_WRITABLE)
 
-  if (updates.url) {
+  const url = typeof updates.url === 'string' ? updates.url : null
+  if (url) {
     const existing = await Note.findById(req.params.id).lean()
     if (existing && !existing.author) {
       const { findAuthorByUrl } = await import('../auth/auth.controllers.js')
-      const author = await findAuthorByUrl(updates.url)
+      const author = await findAuthorByUrl(url)
       if (author) updates.author = author._id
     }
     if (!updates.year) {
-      const year = guessYearFromUrl(updates.url)
+      const year = guessYearFromUrl(url)
       if (year) updates.year = year
     }
   }
 
   const updated = await updateNote(req.params.id, updates)
 
-  if (updates.url && updated?.work) {
-    await inferWorkUrl(updated.work, updates.url)
+  if (url && updated?.work) {
+    await inferWorkUrl(updated.work, url)
   }
 
   if (updated) {
@@ -813,4 +822,4 @@ export const findRandomNotesAndPopulate = async function (
   return populated_notes
 }
 
-export default defaultControllers(Note)
+export default defaultControllers(Note, { writable: NOTE_WRITABLE })

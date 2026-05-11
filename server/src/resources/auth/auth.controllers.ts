@@ -149,4 +149,5 @@ export const deleteAuthor = async function (id: string) {
   await Auth.findOneAndDelete({ _id: id })
 }
 
-export default defaultControllers(Auth)
+const AUTH_WRITABLE = ['name', 'birth_year', 'death_year', 'usernames'] as const
+export default defaultControllers(Auth, { writable: AUTH_WRITABLE })

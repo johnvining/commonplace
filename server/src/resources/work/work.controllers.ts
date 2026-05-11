@@ -186,7 +186,10 @@ export const removePileFromWork = async (workId: string, pileId: unknown) => {
   return doc
 }
 
-export default defaultControllers(Work)
+const WORK_WRITABLE = [
+  'name', 'author', 'url', 'year', 'citation_information', 'summary', 'piles',
+] as const
+export default defaultControllers(Work, { writable: WORK_WRITABLE })
 
 const touchPile = async (pileId: unknown) => {
   if (!pileId) return
