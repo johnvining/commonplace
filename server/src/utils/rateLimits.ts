@@ -16,16 +16,3 @@ export const authRateLimiter: RequestHandler = isTest
       legacyHeaders: false,
       message: { message: 'Too many auth attempts. Try again later.' },
     })
-
-// Expensive endpoints that touch OpenAI. The user wallet is the real damage
-// surface — a runaway client could burn hundreds of dollars in seconds via
-// bulk-embed / bulk-ocr / unified-search.
-export const expensiveRateLimiter: RequestHandler = isTest
-  ? noopLimiter
-  : rateLimit({
-      windowMs: 60 * 1000,
-      max: 30,
-      standardHeaders: true,
-      legacyHeaders: false,
-      message: { message: 'Too many requests. Slow down.' },
-    })
