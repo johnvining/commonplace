@@ -1,10 +1,35 @@
 import axios from 'axios'
+import { showToast } from './Toast'
 
 axios.defaults.withCredentials = true
 // CSRF defence-in-depth: server rejects state-changing requests without
 // this header (set automatically only by same-origin JS, never by a CSRF
 // form post).
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+
+// Surface server errors as toasts. 401s are handled separately by the
+// validateAuth flow (which routes back to /login), so suppress them here
+// to avoid a "Not authorized" toast on every page load before login.
+// Aborted requests (StrictMode, route changes) are also silent.
+axios.interceptors.response.use(
+  r => r,
+  error => {
+    if (axios.isCancel(error) || error?.code === 'ERR_CANCELED') {
+      return Promise.reject(error)
+    }
+    const status = error?.response?.status
+    if (status && status !== 401) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        `Request failed (${status})`
+      showToast({ kind: 'error', message })
+    } else if (!status && error?.message && error?.code !== 'ERR_CANCELED') {
+      showToast({ kind: 'error', message: error.message })
+    }
+    return Promise.reject(error)
+  },
+)
 
 export const types = {
   auth: 'auth',

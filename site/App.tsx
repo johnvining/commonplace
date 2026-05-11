@@ -7,6 +7,7 @@ import search from 'url:./icons/search.svg'
 import home_door from 'url:./icons/home_door.svg'
 import * as constants from './constants'
 import { KeyboardProvider, useKeyboardScopes, useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+import { ToastHost } from './Toast'
 
 class ErrorBoundary extends React.Component<any, any> {
   state: any = { error: null, info: null }
@@ -467,6 +468,7 @@ function AppWithKeyboard() {
         onClose={() => setHelpOpen(false)}
         currentContext={getCurrentContext()}
       />
+      <ToastHost />
     </>
   )
 }
