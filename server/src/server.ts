@@ -83,18 +83,22 @@ export const start = async () => {
     await connect()
 
     await Note.syncIndexes()
-
-    console.log('Listening...')
-    const server = app.listen(config.port, () => {
-      console.log(`REST API on http://localhost:${config.port}/api`)
-    })
-
-    const shutdown = () => {
-      server.close(() => process.exit(0))
-    }
-    process.on('SIGTERM', shutdown)
-    process.on('SIGINT', shutdown)
   } catch (e) {
-    console.error(e)
+    // No Mongo means every route would 500. Crash hard so the supervisor
+    // (systemd / docker / pm2) restarts us instead of serving broken
+    // requests indefinitely.
+    console.error('Failed to start: could not connect to Mongo', e)
+    process.exit(1)
   }
+
+  console.log('Listening...')
+  const server = app.listen(config.port, () => {
+    console.log(`REST API on http://localhost:${config.port}/api`)
+  })
+
+  const shutdown = () => {
+    server.close(() => process.exit(0))
+  }
+  process.on('SIGTERM', shutdown)
+  process.on('SIGINT', shutdown)
 }
