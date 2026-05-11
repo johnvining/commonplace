@@ -32,6 +32,7 @@ import controllers, {
   reqUnifiedSearch,
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
+import { requireObjectIdParam } from '../../utils/validateObjectId.js'
 
 const router = Router()
 
@@ -63,9 +64,11 @@ router.route('/:id/work').put(asyncWrapper(reqAddWork, 200))
 router.route('/:id/work/create').put(asyncWrapper(reqAddNewWork, 201))
 // TODO: router.route('/:id/work/').delete()
 
-router.route('/:id/image').put(reqAddImageToNote)
-router.route('/:id/images/:image').get(reqGetImageForNote)
-router.route('/:id/image/').delete(reqRemoveImageFromNote)
+// Image endpoints concatenate req.params.id into a filesystem path; require an
+// ObjectId here to prevent path traversal via crafted ids.
+router.route('/:id/image').put(requireObjectIdParam('id'), reqAddImageToNote)
+router.route('/:id/images/:image').get(requireObjectIdParam('id'), reqGetImageForNote)
+router.route('/:id/image/').delete(requireObjectIdParam('id'), reqRemoveImageFromNote)
 
 router.route('/:id/title/suggest').get(reqGetSuggestionForNoteTitle)
 router.route('/:id/ideas/suggest').get(reqGetSuggestedIdeasForNote)
