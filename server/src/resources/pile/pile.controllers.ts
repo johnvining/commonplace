@@ -65,35 +65,36 @@ export const reqDeletePile = async (req: Request, res: Response) => {
   await deletePile(req.params.id)
 }
 
-// TODO: Duplicative of whats in work.controllers.js
 export const filePilesByString = async function (string: string, withCounts: boolean) {
   const piles = await Pile.find({ name: new RegExp(escapeRegexInput(string), 'i') })
     .lean()
     .exec()
-  if (!withCounts) {
-    return piles
-  } else {
-    const notePromises: Promise<number>[] = []
-    const workPromises: Promise<number>[] = []
-    piles.map((pile) => {
-      notePromises.push(Note.find({ piles: pile._id }).countDocuments().exec())
-      workPromises.push(Work.find({ piles: pile._id }).countDocuments().exec())
-    })
+  if (!withCounts || !piles.length) return piles
 
-    let noteFiler = Promise.all(notePromises).then((result) => {
-      result.map((val, idx) => {
-        ;(piles as any)[idx] = { ...piles[idx], note_count: val }
-      })
-    })
-    let workFiler = Promise.all(workPromises).then((result) => {
-      result.map((val, idx) => {
-        ;(piles as any)[idx] = { ...piles[idx], work_count: val }
-      })
-    })
-
-    await Promise.all([noteFiler, workFiler])
-    return piles
-  }
+  // Was N+1: one countDocuments per matched pile for both Note and Work.
+  // Two aggregates instead — fixed cost regardless of pile count.
+  const pileIds = piles.map(p => p._id)
+  const [noteCounts, workCounts] = await Promise.all([
+    Note.aggregate([
+      { $match: { piles: { $in: pileIds } } },
+      { $unwind: '$piles' },
+      { $match: { piles: { $in: pileIds } } },
+      { $group: { _id: '$piles', count: { $sum: 1 } } },
+    ]),
+    Work.aggregate([
+      { $match: { piles: { $in: pileIds } } },
+      { $unwind: '$piles' },
+      { $match: { piles: { $in: pileIds } } },
+      { $group: { _id: '$piles', count: { $sum: 1 } } },
+    ]),
+  ])
+  const noteMap = Object.fromEntries(noteCounts.map(x => [String(x._id), x.count]))
+  const workMap = Object.fromEntries(workCounts.map(x => [String(x._id), x.count]))
+  return piles.map(p => ({
+    ...p,
+    note_count: noteMap[String(p._id)] || 0,
+    work_count: workMap[String(p._id)] || 0,
+  }))
 }
 
 export const deletePile = async function (pileId: string) {

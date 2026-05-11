@@ -25,36 +25,6 @@ export const reqGetNotesForIdea = async (req: Request, res: Response) => {
   return doc
 }
 
-export const reqGetIdeasByStringWithCounts = async (req: Request, res: Response) => {
-  try {
-    var doc = await findIdeasByString(req.body.string)
-    if (!doc) {
-      return res.status(400).end()
-    }
-
-    // TODO: Can we use slim here?
-    const notePromises: Promise<unknown[]>[] = []
-    for (let i = 0; i < doc.length; i++) {
-      notePromises.push(findNotesAndPopulate({ ideas: doc[i]._id }))
-    }
-
-    const notes = await Promise.all(notePromises)
-
-    const responseData: any[] = []
-    for (let i = 0; i < doc.length; i++) {
-      let idea = (doc[i] as any)._doc
-      let notesValues = { notes: notes[i] }
-      idea = { ...idea, ...notesValues }
-      responseData[i] = idea
-    }
-
-    res.status(200).json({ data: responseData })
-  } catch (e) {
-    console.error(e)
-    res.status(400).end()
-  }
-}
-
 export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) => {
   return await reqGetAutoComplete(req, res, true)
 }
