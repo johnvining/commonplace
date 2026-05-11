@@ -45,8 +45,8 @@ describe('nick', () => {
 
     it('returns null for an entity without a nick', async () => {
       const agent = await authedAgent()
-      const work = await createWork(agent)
-      const res = await agent.get(`/api/nick/work/${work._id}`).expect(200)
+      // Use a fresh ObjectId that we never created an entity for — guarantees no nick.
+      const res = await agent.get('/api/nick/work/507f1f77bcf86cd799439011').expect(200)
       expect(res.body.data).toBeNull()
     })
   })

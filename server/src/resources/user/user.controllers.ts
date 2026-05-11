@@ -48,7 +48,7 @@ export const reqRegisterUser = async (req: Request, res: Response) => {
   }
 
   try {
-    const hash = await bcrypt.hash(password, 10)
+    const hash = await bcrypt.hash(password, 12)
     const user = await User.create({ username, password: hash })
     const token = jwt.sign({ id: user._id, username }, jwtSecret(), {
       expiresIn: TOKEN_LIFETIME_SECONDS,
