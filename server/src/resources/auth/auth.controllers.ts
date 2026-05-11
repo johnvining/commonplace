@@ -4,13 +4,18 @@ import Work from '../work/work.model.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
+import { pageParams } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
 
 export const reqGetNotesForAuthor = async (req: Request, res: Response) => {
+  const { skip, limit } = pageParams(req)
   const doc = await findNotesAndPopulate(
     { author: req.params.id },
-    { updatedAt: -1 }
+    { updatedAt: -1 },
+    false,
+    skip,
+    limit
   )
   if (!doc) {
     return res.status(400).end()
@@ -19,13 +24,14 @@ export const reqGetNotesForAuthor = async (req: Request, res: Response) => {
 }
 
 export const reqGetAllNotesForAuthor = async (req: Request, res: Response) => {
+  const { skip, limit } = pageParams(req)
   const authorId = req.params.id
   const works = await Work.find({ author: authorId }, { _id: 1 }).lean().exec()
   const workIds = works.map(w => w._id)
   const query = workIds.length
     ? { $or: [{ author: authorId }, { work: { $in: workIds } }] }
     : { author: authorId }
-  return findNotesAndPopulate(query, { updatedAt: -1 })
+  return findNotesAndPopulate(query, { updatedAt: -1 }, false, skip, limit)
 }
 
 export const getAutoCompleteWithCounts = async (req: Request, res: Response) => {

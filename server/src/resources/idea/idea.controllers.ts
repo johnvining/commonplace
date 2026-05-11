@@ -7,10 +7,18 @@ import {
   findNotesAndPopulate
 } from '../note/note.controllers'
 import { escapeRegexInput } from '../../utils/searchInput.js'
+import { pageParams } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
 export const reqGetNotesForIdea = async (req: Request, res: Response) => {
-  const doc = await findNotesAndPopulate({ ideas: req.params.id })
+  const { skip, limit } = pageParams(req)
+  const doc = await findNotesAndPopulate(
+    { ideas: req.params.id },
+    { updatedAt: -1 },
+    false,
+    skip,
+    limit
+  )
   if (!doc) {
     return res.status(400).end()
   }
