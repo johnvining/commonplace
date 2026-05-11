@@ -48,7 +48,7 @@ export const getSuggestedIdeas = async function (
           note_text,
       },
     ],
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     response_format: { type: 'json_object' },
   })
 
@@ -83,7 +83,7 @@ export const getOpenAiOCR = async function (
         ],
       },
     ],
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     max_tokens: 1200,
   })
 
