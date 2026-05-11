@@ -306,11 +306,14 @@ export const reqRemoveImageFromNote = async function (req: Request, res: Respons
 
 export const reqGetImageForNote = async function (req: Request, res: Response) {
   try {
-    const note = await Note.findOne({ _id: req.params.id })
+    // Only need the images array, not the full doc (embedding alone is ~2 KB).
+    const note = await Note.findOne({ _id: req.params.id }, { images: 1 }).lean()
     if (!note) {
       res.status(404).end()
       return
     }
+    // Browser-side cache for blob URL fetches — images are immutable per path.
+    res.set('Cache-Control', 'private, max-age=3600')
     res.sendFile(
       config.imageStorePath + '/' + note.images[Number(req.params.image) - 1]
     )
