@@ -421,6 +421,17 @@ export const reqOcrForNote = async (req: Request, res: Response) => {
 // rows or burning the OpenAI bill via a giant noteIds list.
 const BULK_LIMIT = 1000
 
+// Notes created by import have no embedding/hash yet. After each bulk
+// import, kick a background pass scoped to those notes so they enter the
+// embedding cache and become searchable without a manual bulk-embed run.
+const EMBED_PENDING = { embeddingHash: { $exists: false } } as const
+
+function backgroundEmbedPending() {
+  embedStaleNotes(EMBED_PENDING).catch((err) =>
+    console.error('[import] background embed failed', err)
+  )
+}
+
 export const reqBulkImportForWork = async (req: Request, res: Response) => {
   // TODO: Validate work ID
   const input: string = req.body.notesText
@@ -429,18 +440,21 @@ export const reqBulkImportForWork = async (req: Request, res: Response) => {
     .map((line) => Note.create({ title: '', work: req.params.work, text: line }))
 
   await Promise.all(notePromises)
+  backgroundEmbedPending()
   return null
 }
 
 export const reqBulkImportNotesCSV = async (req: Request, res: Response) => {
   let csv = req.body.importList
   const recordsImported = await importCsvFromString(csv, 1)
+  backgroundEmbedPending()
   return recordsImported
 }
 
 export const reqBulkImportInstapaper = async (req: Request, res: Response) => {
   let tsv = req.body.importList
   const recordsImported = await importCsvFromString(tsv, 3)
+  backgroundEmbedPending()
   return recordsImported
 }
 
@@ -697,7 +711,11 @@ export const reqUnifiedSearch = async (req: Request, res: Response) => {
   return results
 }
 
-export const reqBulkEmbedNotes = async (req: Request, res: Response) => {
+// Iterate notes matching `filter`, embed any whose content hash has changed,
+// persist + populate the in-memory cache. Used by the bulk-embed endpoint
+// and by the bulk import endpoints (which scope it to un-embedded notes
+// to avoid re-scanning the full collection on every import).
+export async function embedStaleNotes(filter: Record<string, unknown> = {}) {
   const BATCH = 100
   let skip = 0
   let processed = 0
@@ -705,7 +723,7 @@ export const reqBulkEmbedNotes = async (req: Request, res: Response) => {
   let failed = 0
 
   while (true) {
-    const batch = await Note.find({})
+    const batch = await Note.find(filter)
       .skip(skip)
       .limit(BATCH)
       .populate('author')
@@ -739,6 +757,10 @@ export const reqBulkEmbedNotes = async (req: Request, res: Response) => {
   }
 
   return { processed, skipped, failed }
+}
+
+export const reqBulkEmbedNotes = async (req: Request, res: Response) => {
+  return embedStaleNotes()
 }
 
 export const findNotesAndPopulate = async function (
