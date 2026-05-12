@@ -131,6 +131,7 @@ class App extends React.Component<any, any> {
 
     let environment = process.env.NODE_ENV
     return (
+      <ErrorBoundary>
       <div className="main">
         <div className="top-bar">
           <div className="title-bar">
@@ -367,6 +368,7 @@ class App extends React.Component<any, any> {
           </div>
         </div>
       </div>
+      </ErrorBoundary>
     )
   }
 }
