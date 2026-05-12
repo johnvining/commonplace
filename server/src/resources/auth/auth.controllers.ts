@@ -3,6 +3,7 @@ import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
+import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
 import { pageParams } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
@@ -147,11 +148,11 @@ export const deleteAuthor = async function (id: string) {
     { updatedAt: -1 },
     true
   )
-  const deletionPromises: Promise<unknown>[] = notes.map((note) =>
-    updateNote(note._id, { author: null })
+  const steps: Array<() => Promise<unknown>> = notes.map(
+    (note) => () => updateNote(note._id, { author: null })
   )
-
-  await Promise.all(deletionPromises)
+  // Author has no nick so nothing to drop on that side.
+  await runCascadeSteps('deleteAuthor', steps)
   await Auth.findOneAndDelete({ _id: id })
 }
 

@@ -18,7 +18,7 @@ import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
-import { generateNick } from '../nick/nick.controllers.js'
+import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
 import { sanitizeSearchInput, escapeRegexInput } from '../../utils/searchInput.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
@@ -97,6 +97,7 @@ export const reqDeleteNote = async (req: Request, res: Response) => {
   }
   await Note.deleteOne({ _id: id })
   invalidateEmbedding(id)
+  await deleteNickFor('note', id)
   res.status(200).end()
 }
 

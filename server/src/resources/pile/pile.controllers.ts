@@ -4,6 +4,8 @@ import Work from '../work/work.model.js'
 import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { removePileFromWork } from '../work/work.controllers.js'
+import { deleteNickFor } from '../nick/nick.controllers.js'
+import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { generateNick } from '../nick/nick.controllers.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
 import { pageParams } from '../../utils/pagination.js'
@@ -98,23 +100,21 @@ export const filePilesByString = async function (string: string, withCounts: boo
 }
 
 export const deletePile = async function (pileId: string) {
-  // TODO: Parallel
   const notes = await findNotesAndPopulate(
     { piles: pileId },
     { updatedAt: -1 },
     true
   )
   const works = await getWorksForPile(pileId)
-  const deletionPromises: Promise<unknown>[] = []
-  notes.map((note) => {
-    deletionPromises.push(updateNote(note._id, { $pull: { piles: pileId } }))
-  })
-
-  works.map((work) => {
-    deletionPromises.push(removePileFromWork(String(work._id), pileId))
-  })
-
-  await Promise.all(deletionPromises)
+  const steps: Array<() => Promise<unknown>> = []
+  for (const note of notes) {
+    steps.push(() => updateNote(note._id, { $pull: { piles: pileId } }))
+  }
+  for (const work of works) {
+    steps.push(() => removePileFromWork(String(work._id), pileId))
+  }
+  steps.push(() => deleteNickFor('pile', pileId))
+  await runCascadeSteps('deletePile', steps)
   await Pile.findOneAndDelete({ _id: pileId })
 }
 

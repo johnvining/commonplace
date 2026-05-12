@@ -6,6 +6,8 @@ import {
   removeIdeaFromNote,
   findNotesAndPopulate
 } from '../note/note.controllers'
+import { deleteNickFor } from '../nick/nick.controllers.js'
+import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
 import { pageParams } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
@@ -91,11 +93,11 @@ export const findOrCreateIdea = async function(name: string) {
 
 export const deleteIdea = async function(ideaId: string) {
   const notes = await findNotesAndPopulate({ ideas: ideaId }, {}, true)
-  const deletionPromises: Promise<unknown>[] = notes.map((note) =>
-    removeIdeaFromNote(note._id, ideaId)
+  const steps: Array<() => Promise<unknown>> = notes.map(
+    (note) => () => removeIdeaFromNote(note._id, ideaId)
   )
-
-  await Promise.all(deletionPromises)
+  steps.push(() => deleteNickFor('idea', ideaId))
+  await runCascadeSteps('deleteIdea', steps)
   await Idea.findOneAndDelete({ _id: ideaId })
 }
 

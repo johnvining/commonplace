@@ -39,6 +39,13 @@ export const generateNick = async (type: NickEntityType, id: unknown) => {
   }
 }
 
+// Drop the nick row for an entity that's about to be deleted. Keeps the
+// global key -> entity index clean so a stale lookup can't resolve to a
+// deleted parent.
+export const deleteNickFor = async (type: NickEntityType, id: unknown) => {
+  await Nick.deleteOne({ [type]: id }).exec()
+}
+
 export const reqGenerateNickForNote = async (req: Request, res: Response) => generateNick('note', req.params.id)
 export const reqGenerateNickForWork = async (req: Request, res: Response) => generateNick('work', req.params.id)
 export const reqGenerateNickForIdea = async (req: Request, res: Response) => generateNick('idea', req.params.id)

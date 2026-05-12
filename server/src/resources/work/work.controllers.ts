@@ -5,7 +5,8 @@ import { createAuthor, findAuthorByUrl } from '../auth/auth.controllers.js'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
-import { generateNick } from '../nick/nick.controllers.js'
+import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
+import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
 import { pageParams } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
@@ -155,11 +156,11 @@ export const findOrCreateWork = async function(name: string) {
 
 export const deleteWork = async function(id: string) {
   const notes = await findNotesAndPopulate({ work: id }, {}, true)
-  const deletionPromises: Promise<unknown>[] = notes.map((note) =>
-    updateNote(note._id, { work: null })
+  const steps: Array<() => Promise<unknown>> = notes.map(
+    (note) => () => updateNote(note._id, { work: null })
   )
-
-  await Promise.all(deletionPromises)
+  steps.push(() => deleteNickFor('work', id))
+  await runCascadeSteps('deleteWork', steps)
   await Work.findOneAndDelete({ _id: id })
 }
 
