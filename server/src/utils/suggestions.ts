@@ -2,8 +2,14 @@ import config from '../config'
 import fs from 'fs'
 
 import OpenAI from 'openai'
+// The SDK defaults to a 10-minute timeout and 2 retries. 10 minutes is
+// long enough for a stuck call to block a deploy on its own; cap it at
+// 60s and let the SDK back off + retry up to 3 times for transient
+// rate-limit / 5xx errors.
 const openai = new OpenAI({
   apiKey: config.secrets.openaikey,
+  timeout: 60_000,
+  maxRetries: 3,
 })
 
 export const getSuggestedTitle = async function (

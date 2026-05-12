@@ -35,7 +35,16 @@ interface EmbeddingUpdate {
 
 let _openai: OpenAI | null = null
 const openai = (): OpenAI => {
-  if (!_openai) _openai = new OpenAI({ apiKey: config.secrets.openaikey })
+  if (!_openai) {
+    // See suggestions.ts: cap timeout at 60s, retry up to 3x for
+    // transient rate-limit / 5xx so a single hiccup doesnt fail the
+    // whole bulk-embed pass.
+    _openai = new OpenAI({
+      apiKey: config.secrets.openaikey,
+      timeout: 60_000,
+      maxRetries: 3,
+    })
+  }
   return _openai
 }
 
