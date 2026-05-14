@@ -5,7 +5,13 @@ import config from '../../config'
 import type { Request, Response, NextFunction } from 'express'
 
 
-const TOKEN_LIFETIME_SECONDS = 30 * 24 * 60 * 60
+// Cookie lasts 7 days, then re-login. Idle users get logged out within a
+// week; active users never do thanks to the sliding refresh below.
+const TOKEN_LIFETIME_SECONDS = 7 * 24 * 60 * 60
+// Refresh threshold: any authenticated request whose token is older than
+// this re-issues a fresh cookie, sliding the 7-day window forward. Set
+// well below TOKEN_LIFETIME_SECONDS so steady use never falls off.
+const TOKEN_REFRESH_AFTER_SECONDS = 24 * 60 * 60
 
 interface ConfigForCookies {
   isDev: boolean
@@ -32,6 +38,13 @@ function jwtSecret(): string {
   return config.secrets.jwt
 }
 
+function signAuthCookie(res: Response, userId: unknown, username: string) {
+  const token = jwt.sign({ id: userId, username }, jwtSecret(), {
+    expiresIn: TOKEN_LIFETIME_SECONDS,
+  })
+  res.cookie('jwt', token, cookieOptions(config))
+}
+
 export const reqRegisterUser = async (req: Request, res: Response) => {
   const { username, password } = req.body
   if (username != 'commonplace' || !password) {
@@ -53,10 +66,7 @@ export const reqRegisterUser = async (req: Request, res: Response) => {
   try {
     const hash = await bcrypt.hash(password, 12)
     const user = await User.create({ username, password: hash })
-    const token = jwt.sign({ id: user._id, username }, jwtSecret(), {
-      expiresIn: TOKEN_LIFETIME_SECONDS,
-    })
-    res.cookie('jwt', token, cookieOptions(config))
+    signAuthCookie(res, user._id, username)
     res.status(201).json({ message: 'User successfully created', user: user._id })
   } catch (error: any) {
     res.status(401).json({
@@ -84,12 +94,7 @@ export const reqAuthorizeUser = async (req: Request, res: Response) => {
     } else {
       const result = await bcrypt.compare(password, user.password)
       if (result) {
-        const token = jwt.sign(
-          { id: user._id, username, role: (user as any).role },
-          jwtSecret(),
-          { expiresIn: TOKEN_LIFETIME_SECONDS }
-        )
-        res.cookie('jwt', token, cookieOptions(config))
+        signAuthCookie(res, user._id, username)
         res.status(201).json({
           message: 'User successfully Logged in',
           user: user._id,
@@ -115,6 +120,14 @@ export const reqAuthenticate = async (req: Request, res: Response, next: NextFun
     } else if (decodedToken.username != 'commonplace') {
       return res.status(401).json({ message: 'Wrong username' })
     } else {
+      // Sliding refresh: if the token has been around for more than the
+      // refresh threshold, re-issue. Steady use keeps the user signed in
+      // indefinitely; a week of idle and the cookie expires for real.
+      const issuedAt = typeof decodedToken.iat === 'number' ? decodedToken.iat : null
+      const nowSeconds = Math.floor(Date.now() / 1000)
+      if (issuedAt && nowSeconds - issuedAt > TOKEN_REFRESH_AFTER_SECONDS) {
+        signAuthCookie(res, decodedToken.id, decodedToken.username)
+      }
       next()
     }
   })
