@@ -25,7 +25,10 @@ function saveConfig(config) {
 
 async function api(method, path, body, config) {
   const url = (config.url || DEFAULT_URL) + path
-  const headers = { 'Content-Type': 'application/json' }
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+  }
   if (config.token) headers['Cookie'] = `jwt=${config.token}`
   const opts = { method, headers }
   if (body) opts.body = JSON.stringify(body)
