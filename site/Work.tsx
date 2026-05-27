@@ -9,6 +9,7 @@ import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import { renderMarkdown } from './safeMarkdown'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
+import { saveAndExitEdit } from './saveAndExitEdit'
 import ImageUploader from './ImageUploader'
 import {
   TopLevelStandardButtonContainer,
@@ -193,12 +194,10 @@ function Work(props: any) {
       citation_information: pendingCitationInfo,
     }
 
-    try {
-      await db.updateRecord(db.types.work, id, updateObject)
-      setEdit(false)
-    } catch {
-      // Toast surfaced by axios interceptor; stay in edit mode for retry.
-    }
+    await saveAndExitEdit(
+      () => db.updateRecord(db.types.work, id, updateObject),
+      setEdit
+    )
   }
 
   const handleImport = async () => {

@@ -16,6 +16,7 @@ import {
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { TopLevelStarButton } from './PinButton'
 import { togglePinned } from './pinned'
+import { saveAndExitEdit } from './saveAndExitEdit'
 
 function Idea(props: any) {
   const { id = '' } = useParams()
@@ -75,12 +76,10 @@ function Idea(props: any) {
       end_year: pendingEndYear,
     }
 
-    try {
-      await db.updateRecord(db.types.idea, id, updateObject)
-      setEdit(false)
-    } catch {
-      // Toast surfaced by axios interceptor; stay in edit mode for retry.
-    }
+    await saveAndExitEdit(
+      () => db.updateRecord(db.types.idea, id, updateObject),
+      setEdit
+    )
   }
 
   const createNoteForIdea = async () => {

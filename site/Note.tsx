@@ -371,9 +371,10 @@ class Note extends React.Component<any, any> {
       this.props.refetchMe(this.props.index)
     } catch (error) {
       // Stay in edit mode so the user can retry; the axios interceptor
-      // already surfaces a toast with the server message.
+      // already surfaces a toast with the server message. Dev-only log is
+      // a safety net for when the interceptor is bypassed.
       this.props.setNoteMode(this.props.id, previousMode)
-      console.error(error)
+      if (process.env.NODE_ENV === 'development') console.error(error)
     }
   }
 

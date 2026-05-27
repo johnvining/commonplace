@@ -63,8 +63,6 @@ const RecentItems = React.lazy(() => import('./RecentItems'))
 const Work        = React.lazy(() => import('./Work'))
 const Read        = React.lazy(() => import('./Read'))
 
-declare const process: { env: Record<string, string | undefined> }
-
 class App extends React.Component<any, any> {
   state: any = { barOpen: false, viewMode: 1, hasToken: false }
   redirectTo: string | null = null

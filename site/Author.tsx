@@ -16,6 +16,7 @@ import {
 import { TopLevelStarButton } from './PinButton'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { togglePinned } from './pinned'
+import { saveAndExitEdit } from './saveAndExitEdit'
 
 function Author(props: any) {
   const { id = '' } = useParams()
@@ -63,12 +64,10 @@ function Author(props: any) {
       usernames: pendingUsernames.split(',').map(u => u.trim()).filter(Boolean),
     }
 
-    try {
-      await db.updateRecord(db.types.auth, id, updateObject)
-      setEdit(false)
-    } catch {
-      // Toast surfaced by axios interceptor; stay in edit mode for retry.
-    }
+    await saveAndExitEdit(
+      () => db.updateRecord(db.types.auth, id, updateObject),
+      setEdit
+    )
   }
 
   useEntityKeyboardShortcuts({
