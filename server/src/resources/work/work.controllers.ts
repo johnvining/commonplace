@@ -9,7 +9,12 @@ import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
 import { pageParams } from '../../utils/pagination.js'
+import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
+
+const WORK_WRITABLE = [
+  'name', 'author', 'url', 'year', 'citation_information', 'summary', 'piles',
+] as const
 
 
 // Request response
@@ -39,16 +44,17 @@ export const reqCreateWork = async (req: Request, res: Response) => {
 }
 
 export const reqUpdateWork = async (req: Request, res: Response) => {
-  const updates = { ...req.body }
+  const updates: Record<string, unknown> = pickAllowed(req.body, WORK_WRITABLE)
 
-  if (updates.url) {
+  const url = typeof updates.url === 'string' ? updates.url : null
+  if (url) {
     const existing = await Work.findById(req.params.id).lean()
     if (existing && !existing.author) {
-      const author = await findAuthorByUrl(updates.url)
+      const author = await findAuthorByUrl(url)
       if (author) updates.author = author._id
     }
     if (!updates.year) {
-      const year = guessYearFromUrl(updates.url)
+      const year = guessYearFromUrl(url)
       if (year) updates.year = year
     }
   }
@@ -189,9 +195,6 @@ export const removePileFromWork = async (workId: string, pileId: unknown) => {
   return doc
 }
 
-const WORK_WRITABLE = [
-  'name', 'author', 'url', 'year', 'citation_information', 'summary', 'piles',
-] as const
 export default defaultControllers(Work, { writable: WORK_WRITABLE })
 
 const touchPile = async (pileId: unknown) => {

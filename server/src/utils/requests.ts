@@ -9,6 +9,13 @@ type AsyncHandler = (req: Request, res: Response) => Promise<unknown>
 type MongoLikeError = Error & { code?: number; name?: string }
 
 function classify(err: unknown): { status: number; message: string } {
+  // Errors that explicitly self-tag with a status (e.g. InvalidFieldsError
+  // from pickAllowed). Honor both status and message so the client sees the
+  // actual reason rather than a generic 500.
+  if (err && typeof err === 'object' && typeof (err as { status?: unknown }).status === 'number') {
+    const e = err as { status: number; message?: string }
+    return { status: e.status, message: e.message ?? '' }
+  }
   if (err instanceof MongooseError) {
     if (err.name === 'CastError') return { status: 400, message: 'Invalid id' }
     if (err.name === 'ValidationError') return { status: 400, message: err.message }
