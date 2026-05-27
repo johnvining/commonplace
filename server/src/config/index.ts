@@ -68,18 +68,15 @@ switch (env) {
     envConfig = loadFileConfigOrEmpty('./devconfig')
 }
 
-// Env-provided secrets take precedence over file-provided secrets.
-const merged = merge({}, envConfig, baseConfig) as Config
+// Non-secret config keeps the old behavior: file values override baseConfig
+// defaults (port, ngrokUrl, etc). Secrets are overlaid below so env vars win.
+const merged = merge({}, baseConfig, envConfig) as Config
 
-// But if the env var is missing and the file has a value, fall back to the
-// file. Merge order above means env var (in baseConfig) overrides file even
-// when env var is undefined — undo that for secrets.
-const fileSecrets = (envConfig.secrets ?? {}) as Partial<Secrets>
-merged.secrets = {
-  ...fileSecrets,
-  ...Object.fromEntries(
-    Object.entries(baseConfig.secrets).filter(([, v]) => v !== undefined && v !== '')
-  ),
-} as Secrets
+// For secrets, env vars take precedence when defined; fall back to whatever
+// the file supplied (already in merged.secrets after the merge above).
+const envSecrets = Object.fromEntries(
+  Object.entries(baseConfig.secrets).filter(([, v]) => v !== undefined && v !== '')
+)
+merged.secrets = { ...merged.secrets, ...envSecrets } as Secrets
 
 export default merged
