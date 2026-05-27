@@ -39,9 +39,14 @@ export const types = {
   pile: 'pile',
 }
 
-// Parcel inlines `process.env.X` at build time; declared loosely for TS.
-declare const process: { env: Record<string, string | undefined> }
-const url_api = process.env.SERVER_API
+// Parcel reliably inlines NODE_ENV but not arbitrary env vars in this
+// project, so the API URL is switched in-code rather than read from .env.
+// Prod traffic is served same-origin by nginx (location /api → server:3000),
+// so a relative URL works there and avoids hardcoding the Pi's LAN address.
+const url_api =
+  process.env.NODE_ENV === 'production'
+    ? '/api/'
+    : 'http://localhost:3000/api/'
 
 // Supported types: idea, auth, work, pile
 export async function getSuggestions(type: string, search: string, withCounts = false, signal?: AbortSignal) {
