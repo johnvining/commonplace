@@ -1,7 +1,7 @@
 import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
-import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
+import { findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
@@ -12,7 +12,7 @@ import type { Request, Response } from 'express'
 export const reqGetNotesForAuthor = async (req: Request, res: Response) => {
   const { skip, limit } = pageParams(req)
   const doc = await findNotesAndPopulate(
-    { author: req.params.id },
+    { authors: req.params.id },
     { updatedAt: -1 },
     false,
     skip,
@@ -27,11 +27,11 @@ export const reqGetNotesForAuthor = async (req: Request, res: Response) => {
 export const reqGetAllNotesForAuthor = async (req: Request, res: Response) => {
   const { skip, limit } = pageParams(req)
   const authorId = req.params.id
-  const works = await Work.find({ author: authorId }, { _id: 1 }).lean().exec()
+  const works = await Work.find({ authors: authorId }, { _id: 1 }).lean().exec()
   const workIds = works.map(w => w._id)
   const query = workIds.length
-    ? { $or: [{ author: authorId }, { work: { $in: workIds } }] }
-    : { author: authorId }
+    ? { $or: [{ authors: authorId }, { work: { $in: workIds } }] }
+    : { authors: authorId }
   return findNotesAndPopulate(query, { updatedAt: -1 }, false, skip, limit)
 }
 
@@ -83,14 +83,22 @@ export const findAuthorsByString = async function (str: string, withCounts: bool
   if (!withCounts || !authors.length) return authors
 
   const authorIds = authors.map(a => a._id)
+  // Notes and Works carry an authors[] array. The initial $match narrows on
+  // the indexed array field, then $unwind explodes one row per (doc, author)
+  // pair, and the second $match drops authors that weren't in our target set
+  // for docs that have multiple authors.
   const [noteCounts, workCounts] = await Promise.all([
     Note.aggregate([
-      { $match: { author: { $in: authorIds } } },
-      { $group: { _id: '$author', count: { $sum: 1 } } },
+      { $match: { authors: { $in: authorIds } } },
+      { $unwind: '$authors' },
+      { $match: { authors: { $in: authorIds } } },
+      { $group: { _id: '$authors', count: { $sum: 1 } } },
     ]),
     Work.aggregate([
-      { $match: { author: { $in: authorIds } } },
-      { $group: { _id: '$author', count: { $sum: 1 } } },
+      { $match: { authors: { $in: authorIds } } },
+      { $unwind: '$authors' },
+      { $match: { authors: { $in: authorIds } } },
+      { $group: { _id: '$authors', count: { $sum: 1 } } },
     ]),
   ])
   const noteMap = Object.fromEntries(noteCounts.map(x => [String(x._id), x.count]))
@@ -111,7 +119,7 @@ export const reqCreateAuthor = async (req: Request, res: Response) => {
 }
 
 export const reqGetWorksForAuthor = async (req: Request, res: Response) => {
-  const doc = await Work.find({ author: req.params.id }).sort({ year: 1 })
+  const doc = await Work.find({ authors: req.params.id }).sort({ year: 1 })
   if (!doc) {
     return res.status(400).end()
   }
@@ -143,15 +151,13 @@ export const findOrCreateAuthor = async function (name: string) {
 }
 
 export const deleteAuthor = async function (id: string) {
-  const notes = await findNotesAndPopulate(
-    { author: id },
-    { updatedAt: -1 },
-    true
-  )
-  const steps: Array<() => Promise<unknown>> = notes.map(
-    (note) => () => updateNote(note._id, { author: null })
-  )
-  // Author has no nick so nothing to drop on that side.
+  // Pull the author from every note's and every work's authors[] in one
+  // updateMany each — cleaner than the per-doc loop the single-author
+  // version needed. Author has no nick, so nothing to drop on that side.
+  const steps: Array<() => Promise<unknown>> = [
+    () => Note.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
+    () => Work.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
+  ]
   await runCascadeSteps('deleteAuthor', steps)
   await Auth.findOneAndDelete({ _id: id })
 }

@@ -49,10 +49,10 @@ async function recentNotes() {
     .sort({ createdAt: -1 })
     .limit(RECENT_LIMIT)
     .select('-embedding -ocrText -embeddingHash')
-    .populate('author')
+    .populate('authors')
     .populate('ideas')
     .populate('piles')
-    .populate({ path: 'work', populate: { path: 'author' } })
+    .populate({ path: 'work', populate: { path: 'authors' } })
     .lean()
     .exec()
 }
@@ -60,14 +60,19 @@ async function recentNotes() {
 async function recentAuthors() {
   const items = await Auth.find({}).sort({ createdAt: -1 }).limit(RECENT_LIMIT).lean().exec()
   const ids = items.map((i) => i._id)
+  // authors is an array field — same unwind pattern as ideas/piles below.
   const [noteCounts, workCounts] = await Promise.all([
     Note.aggregate([
-      { $match: { author: { $in: ids } } },
-      { $group: { _id: '$author', count: { $sum: 1 } } },
+      { $match: { authors: { $in: ids } } },
+      { $unwind: '$authors' },
+      { $match: { authors: { $in: ids } } },
+      { $group: { _id: '$authors', count: { $sum: 1 } } },
     ]),
     Work.aggregate([
-      { $match: { author: { $in: ids } } },
-      { $group: { _id: '$author', count: { $sum: 1 } } },
+      { $match: { authors: { $in: ids } } },
+      { $unwind: '$authors' },
+      { $match: { authors: { $in: ids } } },
+      { $group: { _id: '$authors', count: { $sum: 1 } } },
     ]),
   ])
   const noteMap = buildCountMap(noteCounts)
@@ -83,7 +88,7 @@ async function recentWorks() {
   const items = await Work.find({})
     .sort({ createdAt: -1 })
     .limit(RECENT_LIMIT)
-    .populate('author')
+    .populate('authors')
     .populate('piles')
     .lean()
     .exec()

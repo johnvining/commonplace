@@ -13,7 +13,7 @@ import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
 
 const WORK_WRITABLE = [
-  'name', 'author', 'url', 'year', 'citation_information', 'summary', 'piles',
+  'name', 'authors', 'url', 'year', 'citation_information', 'summary', 'piles',
 ] as const
 
 
@@ -49,9 +49,12 @@ export const reqUpdateWork = async (req: Request, res: Response) => {
   const url = typeof updates.url === 'string' ? updates.url : null
   if (url) {
     const existing = await Work.findById(req.params.id).lean()
-    if (existing && !existing.author) {
+    // Only infer authors from URL if the caller didn't already set them and
+    // the work had none before. Don't clobber a deliberate choice.
+    const incomingAuthors = Array.isArray(updates.authors) ? updates.authors : null
+    if (existing && !existing.authors?.length && !incomingAuthors?.length) {
       const author = await findAuthorByUrl(url)
-      if (author) updates.author = author._id
+      if (author) updates.authors = [author._id]
     }
     if (!updates.year) {
       const year = guessYearFromUrl(url)
@@ -66,8 +69,13 @@ export const reqUpdateWork = async (req: Request, res: Response) => {
 
 export const reqCreateAndAddAuth = async (req: Request, res: Response) => {
   const newAuth = await createAuthor(req.body.name)
-  const updateObject = { author: newAuth.id }
-  const doc = await updateWorkInfo(req.params.id, updateObject)
+  // Append to existing authors rather than overwrite — matches the
+  // multi-author model.
+  const doc = await Work.findOneAndUpdate(
+    { _id: req.params.id },
+    { $addToSet: { authors: newAuth._id } },
+    { new: true }
+  ).lean().exec()
   if (!doc) {
     return res.status(400).end()
   }
@@ -112,7 +120,7 @@ export const reqRemovePileFromWork = async (req: Request, res: Response) => {
 
 export const findWorksByString = async function(string: string, withCounts = false) {
   const works = await Work.find({ name: new RegExp(escapeRegexInput(string), 'i') })
-    .populate('author')
+    .populate('authors')
     .lean()
     .exec()
   if (!withCounts || !works.length) return works
@@ -134,7 +142,7 @@ export const createWork = async function(name: string) {
 
 export const getWorkInfo = async function(workId: string) {
   const results = await Work.findOne({ _id: workId })
-    .populate('author')
+    .populate('authors')
     .populate('piles')
     .lean()
     .exec()

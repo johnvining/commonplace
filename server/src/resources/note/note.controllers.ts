@@ -32,7 +32,7 @@ const LIST_OMIT = '-embedding -ocrText -embeddingHash'
 // Embeddings and their hash are server-controlled; nothing in the client
 // payload should be able to overwrite them.
 const NOTE_WRITABLE = [
-  'title', 'author', 'text', 'ideas', 'work', 'year', 'url',
+  'title', 'authors', 'text', 'ideas', 'work', 'year', 'url',
   'images', 'page', 'piles', 'take', 'ocrText',
 ] as const
 
@@ -58,10 +58,10 @@ export const reqFindNotesByString = async (req: Request, res: Response) => {
   )
     .sort({ score: { $meta: 'textScore' } })
     .select(LIST_OMIT)
-    .populate('author')
+    .populate('authors')
     .populate('ideas')
     .populate('piles')
-    .populate({ path: 'work', populate: { path: 'author' } })
+    .populate({ path: 'work', populate: { path: 'authors' } })
     .lean()
     .exec()) as PopulatedNote[]
 
@@ -206,10 +206,13 @@ export const reqUpdateNote = async (req: Request, res: Response) => {
   const url = typeof updates.url === 'string' ? updates.url : null
   if (url) {
     const existing = await Note.findById(req.params.id).lean()
-    if (existing && !existing.author) {
+    // Only infer authors from URL if the caller didn't already set them and
+    // the note had none before. Don't clobber a deliberate choice.
+    const incomingAuthors = Array.isArray(updates.authors) ? updates.authors : null
+    if (existing && !existing.authors?.length && !incomingAuthors?.length) {
       const { findAuthorByUrl } = await import('../auth/auth.controllers.js')
       const author = await findAuthorByUrl(url)
-      if (author) updates.author = author._id
+      if (author) updates.authors = [author._id]
     }
     if (!updates.year) {
       const year = guessYearFromUrl(url)
@@ -364,7 +367,8 @@ export const reqGetSuggestedIdeasForNote = async function (req: Request, res: Re
 }
 
 export const createNote = async function (title: string, author: unknown) {
-  const note = await Note.create({ title: title, author: author })
+  const authors = author ? [author as any] : []
+  const note = await Note.create({ title: title, authors: authors })
   generateNick('note', note._id).catch(() => {})
   return note
 }
@@ -380,13 +384,13 @@ export const createNoteObj = async function (obj: object) {
 
 export const updateNote = async (noteId: unknown, updateObj: Record<string, unknown>) => {
   return await Note.findOneAndUpdate({ _id: noteId }, updateObj, { new: true })
-    .populate('author')
+    .populate('authors')
     .populate('ideas')
     .populate('piles')
     .populate({
       path: 'work',
       populate: {
-        path: 'author',
+        path: 'authors',
       },
     })
     .lean()
@@ -606,10 +610,10 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
       .sort({ score: { $meta: 'textScore' } })
       .limit(50)
       .select(LIST_OMIT)
-      .populate('author')
+      .populate('authors')
       .populate('ideas')
       .populate('piles')
-      .populate({ path: 'work', populate: { path: 'author' } })
+      .populate({ path: 'work', populate: { path: 'authors' } })
       .lean()
       .exec() as Promise<PopulatedNote[]>,
     generateEmbedding(query),
@@ -636,10 +640,10 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
   if (semanticOnlyIds.length > 0) {
     semanticOnlyNotes = (await Note.find({ _id: { $in: semanticOnlyIds } })
       .select(LIST_OMIT)
-      .populate('author')
+      .populate('authors')
       .populate('ideas')
       .populate('piles')
-      .populate({ path: 'work', populate: { path: 'author' } })
+      .populate({ path: 'work', populate: { path: 'authors' } })
       .lean()
       .exec()) as PopulatedNote[]
   }
@@ -691,7 +695,7 @@ export const reqUnifiedSearch = async (req: Request, res: Response) => {
   const [notes, authors, works, ideas, piles] = await Promise.all([
     hybridSearch(query, limit),
     Auth.find({ name: regex }).lean().exec(),
-    Work.find({ name: regex }).populate('author').lean().exec(),
+    Work.find({ name: regex }).populate('authors').lean().exec(),
     Idea.find({ name: regex }).lean().exec(),
     Pile.find({ name: regex }).lean().exec(),
   ])
@@ -727,9 +731,9 @@ export async function embedStaleNotes(filter: Record<string, unknown> = {}) {
     const batch = await Note.find(filter)
       .skip(skip)
       .limit(BATCH)
-      .populate('author')
+      .populate('authors')
       .populate('ideas')
-      .populate({ path: 'work', populate: { path: 'author' } })
+      .populate({ path: 'work', populate: { path: 'authors' } })
       .lean()
       .exec()
 
@@ -787,12 +791,12 @@ export const findNotesAndPopulate = async function (
       .skip(skip)
       .limit(limit)
       .select(projection)
-      .populate('author')
+      .populate('authors')
       .populate('ideas')
       .populate('piles')
       .populate({
         path: 'work',
-        populate: { path: 'author' },
+        populate: { path: 'authors' },
       })
       .lean()
       .exec()) as PopulatedNote[]
@@ -822,10 +826,10 @@ export const findRandomNotesAndPopulate = async function (
   ]).exec()
 
   const populated_notes = await Note.populate(random_notes, [
-    { path: 'author' },
+    { path: 'authors' },
     { path: 'ideas' },
     { path: 'piles' },
-    { path: 'work', populate: { path: 'author' } },
+    { path: 'work', populate: { path: 'authors' } },
   ])
 
   const noteIds = populated_notes.map((note: any) => note._id)

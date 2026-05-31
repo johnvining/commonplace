@@ -5,14 +5,14 @@ import { getOpenAiOCR } from './suggestions.js'
 
 type EmbeddingVector = number[]
 
-// Callers pass populated/lean Mongoose docs whose shape varies — author/work
+// Callers pass populated/lean Mongoose docs whose shape varies — authors/work
 // may be ObjectIds or populated objects. This shape covers what we read.
 interface NoteForEmbedding {
   title?: string | null
   text?: string | null
   take?: string | null
   ocrText?: string | null
-  author?: { name?: string | null } | unknown
+  authors?: Array<{ name?: string | null } | unknown>
   work?: { name?: string | null } | unknown
   ideas?: Array<{ name?: string | null } | unknown>
   images?: string[]
@@ -54,7 +54,7 @@ export function buildEmbeddingInput(note: NoteForEmbedding): string {
     note.text,
     note.take,
     note.ocrText,
-    maybeName(note.author),
+    note.authors?.map((a) => maybeName(a)).filter(Boolean).join(', '),
     maybeName(note.work),
     note.ideas?.map((i) => maybeName(i)).filter(Boolean).join(', '),
   ]

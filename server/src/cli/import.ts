@@ -225,7 +225,7 @@ export async function downloadImageForNote(
 }
 
 interface NewNoteFields {
-  author?: string
+  authors: string[]
   work?: string
   ideas: string[]
   piles: string[]
@@ -259,7 +259,7 @@ async function importNote(importObject: NoteImportObject) {
   }
 
   const newNote: NewNoteFields = {
-    author: author?._id ? String(author._id) : undefined,
+    authors: author?._id ? [String(author._id)] : [],
     work: work?._id ? String(work._id) : undefined,
     ideas: ideas.filter((x): x is NonNullable<typeof x> => Boolean(x)).map((i) => String(i._id)),
     piles: piles.filter((x): x is NonNullable<typeof x> => Boolean(x)).map((p) => String(p._id)),
@@ -297,7 +297,7 @@ async function importInstapaperNote(importObject: NoteImportObject) {
   ])
 
   const newNote: NewNoteFields = {
-    author: author?._id ? String(author._id) : undefined,
+    authors: author?._id ? [String(author._id)] : [],
     work: work?._id ? String(work._id) : undefined,
     ideas: [],
     piles: [],
@@ -339,7 +339,7 @@ function parseWork(csvLine: CsvRow): WorkImportObject {
 }
 
 interface WorkUpdateFields {
-  author?: string
+  authors: string[]
   year?: number
   url?: string
   piles: string[]
@@ -354,7 +354,7 @@ async function importWork(importObject: WorkImportObject) {
 
   const author = await AuthControllers.findOrCreateAuthor(importObject.authorName)
   const updateObject: WorkUpdateFields = {
-    author: author?._id ? String(author._id) : undefined,
+    authors: author?._id ? [String(author._id)] : [],
     piles: [],
   }
 
