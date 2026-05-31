@@ -3,7 +3,7 @@ import mongoose, { Schema, Types } from 'mongoose'
 export interface WorkDoc {
   _id: Types.ObjectId
   name?: string
-  author?: Types.ObjectId
+  authors: Types.ObjectId[]
   url?: string
   year?: number
   citation_information?: string
@@ -16,10 +16,7 @@ export interface WorkDoc {
 const workSchema = new Schema<WorkDoc>(
   {
     name: String,
-    author: {
-      type: Schema.Types.ObjectId,
-      ref: 'author',
-    },
+    authors: [{ type: Schema.Types.ObjectId, ref: 'author' }],
     url: String,
     year: Number,
     citation_information: String,
@@ -30,6 +27,6 @@ const workSchema = new Schema<WorkDoc>(
 )
 
 workSchema.index({ name: 1 })
-workSchema.index({ author: 1 })
+workSchema.index({ authors: 1 })
 
 export default mongoose.model<WorkDoc>('work', workSchema)

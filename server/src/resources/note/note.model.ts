@@ -3,7 +3,7 @@ import mongoose, { Schema, Types } from 'mongoose'
 export interface NoteDoc {
   _id: Types.ObjectId
   title?: string
-  author?: Types.ObjectId
+  authors: Types.ObjectId[]
   text?: string
   ideas: Types.ObjectId[]
   work?: Types.ObjectId
@@ -23,10 +23,7 @@ export interface NoteDoc {
 const noteSchema = new Schema<NoteDoc>(
   {
     title: String,
-    author: {
-      type: Schema.Types.ObjectId,
-      ref: 'author',
-    },
+    authors: [{ type: Schema.Types.ObjectId, ref: 'author' }],
     text: String,
     ideas: [{ type: Schema.Types.ObjectId, ref: 'idea' }],
     work: {
@@ -47,7 +44,7 @@ const noteSchema = new Schema<NoteDoc>(
 )
 noteSchema.index({ title: 'text', text: 'text', take: 'text', ocrText: 'text' })
 
-noteSchema.index({ author: 1 })
+noteSchema.index({ authors: 1 })
 noteSchema.index({ work: 1 })
 noteSchema.index({ piles: 1 })
 noteSchema.index({ ideas: 1 })

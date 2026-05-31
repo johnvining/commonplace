@@ -48,8 +48,9 @@ export interface Work {
   name: string
   url?: string | null
   year?: number | null
-  // Populated when fetched via getWorkInfo / autocomplete; raw ObjectId string elsewhere
-  author?: Author | EntityId | null
+  // Populated when fetched via getWorkInfo / autocomplete; raw ObjectId strings elsewhere.
+  // Ordered — first entry is the primary author for citation rendering.
+  authors?: Array<Author | EntityId>
   piles?: Pile[] | EntityId[]
   createdAt?: string
   updatedAt?: string
@@ -64,8 +65,9 @@ export interface Note {
   url?: string | null
   year?: number | null
   page?: string | null
-  // Populated forms when fetched via findNotesAndPopulate; ObjectId strings elsewhere
-  author?: Author | EntityId | null
+  // Populated forms when fetched via findNotesAndPopulate; ObjectId strings elsewhere.
+  // Ordered — first entry is the primary author for citation rendering.
+  authors?: Array<Author | EntityId>
   work?: Work | EntityId | null
   ideas?: Idea[] | EntityId[]
   piles?: Pile[] | EntityId[]
