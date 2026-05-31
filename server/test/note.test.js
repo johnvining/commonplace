@@ -33,12 +33,12 @@ describe('note CRUD', () => {
     it('returns the note (populated)', async () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent)
-      const note = await createNote(agent, { title: 'Hello', author: author._id })
+      const note = await createNote(agent, { title: 'Hello', authors: [author._id] })
       const res = await agent.get(`/api/note/${note._id}`).expect(200)
       // findNotesAndPopulate returns array; reqGetNoteDetails uses _id filter
       expect(Array.isArray(res.body.data)).toBe(true)
       expect(res.body.data[0].title).toBe('Hello')
-      expect(res.body.data[0].author._id).toBe(String(author._id))
+      expect(res.body.data[0].authors?.[0]?._id).toBe(String(author._id))
     })
   })
 
@@ -72,14 +72,14 @@ describe('note CRUD', () => {
       expect(res.body.data[0].text).toBe('body')
     })
 
-    it('infers author from url when none set', async () => {
+    it('infers authors from url when none set', async () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent, 'jvining')
       await agent.put(`/api/auth/${author._id}`).send({ usernames: ['jvining'] }).expect(200)
       const note = await createNote(agent, { title: 'X' })
       await agent.put(`/api/note/${note._id}`).send({ url: 'https://jvining.substack.com/p/post' }).expect(200)
       const res = await agent.get(`/api/note/${note._id}`).expect(200)
-      expect(res.body.data[0].author?._id).toBe(String(author._id))
+      expect(res.body.data[0].authors?.[0]?._id).toBe(String(author._id))
     })
 
     it('infers year from url when not provided', async () => {

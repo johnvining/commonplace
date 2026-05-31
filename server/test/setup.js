@@ -52,11 +52,11 @@ export async function createAuthor(agent, name = 'Test Author') {
   return res.body.data
 }
 
-export async function createWork(agent, { name = 'Test Work', author = null } = {}) {
+export async function createWork(agent, { name = 'Test Work', authors = [] } = {}) {
   const res = await agent.post('/api/work/').send({ name }).expect(201)
   const work = res.body.data
-  if (author) {
-    await agent.put(`/api/work/${work._id}`).send({ author }).expect(200)
+  if (authors.length) {
+    await agent.put(`/api/work/${work._id}`).send({ authors }).expect(200)
   }
   return work
 }

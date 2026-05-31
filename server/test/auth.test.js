@@ -84,7 +84,7 @@ describe('auth (authors)', () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent, 'Author1')
       // Create a note attached to the author
-      await agent.post('/api/note/').send({ author: author._id, title: 'My Note' }).expect(201)
+      await agent.post('/api/note/').send({ authors: [author._id], title: 'My Note' }).expect(201)
       const res = await agent.get(`/api/auth/${author._id}/notes`).expect(200)
       expect(res.body.data.length).toBeGreaterThan(0)
     })
@@ -102,9 +102,9 @@ describe('auth (authors)', () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent, 'Author1')
       // Note attached directly
-      await agent.post('/api/note/').send({ author: author._id, title: 'Direct' }).expect(201)
+      await agent.post('/api/note/').send({ authors: [author._id], title: 'Direct' }).expect(201)
       // Work + note attached to that work
-      const work = await createWork(agent, { name: 'Some Work', author: author._id })
+      const work = await createWork(agent, { name: 'Some Work', authors: [author._id] })
       await agent.post('/api/note/').send({ work: work._id, title: 'Via work' }).expect(201)
 
       const res = await agent.get(`/api/auth/${author._id}/all-notes`).expect(200)
@@ -116,8 +116,8 @@ describe('auth (authors)', () => {
     it('returns works for the author', async () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent)
-      await createWork(agent, { name: 'W1', author: author._id })
-      await createWork(agent, { name: 'W2', author: author._id })
+      await createWork(agent, { name: 'W1', authors: [author._id] })
+      await createWork(agent, { name: 'W2', authors: [author._id] })
       const res = await agent.get(`/api/auth/${author._id}/works`).expect(200)
       expect(res.body.data.length).toBe(2)
     })

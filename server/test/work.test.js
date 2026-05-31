@@ -18,13 +18,13 @@ describe('work', () => {
   })
 
   describe('GET /api/work/:id', () => {
-    it('returns work with populated author and piles', async () => {
+    it('returns work with populated authors and piles', async () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent, 'WorkAuthor')
-      const work = await createWork(agent, { name: 'WithAuthor', author: author._id })
+      const work = await createWork(agent, { name: 'WithAuthor', authors: [author._id] })
       const res = await agent.get(`/api/work/${work._id}`).expect(200)
       expect(res.body.data.name).toBe('WithAuthor')
-      expect(res.body.data.author._id).toBe(String(author._id))
+      expect(res.body.data.authors?.[0]?._id).toBe(String(author._id))
     })
 
     it('returns 400 for missing id', async () => {
@@ -42,7 +42,7 @@ describe('work', () => {
       expect(res.body.data.name).toBe('New')
     })
 
-    it('infers author from url for an authorless work', async () => {
+    it('infers authors from url for an authorless work', async () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent, 'jvining')
       // Manually add username to author so URL inference can match
@@ -50,7 +50,7 @@ describe('work', () => {
       const work = await createWork(agent, { name: 'AuthorlessWork' })
       await agent.put(`/api/work/${work._id}`).send({ url: 'https://jvining.substack.com/post/x' }).expect(200)
       const res = await agent.get(`/api/work/${work._id}`).expect(200)
-      expect(res.body.data.author?._id).toBe(String(author._id))
+      expect(res.body.data.authors?.[0]?._id).toBe(String(author._id))
     })
 
     it('infers year from url when not provided', async () => {
@@ -72,12 +72,12 @@ describe('work', () => {
   })
 
   describe('PUT /api/work/:id/auth/create', () => {
-    it('creates an author and assigns to the work', async () => {
+    it('creates an author and appends to the work authors', async () => {
       const agent = await authedAgent()
       const work = await createWork(agent, { name: 'WorkX' })
       await agent.put(`/api/work/${work._id}/auth/create`).send({ name: 'NewAuthor' }).expect(201)
       const res = await agent.get(`/api/work/${work._id}`).expect(200)
-      expect(res.body.data.author?.name).toBe('NewAuthor')
+      expect(res.body.data.authors?.[0]?.name).toBe('NewAuthor')
     })
   })
 
