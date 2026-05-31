@@ -714,67 +714,46 @@ class Note extends React.Component<any, any> {
             </div>
           ) : null}
 
-          {/* Overlay mode */}
+          {/* Overlay mode — show the focused image at full natural size.
+              Images here are usually text scans, so nothing covers them:
+              navigation lives below the image, not on top of it. */}
           {this.state.overlayMode && !edit && this.props.note.imageUrls?.length > 0 && this.state.largeImage >= 0 ? (
-            <div className="note-overlay-wrapper width-100" onClick={() => this.setState({ lightboxOpen: true })}>
+            <div className="note-overlay-wrapper width-100">
               <button
                 className="overlay-close-btn"
-                onClick={(e: any) => { e.stopPropagation(); this.setState({ overlayMode: false, largeImage: -1 }) }}
+                onClick={() => this.setState({ overlayMode: false, largeImage: -1 })}
                 title="Close"
               >×</button>
               <img
                 className="note-overlay-image"
                 src={this.props.note.imageUrls[this.state.largeImage]}
+                onClick={() => this.setState({ lightboxOpen: true })}
               />
-              <div className="note-overlay-gradient">
-                {this.props.note.imageUrls.length > 1 ? (
+              {this.props.note.imageUrls.length > 1 ? (
+                <div className="note-overlay-nav">
                   <button
                     className="overlay-nav-btn overlay-nav-prev"
-                    onClick={(e: any) => { e.stopPropagation(); this.moveFocusedImage(-1) }}
+                    onClick={() => this.moveFocusedImage(-1)}
                     disabled={this.state.largeImage === 0}
                   >
                     <img src={left_arrow} />
                   </button>
-                ) : null}
-                <div className="note-overlay-text-panel" onClick={(e: any) => e.stopPropagation()}>
-                  {this.state.pendingTitle ? (
-                    <div className="note-overlay-title">{this.state.pendingTitle}</div>
-                  ) : null}
-                  {this.state.pendingText ? (
-                    <div
-                      className="note-overlay-text"
-                      dangerouslySetInnerHTML={{ __html: renderMarkdown(this.state.pendingText) }}
-                    />
-                  ) : null}
-                  {(this.state.pendingAuthorName || this.state.pendingWorkName) ? (
-                    <div className="note-overlay-citation">
-                      <WorkCitationSpan
-                        plain={true}
-                        authorName={this.state.pendingAuthorName ?? this.props.note?.work?.author?.name}
-                        workTitle={this.state.pendingWorkName}
+                  <div className="overlay-nav-dots">
+                    {this.props.note.imageUrls.map((_: any, i: any) => (
+                      <button
+                        key={i}
+                        className={`overlay-dot${i === this.state.largeImage ? ' active' : ''}`}
+                        onClick={() => this.setState({ largeImage: i })}
                       />
-                    </div>
-                  ) : null}
-                </div>
-                {this.props.note.imageUrls.length > 1 ? (
+                    ))}
+                  </div>
                   <button
                     className="overlay-nav-btn overlay-nav-next"
-                    onClick={(e: any) => { e.stopPropagation(); this.moveFocusedImage(1) }}
+                    onClick={() => this.moveFocusedImage(1)}
                     disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
                   >
                     <img src={right_arrow} />
                   </button>
-                ) : null}
-              </div>
-              {this.props.note.imageUrls.length > 1 ? (
-                <div className="note-overlay-dots" onClick={(e: any) => e.stopPropagation()}>
-                  {this.props.note.imageUrls.map((_: any, i: any) => (
-                    <button
-                      key={i}
-                      className={`overlay-dot${i === this.state.largeImage ? ' active' : ''}`}
-                      onClick={() => this.setState({ largeImage: i })}
-                    />
-                  ))}
                 </div>
               ) : null}
             </div>

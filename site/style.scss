@@ -1111,89 +1111,48 @@ a.grid-link {
 
 .note-overlay-wrapper {
   position: relative;
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: zoom-in;
   margin: 4px 0;
 
+  // Images in notes are usually text scans the user needs to read, so we
+  // always show the full image at its natural aspect ratio — no cropping,
+  // no max-height clamp, and nothing covering it.
   .note-overlay-image {
     width: 100%;
+    height: auto;
     display: block;
-    object-fit: cover;
-    max-height: 480px;
+    border-radius: 4px;
+    cursor: zoom-in;
   }
 
-  .note-overlay-gradient {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 40%, rgba(0,0,0,0.92) 100%);
+  // Navigation lives below the image, never over it.
+  .note-overlay-nav {
     display: flex;
-    align-items: flex-end;
-    padding: 16px 8px 36px 8px;
-  }
-
-  .note-overlay-text-panel {
-    flex: 1;
-    padding: 0 8px;
-    color: #fff;
-    min-width: 0;
-
-    .note-overlay-title {
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 4px;
-      font-family: $main_font;
-    }
-
-    .note-overlay-text {
-      font-size: 12px;
-      line-height: 1.5;
-      font-family: $main_font;
-      max-height: 120px;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 6;
-      -webkit-box-orient: vertical;
-
-      p { margin: 0 0 4px 0; }
-    }
-
-    .note-overlay-citation {
-      font-size: 11px;
-      opacity: 0.7;
-      margin-top: 4px;
-      font-style: italic;
-      font-family: $main_font;
-    }
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 0 4px 0;
   }
 
   .overlay-nav-btn {
-    background: rgba(255,255,255,0.15);
-    border: none;
+    background: $input_background;
+    border: 1px solid $note_border;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     flex-shrink: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    align-self: center;
     padding: 4px;
 
-    img { filter: invert(1); width: 16px; height: 16px; }
+    img { width: 14px; height: 14px; }
 
-    &:hover:not(:disabled) { background: rgba(255,255,255,0.3); }
-    &:disabled { opacity: 0.2; cursor: default; }
+    &:hover:not(:disabled) { background: $semantic_selection; }
+    &:disabled { opacity: 0.3; cursor: default; }
   }
 
-  .note-overlay-dots {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+  .overlay-nav-dots {
     display: flex;
     gap: 6px;
 
@@ -1201,13 +1160,13 @@ a.grid-link {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.4);
+      background: $note_border;
       border: none;
       cursor: pointer;
       padding: 0;
 
-      &.active { background: #fff; }
-      &:hover { background: rgba(255,255,255,0.7); }
+      &.active { background: $font_color; }
+      &:hover:not(.active) { background: $note_border_focused; }
     }
   }
 }
