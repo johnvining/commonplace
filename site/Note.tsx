@@ -101,8 +101,8 @@ class Note extends React.Component<any, any> {
     this.fetchLinkedNotes()
 
     this.setState({
-      pendingAuthorId: this.props.note.author?._id,
-      pendingAuthorName: this.props.note.author?.name,
+      pendingAuthorId: this.props.note.authors?.[0]?._id,
+      pendingAuthorName: this.props.note.authors?.[0]?.name,
       pendingPage: this.props.note.page,
       pendingTake: this.props.note.take,
       pendingText: this.props.note.text,
@@ -349,7 +349,9 @@ class Note extends React.Component<any, any> {
 
   async handleAccept() {
     const updateObject: any = {
-      author: this.state.pendingAuthorId,
+      // Server expects authors[] now. Stage 5 keeps the editor as a
+      // single-author UX; the chip-list lands in stage 6.
+      authors: this.state.pendingAuthorId ? [this.state.pendingAuthorId] : [],
       page: this.state.pendingPage,
       take: this.state.pendingTake,
       text: this.state.pendingText,
@@ -864,7 +866,7 @@ class Note extends React.Component<any, any> {
               </div>
             </>
           ) : !this.state.overlayMode && (this.state.pendingAuthorId ||
-            this.props.note?.work?.author ||
+            this.props.note?.work?.authors?.length ||
             this.state.pendingWorkId ||
             this.state.pendingYear ||
             this.state.pendingUrl ||
@@ -874,11 +876,11 @@ class Note extends React.Component<any, any> {
                 <WorkCitationSpan
                   authorName={
                     this.state.pendingAuthorName ??
-                    this.props.note?.work?.author?.name
+                    this.props.note?.work?.authors?.[0]?.name
                   }
                   authorID={
                     this.state.pendingAuthorId ??
-                    this.props.note?.work?.author?._id
+                    this.props.note?.work?.authors?.[0]?._id
                   }
                   workTitle={this.state.pendingWorkName}
                   workID={this.state.pendingWorkId}

@@ -4,6 +4,7 @@ import work_img from 'url:./icons/work.svg'
 import note_img from 'url:./icons/write.svg'
 import PileListForItem from './PileListForItem'
 import PinButton from './PinButton'
+import { joinAuthorNames } from './authorsDisplay'
 
 class ResultWork extends React.Component<any, any> {
   state: any = {}
@@ -25,7 +26,7 @@ class ResultWork extends React.Component<any, any> {
           <div className="result-box header">
             <img src={work_img} />
             <div>
-              {work.author?.name ? <>{work.author?.name},&nbsp;</> : null}
+              {work.authors?.length ? <>{joinAuthorNames(work.authors)},&nbsp;</> : null}
               <em>{work.name}</em>
               {work.year ? <span className="date">{work.year}</span> : null}
             </div>

@@ -8,6 +8,7 @@ import AuthorList from './AuthorList'
 import PileList from './PileList'
 import React from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { joinAuthorNames } from './authorsDisplay'
 import work_img from 'url:./icons/work.svg'
 import author_img from 'url:./icons/author.svg'
 import idea_img from 'url:./icons/idea.svg'
@@ -55,7 +56,7 @@ function UnifiedResult({ entry, query }: any) {
           <div className="result-box header">
             <img src={work_img} />
             <span className="truncate">
-              {item.author?.name ? <>{highlight(item.author.name, query)},&nbsp;</> : null}
+              {item.authors?.length ? <>{highlight(joinAuthorNames(item.authors), query)},&nbsp;</> : null}
               <em>{highlight(item.name, query)}</em>
               {item.year ? <span className="date">&nbsp;{item.year}</span> : null}
             </span>

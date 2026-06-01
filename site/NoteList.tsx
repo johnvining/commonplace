@@ -7,6 +7,7 @@ import NoteResult from './NoteResult'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import * as constants from './constants'
+import { joinAuthorNames, authorsWithWorkFallback } from './authorsDisplay'
 import left from 'url:./icons/left.svg'
 import right from 'url:./icons/right.svg'
 import autosize from 'autosize'
@@ -684,15 +685,11 @@ class NoteList extends React.Component<any, any> {
                 >
                   {this.props.viewMode == constants.view_modes.GRID ? (
                     <NoteGrid
-                      author={
-                        note.author?.name
-                          ? note.author?.name
-                          : note.work?.author?.name
-                      }
+                      author={joinAuthorNames(authorsWithWorkFallback(note.authors, note.work?.authors))}
                       index={index}
                       selected={this.state.selectedArray[index]}
                       deleted={this.state.deleted.includes(index)}
-                      authorId={note.author?._id}
+                      authorId={note.authors?.[0]?._id}
                       id={note._id}
                       inFocus={this.state.inFocus}
                       key={note._id}

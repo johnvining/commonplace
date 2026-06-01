@@ -30,8 +30,8 @@ function Read(props: any) {
     ]).then(([infoResponse, nickResponse]) => {
       const work = infoResponse.data.data
       setWorkTitle(work.name)
-      setAuthorName(work.author?.name)
-      setAuthorId(work.author?._id)
+      setAuthorName(work.authors?.[0]?.name)
+      setAuthorId(work.authors?.[0]?._id)
       setUrl(work.url)
       setYear(work.year)
       setNick(nickResponse.data.data.key)

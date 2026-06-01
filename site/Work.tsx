@@ -102,8 +102,8 @@ function Work(props: any) {
       const work = infoResponse.data.data
       setPendingWorkTitle(work.name)
       setPiles(work.piles)
-      setPendingAuthorName(work.author?.name)
-      setPendingAuthorId(work.author?._id)
+      setPendingAuthorName(work.authors?.[0]?.name)
+      setPendingAuthorId(work.authors?.[0]?._id)
       setPendingUrl(work.url)
       setPendingYear(work.year)
       setPendingSummary(work.summary)
@@ -186,7 +186,9 @@ function Work(props: any) {
 
   const handleAcceptUpdates = async () => {
     var updateObject = {
-      author: pendingAuthorId,
+      // Server expects authors[] now. Stage 5 keeps the editor as a
+      // single-author UX; the chip-list lands in stage 6.
+      authors: pendingAuthorId ? [pendingAuthorId] : [],
       year: pendingYear,
       url: pendingUrl,
       name: pendingWorkTitle,

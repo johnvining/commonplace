@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import circle from 'url:./icons/circle.svg'
 import check_circle from 'url:./icons/check_circle.svg'
 import WorkCitationSpan from './WorkCitationSpan'
+import { authorsWithWorkFallback } from './authorsDisplay'
 
 class NoteTile extends React.PureComponent<any> {
   markChecked(e: any) {
@@ -95,14 +96,11 @@ class NoteTile extends React.PureComponent<any> {
         <div className="note-slim tile-footer">
           <div className="note-slim tile-footer-meta">
             <WorkCitationSpan
-              authorName={
-                this.props.note.author?.name ??
-                this.props.note.work?.author?.name
-              }
-              authorID={null}
+              authors={authorsWithWorkFallback(this.props.note.authors, this.props.note.work?.authors)}
               workTitle={this.props.note.work?.name}
               workID={null}
               spaceAfter={false}
+              plain={true}
             />
           </div>
         </div>

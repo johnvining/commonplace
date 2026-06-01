@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import note_img from 'url:./icons/write.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 import PinButton from './PinButton'
+import { authorsWithWorkFallback } from './authorsDisplay'
 
 function snippetAround(text: any, query: any) {
   const idx = text.toLowerCase().indexOf(query.toLowerCase())
@@ -26,11 +27,10 @@ class NoteResult extends React.PureComponent<any> {
     const note = this.props.note
     const hl = this.props.highlight
 
-    const authorName = note.author?.name ?? note.work?.author?.name
-    const authorID = note.author?._id ?? null
+    const authors = authorsWithWorkFallback(note.authors, note.work?.authors)
     const workTitle = note.work?.name ?? null
     const workID = note.work?._id ?? null
-    const hasAttribution = authorName || workTitle
+    const hasAttribution = authors.length > 0 || workTitle
 
     const title = note.title?.length ? note.title : null
     const body = note.text?.length ? note.text : note.take?.length ? note.take : null
@@ -67,8 +67,7 @@ class NoteResult extends React.PureComponent<any> {
               {hasAttribution ? (
                 <>
                   <WorkCitationSpan
-                    authorName={authorName}
-                    authorID={authorID}
+                    authors={authors}
                     workTitle={workTitle}
                     workID={workID}
                     spaceAfter={false}
