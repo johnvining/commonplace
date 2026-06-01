@@ -10,6 +10,7 @@ import WorkCitationSpan from './WorkCitationSpan'
 import { renderMarkdown } from './safeMarkdown'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { saveAndExitEdit } from './saveAndExitEdit'
+import AuthorsChipList from './AuthorsChipList'
 import ImageUploader from './ImageUploader'
 import {
   TopLevelStandardButtonContainer,
@@ -39,8 +40,7 @@ function Work(props: any) {
   const [pendingWorkTitle, setPendingWorkTitle] = useState('')
   const [pendingUrl, setPendingUrl] = useState('')
   const [pendingYear, setPendingYear] = useState('')
-  const [pendingAuthorName, setPendingAuthorName] = useState('')
-  const [pendingAuthorId, setPendingAuthorId] = useState<string | null>('')
+  const [pendingAuthors, setPendingAuthors] = useState<import('./authorsDisplay').AuthorLike[]>([])
   const [pendingSummary, setPendingSummary] = useState('')
   const [pendingCitationInfo, setPendingCitationInfo] = useState('')
   const [piles, setPiles] = useState<any[]>([])
@@ -102,8 +102,7 @@ function Work(props: any) {
       const work = infoResponse.data.data
       setPendingWorkTitle(work.name)
       setPiles(work.piles)
-      setPendingAuthorName(work.authors?.[0]?.name)
-      setPendingAuthorId(work.authors?.[0]?._id)
+      setPendingAuthors(Array.isArray(work.authors) ? work.authors : [])
       setPendingUrl(work.url)
       setPendingYear(work.year)
       setPendingSummary(work.summary)
@@ -161,20 +160,6 @@ function Work(props: any) {
     return notesResponse
   }
 
-  const handleUpdateAuthor = (authorId: any, authorName: any) => {
-    setPendingAuthorName(authorName)
-    setPendingAuthorId(authorId)
-  }
-
-  const handleCreateAuthorAndAssign = (authorName: any) => {
-    setPendingAuthorName(authorName)
-    db.createAndLinkToRecord(db.types.auth, authorName, db.types.work, id).then(
-      (response: any) => {
-        setPendingAuthorId(response.data.data.id)
-      },
-    )
-  }
-
   const deleteWork = async () => {
     if (!confirm(`Do you want to permanently delete '${pendingWorkTitle}'?`)) {
       return
@@ -186,9 +171,7 @@ function Work(props: any) {
 
   const handleAcceptUpdates = async () => {
     var updateObject = {
-      // Server expects authors[] now. Stage 5 keeps the editor as a
-      // single-author UX; the chip-list lands in stage 6.
-      authors: pendingAuthorId ? [pendingAuthorId] : [],
+      authors: pendingAuthors.map((a) => a._id).filter(Boolean),
       year: pendingYear,
       url: pendingUrl,
       name: pendingWorkTitle,
@@ -223,11 +206,6 @@ function Work(props: any) {
         fetchWorkInfo(id)
       },
     )
-  }
-
-  const handleClearAuthor = async () => {
-    setPendingAuthorId(null)
-    setPendingAuthorName('')
   }
 
   const handleFinishEditing = async () => {
@@ -326,16 +304,12 @@ function Work(props: any) {
               setPendingWorkTitle(e.target.value)
             }}
           />
-          <TopLevelFormAutocomplete
-            name="Author"
-            id="author"
-            ontAutofocus={true}
-            defaultValue={pendingAuthorName || ''}
-            onSelect={handleUpdateAuthor}
-            getSuggestions={db.getSuggestions}
-            apiType={db.types.auth}
-            handleNewSelect={handleCreateAuthorAndAssign}
-            onClearText={handleClearAuthor}
+          <label htmlFor="add-author" className="top-level form-label">Authors</label>
+          <AuthorsChipList
+            value={pendingAuthors}
+            onChange={setPendingAuthors}
+            inputId="add-author"
+            dontAutofocus
           />
           <TopLevelFormInput
             name="Citation Information"
@@ -376,8 +350,7 @@ function Work(props: any) {
         <TopLevelTitleContainer>
           <TopLevelTitle>
             <WorkCitationSpan
-              authorName={pendingAuthorName}
-              authorID={pendingAuthorId}
+              authors={pendingAuthors}
               workTitle={pendingWorkTitle}
               workID={null}
               spaceAfter={pendingYear || pendingUrl}

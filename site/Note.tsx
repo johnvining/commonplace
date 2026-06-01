@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { guessYearFromURL } from './utils'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
+import AuthorsChipList from './AuthorsChipList'
 import check_circle from 'url:./icons/check_circle.svg'
 import cross_circle from 'url:./icons/cross_circle.svg'
 // import clipboard from 'url:./icons/clipboard.svg'
@@ -36,8 +37,7 @@ class Note extends React.Component<any, any> {
     lightboxOpen: false,
     overlayMode: false,
     focusEdit: false,
-    pendingAuthorId: null,
-    pendingAuthorName: '',
+    pendingAuthors: [] as import('./authorsDisplay').AuthorLike[],
     pendingPage: '',
     pendingTake: '',
     pendingText: '',
@@ -101,8 +101,7 @@ class Note extends React.Component<any, any> {
     this.fetchLinkedNotes()
 
     this.setState({
-      pendingAuthorId: this.props.note.authors?.[0]?._id,
-      pendingAuthorName: this.props.note.authors?.[0]?.name,
+      pendingAuthors: Array.isArray(this.props.note.authors) ? this.props.note.authors : [],
       pendingPage: this.props.note.page,
       pendingTake: this.props.note.take,
       pendingText: this.props.note.text,
@@ -321,17 +320,8 @@ class Note extends React.Component<any, any> {
       })
   }
 
-  handleUpdateAuthor = (authorId: any, authorName: any) => {
-    this.setState({ pendingAuthorName: authorName, pendingAuthorId: authorId })
-  }
-
-  handleCreateAuthorAndAssign = (authorName: any) => {
-    db.createRecord(db.types.auth, authorName).then((response: any) => {
-      this.setState({
-        pendingAuthorId: response.data.data._id,
-        pendingAuthorName: authorName,
-      })
-    })
+  handleUpdateAuthors = (authors: import('./authorsDisplay').AuthorLike[]) => {
+    this.setState({ pendingAuthors: authors })
   }
 
   handleUpdateWork = (workId: any, workName: any) => {
@@ -349,9 +339,7 @@ class Note extends React.Component<any, any> {
 
   async handleAccept() {
     const updateObject: any = {
-      // Server expects authors[] now. Stage 5 keeps the editor as a
-      // single-author UX; the chip-list lands in stage 6.
-      authors: this.state.pendingAuthorId ? [this.state.pendingAuthorId] : [],
+      authors: this.state.pendingAuthors.map((a: any) => a._id).filter(Boolean),
       page: this.state.pendingPage,
       take: this.state.pendingTake,
       text: this.state.pendingText,
@@ -495,10 +483,6 @@ class Note extends React.Component<any, any> {
     ).then(() => {
       this.props.refetchMe(this.props.index)
     })
-  }
-
-  async handleClearAuthor() {
-    this.setState({ pendingAuthorId: null, pendingAuthorName: '' })
   }
 
   async handleClearWork() {
@@ -833,19 +817,12 @@ class Note extends React.Component<any, any> {
           {edit ? (
             <>
               <div data-name="author" className="width-100">
-                <label htmlFor="author" className="note-full form-label">
-                  Author
-                </label>
-                <Autocomplete
-                  className={'note-full edit-author'}
-                  defaultValue={this.state.pendingAuthorName || ''}
-                  dontAutofocus={true}
-                  inputName={this.props.id + 'author'}
-                  onSelect={this.handleUpdateAuthor}
-                  getSuggestions={db.getSuggestions}
-                  apiType={db.types.auth}
-                  handleNewSelect={this.handleCreateAuthorAndAssign}
-                  onClearText={this.handleClearAuthor.bind(this)}
+                <label className="note-full form-label">Authors</label>
+                <AuthorsChipList
+                  value={this.state.pendingAuthors}
+                  onChange={this.handleUpdateAuthors}
+                  inputId={this.props.id + 'add-author'}
+                  dontAutofocus
                 />
               </div>
               <div data-name="work" className="width-100">
@@ -865,7 +842,7 @@ class Note extends React.Component<any, any> {
                 />
               </div>
             </>
-          ) : !this.state.overlayMode && (this.state.pendingAuthorId ||
+          ) : !this.state.overlayMode && (this.state.pendingAuthors.length ||
             this.props.note?.work?.authors?.length ||
             this.state.pendingWorkId ||
             this.state.pendingYear ||
@@ -874,13 +851,10 @@ class Note extends React.Component<any, any> {
             <div data-name="work" className="width-100">
               <div className="citation">
                 <WorkCitationSpan
-                  authorName={
-                    this.state.pendingAuthorName ??
-                    this.props.note?.work?.authors?.[0]?.name
-                  }
-                  authorID={
-                    this.state.pendingAuthorId ??
-                    this.props.note?.work?.authors?.[0]?._id
+                  authors={
+                    this.state.pendingAuthors.length
+                      ? this.state.pendingAuthors
+                      : this.props.note?.work?.authors
                   }
                   workTitle={this.state.pendingWorkName}
                   workID={this.state.pendingWorkId}

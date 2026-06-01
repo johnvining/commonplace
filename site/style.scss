@@ -1860,3 +1860,53 @@ mark.search-highlight {
     }
   }
 }
+
+.authors-chip-list {
+  margin-bottom: 8px;
+
+  .authors-chip-list-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .authors-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px 2px 2px;
+    border: 1px solid $note_border;
+    border-radius: 4px;
+    background: $input_background;
+    font-size: 13px;
+  }
+
+  .authors-chip-name {
+    padding: 0 4px;
+  }
+
+  .authors-chip-move,
+  .authors-chip-remove {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0 4px;
+    color: $font_color;
+    line-height: 1;
+
+    &:hover:not(:disabled) {
+      background: $semantic_selection;
+      border-radius: 3px;
+    }
+    &:disabled {
+      opacity: 0.25;
+      cursor: default;
+    }
+  }
+
+  .authors-chip-remove {
+    font-weight: 600;
+    &:hover { background: $semantic_removal; }
+  }
+}
