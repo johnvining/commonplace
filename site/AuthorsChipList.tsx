@@ -91,13 +91,17 @@ export default function AuthorsChipList(props: Props) {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // stopPropagation on the keys we handle so the app-wide keyboard
+    // shortcut system doesn't ALSO fire (e.g. global Enter handlers).
     if (e.key === 'Backspace' && !query && value.length) {
       e.preventDefault()
+      e.stopPropagation()
       onChange(value.slice(0, -1))
       return
     }
     if (e.key === 'Enter') {
       e.preventDefault()
+      e.stopPropagation()
       if (suggestions.length && highlighted < suggestions.length) {
         append(suggestions[highlighted])
       } else if (query.trim()) {
@@ -108,6 +112,7 @@ export default function AuthorsChipList(props: Props) {
     if (e.key === 'ArrowDown') {
       if (suggestions.length) {
         e.preventDefault()
+        e.stopPropagation()
         setHighlighted((h) => Math.min(h + 1, suggestions.length - 1))
         setOpen(true)
       }
@@ -116,11 +121,13 @@ export default function AuthorsChipList(props: Props) {
     if (e.key === 'ArrowUp') {
       if (suggestions.length) {
         e.preventDefault()
+        e.stopPropagation()
         setHighlighted((h) => Math.max(h - 1, 0))
       }
       return
     }
     if (e.key === 'Escape') {
+      e.stopPropagation()
       setOpen(false)
       return
     }
@@ -170,6 +177,7 @@ export default function AuthorsChipList(props: Props) {
             <li key={s._id ?? i}>
               <button
                 type="button"
+                tabIndex={-1}
                 className={'pill-input-option' + (i === highlighted ? ' highlighted' : '')}
                 onMouseDown={(e) => { e.preventDefault(); append(s) }}
                 onMouseEnter={() => setHighlighted(i)}
