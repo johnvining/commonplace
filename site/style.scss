@@ -1874,39 +1874,49 @@ mark.search-highlight {
   .authors-chip {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 4px 2px 2px;
+    gap: 2px;
+    padding: 2px 4px;
     border: 1px solid $note_border;
     border-radius: 4px;
     background: $input_background;
     font-size: 13px;
+    line-height: 1.4;
   }
 
   .authors-chip-name {
-    padding: 0 4px;
+    padding: 0 4px 0 2px;
   }
 
+  // Override default <button> chrome (background/border/font) so the icons
+  // sit flush inside the chip without their own outlined boxes.
   .authors-chip-move,
   .authors-chip-remove {
+    appearance: none;
     background: transparent;
     border: none;
+    box-shadow: none;
     cursor: pointer;
-    padding: 0 4px;
+    padding: 0;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: $font_color;
+    font: inherit;
     line-height: 1;
+    border-radius: 3px;
 
-    &:hover:not(:disabled) {
-      background: $semantic_selection;
-      border-radius: 3px;
-    }
-    &:disabled {
-      opacity: 0.25;
-      cursor: default;
-    }
+    &:hover:not(:disabled) { background: $semantic_selection; }
+    &:disabled { opacity: 0.25; cursor: default; }
+    &:focus { outline: none; }
+    &:focus-visible { outline: 1px solid $high_intensity_border; }
   }
 
   .authors-chip-remove {
     font-weight: 600;
+    margin-left: 2px;
     &:hover { background: $semantic_removal; }
   }
 }

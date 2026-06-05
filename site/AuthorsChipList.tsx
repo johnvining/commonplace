@@ -62,26 +62,33 @@ export default function AuthorsChipList(props: Props) {
         <div className="authors-chip-list-chips">
           {value.map((author, index) => (
             <span key={author._id ?? index} className="authors-chip">
-              <button
-                type="button"
-                className="authors-chip-move"
-                onClick={() => move(index, index - 1)}
-                disabled={index === 0}
-                title="Move up"
-              >↑</button>
-              <button
-                type="button"
-                className="authors-chip-move"
-                onClick={() => move(index, index + 1)}
-                disabled={index === value.length - 1}
-                title="Move down"
-              >↓</button>
               <span className="authors-chip-name">{author.name}</span>
+              {value.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className="authors-chip-move"
+                    onClick={() => move(index, index - 1)}
+                    disabled={index === 0}
+                    title="Move up"
+                    aria-label="Move up"
+                  >↑</button>
+                  <button
+                    type="button"
+                    className="authors-chip-move"
+                    onClick={() => move(index, index + 1)}
+                    disabled={index === value.length - 1}
+                    title="Move down"
+                    aria-label="Move down"
+                  >↓</button>
+                </>
+              )}
               <button
                 type="button"
                 className="authors-chip-remove"
                 onClick={() => remove(index)}
                 title="Remove author"
+                aria-label="Remove author"
               >×</button>
             </span>
           ))}
