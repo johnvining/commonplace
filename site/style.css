@@ -1772,107 +1772,64 @@ div .image-row {
 
 .note-overlay-wrapper {
   position: relative;
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: zoom-in;
   margin: 4px 0;
 }
 .note-overlay-wrapper .note-overlay-image {
   width: 100%;
+  height: auto;
   display: block;
-  object-fit: cover;
-  max-height: 480px;
+  border-radius: 4px;
+  cursor: zoom-in;
 }
-.note-overlay-wrapper .note-overlay-gradient {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.75) 40%, rgba(0, 0, 0, 0.92) 100%);
+.note-overlay-wrapper .note-overlay-nav {
   display: flex;
-  align-items: flex-end;
-  padding: 16px 8px 36px 8px;
-}
-.note-overlay-wrapper .note-overlay-text-panel {
-  flex: 1;
-  padding: 0 8px;
-  color: #fff;
-  min-width: 0;
-}
-.note-overlay-wrapper .note-overlay-text-panel .note-overlay-title {
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 4px;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-}
-.note-overlay-wrapper .note-overlay-text-panel .note-overlay-text {
-  font-size: 12px;
-  line-height: 1.5;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
-  max-height: 120px;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 6;
-  -webkit-box-orient: vertical;
-}
-.note-overlay-wrapper .note-overlay-text-panel .note-overlay-text p {
-  margin: 0 0 4px 0;
-}
-.note-overlay-wrapper .note-overlay-text-panel .note-overlay-citation {
-  font-size: 11px;
-  opacity: 0.7;
-  margin-top: 4px;
-  font-style: italic;
-  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 0 4px 0;
 }
 .note-overlay-wrapper .overlay-nav-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
+  background: var(--input-background);
+  border: 1px solid var(--note-border);
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  align-self: center;
   padding: 4px;
 }
 .note-overlay-wrapper .overlay-nav-btn img {
-  filter: invert(1);
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 .note-overlay-wrapper .overlay-nav-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--semantic-selection);
 }
 .note-overlay-wrapper .overlay-nav-btn:disabled {
-  opacity: 0.2;
+  opacity: 0.3;
   cursor: default;
 }
-.note-overlay-wrapper .note-overlay-dots {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
+.note-overlay-wrapper .overlay-nav-dots {
   display: flex;
   gap: 6px;
 }
-.note-overlay-wrapper .note-overlay-dots .overlay-dot {
+.note-overlay-wrapper .overlay-nav-dots .overlay-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--note-border);
   border: none;
   cursor: pointer;
   padding: 0;
 }
-.note-overlay-wrapper .note-overlay-dots .overlay-dot.active {
-  background: #fff;
+.note-overlay-wrapper .overlay-nav-dots .overlay-dot.active {
+  background: var(--font-color);
 }
-.note-overlay-wrapper .note-overlay-dots .overlay-dot:hover {
-  background: rgba(255, 255, 255, 0.7);
+.note-overlay-wrapper .overlay-nav-dots .overlay-dot:hover:not(.active) {
+  background: var(--note-border-focused);
 }
 
 .focus-edit-backdrop {
@@ -2518,6 +2475,113 @@ mark.search-highlight {
     background-color: rgb(5.6515789474, 73.4705263158, 101.7284210526);
     border-color: var(--high-intensity-border);
   }
+}
+
+.pill-input {
+  position: relative;
+  margin-bottom: 8px;
+  width: 100%;
+}
+.pill-input .pill-input-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid var(--note-border);
+  border-radius: 4px;
+  background: var(--input-background);
+  width: 100%;
+  min-height: 32px;
+  box-sizing: border-box;
+  cursor: text;
+}
+.pill-input .pill-input-control:focus-within {
+  border-color: var(--high-intensity-border);
+}
+.pill-input .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 2px 1px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--note-border);
+  background: var(--note-background);
+  font-size: 13px;
+  line-height: 1.4;
+}
+.pill-input .pill-name {
+  padding-right: 2px;
+}
+.pill-input .pill-remove {
+  appearance: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--font-color);
+  font: inherit;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 50%;
+}
+.pill-input .pill-remove:hover {
+  background: var(--semantic-removal);
+}
+.pill-input .pill-remove:focus {
+  outline: none;
+}
+.pill-input .pill-remove:focus-visible {
+  outline: 1px solid var(--high-intensity-border);
+}
+.pill-input .pill-input-field {
+  flex: 1 1 auto;
+  min-width: 2px;
+  width: 2px;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 2px 0;
+  color: var(--font-color);
+  font: inherit;
+  font-size: 14px;
+}
+.pill-input .pill-input-suggestions {
+  list-style: none;
+  margin: 4px 0 0 0;
+  padding: 4px 0;
+  border: 1px solid var(--note-border);
+  border-radius: 4px;
+  background: var(--note-background);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  max-height: 240px;
+  overflow-y: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+.pill-input .pill-input-option {
+  appearance: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--font-color);
+  font: inherit;
+  font-size: 14px;
+}
+.pill-input .pill-input-option.highlighted, .pill-input .pill-input-option:hover {
+  background: var(--semantic-selection);
 }
 
 /*# sourceMappingURL=style.css.map */
