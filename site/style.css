@@ -2623,4 +2623,20 @@ mark.search-highlight {
   border-color: transparent;
 }
 
+.pill-input.piles .pill {
+  background: var(--semantic-pile);
+  border-color: transparent;
+}
+
+.pill-input .pill-pre {
+  font-size: 10px;
+  background: var(--note-background);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 4px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
 /*# sourceMappingURL=style.css.map */

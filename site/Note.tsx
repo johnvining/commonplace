@@ -5,6 +5,7 @@ import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import AuthorsChipList from './AuthorsChipList'
 import IdeasPillList from './IdeasPillList'
+import PilesPillList from './PilesPillList'
 import check_circle from 'url:./icons/check_circle.svg'
 import cross_circle from 'url:./icons/cross_circle.svg'
 // import clipboard from 'url:./icons/clipboard.svg'
@@ -897,22 +898,27 @@ class Note extends React.Component<any, any> {
           note.ideas?.length > 0 ||
           Object.keys(this.state.linkedNotes).length > 0 ? (
             <div className={'note-full container width-100'}>
-              <PileListForItem
-                remove={edit_piles}
-                allowTabbing={selected || edit_piles}
-                allowAdd={false}
-                edit={false}
-                piles={note.piles}
-                onSelect={this.handleNewPile.bind(this)}
-                getSuggestions={db.getSuggestions}
-                apiType={db.types.pile}
-                handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-                mainClassName="note"
-                onPileRemove={this.handlePileRemove.bind(this)}
-                onStartPileEdit={() => {
-                  this.props.onStartPileEdit(note._id)
-                }}
-              />
+              {/* In edit_piles mode the PilesPillList below renders the
+                  pills with their own × buttons, so we skip the inline
+                  PileListForItem row to avoid duplication. */}
+              {!edit_piles && (
+                <PileListForItem
+                  remove={false}
+                  allowTabbing={selected}
+                  allowAdd={false}
+                  edit={false}
+                  piles={note.piles}
+                  onSelect={this.handleNewPile.bind(this)}
+                  getSuggestions={db.getSuggestions}
+                  apiType={db.types.pile}
+                  handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
+                  mainClassName="note"
+                  onPileRemove={this.handlePileRemove.bind(this)}
+                  onStartPileEdit={() => {
+                    this.props.onStartPileEdit(note._id)
+                  }}
+                />
+              )}
               {/* In edit_ideas mode the IdeasPillList below renders the
                   pills with their own × buttons, so we skip the inline
                   chip row to avoid duplication. */}
@@ -1025,19 +1031,14 @@ class Note extends React.Component<any, any> {
                   inputId={this.props.id + 'idea'}
                 />
               ) : edit_piles ? (
-                <>
-                  <Autocomplete
-                    inputName={this.props.id + 'pile'}
-                    className="pile"
-                    clearOnSelect={true}
-                    escape={() => this.setState({ edit_piles: false })}
-                    onSelect={this.handleNewPile.bind(this)}
-                    handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-                    getSuggestions={db.getSuggestions}
-                    apiType={db.types.pile}
-                    excludeIds={note.piles?.map((pile: any) => pile._id)}
-                  />
-                </>
+                <PilesPillList
+                  value={note.piles ?? []}
+                  onAddExisting={(pile) => this.handleNewPile(pile._id)}
+                  onCreateNew={(name) => this.handleCreatePileAndAssign(name)}
+                  onRemove={(id) => this.handlePileRemove(id)}
+                  onExit={() => this.setState({ edit_piles: false })}
+                  inputId={this.props.id + 'pile'}
+                />
               ) : edit_links ? (
                 <>
                   <div className="right-div">

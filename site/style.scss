@@ -2014,3 +2014,22 @@ mark.search-highlight {
   background: $semantic_idea;
   border-color: transparent;
 }
+
+// Piles-flavoured pill input. Pills are purple-tinted to match the
+// existing pile chip palette, and pile names with a "Prefix: Name"
+// format render the prefix as a small uppercase tag inside the pill.
+.pill-input.piles .pill {
+  background: $semantic_pile;
+  border-color: transparent;
+}
+
+.pill-input .pill-pre {
+  font-size: 10px;
+  background: $note_background;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 4px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
