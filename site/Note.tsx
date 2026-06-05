@@ -4,6 +4,7 @@ import { guessYearFromURL } from './utils'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import AuthorsChipList from './AuthorsChipList'
+import IdeasPillList from './IdeasPillList'
 import check_circle from 'url:./icons/check_circle.svg'
 import cross_circle from 'url:./icons/cross_circle.svg'
 // import clipboard from 'url:./icons/clipboard.svg'
@@ -912,30 +913,20 @@ class Note extends React.Component<any, any> {
                   this.props.onStartPileEdit(note._id)
                 }}
               />
-              {note.ideas?.map((idea: any) =>
-                edit_ideas ? (
+              {/* In edit_ideas mode the IdeasPillList below renders the
+                  pills with their own × buttons, so we skip the inline
+                  chip row to avoid duplication. */}
+              {!edit_ideas && note.ideas?.map((idea: any) => (
+                <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
                   <button
-                    className="idea label edit"
+                    className="idea label"
                     key={'idea-button' + idea._id}
-                    tabIndex={-1}
-                    onClick={() => {
-                      this.removeIdea(idea._id)
-                    }}
+                    tabIndex={selected ? undefined : -1}
                   >
                     {idea.name}
                   </button>
-                ) : (
-                  <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
-                    <button
-                      className="idea label"
-                      key={'idea-button' + idea._id}
-                      tabIndex={selected || edit_ideas ? undefined : -1}
-                    >
-                      {idea.name}
-                    </button>
-                  </Link>
-                )
-              )}
+                </Link>
+              ))}
               {Object.keys(this.state.linkedNotes).length > 0 &&
                 Object.keys(this.state.linkedNotes).map((note: any) => (
                   <Link key={note} to={'/note/' + note}>
@@ -1019,39 +1010,32 @@ class Note extends React.Component<any, any> {
                     </button>
                   </div>
                 </>
-              ) : edit_ideas || edit_piles ? (
+              ) : edit_ideas ? (
+                <IdeasPillList
+                  value={note.ideas ?? []}
+                  onAddExisting={(idea) => this.handleNewIdea(idea._id)}
+                  onCreateNew={(name) => this.handleCreateIdeaAndAddToNote(name)}
+                  onRemove={(id) => this.removeIdea(id)}
+                  onExit={() => this.setState({ edit_ideas: false })}
+                  fetchAiSuggestions={async () => {
+                    const res: any = await db.getIdeaSuggestions(this.props.id)
+                    const names: string[] = res?.data?.suggested_ideas ?? []
+                    return names.map((name) => ({ name }))
+                  }}
+                  inputId={this.props.id + 'idea'}
+                />
+              ) : edit_piles ? (
                 <>
                   <Autocomplete
-                    inputName={this.props.id + edit_ideas ? 'idea' : 'pile'}
-                    className={edit_ideas ? 'idea' : 'pile'}
+                    inputName={this.props.id + 'pile'}
+                    className="pile"
                     clearOnSelect={true}
-                    showSuggestedIdeas={edit_ideas}
-                    getIdeaSuggestions={this.handleSuggestedIdeas.bind(this)}
-                    escape={() => {
-                      edit_ideas
-                        ? this.setState({ edit_ideas: false })
-                        : this.setState({ edit_piles: false })
-                    }}
-                    onSelect={
-                      edit_ideas
-                        ? this.handleNewIdea.bind(this)
-                        : this.handleNewPile.bind(this)
-                    }
-                    handleNewSelect={
-                      edit_ideas
-                        ? this.handleCreateIdeaAndAddToNote.bind(this)
-                        : this.handleCreatePileAndAssign.bind(this)
-                    }
+                    escape={() => this.setState({ edit_piles: false })}
+                    onSelect={this.handleNewPile.bind(this)}
+                    handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
                     getSuggestions={db.getSuggestions}
-                    apiType={edit_ideas ? db.types.idea : db.types.pile}
-                    excludeIds={
-                      edit_ideas
-                        ? note.ideas?.map((idea: any) => idea._id)
-                        : note.piles?.map((pile: any) => pile._id)
-                    }
-                    excludeNames={
-                      edit_ideas ? note.ideas?.map((idea: any) => idea.name) : null
-                    }
+                    apiType={db.types.pile}
+                    excludeIds={note.piles?.map((pile: any) => pile._id)}
                   />
                 </>
               ) : edit_links ? (

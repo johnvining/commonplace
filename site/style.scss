@@ -1976,4 +1976,41 @@ mark.search-highlight {
       background: $semantic_selection;
     }
   }
+
+  // Inline lightbulb that fires AI suggestions. Sits flush at the right
+  // edge of the control next to the input.
+  .pill-input-ai {
+    appearance: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0 4px;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+
+    img { width: 16px; height: 16px; }
+
+    &:hover:not(:disabled) { opacity: 0.7; }
+    &:disabled { opacity: 0.3; cursor: default; }
+  }
+
+  // Small "AI" badge appended to AI-sourced suggestions in the dropdown.
+  .pill-input-ai-tag {
+    margin-left: 8px;
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    background: $semantic_idea;
+    color: $font_color;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+  }
+}
+
+// Ideas-flavoured pill input — same shape, colored pills.
+.pill-input.ideas .pill {
+  background: $semantic_idea;
+  border-color: transparent;
 }
