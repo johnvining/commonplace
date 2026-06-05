@@ -1,14 +1,15 @@
-import React from 'react'
-import Autocomplete from './Autocomplete'
+import React, { useState, useEffect, useRef } from 'react'
 import * as db from './Database'
 import { AuthorLike } from './authorsDisplay'
 
-// Ordered, editable list of authors for Note and Work editors.
+// Ordered, editable list of authors as inline pills sharing a single
+// styled input — same shape as Gmail "To:" or Linear's tag picker.
 //
-// Each existing author renders as a chip with ↑ / ↓ reorder buttons and an
-// × remove. A trailing autocomplete adds a new author — selecting an
-// existing one appends it to the list, and typing a brand-new name creates
-// an Auth record then appends. Order is significant (citation order).
+// - Each existing author renders as a pill with an × to remove.
+// - Backspace at position 0 with an empty query removes the last pill.
+// - Typing triggers a debounced suggestion fetch; Enter selects the
+//   highlighted suggestion, or creates a new author if no match.
+// - Order is significant (citation order). New authors append to the end.
 
 interface Props {
   value: AuthorLike[]
@@ -19,92 +20,166 @@ interface Props {
 
 export default function AuthorsChipList(props: Props) {
   const { value, onChange } = props
+  const [query, setQuery] = useState('')
+  const [suggestions, setSuggestions] = useState<AuthorLike[]>([])
+  const [highlighted, setHighlighted] = useState(0)
+  const [open, setOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const requestRef = useRef<AbortController | null>(null)
 
-  const move = (from: number, to: number) => {
-    if (to < 0 || to >= value.length) return
-    const next = value.slice()
-    const [item] = next.splice(from, 1)
-    next.splice(to, 0, item)
-    onChange(next)
-  }
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      if (requestRef.current) requestRef.current.abort()
+    }
+  }, [])
 
-  const remove = (index: number) => {
-    const next = value.slice()
-    next.splice(index, 1)
-    onChange(next)
-  }
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (requestRef.current) requestRef.current.abort()
+    if (!query.trim()) {
+      setSuggestions([])
+      setOpen(false)
+      return
+    }
+    debounceRef.current = setTimeout(async () => {
+      const controller = new AbortController()
+      requestRef.current = controller
+      try {
+        const res: any = await db.getSuggestions('auth', query, false, controller.signal)
+        const list: AuthorLike[] = res?.data?.data || []
+        const taken = new Set(value.map((a) => a._id).filter(Boolean))
+        const filtered = list.filter((a) => !taken.has(a._id))
+        setSuggestions(filtered)
+        setHighlighted(0)
+        setOpen(true)
+      } catch {
+        // Aborted or network error — leave the existing list alone.
+      }
+    }, 180)
+  }, [query, value])
 
   const append = (author: AuthorLike) => {
     if (!author?._id) return
     if (value.some((a) => a._id === author._id)) return
     onChange([...value, author])
+    setQuery('')
+    setSuggestions([])
+    setOpen(false)
+    inputRef.current?.focus()
   }
 
-  // Existing Autocomplete fires onSelect(id, name) when picking a suggestion.
-  const handleSelectExisting = (authorId: string, authorName: string) => {
-    append({ _id: authorId, name: authorName })
+  const removeAt = (index: number) => {
+    const next = value.slice()
+    next.splice(index, 1)
+    onChange(next)
+    inputRef.current?.focus()
   }
 
-  // handleNewSelect fires when the user submits a name that didn't match.
-  // We create the Auth record then append.
-  const handleCreateNew = async (authorName: string) => {
-    if (!authorName) return
-    const response: any = await db.createRecord(db.types.auth, authorName)
-    const created = response?.data
-    if (created?._id) {
-      append({ _id: created._id, name: created.name ?? authorName })
+  const createAndAppend = async (name: string) => {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    try {
+      const res: any = await db.createRecord('auth', trimmed)
+      const created: AuthorLike | undefined = res?.data?.data
+      if (created?._id) append(created)
+    } catch (e) {
+      if (process.env.NODE_ENV === 'development') console.error(e)
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !query && value.length) {
+      e.preventDefault()
+      onChange(value.slice(0, -1))
+      return
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (suggestions.length && highlighted < suggestions.length) {
+        append(suggestions[highlighted])
+      } else if (query.trim()) {
+        createAndAppend(query)
+      }
+      return
+    }
+    if (e.key === 'ArrowDown') {
+      if (suggestions.length) {
+        e.preventDefault()
+        setHighlighted((h) => Math.min(h + 1, suggestions.length - 1))
+        setOpen(true)
+      }
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      if (suggestions.length) {
+        e.preventDefault()
+        setHighlighted((h) => Math.max(h - 1, 0))
+      }
+      return
+    }
+    if (e.key === 'Escape') {
+      setOpen(false)
+      return
+    }
+  }
+
+  const handleContainerClick = () => {
+    inputRef.current?.focus()
+  }
+
+  // Close the suggestions dropdown when focus leaves the component.
+  const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    const next = e.relatedTarget as Node | null
+    if (next && containerRef.current?.contains(next)) return
+    setOpen(false)
+  }
+
   return (
-    <div className="authors-chip-list">
-      {value.length > 0 && (
-        <div className="authors-chip-list-chips">
-          {value.map((author, index) => (
-            <span key={author._id ?? index} className="authors-chip">
-              <span className="authors-chip-name">{author.name}</span>
-              {value.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    className="authors-chip-move"
-                    onClick={() => move(index, index - 1)}
-                    disabled={index === 0}
-                    title="Move up"
-                    aria-label="Move up"
-                  >↑</button>
-                  <button
-                    type="button"
-                    className="authors-chip-move"
-                    onClick={() => move(index, index + 1)}
-                    disabled={index === value.length - 1}
-                    title="Move down"
-                    aria-label="Move down"
-                  >↓</button>
-                </>
-              )}
+    <div className="pill-input" ref={containerRef} onBlur={handleBlur}>
+      <div className="pill-input-control" onClick={handleContainerClick}>
+        {value.map((author, index) => (
+          <span key={author._id ?? index} className="pill">
+            <span className="pill-name">{author.name}</span>
+            <button
+              type="button"
+              className="pill-remove"
+              onClick={(e) => { e.stopPropagation(); removeAt(index) }}
+              tabIndex={-1}
+              aria-label={`Remove ${author.name ?? 'author'}`}
+            >×</button>
+          </span>
+        ))}
+        <input
+          ref={inputRef}
+          id={props.inputId ?? 'add-author'}
+          className="pill-input-field"
+          autoFocus={!props.dontAutofocus}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => { if (suggestions.length) setOpen(true) }}
+          autoComplete="off"
+        />
+      </div>
+      {open && suggestions.length > 0 && (
+        <ul className="pill-input-suggestions">
+          {suggestions.map((s, i) => (
+            <li key={s._id ?? i}>
               <button
                 type="button"
-                className="authors-chip-remove"
-                onClick={() => remove(index)}
-                title="Remove author"
-                aria-label="Remove author"
-              >×</button>
-            </span>
+                className={'pill-input-option' + (i === highlighted ? ' highlighted' : '')}
+                onMouseDown={(e) => { e.preventDefault(); append(s) }}
+                onMouseEnter={() => setHighlighted(i)}
+              >
+                {s.name}
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-      <Autocomplete
-        inputName={props.inputId ?? 'add-author'}
-        className="top-level author-select"
-        dontAutofocus={props.dontAutofocus}
-        defaultValue=""
-        onSelect={handleSelectExisting}
-        getSuggestions={db.getSuggestions}
-        apiType={db.types.auth}
-        handleNewSelect={handleCreateNew}
-        onClearText={() => {}}
-      />
     </div>
   )
 }

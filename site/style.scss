@@ -1861,36 +1861,43 @@ mark.search-highlight {
   }
 }
 
-.authors-chip-list {
+.pill-input {
+  position: relative;
   margin-bottom: 8px;
 
-  .authors-chip-list-chips {
+  .pill-input-control {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 6px;
-  }
-
-  .authors-chip {
-    display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 2px 4px;
+    gap: 4px;
+    padding: 4px 6px;
     border: 1px solid $note_border;
     border-radius: 4px;
     background: $input_background;
+    min-height: 32px;
+    cursor: text;
+
+    &:focus-within {
+      border-color: $high_intensity_border;
+    }
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 2px 1px 6px;
+    border-radius: 12px;
+    background: $button_input_background_selected;
     font-size: 13px;
     line-height: 1.4;
   }
 
-  .authors-chip-name {
-    padding: 0 4px 0 2px;
+  .pill-name {
+    padding-right: 2px;
   }
 
-  // Override default <button> chrome (background/border/font) so the icons
-  // sit flush inside the chip without their own outlined boxes.
-  .authors-chip-move,
-  .authors-chip-remove {
+  .pill-remove {
     appearance: none;
     background: transparent;
     border: none;
@@ -1898,25 +1905,67 @@ mark.search-highlight {
     cursor: pointer;
     padding: 0;
     margin: 0;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: $font_color;
     font: inherit;
+    font-weight: 600;
     line-height: 1;
-    border-radius: 3px;
+    border-radius: 50%;
 
-    &:hover:not(:disabled) { background: $semantic_selection; }
-    &:disabled { opacity: 0.25; cursor: default; }
+    &:hover { background: $semantic_removal; }
     &:focus { outline: none; }
     &:focus-visible { outline: 1px solid $high_intensity_border; }
   }
 
-  .authors-chip-remove {
-    font-weight: 600;
-    margin-left: 2px;
-    &:hover { background: $semantic_removal; }
+  // The bare text input shares the line with the pills, growing to fill
+  // remaining space.
+  .pill-input-field {
+    flex: 1;
+    min-width: 80px;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 2px 0;
+    color: $font_color;
+    font: inherit;
+    font-size: 14px;
+  }
+
+  .pill-input-suggestions {
+    list-style: none;
+    margin: 4px 0 0 0;
+    padding: 4px 0;
+    border: 1px solid $note_border;
+    border-radius: 4px;
+    background: $note_background;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    max-height: 240px;
+    overflow-y: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
+
+  .pill-input-option {
+    appearance: none;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 6px 10px;
+    cursor: pointer;
+    color: $font_color;
+    font: inherit;
+    font-size: 14px;
+
+    &.highlighted,
+    &:hover {
+      background: $semantic_selection;
+    }
   }
 }
