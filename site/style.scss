@@ -1864,17 +1864,20 @@ mark.search-highlight {
 .pill-input {
   position: relative;
   margin-bottom: 8px;
+  width: 100%;
 
   .pill-input-control {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 4px;
-    padding: 4px 6px;
+    padding: 6px 8px;
     border: 1px solid $note_border;
     border-radius: 4px;
     background: $input_background;
+    width: 100%;
     min-height: 32px;
+    box-sizing: border-box;
     cursor: text;
 
     &:focus-within {
@@ -1921,11 +1924,13 @@ mark.search-highlight {
     &:focus-visible { outline: 1px solid $high_intensity_border; }
   }
 
-  // The bare text input shares the line with the pills, growing to fill
-  // remaining space.
+  // The bare text input fills the rest of the line invisibly when empty
+  // and grows as the user types. The container is the visible field; the
+  // input itself has no decoration of its own.
   .pill-input-field {
-    flex: 1;
-    min-width: 80px;
+    flex: 1 1 auto;
+    min-width: 2px;
+    width: 2px;
     border: none;
     outline: none;
     background: transparent;
