@@ -1890,8 +1890,9 @@ mark.search-highlight {
     align-items: center;
     gap: 2px;
     padding: 1px 2px 1px 6px;
-    border-radius: 12px;
-    background: $button_input_background_selected;
+    border-radius: 3px;
+    border: 1px solid $note_border;
+    background: $note_background;
     font-size: 13px;
     line-height: 1.4;
   }
