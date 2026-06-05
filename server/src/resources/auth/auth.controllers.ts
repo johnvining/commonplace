@@ -119,7 +119,9 @@ export const reqCreateAuthor = async (req: Request, res: Response) => {
 }
 
 export const reqGetWorksForAuthor = async (req: Request, res: Response) => {
-  const doc = await Work.find({ authors: req.params.id }).sort({ year: 1 })
+  const doc = await Work.find({ authors: req.params.id })
+    .populate('authors')
+    .sort({ year: 1 })
   if (!doc) {
     return res.status(400).end()
   }
