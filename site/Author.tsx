@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 import ResultWork from './ResultWork'
+import NoteResult from './NoteResult'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import {
@@ -26,6 +27,7 @@ function Author(props: any) {
   const [pendingDeathYear, setPendingDeathYear] = useState('')
   const [pendingUsernames, setPendingUsernames] = useState('')
   const [works, setWorks] = useState<any>(null)
+  const [authorOnlyNotes, setAuthorOnlyNotes] = useState<any[]>([])
   const navigate = useNavigate()
 
   const fetchAuthorInfo = (id: any) => {
@@ -50,6 +52,27 @@ function Author(props: any) {
         console.error(error)
       })
   }
+
+  // Notes attributed to this author directly. We exclude notes whose work
+  // already appears in the works section above, so we don't double-list
+  // (those notes are accessible by clicking through to the work).
+  useEffect(() => {
+    if (works === null) return
+    let cancelled = false
+    db.getRecordsWithFilter(db.types.note, db.types.auth, id)
+      .then((response: any) => {
+        if (cancelled) return
+        const allNotes: any[] = response?.data?.data ?? []
+        const workIds = new Set((works ?? []).map((w: any) => String(w._id)))
+        const filtered = allNotes.filter((n: any) => {
+          const wid = n.work?._id ? String(n.work._id) : null
+          return !wid || !workIds.has(wid)
+        })
+        setAuthorOnlyNotes(filtered)
+      })
+      .catch((err: any) => console.error(err))
+    return () => { cancelled = true }
+  }, [id, works])
 
   useEffect(() => {
     fetchAuthorInfo(id)
@@ -179,6 +202,11 @@ function Author(props: any) {
         <div key={'work-listing-' + workindex}>
           <ResultWork work={work} key={'work-' + work._id} />
         </div>
+      ))}
+
+      {/* Notes attributed to this author (excluding those from works above) */}
+      {authorOnlyNotes.map((note: any) => (
+        <NoteResult note={note} key={'auth-note-' + note._id} />
       ))}
     </div>
   )
