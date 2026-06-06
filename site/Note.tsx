@@ -844,7 +844,7 @@ class Note extends React.Component<any, any> {
                 />
               </div>
             </>
-          ) : !this.state.overlayMode && (this.state.pendingAuthors.length ||
+          ) : !this.state.overlayMode && !this.props.hideCitation && (this.state.pendingAuthors.length ||
             this.props.note?.work?.authors?.length ||
             this.state.pendingWorkId ||
             this.state.pendingYear ||

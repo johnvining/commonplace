@@ -751,6 +751,7 @@ class NoteList extends React.Component<any, any> {
                       }
                       setNoteMode={this.setNoteMode.bind(this)}
                       onStartPileEdit={this.onStartPileEdit.bind(this)}
+                      hideCitation={this.props.hideCitation}
                     />
                   )}
                 </div>

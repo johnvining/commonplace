@@ -12,6 +12,7 @@ import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { saveAndExitEdit } from './saveAndExitEdit'
 import AuthorsChipList from './AuthorsChipList'
 import PilesPillList from './PilesPillList'
+import ClickToCopyNick from './ClickToCopyNick'
 import ImageUploader from './ImageUploader'
 import {
   TopLevelStandardButtonContainer,
@@ -347,131 +348,143 @@ function Work(props: any) {
           />
         </TopLevelFormContainer>
       ) : (
-        <TopLevelTitleContainer>
-          <TopLevelTitle>
-            <WorkCitationSpan
-              authors={pendingAuthors}
-              workTitle={pendingWorkTitle}
-              workID={null}
-              spaceAfter={pendingYear || pendingUrl}
-            />
-            <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
-          </TopLevelTitle>
-        </TopLevelTitleContainer>
+        <>
+          <div className="work-page-header">
+            <div className="work-page-header-left">
+              <div className="work-page-title">
+                <WorkCitationSpan
+                  workTitle={pendingWorkTitle}
+                  workID={null}
+                  spaceAfter={pendingYear || pendingUrl}
+                />
+                <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
+              </div>
+              {pendingAuthors.length > 0 && (
+                <div className="work-page-byline">
+                  <WorkCitationSpan authors={pendingAuthors} />
+                </div>
+              )}
+              {nick && (
+                <div className="work-page-nick">
+                  <ClickToCopyNick nick={nick} />
+                </div>
+              )}
+            </div>
+            <div className="work-page-header-right">
+              {editPiles ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '8px',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <PilesPillList
+                      value={piles ?? []}
+                      onAddExisting={(pile) => handleNewPile(pile._id)}
+                      onCreateNew={(name) => handleCreatePileAndAssign(name)}
+                      onRemove={(id) => handlePileRemove(id)}
+                      onExit={() => setEditPiles(false)}
+                      inputId="work-work-pile"
+                    />
+                  </div>
+                  <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
+                </div>
+              ) : (
+                <>
+                  <TopLevelStandardButtonContainer className="top-level-toolbar">
+                    <TopLevelStarButton
+                      type="work"
+                      id={id}
+                      label={pendingWorkTitle}
+                      href={`/work/${id}`}
+                    />
+                    <TopLevelStandardButton
+                      name="Edit"
+                      onClick={() => {
+                        setEdit(true)
+                        setEditPiles(false)
+                      }}
+                    />
+                    <TopLevelStandardButton
+                      name="Piles"
+                      onClick={() => {
+                        setEdit(false)
+                        setEditPiles(true)
+                      }}
+                    />
+                    <TopLevelStandardButton name="Delete" onClick={deleteWork} />
+                  </TopLevelStandardButtonContainer>
+                  <TopLevelStandardButtonContainer className="top-level-toolbar">
+                    <TopLevelStandardButton
+                      name="Read"
+                      onClick={() => {
+                        navigate('/read/' + id)
+                      }}
+                    />
+                    <TopLevelStandardButton
+                      name="Add Note"
+                      onClick={createNoteForWork}
+                    />
+                    <ImageUploader
+                      onImagesUpload={createNotesForWorkFromImages}
+                      allowMultiple={true}
+                      buttonClassName="button left-right"
+                    />
+                    <TopLevelStandardButton
+                      name="Import"
+                      onClick={() => {
+                        setImportMode(!importMode)
+                      }}
+                    />
+                  </TopLevelStandardButtonContainer>
+                  {piles && piles.length > 0 && (
+                    <div className="work-page-piles">
+                      <PileListForItem
+                        remove={false}
+                        edit={false}
+                        piles={piles}
+                        onSelect={handleNewPile}
+                        getSuggestions={db.getSuggestions}
+                        handleNewSelect={handleCreatePileAndAssign}
+                        mainClassName="top-level"
+                        onStartPileEdit={() => {
+                          setEditPiles(true)
+                        }}
+                        allowAdd={false}
+                        allowTabbing={true}
+                        onPileRemove={handlePileRemove}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+          {(pendingCitationInfo || pendingSummary) && (
+            <details className="work-summary-collapse">
+              <summary>Summary</summary>
+              <div className="work-summary-content">
+                {pendingCitationInfo}
+                {pendingCitationInfo && pendingSummary && <br />}
+                {pendingCitationInfo && pendingSummary && <br />}
+                <div
+                  className="work-summary"
+                  dangerouslySetInnerHTML={{
+                    __html: processHtmlForNicks(renderMarkdown(pendingSummary)),
+                  }}
+                />
+              </div>
+            </details>
+          )}
+        </>
       )}
-      {edit ? (
+      {edit && (
         <div style={{ marginBottom: '4px' }}>
           <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
         </div>
-      ) : editPiles ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '8px',
-            marginBottom: '4px',
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <PilesPillList
-              value={piles ?? []}
-              onAddExisting={(pile) => handleNewPile(pile._id)}
-              onCreateNew={(name) => handleCreatePileAndAssign(name)}
-              onRemove={(id) => handlePileRemove(id)}
-              onExit={() => setEditPiles(false)}
-              inputId="work-work-pile"
-            />
-          </div>
-          <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
-        </div>
-      ) : (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '0px',
-          }}
-        >
-          <TopLevelStandardButtonContainer
-            nick={nick}
-            className="top-level-toolbar"
-          >
-            <TopLevelStarButton
-              type="work"
-              id={id}
-              label={pendingWorkTitle}
-              href={`/work/${id}`}
-            />
-            <TopLevelStandardButton
-              name="Edit"
-              onClick={() => {
-                setEdit(true)
-                setEditPiles(false)
-              }}
-            />
-            <TopLevelStandardButton
-              name="Piles"
-              onClick={() => {
-                setEdit(false)
-                setEditPiles(true)
-              }}
-            />
-            <TopLevelStandardButton name="Delete" onClick={deleteWork} />
-            <TopLevelStandardButton
-              name="Import"
-              onClick={() => {
-                setImportMode(!importMode)
-              }}
-            />
-            <TopLevelStandardButton
-              name="Read"
-              onClick={() => {
-                navigate('/read/' + id)
-              }}
-            />
-            <TopLevelStandardButton
-              name="Add Note"
-              onClick={createNoteForWork}
-            />
-            <ImageUploader
-              onImagesUpload={createNotesForWorkFromImages}
-              allowMultiple={true}
-              buttonClassName="button left-right"
-            />
-          </TopLevelStandardButtonContainer>
-          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1 }}>
-            <PileListForItem
-              remove={editPiles}
-              edit={false}
-              piles={piles}
-              onSelect={handleNewPile}
-              getSuggestions={db.getSuggestions}
-              handleNewSelect={handleCreatePileAndAssign}
-              mainClassName="top-level"
-              onStartPileEdit={() => {
-                setEditPiles(true)
-              }}
-              allowAdd={false}
-              allowTabbing={true}
-              onPileRemove={handlePileRemove}
-            />
-          </div>
-        </div>
       )}
-      {!edit && (pendingCitationInfo || pendingSummary) ? (
-        <TopLevelPostButtonContent>
-          {pendingCitationInfo}
-          {pendingCitationInfo && pendingSummary && <br />}
-          {pendingCitationInfo && pendingSummary && <br />}
-          <div
-            className="work-summary"
-            dangerouslySetInnerHTML={{
-              __html: processHtmlForNicks(renderMarkdown(pendingSummary)),
-            }}
-          />
-        </TopLevelPostButtonContent>
-      ) : null}
       {importMode ? (
         <TopLevelFormContainer>
           <TopLevelFormTextArea
@@ -492,6 +505,7 @@ function Work(props: any) {
           key={`work-${id}-${notesRefreshKey}`}
           viewMode={props.viewMode}
           getListOfNotes={getListOfNotes}
+          hideCitation
         />
       )}
     </>

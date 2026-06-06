@@ -2010,6 +2010,102 @@ mark.search-highlight {
   }
 }
 
+// Work page header — two-column layout: title + byline on the left,
+// action buttons + pile chips stacked on the right. Subtle off-color
+// background + border to set the page header apart from the note list
+// below it.
+.work-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0 12px 0;
+  padding: 14px 16px;
+  background: $note_background;
+  border: 1px solid $note_border;
+  border-radius: 6px;
+}
+
+.work-page-header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.work-page-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  max-width: 60%;
+  padding-right: 4px;
+}
+
+.work-page-title {
+  font-size: 26px;
+  font-family: $main_font;
+  line-height: 1.2;
+}
+
+.work-page-byline {
+  font-size: 24px;
+  font-family: $main_font;
+  color: $font_color;
+  opacity: 0.8;
+  margin-top: 8px;
+  line-height: 1.25;
+}
+
+// Nick sits under the byline on the left, low visual weight.
+.work-page-nick {
+  margin-top: 10px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.work-page-piles {
+  text-align: right;
+  margin-top: 6px;
+}
+
+// Collapsible summary block below the header. Starts collapsed; opens
+// on click. Uses native <details>/<summary> so it's accessible.
+.work-summary-collapse {
+  margin: 0 0 12px 0;
+  border: 1px solid $note_border;
+  border-radius: 4px;
+  background: $note_background;
+
+  > summary {
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-family: $sans_font;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $font_color;
+    opacity: 0.7;
+    user-select: none;
+
+    &:hover { opacity: 1; }
+    &::-webkit-details-marker { color: inherit; }
+  }
+
+  &[open] > summary {
+    border-bottom: 1px solid $note_border;
+    opacity: 1;
+  }
+
+  .work-summary-content {
+    padding: 8px 10px;
+    font-family: $main_font;
+
+    .work-summary {
+      p { margin: 0 0 0.5em 0; &:last-child { margin-bottom: 0; } }
+    }
+  }
+}
+
 // Ideas-flavoured pill input — same shape, colored pills.
 .pill-input.ideas .pill {
   background: $semantic_idea;

@@ -147,6 +147,8 @@
 }
 .note-full .citation {
   padding: 2px;
+  font-size: 13px;
+  opacity: 0.55;
 }
 .note-full .note-text,
 .note-full .note-take {
@@ -2617,6 +2619,97 @@ mark.search-highlight {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   vertical-align: middle;
+}
+
+.work-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 8px 0 12px 0;
+  padding: 14px 16px;
+  background: var(--note-background);
+  border: 1px solid var(--note-border);
+  border-radius: 6px;
+}
+
+.work-page-header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.work-page-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  max-width: 60%;
+  padding-right: 4px;
+}
+
+.work-page-title {
+  font-size: 26px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  line-height: 1.2;
+}
+
+.work-page-byline {
+  font-size: 24px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  color: var(--font-color);
+  opacity: 0.8;
+  margin-top: 8px;
+  line-height: 1.25;
+}
+
+.work-page-nick {
+  margin-top: 10px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.work-page-piles {
+  text-align: right;
+  margin-top: 6px;
+}
+
+.work-summary-collapse {
+  margin: 0 0 12px 0;
+  border: 1px solid var(--note-border);
+  border-radius: 4px;
+  background: var(--note-background);
+}
+.work-summary-collapse > summary {
+  cursor: pointer;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--font-color);
+  opacity: 0.7;
+  user-select: none;
+}
+.work-summary-collapse > summary:hover {
+  opacity: 1;
+}
+.work-summary-collapse > summary::-webkit-details-marker {
+  color: inherit;
+}
+.work-summary-collapse[open] > summary {
+  border-bottom: 1px solid var(--note-border);
+  opacity: 1;
+}
+.work-summary-collapse .work-summary-content {
+  padding: 8px 10px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+.work-summary-collapse .work-summary-content .work-summary p {
+  margin: 0 0 0.5em 0;
+}
+.work-summary-collapse .work-summary-content .work-summary p:last-child {
+  margin-bottom: 0;
 }
 
 .pill-input.ideas .pill {
