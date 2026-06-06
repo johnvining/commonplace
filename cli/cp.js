@@ -68,9 +68,25 @@ function typeLabel(type) {
   return { note: 'note', auth: 'author', work: 'work', idea: 'idea', pile: 'pile' }[type] || type
 }
 
+function joinAuthorNames(authors) {
+  // Mirrors site/authorsDisplay.ts so the CLI renders multi-author notes
+  // the same way the web UI does.
+  const names = (authors || [])
+    .map(a => a && typeof a === 'object' ? a.name : null)
+    .filter(n => typeof n === 'string' && n.length > 0)
+  if (!names.length) return ''
+  if (names.length === 1) return names[0]
+  if (names.length === 2) return `${names[0]} & ${names[1]}`
+  return names.slice(0, -1).join(', ') + ' & ' + names[names.length - 1]
+}
+
 function formatNote(note, { full = false } = {}) {
   const title = note.title || '(untitled)'
-  const author = note.author?.name ? `${DIM}${note.author.name}${RESET}` : ''
+  const noteAuthors = joinAuthorNames(note.authors)
+  const workAuthors = joinAuthorNames(note.work?.authors)
+  const author = noteAuthors || workAuthors
+    ? `${DIM}${noteAuthors || workAuthors}${RESET}`
+    : ''
   const work = note.work?.name ? `${DIM}${note.work.name}${RESET}` : ''
   const ideas = note.ideas?.length ? `${DIM}[${note.ideas.map(i => i.name).join(', ')}]${RESET}` : ''
   const nick = note.nick ? `${DIM}:${note.nick}${RESET}` : ''
@@ -91,9 +107,55 @@ function formatEntity(type, item) {
   let name = item.name || '(unnamed)'
   const nick = item.nick ? `${DIM}:${item.nick}${RESET}` : ''
   let meta = ''
-  if (type === 'work' && item.author?.name) meta = ` ${DIM}— ${item.author.name}${RESET}`
-  if (type === 'work' && item.year) meta += ` ${DIM}(${item.year})${RESET}`
+  if (type === 'work') {
+    const authorStr = joinAuthorNames(item.authors)
+    if (authorStr) meta = ` ${DIM}— ${authorStr}${RESET}`
+    if (item.year) meta += ` ${DIM}(${item.year})${RESET}`
+  }
   return `${BOLD}${color}[${label}]${RESET} ${name}${meta}${nick ? '  ' + nick : ''}\n  ${DIM}${item._id}${RESET}`
+}
+
+// Map a nick (e.g. "p12345", "n42") to {type, id} by hitting /nick/:nick.
+// Returns null if the nick can't be resolved.
+async function resolveByNick(nick, config) {
+  try {
+    const res = await api('GET', `nick/${nick}`, null, config)
+    const data = res?.data
+    if (!data) return null
+    if (data.note) return { type: 'note', id: data.note }
+    if (data.work) return { type: 'work', id: data.work }
+    if (data.idea) return { type: 'idea', id: data.idea }
+    if (data.pile) return { type: 'pile', id: data.pile }
+  } catch {}
+  return null
+}
+
+// Resolve <id-or-nick> to {type, id}. If a nick prefix matches the
+// nick-pattern (letter + digits), look it up; otherwise treat as an
+// ObjectId and require a fallbackType.
+async function resolveTarget(input, fallbackType, config) {
+  if (!input) return null
+  if (/^[nwip]\d+$/i.test(input)) {
+    const resolved = await resolveByNick(input, config)
+    if (resolved) return resolved
+    return null
+  }
+  if (fallbackType) return { type: fallbackType, id: input }
+  return null
+}
+
+// Simple y/N prompt for destructive ops. Returns true if user confirmed.
+function confirm(prompt) {
+  return new Promise(resolve => {
+    process.stdout.write(prompt)
+    process.stdin.setEncoding('utf8')
+    process.stdin.resume()
+    process.stdin.once('data', ch => {
+      process.stdin.pause()
+      const answer = String(ch).trim().toLowerCase()
+      resolve(answer === 'y' || answer === 'yes')
+    })
+  })
 }
 
 function formatResult(entry) {
@@ -306,10 +368,14 @@ async function cmdCapture(args, config) {
   }
 
   if (flags.author) {
-    const authorId = await resolveOrCreate('auth', flags.author, config)
-    if (authorId) {
-      await api('PUT', `note/${id}`, { author: authorId }, config)
-      if (!isJson) console.log(`${DIM}  author → ${flags.author}${RESET}`)
+    const authorIds = []
+    for (const name of flags.author.split(',').map(s => s.trim()).filter(Boolean)) {
+      const aid = await resolveOrCreate('auth', name, config)
+      if (aid) authorIds.push(aid)
+    }
+    if (authorIds.length) {
+      await api('PUT', `note/${id}`, { authors: authorIds }, config)
+      if (!isJson) console.log(`${DIM}  authors → ${flags.author}${RESET}`)
     }
   }
 
@@ -354,10 +420,14 @@ async function cmdSet(args, config) {
   }
 
   if (flags.author) {
-    const authorId = await resolveOrCreate('auth', flags.author, config)
-    if (authorId) {
-      await api('PUT', `note/${id}`, { author: authorId }, config)
-      console.log(`${DIM}  author → ${flags.author}${RESET}`)
+    const authorIds = []
+    for (const name of flags.author.split(',').map(s => s.trim()).filter(Boolean)) {
+      const aid = await resolveOrCreate('auth', name, config)
+      if (aid) authorIds.push(aid)
+    }
+    if (authorIds.length) {
+      await api('PUT', `note/${id}`, { authors: authorIds }, config)
+      console.log(`${DIM}  authors → ${flags.author}${RESET}`)
     }
   }
 
@@ -526,32 +596,373 @@ async function cmdBackfillNicks(args, config) {
   }
 }
 
+async function cmdShow(args, config) {
+  const input = args[0]
+  if (!input) {
+    console.error('Usage: cp show <id|nick>')
+    console.error('  Shows the entity and its contents (pile→notes+works, work→notes,')
+    console.error('  auth→works+notes, idea→notes, note→full).')
+    return
+  }
+  // Without a nick prefix we can't infer type — require a nick.
+  const target = await resolveTarget(input, null, config)
+  if (!target) {
+    console.error('Could not resolve — pass a nick (e.g. p12345) or use a type-specific command.')
+    return
+  }
+  const { type, id } = target
+
+  if (type === 'note') {
+    const res = await api('GET', `note/${id}`, null, config)
+    const note = Array.isArray(res?.data) ? res.data[0] : res?.data
+    if (!note) { console.log('Not found.'); return }
+    note.nick = input
+    console.log('\n' + formatNote(note, { full: true }))
+    return
+  }
+
+  // Header for the entity itself.
+  let info = null
+  try { info = (await api('GET', `${type}/${id}`, null, config))?.data } catch {}
+  const header = info
+    ? formatEntity(type, { ...info, nick: input })
+    : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
+  console.log('\n' + header)
+
+  // Contents by type.
+  if (type === 'pile') {
+    const [notesRes, worksRes] = await Promise.all([
+      api('GET', `pile/${id}/notes`, null, config),
+      api('GET', `pile/${id}/works`, null, config),
+    ])
+    const notes = notesRes?.data || []
+    const works = worksRes?.data || []
+    if (works.length) {
+      console.log(`\n${BOLD}Works${RESET} (${works.length})`)
+      works.forEach(w => console.log('  ' + formatEntity('work', w).split('\n').join('\n  ')))
+    }
+    if (notes.length) {
+      console.log(`\n${BOLD}Notes${RESET} (${notes.length})`)
+      notes.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
+    }
+    if (!works.length && !notes.length) console.log('\n(empty)')
+    return
+  }
+
+  if (type === 'idea') {
+    const res = await api('GET', `idea/${id}/notes`, null, config)
+    const notes = res?.data || []
+    console.log(`\n${BOLD}Notes${RESET} (${notes.length})`)
+    if (!notes.length) { console.log('(none)'); return }
+    notes.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
+    return
+  }
+
+  if (type === 'work') {
+    const res = await api('GET', `work/${id}/notes`, null, config)
+    const notes = res?.data || []
+    console.log(`\n${BOLD}Notes${RESET} (${notes.length})`)
+    if (!notes.length) { console.log('(none)'); return }
+    notes.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
+    return
+  }
+}
+
+async function cmdAuthor(args, config) {
+  // `cp author <id-or-name>` — shows works + notes for one author. Accepts
+  // either an ObjectId or a name we'll autocomplete to a single match.
+  const input = args.join(' ').trim()
+  if (!input) { console.error('Usage: cp author <id|name>'); return }
+  let id = input
+  if (!/^[0-9a-f]{24}$/i.test(input)) {
+    const ac = await api('POST', 'auth/autocomplete', { string: input }, config)
+    const matches = ac?.data || []
+    if (!matches.length) { console.log('No match.'); return }
+    if (matches.length > 1) {
+      console.log(`Multiple matches — be more specific or pass the ObjectId:`)
+      matches.forEach(a => console.log(`  ${a.name}  ${DIM}${a._id}${RESET}`))
+      return
+    }
+    id = matches[0]._id
+  }
+  const info = (await api('GET', `auth/${id}`, null, config))?.data
+  if (!info) { console.log('Not found.'); return }
+  console.log('\n' + formatEntity('auth', info))
+
+  const [worksRes, notesRes] = await Promise.all([
+    api('GET', `auth/${id}/works`, null, config),
+    api('GET', `auth/${id}/notes`, null, config),
+  ])
+  const works = worksRes?.data || []
+  const notes = notesRes?.data || []
+  if (works.length) {
+    console.log(`\n${BOLD}Works${RESET} (${works.length})`)
+    works.forEach(w => console.log('  ' + formatEntity('work', w).split('\n').join('\n  ')))
+  }
+  if (notes.length) {
+    // Filter out notes whose work was already listed, same as the web UI.
+    const workIds = new Set(works.map(w => String(w._id)))
+    const standalone = notes.filter(n => !n.work?._id || !workIds.has(String(n.work._id)))
+    console.log(`\n${BOLD}Notes${RESET} (${standalone.length})`)
+    standalone.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
+  }
+  if (!works.length && !notes.length) console.log('\n(empty)')
+}
+
+async function cmdDelete(args, config) {
+  // `cp delete <id-or-nick> [--yes]` — deletes a note, work, idea, or pile.
+  // Type inferred from nick prefix; for raw ObjectId, pass --type.
+  const flagYes = args.includes('--yes') || args.includes('-y')
+  const positional = args.filter(a => a !== '--yes' && a !== '-y' && !a.startsWith('--type'))
+  const typeFlag = args.find(a => a.startsWith('--type='))?.split('=')[1]
+  const input = positional[0]
+  if (!input) { console.error('Usage: cp delete <id|nick> [--type note|work|idea|pile|auth] [--yes]'); return }
+  const target = await resolveTarget(input, typeFlag, config)
+  if (!target) { console.error('Could not resolve target — pass a nick, or both an ObjectId and --type.'); return }
+  const { type, id } = target
+
+  if (!flagYes) {
+    const ok = await confirm(`Delete ${type} ${id}? [y/N] `)
+    if (!ok) { console.log('Cancelled.'); return }
+  }
+
+  // Per-resource endpoint shapes — some use /:id/delete, some DELETE /:id.
+  const deletePath = {
+    note: `note/${id}`,
+    work: `work/${id}`,
+    idea: `idea/${id}/delete`,
+    pile: `pile/${id}`,
+    auth: `auth/${id}/delete`,
+  }[type]
+  if (!deletePath) { console.error(`Unknown type: ${type}`); return }
+  await api('DELETE', deletePath, null, config)
+  console.log(`${GREEN}Deleted${RESET} ${type} ${id}`)
+}
+
+async function cmdRm(args, config) {
+  // `cp rm <noteId> [--idea NAME|--pile NAME|--author NAME|--work]`
+  // Detaches a relation from a note. --work has no value (clears the work).
+  const noteId = args[0]
+  if (!noteId) { console.error('Usage: cp rm <noteId> [--idea NAME|--pile NAME|--author NAME|--work]'); return }
+  const { flags } = parseFlags(args.slice(1))
+
+  if (flags.idea) {
+    const ac = await api('POST', 'idea/autocomplete', { string: flags.idea }, config)
+    const idea = (ac?.data || []).find(i => i.name === flags.idea) || (ac?.data || [])[0]
+    if (!idea) { console.error(`No idea matching "${flags.idea}".`); return }
+    await api('DELETE', `note/${noteId}/idea/${idea._id}`, null, config)
+    console.log(`${DIM}  idea ✕ ${idea.name}${RESET}`)
+  }
+
+  if (flags.pile) {
+    const ac = await api('POST', 'pile/autocomplete', { string: flags.pile }, config)
+    const pile = (ac?.data || []).find(p => p.name === flags.pile) || (ac?.data || [])[0]
+    if (!pile) { console.error(`No pile matching "${flags.pile}".`); return }
+    await api('DELETE', `note/${noteId}/pile/${pile._id}`, null, config)
+    console.log(`${DIM}  pile ✕ ${pile.name}${RESET}`)
+  }
+
+  if (flags.author) {
+    // Removing an author = rewrite the authors array without that one.
+    const noteRes = await api('GET', `note/${noteId}`, null, config)
+    const note = Array.isArray(noteRes?.data) ? noteRes.data[0] : noteRes?.data
+    const current = (note?.authors || []).filter(a => a)
+    const filtered = current.filter(a => (a.name || '') !== flags.author)
+    await api('PUT', `note/${noteId}`, { authors: filtered.map(a => a._id) }, config)
+    console.log(`${DIM}  author ✕ ${flags.author}${RESET}`)
+  }
+
+  if (flags.work !== undefined) {
+    await api('PUT', `note/${noteId}`, { work: null }, config)
+    console.log(`${DIM}  work ✕${RESET}`)
+  }
+
+  console.log(`${GREEN}Done.${RESET}`)
+}
+
+async function cmdOcr(args, config) {
+  const input = args[0]
+  if (!input) { console.error('Usage: cp ocr <noteId|nick>'); return }
+  const target = await resolveTarget(input, 'note', config)
+  if (!target) { console.error('Could not resolve note.'); return }
+  console.log('Running OCR...')
+  const res = await api('GET', `note/${target.id}/ocr`, null, config)
+  const text = res?.data || ''
+  if (!text) { console.log('No text extracted.'); return }
+  console.log(`${GREEN}OCR text:${RESET}`)
+  console.log(text)
+}
+
+async function cmdSuggest(args, config) {
+  const input = args[0]
+  if (!input) { console.error('Usage: cp suggest <noteId|nick> [--title|--ideas]'); return }
+  const target = await resolveTarget(input, 'note', config)
+  if (!target) { console.error('Could not resolve note.'); return }
+  const wantTitle = args.includes('--title')
+  const wantIdeas = args.includes('--ideas')
+  const both = !wantTitle && !wantIdeas
+
+  if (wantTitle || both) {
+    const res = await api('GET', `note/${target.id}/title/suggest`, null, config)
+    const title = res?.suggested_title || res?.data?.suggested_title || '(none)'
+    console.log(`${BOLD}Title:${RESET}  ${title}`)
+  }
+  if (wantIdeas || both) {
+    const res = await api('GET', `note/${target.id}/ideas/suggest`, null, config)
+    const ideas = res?.suggested_ideas || res?.data?.suggested_ideas || []
+    console.log(`${BOLD}Ideas:${RESET}  ${ideas.length ? ideas.join(', ') : '(none)'}`)
+  }
+}
+
+async function cmdLink(args, config) {
+  const a = args[0], b = args[1]
+  if (!a || !b) { console.error('Usage: cp link <noteId-or-nick> <noteId-or-nick>'); return }
+  const ta = await resolveTarget(a, 'note', config)
+  const tb = await resolveTarget(b, 'note', config)
+  if (!ta || !tb) { console.error('Could not resolve both notes.'); return }
+  await api('PUT', 'link', { fromId: ta.id, toId: tb.id }, config)
+  console.log(`${GREEN}Linked${RESET} ${ta.id} ↔ ${tb.id}`)
+}
+
+async function cmdLinks(args, config) {
+  const input = args[0]
+  if (!input) { console.error('Usage: cp links <noteId|nick>'); return }
+  const target = await resolveTarget(input, 'note', config)
+  if (!target) { console.error('Could not resolve note.'); return }
+  const res = await api('GET', `link/note/${target.id}`, null, config)
+  const links = res?.data || []
+  if (!links.length) { console.log('No links.'); return }
+  console.log(`${BOLD}Links${RESET} (${links.length})`)
+  links.forEach(l => {
+    console.log(`  ${l.nick || ''}  ${l.title || '(untitled)'}  ${DIM}${l._id}${RESET}`)
+  })
+}
+
+async function cmdEarliest(args, config) {
+  const page = parseInt(args[0]) || 1
+  const res = await api('GET', `note/file/${page}`, null, config)
+  const notes = res?.data || []
+  if (!notes.length) { console.log('No notes.'); return }
+  notes.forEach((note, i) => {
+    const num = (page - 1) * 40 + i + 1
+    console.log(`\n${DIM}${num}.${RESET}`)
+    console.log(formatNote(note))
+  })
+}
+
+async function cmdAllPiles(args, config) {
+  const res = await api('GET', 'pile/all', null, config)
+  const piles = res?.data || []
+  if (!piles.length) { console.log('No piles.'); return }
+  piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}  ${DIM}${p._id}${RESET}`))
+}
+
+async function cmdImport(args, config) {
+  const kind = args[0]
+  const file = args[1]
+  const flagWork = args.find(a => a.startsWith('--work='))?.split('=')[1]
+  if (!kind || !file) {
+    console.error('Usage: cp import csv <file>')
+    console.error('       cp import instapaper <file>')
+    console.error('       cp import work <file> --work=<workId>')
+    return
+  }
+  const importList = readFileSync(file, 'utf8')
+
+  if (kind === 'csv') {
+    const res = await api('PUT', 'note/import/csv', { importList }, config)
+    const n = res?.data
+    console.log(`${GREEN}Imported${RESET} ${n ?? '?'} notes`)
+    return
+  }
+  if (kind === 'instapaper') {
+    const res = await api('PUT', 'note/import/instapaper', { importList }, config)
+    const n = res?.data
+    console.log(`${GREEN}Imported${RESET} ${n ?? '?'} notes`)
+    return
+  }
+  if (kind === 'work') {
+    if (!flagWork) { console.error('--work=<workId> required for work import.'); return }
+    await api('PUT', `note/import/work/${flagWork}`, { notesText: importList }, config)
+    console.log(`${GREEN}Imported${RESET} notes into work ${flagWork}`)
+    return
+  }
+  console.error(`Unknown import kind: ${kind}`)
+}
+
+async function cmdNickGen(args, config) {
+  // `cp nick-gen <id-or-nick>` — generates or returns the existing nick for
+  // the resolved entity. Useful when a non-note entity is missing a nick.
+  const input = args[0]
+  if (!input) { console.error('Usage: cp nick-gen <id-or-nick> [--type note|work|idea|pile]'); return }
+  const typeFlag = args.find(a => a.startsWith('--type='))?.split('=')[1]
+  const target = await resolveTarget(input, typeFlag, config)
+  if (!target) { console.error('Could not resolve target.'); return }
+  const nick = await ensureNick(target.type, target.id, config)
+  if (nick) {
+    console.log(`${GREEN}${nick}${RESET}`)
+  } else {
+    console.error('Could not generate nick.')
+  }
+}
+
 function cmdHelp() {
   console.log(`
 ${BOLD}cplace${RESET} — Commonplace CLI
 
-${BOLD}Commands${RESET}
-  login              Authenticate with the server
+${BOLD}Finding & viewing${RESET}
   search <query>     Unified search across notes, authors, works, ideas, piles
-  note <id>          Show a note in full
   recent [page]      List recent notes (40 per page)
-  add [title]        Create a new note and open it in the browser
-  open <id> [type]   Open an item in the browser (type: note, auth, work, idea, pile)
-  nick <nick>        Look up a note by its short name
+  earliest [page]    List earliest unfiled notes
+  flip               Show random notes
+  nick <nick>        Look up an entity by its short name
+  note <id|nick>     Show a note in full
+  show <id|nick>     Show an entity and its contents (pile→notes+works, etc.)
+  author <id|name>   Show author info, their works, and standalone notes
+  links <id|nick>    Show notes linked to this note
+
+${BOLD}Lists & searches${RESET}
   authors <query>    Search authors
   ideas <query>      Search ideas
   works <query>      Search works
   piles <query>      Search piles
+  all-piles          List every pile
+
+${BOLD}Creating & editing${RESET}
+  add [title]        Create a new note and open in browser
   quick <title>      Create a note without opening browser
-  capture <title> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME]
+  capture <title> [--text T] [--author N[,N]] [--work N] [--idea T[,T]] [--pile N]
                      Create a note with metadata in one step
-  set <id> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME] [--title T] [--text T]
+  set <id> [--title T] [--text T] [--author N[,N]] [--work N] [--idea T] [--pile N]
                      Update metadata on an existing note
-  flip               Show random notes
+  edit <id> <field> <value>  Quick update (field: title or text)
+  rm <noteId> [--idea N] [--pile N] [--author N] [--work]
+                     Detach an idea/pile/author/work from a note
+  delete <id|nick> [--type T] [--yes]
+                     Delete a note/work/idea/pile/auth
+
+${BOLD}AI & enrichment${RESET}
+  ocr <id|nick>      Run OCR on a note's images
+  suggest <id> [--title|--ideas]
+                     Get title or idea suggestions for a note
+
+${BOLD}Linking${RESET}
+  link <id> <id>     Link two notes
+
+${BOLD}Import${RESET}
+  import csv <file>
+  import instapaper <file>
+  import work <file> --work=<workId>
+
+${BOLD}Admin${RESET}
+  open <id> [type]   Open an item in the browser
+  nick-gen <id|nick> [--type T]   Generate / fetch a nick
   stats              Show counts (notes, authors, works, ideas, piles)
-  edit <id> <field> <value>  Update a note's title or text
   config [url <url>] Show or set config (server URL)
+  login              Authenticate with the server
   ping               Check server status
+  backfill-nicks     Backfill nicks for all entity types
+  backfill-embeddings  Backfill embeddings for all notes
   help               Show this help
 
 ${BOLD}Config${RESET}  ~/.commonplace.json
@@ -568,14 +979,19 @@ const commands = {
   search:  cmdSearch,
   note:    cmdNote,
   recent:  cmdRecent,
+  earliest: cmdEarliest,
   add:     cmdAdd,
   open:    cmdOpen,
   ping:    cmdPing,
   authors: cmdAuthors,
+  author:  cmdAuthor,
   ideas:   cmdIdeas,
   works:   cmdWorks,
   piles:   cmdPiles,
+  'all-piles': cmdAllPiles,
   nick:    cmdNick,
+  'nick-gen': cmdNickGen,
+  show:    cmdShow,
   flip:    cmdFlip,
   edit:    cmdEdit,
   config:  cmdConfig,
@@ -583,6 +999,13 @@ const commands = {
   stats:   cmdStats,
   capture: cmdCapture,
   set:     cmdSet,
+  rm:      cmdRm,
+  delete:  cmdDelete,
+  ocr:     cmdOcr,
+  suggest: cmdSuggest,
+  link:    cmdLink,
+  links:   cmdLinks,
+  import:  cmdImport,
   'backfill-nicks': cmdBackfillNicks,
   'backfill-embeddings': cmdBackfillEmbeddings,
   help:    async () => cmdHelp(),
