@@ -7,6 +7,7 @@ import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { saveAndExitEdit } from './saveAndExitEdit'
+import ClickToCopyNick from './ClickToCopyNick'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
@@ -168,56 +169,58 @@ function Pile(props: any) {
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
-          <>
-            <TopLevelTitleContainer>
-              <TopLevelTitle>{pendingName}</TopLevelTitle>
-              {pendingStartYear || pendingEndYear ? (
-                <TopLevelSubTitle>
-                  {pendingStartYear ? (
-                    <YearSpan year={pendingStartYear} />
-                  ) : null}
+          <div className="entity-page-header">
+            <div className="entity-page-header-left">
+              <div className="entity-page-title">{pendingName}</div>
+              {(pendingStartYear || pendingEndYear) && (
+                <div className="entity-page-byline">
+                  {pendingStartYear ? <YearSpan year={pendingStartYear} /> : null}
                   {pendingStartYear && pendingEndYear ? ' • ' : null}
                   {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
-                </TopLevelSubTitle>
-              ) : null}
-            </TopLevelTitleContainer>
-            <TopLevelStandardButtonContainer
-              nick={nick}
-              className="top-level-toolbar"
-            >
-              <TopLevelStarButton
-                type="pile"
-                id={id}
-                label={pendingName}
-                href={`/pile/${id}`}
-              />
-              <TopLevelStandardButton
-                name="Delete"
-                onClick={handleDeletePile}
-              />
-              <TopLevelStandardButton
-                name="Edit"
-                onClick={() => {
-                  setEdit(true)
-                }}
-              />
-              {!props.showNotes ? (
-                <TopLevelStandardButton
-                  name="View notes"
-                  onClick={() => {
-                    navigate('/pile/' + id + '/notes')
-                  }}
-                />
-              ) : (
-                <TopLevelStandardButton
-                  name="View all"
-                  onClick={() => {
-                    navigate('/pile/' + id)
-                  }}
-                />
+                </div>
               )}
-            </TopLevelStandardButtonContainer>
-          </>
+              {nick && (
+                <div className="entity-page-nick">
+                  <ClickToCopyNick nick={nick} />
+                </div>
+              )}
+            </div>
+            <div className="entity-page-header-right">
+              <TopLevelStandardButtonContainer className="top-level-toolbar">
+                <TopLevelStarButton
+                  type="pile"
+                  id={id}
+                  label={pendingName}
+                  href={`/pile/${id}`}
+                />
+                <TopLevelStandardButton
+                  name="Edit"
+                  onClick={() => {
+                    setEdit(true)
+                  }}
+                />
+                {!props.showNotes ? (
+                  <TopLevelStandardButton
+                    name="View notes"
+                    onClick={() => {
+                      navigate('/pile/' + id + '/notes')
+                    }}
+                  />
+                ) : (
+                  <TopLevelStandardButton
+                    name="View all"
+                    onClick={() => {
+                      navigate('/pile/' + id)
+                    }}
+                  />
+                )}
+                <TopLevelStandardButton
+                  name="Delete"
+                  onClick={handleDeletePile}
+                />
+              </TopLevelStandardButtonContainer>
+            </div>
+          </div>
         )}
       </div>
 

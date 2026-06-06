@@ -15,6 +15,7 @@ import {
 } from './TopLevelHeadings'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { TopLevelStarButton } from './PinButton'
+import ClickToCopyNick from './ClickToCopyNick'
 import { togglePinned } from './pinned'
 import { saveAndExitEdit } from './saveAndExitEdit'
 
@@ -152,38 +153,40 @@ function Idea(props: any) {
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
-          <>
-            <TopLevelTitleContainer>
-              <TopLevelTitle>{pendingName}</TopLevelTitle>
-              {pendingStartYear || pendingEndYear ? (
-                <TopLevelSubTitle>
-                  {pendingStartYear ? (
-                    <YearSpan year={pendingStartYear} />
-                  ) : null}
+          <div className="entity-page-header">
+            <div className="entity-page-header-left">
+              <div className="entity-page-title">{pendingName}</div>
+              {(pendingStartYear || pendingEndYear) && (
+                <div className="entity-page-byline">
+                  {pendingStartYear ? <YearSpan year={pendingStartYear} /> : null}
                   {pendingStartYear && pendingEndYear ? ' • ' : null}
                   {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
-                </TopLevelSubTitle>
-              ) : null}
-            </TopLevelTitleContainer>
-            <TopLevelStandardButtonContainer
-              nick={nick}
-              className="top-level-toolbar"
-            >
-              <TopLevelStarButton
-                type="idea"
-                id={id}
-                label={pendingName}
-                href={`/idea/${id}`}
-              />
-              <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
-              <TopLevelStandardButton
-                name="Edit"
-                onClick={() => {
-                  setEdit(true)
-                }}
-              />
-            </TopLevelStandardButtonContainer>
-          </>
+                </div>
+              )}
+              {nick && (
+                <div className="entity-page-nick">
+                  <ClickToCopyNick nick={nick} />
+                </div>
+              )}
+            </div>
+            <div className="entity-page-header-right">
+              <TopLevelStandardButtonContainer className="top-level-toolbar">
+                <TopLevelStarButton
+                  type="idea"
+                  id={id}
+                  label={pendingName}
+                  href={`/idea/${id}`}
+                />
+                <TopLevelStandardButton
+                  name="Edit"
+                  onClick={() => {
+                    setEdit(true)
+                  }}
+                />
+                <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
+              </TopLevelStandardButtonContainer>
+            </div>
+          </div>
         )}
       </div>
 

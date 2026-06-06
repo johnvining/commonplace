@@ -129,50 +129,48 @@ function Author(props: any) {
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
-          <>
-            <TopLevelTitleContainer>
-              <TopLevelTitle>{pendingName}</TopLevelTitle>
-              {pendingBirthYear || pendingDeathYear ? (
-                <TopLevelSubTitle>
+          <div className="entity-page-header">
+            <div className="entity-page-header-left">
+              <div className="entity-page-title">{pendingName}</div>
+              {(pendingBirthYear || pendingDeathYear) && (
+                <div className="entity-page-byline">
                   {pendingBirthYear ? (
-                    <>
-                      b. <YearSpan year={pendingBirthYear} />
-                    </>
+                    <>b. <YearSpan year={pendingBirthYear} /></>
                   ) : null}
                   {pendingBirthYear && pendingDeathYear ? ' • ' : null}
                   {pendingDeathYear ? (
-                    <>
-                      d. <YearSpan year={pendingDeathYear} />
-                    </>
+                    <>d. <YearSpan year={pendingDeathYear} /></>
                   ) : null}
-                </TopLevelSubTitle>
-              ) : null}
+                </div>
+              )}
               {pendingUsernames ? (
-                <TopLevelSubTitle>
+                <div className="entity-page-byline-secondary">
                   {pendingUsernames.split(',').map(u => u.trim()).filter(Boolean).map(u => `@${u}`).join(', ')}
-                </TopLevelSubTitle>
+                </div>
               ) : null}
-            </TopLevelTitleContainer>
-            <TopLevelStandardButtonContainer className="top-level-toolbar">
-              <TopLevelStarButton
-                type="auth"
-                id={id}
-                label={pendingName}
-                href={`/auth/${id}`}
-              />
-              <TopLevelStandardButton name="Delete" onClick={deleteAuthor} />
-              <TopLevelStandardButton
-                name="Edit"
-                onClick={() => {
-                  setEdit(true)
-                }}
-              />
-              <TopLevelStandardButton
-                name="Show Notes"
-                onClick={() => navigate(`/auth/${id}/notes`)}
-              />
-            </TopLevelStandardButtonContainer>
-          </>
+            </div>
+            <div className="entity-page-header-right">
+              <TopLevelStandardButtonContainer className="top-level-toolbar">
+                <TopLevelStarButton
+                  type="auth"
+                  id={id}
+                  label={pendingName}
+                  href={`/auth/${id}`}
+                />
+                <TopLevelStandardButton
+                  name="Edit"
+                  onClick={() => {
+                    setEdit(true)
+                  }}
+                />
+                <TopLevelStandardButton
+                  name="Show Notes"
+                  onClick={() => navigate(`/auth/${id}/notes`)}
+                />
+                <TopLevelStandardButton name="Delete" onClick={deleteAuthor} />
+              </TopLevelStandardButtonContainer>
+            </div>
+          </div>
         )}
       </div>
 

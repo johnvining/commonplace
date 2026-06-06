@@ -349,9 +349,9 @@ function Work(props: any) {
         </TopLevelFormContainer>
       ) : (
         <>
-          <div className="work-page-header">
-            <div className="work-page-header-left">
-              <div className="work-page-title">
+          <div className="entity-page-header">
+            <div className="entity-page-header-left">
+              <div className="entity-page-title">
                 <WorkCitationSpan
                   workTitle={pendingWorkTitle}
                   workID={null}
@@ -360,17 +360,17 @@ function Work(props: any) {
                 <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
               </div>
               {pendingAuthors.length > 0 && (
-                <div className="work-page-byline">
+                <div className="entity-page-byline">
                   <WorkCitationSpan authors={pendingAuthors} />
                 </div>
               )}
               {nick && (
-                <div className="work-page-nick">
+                <div className="entity-page-nick">
                   <ClickToCopyNick nick={nick} />
                 </div>
               )}
             </div>
-            <div className="work-page-header-right">
+            <div className="entity-page-header-right">
               {editPiles ? (
                 <div
                   style={{
@@ -440,7 +440,7 @@ function Work(props: any) {
                     />
                   </TopLevelStandardButtonContainer>
                   {piles && piles.length > 0 && (
-                    <div className="work-page-piles">
+                    <div className="entity-page-piles">
                       <PileListForItem
                         remove={false}
                         edit={false}
