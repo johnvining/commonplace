@@ -890,6 +890,94 @@ async function cmdImport(args, config) {
   console.error(`Unknown import kind: ${kind}`)
 }
 
+async function cmdUpdate(args, config) {
+  // `cp update <type> <id|nick> --field=value ...`
+  // Generic entity update. For notes, prefer `cp set` / `cp edit`; this
+  // covers works, ideas, piles, authors — none of which had an editable
+  // path from the CLI before. Field whitelists are enforced server-side
+  // (NOTE_WRITABLE / WORK_WRITABLE / etc.) so unknown flags get rejected.
+  const type = args[0]
+  const idOrNick = args[1]
+  if (!type || !idOrNick) {
+    console.error('Usage: cp update <type> <id|nick> --field=value [...]')
+    console.error('  type: note|work|idea|pile|auth')
+    console.error('  examples:')
+    console.error('    cp update auth 5f5...02 --name="Tyler Cowen" --birth_year=1962')
+    console.error('    cp update work w42 --year=2024 --url=https://...')
+    console.error('    cp update pile p7 --name="Status: Read"')
+    return
+  }
+  const valid = new Set(['note', 'work', 'idea', 'pile', 'auth'])
+  if (!valid.has(type)) { console.error(`Unknown type: ${type}`); return }
+
+  let id = idOrNick
+  if (type !== 'auth' && /^[nwip]\d+$/i.test(idOrNick)) {
+    const target = await resolveByNick(idOrNick, config)
+    if (!target || target.type !== type) {
+      console.error(`Nick ${idOrNick} doesn't resolve to a ${type}.`)
+      return
+    }
+    id = target.id
+  }
+
+  const body = {}
+  for (const a of args.slice(2)) {
+    if (!a.startsWith('--')) continue
+    const eq = a.indexOf('=')
+    if (eq < 0) {
+      // bare --field with no value → set null (e.g. to clear a field)
+      body[a.slice(2)] = null
+      continue
+    }
+    const key = a.slice(2, eq)
+    let value = a.slice(eq + 1)
+    if (/^-?\d+$/.test(value)) value = parseInt(value, 10)
+    body[key] = value
+  }
+  if (!Object.keys(body).length) { console.error('No --field=value pairs given.'); return }
+
+  await api('PUT', `${type}/${id}`, body, config)
+  console.log(`${GREEN}Updated${RESET} ${type} ${id}`)
+  for (const [k, v] of Object.entries(body)) {
+    console.log(`  ${DIM}${k} → ${v}${RESET}`)
+  }
+}
+
+async function cmdRecentItems(args, config) {
+  // `cp recent-items <type>` — recent items of a non-note type, the same
+  // data that powers the home page's right-hand column.
+  const type = args[0]
+  if (!type) { console.error('Usage: cp recent-items <type>  (notes|authors|works|ideas|piles)'); return }
+  const valid = new Set(['notes', 'authors', 'works', 'ideas', 'piles'])
+  if (!valid.has(type)) { console.error(`Unknown type: ${type}`); return }
+
+  const res = await api('GET', `stats/recent/${type}`, null, config)
+  const items = res?.data || []
+  if (!items.length) { console.log('No items.'); return }
+
+  if (type === 'notes') {
+    items.forEach((n, i) => {
+      console.log(`\n${DIM}${i + 1}.${RESET}`)
+      console.log(formatNote(n))
+    })
+    return
+  }
+  const singular = { authors: 'auth', works: 'work', ideas: 'idea', piles: 'pile' }[type]
+  items.forEach((item, i) => {
+    console.log(`\n${DIM}${i + 1}.${RESET}`)
+    console.log(formatEntity(singular, item))
+  })
+}
+
+async function cmdLogout(args, config) {
+  try {
+    await api('POST', 'user/logout', null, config)
+  } catch {}
+  delete config.token
+  saveConfig(config)
+  console.log(`${GREEN}Logged out.${RESET}`)
+}
+
 async function cmdNickGen(args, config) {
   // `cp nick-gen <id-or-nick>` — generates or returns the existing nick for
   // the resolved entity. Useful when a non-note entity is missing a nick.
@@ -927,6 +1015,7 @@ ${BOLD}Lists & searches${RESET}
   works <query>      Search works
   piles <query>      Search piles
   all-piles          List every pile
+  recent-items <type>  Recent items by type (notes|authors|works|ideas|piles)
 
 ${BOLD}Creating & editing${RESET}
   add [title]        Create a new note and open in browser
@@ -936,6 +1025,8 @@ ${BOLD}Creating & editing${RESET}
   set <id> [--title T] [--text T] [--author N[,N]] [--work N] [--idea T] [--pile N]
                      Update metadata on an existing note
   edit <id> <field> <value>  Quick update (field: title or text)
+  update <type> <id> --field=value [...]
+                     Update any entity's fields (auth/work/idea/pile/note)
   rm <noteId> [--idea N] [--pile N] [--author N] [--work]
                      Detach an idea/pile/author/work from a note
   delete <id|nick> [--type T] [--yes]
@@ -960,6 +1051,7 @@ ${BOLD}Admin${RESET}
   stats              Show counts (notes, authors, works, ideas, piles)
   config [url <url>] Show or set config (server URL)
   login              Authenticate with the server
+  logout             Drop the saved token
   ping               Check server status
   backfill-nicks     Backfill nicks for all entity types
   backfill-embeddings  Backfill embeddings for all notes
@@ -1006,6 +1098,9 @@ const commands = {
   link:    cmdLink,
   links:   cmdLinks,
   import:  cmdImport,
+  update:  cmdUpdate,
+  'recent-items': cmdRecentItems,
+  logout:  cmdLogout,
   'backfill-nicks': cmdBackfillNicks,
   'backfill-embeddings': cmdBackfillEmbeddings,
   help:    async () => cmdHelp(),
