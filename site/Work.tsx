@@ -11,6 +11,7 @@ import { renderMarkdown } from './safeMarkdown'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { saveAndExitEdit } from './saveAndExitEdit'
 import AuthorsChipList from './AuthorsChipList'
+import PilesPillList from './PilesPillList'
 import ImageUploader from './ImageUploader'
 import {
   TopLevelStandardButtonContainer,
@@ -366,44 +367,22 @@ function Work(props: any) {
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: 'flex-start',
+            gap: '8px',
             marginBottom: '4px',
           }}
         >
-          <TopLevelStandardButtonContainer>
-            <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
-            {/* TODO: Create Standard Button inline autocomplete with better margin/padding */}
-            <Autocomplete
-              inputName="work-work-pile"
-              className={'top-level pile-select'}
-              dontAutofocus={false}
-              defaultValue={''}
-              onSelect={handleNewPile}
-              getSuggestions={db.getSuggestions}
-              apiType={db.types.pile}
-              handleNewSelect={handleCreatePileAndAssign}
-              clearOnSelect={true}
-              excludeIds={piles?.map((pile: any) => pile._id)}
-            />
-          </TopLevelStandardButtonContainer>
-          <div style={{ textAlign: 'right', maxWidth: '50%', flexShrink: 1 }}>
-            <PileListForItem
-              remove={editPiles}
-              edit={false}
-              piles={piles}
-              onSelect={handleNewPile}
-              getSuggestions={db.getSuggestions}
-              handleNewSelect={handleCreatePileAndAssign}
-              mainClassName="top-level"
-              onStartPileEdit={() => {
-                setEditPiles(true)
-              }}
-              allowAdd={false}
-              allowTabbing={true}
-              onPileRemove={handlePileRemove}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <PilesPillList
+              value={piles ?? []}
+              onAddExisting={(pile) => handleNewPile(pile._id)}
+              onCreateNew={(name) => handleCreatePileAndAssign(name)}
+              onRemove={(id) => handlePileRemove(id)}
+              onExit={() => setEditPiles(false)}
+              inputId="work-work-pile"
             />
           </div>
+          <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
         </div>
       ) : (
         <div
