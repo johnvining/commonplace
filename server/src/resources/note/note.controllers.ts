@@ -27,7 +27,7 @@ import type { Request, Response } from 'express'
 const pageSize = 40
 
 // Fields that are large and not needed in list views
-const LIST_OMIT = '-embedding -ocrText -embeddingHash'
+const LIST_OMIT = '-embedding -ocrText'
 
 // Embeddings and their hash are server-controlled; nothing in the client
 // payload should be able to overwrite them.
