@@ -288,14 +288,20 @@ async function cmdSearch(args, config) {
 }
 
 async function cmdNote(args, config) {
-  let id = args[0]
-  if (!id) { console.error('Usage: cplace note <id|nick>'); return }
+  const jsonFlag = args.includes('--json')
+  const positional = args.filter(a => a !== '--json')
+  let id = positional[0]
+  if (!id) { console.error('Usage: cplace note <id|nick> [--json]'); return }
   let resolvedNick = null
   if (/^[nwip]\d+$/.test(id)) {
     resolvedNick = id
     const nickRes = await api('GET', `nick/${id}`, null, config)
     const noteId = nickRes?.data?.note
-    if (!noteId) { console.log('Nick not found.'); return }
+    if (!noteId) {
+      if (jsonFlag) console.log('null')
+      else console.log('Nick not found.')
+      return
+    }
     id = noteId
   }
   const [res, nickRes] = await Promise.all([
@@ -303,19 +309,31 @@ async function cmdNote(args, config) {
     resolvedNick ? Promise.resolve(null) : ensureNick('note', id, config),
   ])
   const note = res?.data
-  if (!note) { console.log('Not found.'); return }
+  if (!note) {
+    if (jsonFlag) console.log('null')
+    else console.log('Not found.')
+    return
+  }
   note.nick = resolvedNick || nickRes
+  if (jsonFlag) { console.log(JSON.stringify(note)); return }
   console.log('\n' + formatNote(note, { full: true }))
 }
 
 async function cmdRecent(args, config) {
-  const page = parseInt(args[0]) || 1
+  const jsonFlag = args.includes('--json')
+  const positional = args.filter(a => a !== '--json')
+  const page = parseInt(positional[0]) || 1
   const res = await api('GET', `note/all/${page}`, null, config)
   const notes = res?.data || []
-  if (!notes.length) { console.log('No notes.'); return }
+  if (!notes.length) {
+    if (jsonFlag) console.log('[]')
+    else console.log('No notes.')
+    return
+  }
   const nicks = await Promise.all(notes.map(n => fetchNick('note', n._id, config)))
+  notes.forEach((note, i) => { note.nick = nicks[i] })
+  if (jsonFlag) { console.log(JSON.stringify(notes)); return }
   notes.forEach((note, i) => {
-    note.nick = nicks[i]
     const num = (page - 1) * 40 + i + 1
     console.log(`\n${DIM}${num}.${RESET}`)
     console.log(formatNote(note))
@@ -346,9 +364,15 @@ async function cmdQuick(args, config) {
 }
 
 async function cmdStats(args, config) {
+  const jsonFlag = args.includes('--json')
   const res = await api('GET', 'stats', null, config)
   const d = res?.data
-  if (!d) { console.log('No stats.'); return }
+  if (!d) {
+    if (jsonFlag) console.log('null')
+    else console.log('No stats.')
+    return
+  }
+  if (jsonFlag) { console.log(JSON.stringify(d)); return }
   console.log(`${BOLD}Notes${RESET}   ${d.notes}`)
   console.log(`${BOLD}Authors${RESET} ${d.authors}`)
   console.log(`${BOLD}Works${RESET}   ${d.works}`)
@@ -515,28 +539,34 @@ async function cmdPing(args, config) {
 }
 
 async function cmdAuthors(args, config) {
-  const query = args.join(' ')
-  if (!query) { console.error('Usage: cp authors <query>'); return }
+  const jsonFlag = args.includes('--json')
+  const query = args.filter(a => a !== '--json').join(' ')
+  if (!query) { console.error('Usage: cp authors <query> [--json]'); return }
   const res = await api('POST', 'auth/autocomplete', { string: query }, config)
   const authors = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(authors)); return }
   if (!authors.length) { console.log('No authors found.'); return }
   authors.forEach(a => console.log(`${GREEN}${a.name}${RESET}  ${DIM}${a._id}${RESET}`))
 }
 
 async function cmdIdeas(args, config) {
-  const query = args.join(' ')
-  if (!query) { console.error('Usage: cp ideas <query>'); return }
+  const jsonFlag = args.includes('--json')
+  const query = args.filter(a => a !== '--json').join(' ')
+  if (!query) { console.error('Usage: cp ideas <query> [--json]'); return }
   const res = await api('POST', 'idea/autocomplete', { string: query }, config)
   const ideas = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(ideas)); return }
   if (!ideas.length) { console.log('No ideas found.'); return }
   ideas.forEach(i => console.log(`${BLUE}${i.name}${RESET}  ${DIM}${i._id}${RESET}`))
 }
 
 async function cmdWorks(args, config) {
-  const query = args.join(' ')
-  if (!query) { console.error('Usage: cp works <query>'); return }
+  const jsonFlag = args.includes('--json')
+  const query = args.filter(a => a !== '--json').join(' ')
+  if (!query) { console.error('Usage: cp works <query> [--json]'); return }
   const res = await api('POST', 'work/autocomplete', { string: query }, config)
   const works = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(works)); return }
   if (!works.length) { console.log('No works found.'); return }
   works.forEach(w => {
     const auth = w.author?.name ? ` ${DIM}— ${w.author.name}${RESET}` : ''
@@ -545,17 +575,21 @@ async function cmdWorks(args, config) {
 }
 
 async function cmdPiles(args, config) {
-  const query = args.join(' ')
-  if (!query) { console.error('Usage: cp piles <query>'); return }
+  const jsonFlag = args.includes('--json')
+  const query = args.filter(a => a !== '--json').join(' ')
+  if (!query) { console.error('Usage: cp piles <query> [--json]'); return }
   const res = await api('POST', 'pile/autocomplete', { string: query }, config)
   const piles = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(piles)); return }
   if (!piles.length) { console.log('No piles found.'); return }
   piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}  ${DIM}${p._id}${RESET}`))
 }
 
 async function cmdFlip(args, config) {
+  const jsonFlag = args.includes('--json')
   const res = await api('GET', 'note/flip', null, config)
   const notes = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(notes)); return }
   if (!notes.length) { console.log('No notes.'); return }
   notes.forEach((note, i) => {
     console.log(`\n${DIM}${i + 1}.${RESET}`)
@@ -627,11 +661,12 @@ async function cmdBackfillNicks(args, config) {
 }
 
 async function cmdShow(args, config) {
+  const jsonFlag = args.includes('--json')
   const typeFlag = args.find(a => a.startsWith('--type='))?.split('=')[1]
   const positional = args.filter(a => !a.startsWith('--'))
   const input = positional.join(' ')
   if (!input) {
-    console.error('Usage: cp show <nick|ObjectId|name> [--type T]')
+    console.error('Usage: cp show <nick|ObjectId|name> [--type T] [--json]')
     console.error('  Examples:')
     console.error('    cp show p12345')
     console.error('    cp show 5f5...02 --type pile')
@@ -641,6 +676,7 @@ async function cmdShow(args, config) {
   }
   const target = await resolveTarget(input, typeFlag, config)
   if (!target) {
+    if (jsonFlag) { console.log('null'); return }
     console.error(`Could not resolve "${input}".`)
     console.error('  Try a nick (p12345), an ObjectId + --type, or the exact entity name.')
     return
@@ -656,8 +692,13 @@ async function cmdShow(args, config) {
   if (type === 'note') {
     const res = await api('GET', `note/${id}`, null, config)
     const note = Array.isArray(res?.data) ? res.data[0] : res?.data
-    if (!note) { console.log('Not found.'); return }
+    if (!note) {
+      if (jsonFlag) console.log('null')
+      else console.log('Not found.')
+      return
+    }
     note.nick = displayNick
+    if (jsonFlag) { console.log(JSON.stringify({ type, id, nick: displayNick, note })); return }
     console.log('\n' + formatNote(note, { full: true }))
     return
   }
@@ -665,10 +706,6 @@ async function cmdShow(args, config) {
   // Header for the entity itself.
   let info = null
   try { info = (await api('GET', `${type}/${id}`, null, config))?.data } catch {}
-  const header = info
-    ? formatEntity(type, { ...info, nick: displayNick })
-    : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
-  console.log('\n' + header)
 
   // Contents by type.
   if (type === 'pile') {
@@ -678,6 +715,14 @@ async function cmdShow(args, config) {
     ])
     const notes = notesRes?.data || []
     const works = worksRes?.data || []
+    if (jsonFlag) {
+      console.log(JSON.stringify({ type, id, nick: displayNick, info, works, notes }))
+      return
+    }
+    const header = info
+      ? formatEntity(type, { ...info, nick: displayNick })
+      : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
+    console.log('\n' + header)
     if (works.length) {
       console.log(`\n${BOLD}Works${RESET} (${works.length})`)
       works.forEach(w => console.log('  ' + formatEntity('work', w).split('\n').join('\n  ')))
@@ -693,6 +738,14 @@ async function cmdShow(args, config) {
   if (type === 'idea') {
     const res = await api('GET', `idea/${id}/notes`, null, config)
     const notes = res?.data || []
+    if (jsonFlag) {
+      console.log(JSON.stringify({ type, id, nick: displayNick, info, notes }))
+      return
+    }
+    const header = info
+      ? formatEntity(type, { ...info, nick: displayNick })
+      : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
+    console.log('\n' + header)
     console.log(`\n${BOLD}Notes${RESET} (${notes.length})`)
     if (!notes.length) { console.log('(none)'); return }
     notes.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
@@ -702,24 +755,49 @@ async function cmdShow(args, config) {
   if (type === 'work') {
     const res = await api('GET', `work/${id}/notes`, null, config)
     const notes = res?.data || []
+    if (jsonFlag) {
+      console.log(JSON.stringify({ type, id, nick: displayNick, info, notes }))
+      return
+    }
+    const header = info
+      ? formatEntity(type, { ...info, nick: displayNick })
+      : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
+    console.log('\n' + header)
     console.log(`\n${BOLD}Notes${RESET} (${notes.length})`)
     if (!notes.length) { console.log('(none)'); return }
     notes.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
     return
   }
+
+  // Auth and any unhandled type: just print the header.
+  if (jsonFlag) {
+    console.log(JSON.stringify({ type, id, nick: displayNick, info }))
+    return
+  }
+  const header = info
+    ? formatEntity(type, { ...info, nick: displayNick })
+    : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
+  console.log('\n' + header)
 }
 
 async function cmdAuthor(args, config) {
   // `cp author <id-or-name>` — shows works + notes for one author. Accepts
   // either an ObjectId or a name we'll autocomplete to a single match.
-  const input = args.join(' ').trim()
-  if (!input) { console.error('Usage: cp author <id|name>'); return }
+  const jsonFlag = args.includes('--json')
+  const positional = args.filter(a => a !== '--json')
+  const input = positional.join(' ').trim()
+  if (!input) { console.error('Usage: cp author <id|name> [--json]'); return }
   let id = input
   if (!/^[0-9a-f]{24}$/i.test(input)) {
     const ac = await api('POST', 'auth/autocomplete', { string: input }, config)
     const matches = ac?.data || []
-    if (!matches.length) { console.log('No match.'); return }
+    if (!matches.length) {
+      if (jsonFlag) console.log('null')
+      else console.log('No match.')
+      return
+    }
     if (matches.length > 1) {
+      if (jsonFlag) { console.log(JSON.stringify({ ambiguous: true, matches })); return }
       console.log(`Multiple matches — be more specific or pass the ObjectId:`)
       matches.forEach(a => console.log(`  ${a.name}  ${DIM}${a._id}${RESET}`))
       return
@@ -727,23 +805,31 @@ async function cmdAuthor(args, config) {
     id = matches[0]._id
   }
   const info = (await api('GET', `auth/${id}`, null, config))?.data
-  if (!info) { console.log('Not found.'); return }
-  console.log('\n' + formatEntity('auth', info))
-
+  if (!info) {
+    if (jsonFlag) console.log('null')
+    else console.log('Not found.')
+    return
+  }
   const [worksRes, notesRes] = await Promise.all([
     api('GET', `auth/${id}/works`, null, config),
     api('GET', `auth/${id}/notes`, null, config),
   ])
   const works = worksRes?.data || []
   const notes = notesRes?.data || []
+  const workIds = new Set(works.map(w => String(w._id)))
+  const standalone = notes.filter(n => !n.work?._id || !workIds.has(String(n.work._id)))
+
+  if (jsonFlag) {
+    console.log(JSON.stringify({ type: 'auth', id, info, works, notes: standalone }))
+    return
+  }
+
+  console.log('\n' + formatEntity('auth', info))
   if (works.length) {
     console.log(`\n${BOLD}Works${RESET} (${works.length})`)
     works.forEach(w => console.log('  ' + formatEntity('work', w).split('\n').join('\n  ')))
   }
-  if (notes.length) {
-    // Filter out notes whose work was already listed, same as the web UI.
-    const workIds = new Set(works.map(w => String(w._id)))
-    const standalone = notes.filter(n => !n.work?._id || !workIds.has(String(n.work._id)))
+  if (standalone.length) {
     console.log(`\n${BOLD}Notes${RESET} (${standalone.length})`)
     standalone.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
   }
@@ -866,12 +952,19 @@ async function cmdLink(args, config) {
 }
 
 async function cmdLinks(args, config) {
-  const input = args[0]
-  if (!input) { console.error('Usage: cp links <noteId|nick>'); return }
+  const jsonFlag = args.includes('--json')
+  const positional = args.filter(a => a !== '--json')
+  const input = positional[0]
+  if (!input) { console.error('Usage: cp links <noteId|nick> [--json]'); return }
   const target = await resolveTarget(input, 'note', config)
-  if (!target) { console.error('Could not resolve note.'); return }
+  if (!target) {
+    if (jsonFlag) console.log('null')
+    else console.error('Could not resolve note.')
+    return
+  }
   const res = await api('GET', `link/note/${target.id}`, null, config)
   const links = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(links)); return }
   if (!links.length) { console.log('No links.'); return }
   console.log(`${BOLD}Links${RESET} (${links.length})`)
   links.forEach(l => {
@@ -880,9 +973,12 @@ async function cmdLinks(args, config) {
 }
 
 async function cmdEarliest(args, config) {
-  const page = parseInt(args[0]) || 1
+  const jsonFlag = args.includes('--json')
+  const positional = args.filter(a => a !== '--json')
+  const page = parseInt(positional[0]) || 1
   const res = await api('GET', `note/file/${page}`, null, config)
   const notes = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(notes)); return }
   if (!notes.length) { console.log('No notes.'); return }
   notes.forEach((note, i) => {
     const num = (page - 1) * 40 + i + 1
@@ -892,8 +988,10 @@ async function cmdEarliest(args, config) {
 }
 
 async function cmdAllPiles(args, config) {
+  const jsonFlag = args.includes('--json')
   const res = await api('GET', 'pile/all', null, config)
   const piles = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(piles)); return }
   if (!piles.length) { console.log('No piles.'); return }
   piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}  ${DIM}${p._id}${RESET}`))
 }
@@ -987,13 +1085,16 @@ async function cmdUpdate(args, config) {
 async function cmdRecentItems(args, config) {
   // `cp recent-items <type>` — recent items of a non-note type, the same
   // data that powers the home page's right-hand column.
-  const type = args[0]
-  if (!type) { console.error('Usage: cp recent-items <type>  (notes|authors|works|ideas|piles)'); return }
+  const jsonFlag = args.includes('--json')
+  const positional = args.filter(a => a !== '--json')
+  const type = positional[0]
+  if (!type) { console.error('Usage: cp recent-items <type> [--json]  (notes|authors|works|ideas|piles)'); return }
   const valid = new Set(['notes', 'authors', 'works', 'ideas', 'piles'])
   if (!valid.has(type)) { console.error(`Unknown type: ${type}`); return }
 
   const res = await api('GET', `stats/recent/${type}`, null, config)
   const items = res?.data || []
+  if (jsonFlag) { console.log(JSON.stringify(items)); return }
   if (!items.length) { console.log('No items.'); return }
 
   if (type === 'notes') {
@@ -1097,6 +1198,11 @@ ${BOLD}Admin${RESET}
   backfill-nicks     Backfill nicks for all entity types
   backfill-embeddings  Backfill embeddings for all notes
   help               Show this help
+
+${BOLD}Flags${RESET}
+  --json  on read commands (search, show, note, author, piles, works, authors,
+          ideas, all-piles, recent, recent-items, earliest, flip, links, stats)
+          prints machine-readable JSON instead of formatted output.
 
 ${BOLD}Config${RESET}  ~/.commonplace.json
 `)
