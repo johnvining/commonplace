@@ -1229,6 +1229,34 @@ async function cmdPile(args, config) {
   console.error(`Unknown pile subcommand: ${sub}`)
 }
 
+async function cmdNew(args, config) {
+  // `cp new <type> "<name>"` — standalone creation of empty entities.
+  // Previously you could only create works/ideas/authors as a side effect
+  // of attaching them to a note (via cp set / cp capture), even though
+  // the server has POST endpoints for each. Piles have `cp pile new` too,
+  // which this command accepts as an alias.
+  const jsonFlag = args.includes('--json')
+  const positional = args.filter(a => a !== '--json')
+  const type = positional[0]
+  const name = positional.slice(1).join(' ').trim()
+  const valid = new Set(['work', 'idea', 'auth', 'pile'])
+  if (!type || !name) {
+    console.error('Usage: cp new <work|idea|auth|pile> "<name>" [--json]')
+    return
+  }
+  if (!valid.has(type)) { console.error(`Unknown type: ${type}`); return }
+
+  const res = await api('POST', type, { name }, config)
+  const entity = res?.data || res
+  if (!entity?._id) {
+    if (jsonFlag) console.log('null')
+    else console.error(`Failed to create ${type}.`)
+    return
+  }
+  if (jsonFlag) { console.log(JSON.stringify(entity)); return }
+  console.log(`${GREEN}Created ${type}${RESET} ${typeColor(type)}${entity.name}${RESET}  ${DIM}${entity._id}${RESET}`)
+}
+
 async function cmdWork(args, config) {
   // `cp work <subcommand> ...` — manage works and their author list. The
   // pile<->work side is handled by `cp pile add-work/rm-work`; this is
@@ -1468,6 +1496,10 @@ ${BOLD}Works${RESET}
   work add-author <work> <author>  Attach an existing author to a work
   work rm-author  <work> <author>  Detach an author from a work
 
+${BOLD}Standalone create${RESET}
+  new <work|idea|auth|pile> "<name>"   Create an empty entity of any type
+                                       (alias for \`pile new\` when type=pile)
+
 ${BOLD}Bulk export${RESET}
   export --piles "<query>"   Dump matching piles with works+notes as JSON
                              (wildcards and ranges work the same as \`piles\`)
@@ -1542,6 +1574,7 @@ const commands = {
   piles:   cmdPiles,
   pile:    cmdPile,
   work:    cmdWork,
+  new:     cmdNew,
   'all-piles': cmdAllPiles,
   nick:    cmdNick,
   'nick-gen': cmdNickGen,
