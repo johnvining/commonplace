@@ -987,6 +987,61 @@ async function cmdEarliest(args, config) {
   })
 }
 
+async function cmdPile(args, config) {
+  // `cp pile <subcommand> ...` — manage piles and their relationships to works.
+  // The relationship between notes and piles is already covered by `cp set
+  // --pile` and `cp rm --pile`; this command fills the gap for works and
+  // standalone pile creation, neither of which had a CLI path before.
+  const sub = args[0]
+  const rest = args.slice(1)
+  if (!sub) {
+    console.error('Usage: cp pile <new|add-work|rm-work> ...')
+    console.error('  cp pile new "<name>"')
+    console.error('  cp pile add-work <pileTarget> <workTarget>')
+    console.error('  cp pile rm-work <pileTarget> <workTarget>')
+    return
+  }
+
+  if (sub === 'new') {
+    const jsonFlag = rest.includes('--json')
+    const name = rest.filter(a => a !== '--json').join(' ').trim()
+    if (!name) { console.error('Usage: cp pile new "<name>"'); return }
+    const res = await api('POST', 'pile', { name }, config)
+    const pile = res?.data || res
+    if (!pile?._id) {
+      if (jsonFlag) console.log('null')
+      else console.error('Failed to create pile.')
+      return
+    }
+    if (jsonFlag) { console.log(JSON.stringify(pile)); return }
+    console.log(`${GREEN}Created pile${RESET} ${MAGENTA}${pile.name}${RESET}  ${DIM}${pile._id}${RESET}`)
+    return
+  }
+
+  if (sub === 'add-work' || sub === 'rm-work') {
+    const [pileInput, workInput] = rest
+    if (!pileInput || !workInput) {
+      console.error(`Usage: cp pile ${sub} <pileTarget> <workTarget>`)
+      return
+    }
+    const pileTarget = await resolveTarget(pileInput, 'pile', config)
+    if (!pileTarget) { console.error(`Could not resolve pile "${pileInput}".`); return }
+    const workTarget = await resolveTarget(workInput, 'work', config)
+    if (!workTarget) { console.error(`Could not resolve work "${workInput}".`); return }
+
+    if (sub === 'add-work') {
+      await api('PUT', `work/${workTarget.id}/pile`, { id: pileTarget.id }, config)
+      console.log(`${GREEN}Added${RESET} work ${workTarget.id} to pile ${pileTarget.id}`)
+    } else {
+      await api('DELETE', `work/${workTarget.id}/pile/${pileTarget.id}`, null, config)
+      console.log(`${GREEN}Removed${RESET} work ${workTarget.id} from pile ${pileTarget.id}`)
+    }
+    return
+  }
+
+  console.error(`Unknown pile subcommand: ${sub}`)
+}
+
 async function cmdAllPiles(args, config) {
   const jsonFlag = args.includes('--json')
   const res = await api('GET', 'pile/all', null, config)
@@ -1159,6 +1214,11 @@ ${BOLD}Lists & searches${RESET}
   all-piles          List every pile
   recent-items <type>  Recent items by type (notes|authors|works|ideas|piles)
 
+${BOLD}Piles${RESET}
+  pile new "<name>"           Create an empty pile
+  pile add-work <pile> <work> Add a work to a pile (each accepts nick/ObjectId/name)
+  pile rm-work  <pile> <work> Remove a work from a pile
+
 ${BOLD}Creating & editing${RESET}
   add [title]        Create a new note and open in browser
   quick <title>      Create a note without opening browser
@@ -1227,6 +1287,7 @@ const commands = {
   ideas:   cmdIdeas,
   works:   cmdWorks,
   piles:   cmdPiles,
+  pile:    cmdPile,
   'all-piles': cmdAllPiles,
   nick:    cmdNick,
   'nick-gen': cmdNickGen,
