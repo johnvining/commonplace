@@ -394,12 +394,42 @@ function parseFlags(args) {
   return { title: title.join(' '), flags }
 }
 
-async function resolveOrCreate(type, name, config) {
-  const ac = await api('POST', `${type}/autocomplete`, { string: name }, config)
+async function resolveOrCreate(type, input, config) {
+  // Accepts nick, ObjectId, or name. Nicks/ObjectIds skip the autocomplete
+  // path so an exact ref never gets ambiguity-matched. Only name input
+  // creates a new entity when nothing matches.
+  if (/^[nwip]\d+$/i.test(input)) {
+    const resolved = await resolveByNick(input, config)
+    if (resolved && (type === 'auth' ? resolved.type === 'auth' : resolved.type === type)) {
+      return resolved.id
+    }
+    return null
+  }
+  if (/^[0-9a-f]{24}$/i.test(input)) return input
+  const ac = await api('POST', `${type}/autocomplete`, { string: input }, config)
   const items = ac?.data || []
   if (items.length) return items[0]._id
-  const created = await api('POST', type, { name }, config)
+  const created = await api('POST', type, { name: input }, config)
   return created?._id || created?.data?._id
+}
+
+// Like resolveOrCreate but never creates. Used on the rm path where we
+// need to identify an existing relationship to detach, not invent one.
+async function resolveExisting(type, input, config) {
+  if (/^[nwip]\d+$/i.test(input)) {
+    const resolved = await resolveByNick(input, config)
+    if (resolved && resolved.type === type) {
+      return { id: resolved.id }
+    }
+    return null
+  }
+  if (/^[0-9a-f]{24}$/i.test(input)) return { id: input }
+  const ac = await api('POST', `${type}/autocomplete`, { string: input }, config)
+  const items = ac?.data || []
+  if (!items.length) return null
+  const exact = items.find(i => (i.name || '') === input)
+  const pick = exact || items[0]
+  return { id: pick._id, name: pick.name }
 }
 
 async function cmdCapture(args, config) {
@@ -423,8 +453,8 @@ async function cmdCapture(args, config) {
 
   if (flags.author) {
     const authorIds = []
-    for (const name of flags.author.split(',').map(s => s.trim()).filter(Boolean)) {
-      const aid = await resolveOrCreate('auth', name, config)
+    for (const ref of flags.author.split(',').map(s => s.trim()).filter(Boolean)) {
+      const aid = await resolveOrCreate('auth', ref, config)
       if (aid) authorIds.push(aid)
     }
     if (authorIds.length) {
@@ -442,15 +472,17 @@ async function cmdCapture(args, config) {
   }
 
   if (flags.idea) {
-    for (const tag of flags.idea.split(',').map(s => s.trim()).filter(Boolean)) {
-      await api('PUT', `note/${id}/idea/create`, { name: tag }, config)
-      if (!isJson) console.log(`${DIM}  idea → ${tag}${RESET}`)
+    for (const ref of flags.idea.split(',').map(s => s.trim()).filter(Boolean)) {
+      await attachIdeaToNote(id, ref, config)
+      if (!isJson) console.log(`${DIM}  idea → ${ref}${RESET}`)
     }
   }
 
   if (flags.pile) {
-    await api('PUT', `note/${id}/pile/create`, { name: flags.pile }, config)
-    if (!isJson) console.log(`${DIM}  pile → ${flags.pile}${RESET}`)
+    for (const ref of flags.pile.split(',').map(s => s.trim()).filter(Boolean)) {
+      await attachPileToNote(id, ref, config)
+      if (!isJson) console.log(`${DIM}  pile → ${ref}${RESET}`)
+    }
   }
 
   if (isJson) {
@@ -462,7 +494,7 @@ async function cmdCapture(args, config) {
 async function cmdSet(args, config) {
   const id = args[0]
   const { flags } = parseFlags(args.slice(1))
-  if (!id) { console.error('Usage: cplace set <id> [--author NAME] [--work NAME] [--idea TAG] [--pile NAME] [--title TEXT] [--text TEXT]'); return }
+  if (!id) { console.error('Usage: cplace set <id> [--author REF] [--work REF] [--idea REF] [--pile REF] [--title TEXT] [--text TEXT]'); return }
 
   if (flags.title || flags.text) {
     const body = {}
@@ -475,8 +507,8 @@ async function cmdSet(args, config) {
 
   if (flags.author) {
     const authorIds = []
-    for (const name of flags.author.split(',').map(s => s.trim()).filter(Boolean)) {
-      const aid = await resolveOrCreate('auth', name, config)
+    for (const ref of flags.author.split(',').map(s => s.trim()).filter(Boolean)) {
+      const aid = await resolveOrCreate('auth', ref, config)
       if (aid) authorIds.push(aid)
     }
     if (authorIds.length) {
@@ -494,18 +526,46 @@ async function cmdSet(args, config) {
   }
 
   if (flags.idea) {
-    for (const tag of flags.idea.split(',').map(s => s.trim()).filter(Boolean)) {
-      await api('PUT', `note/${id}/idea/create`, { name: tag }, config)
-      console.log(`${DIM}  idea → ${tag}${RESET}`)
+    for (const ref of flags.idea.split(',').map(s => s.trim()).filter(Boolean)) {
+      await attachIdeaToNote(id, ref, config)
+      console.log(`${DIM}  idea → ${ref}${RESET}`)
     }
   }
 
   if (flags.pile) {
-    await api('PUT', `note/${id}/pile/create`, { name: flags.pile }, config)
-    console.log(`${DIM}  pile → ${flags.pile}${RESET}`)
+    for (const ref of flags.pile.split(',').map(s => s.trim()).filter(Boolean)) {
+      await attachPileToNote(id, ref, config)
+      console.log(`${DIM}  pile → ${ref}${RESET}`)
+    }
   }
 
   console.log(`${GREEN}Done.${RESET}`)
+}
+
+// Attach an existing idea (nick/ObjectId) or create-and-attach by name.
+// Hits PUT /note/:id/idea for refs, PUT /note/:id/idea/create for names.
+async function attachIdeaToNote(noteId, ref, config) {
+  if (/^[ip]\d+$/i.test(ref) || /^[0-9a-f]{24}$/i.test(ref)) {
+    const id = /^i\d+$/i.test(ref)
+      ? (await resolveByNick(ref, config))?.id
+      : ref
+    if (!id) throw new Error(`Could not resolve idea ref ${ref}`)
+    await api('PUT', `note/${noteId}/idea`, { id }, config)
+    return
+  }
+  await api('PUT', `note/${noteId}/idea/create`, { name: ref }, config)
+}
+
+async function attachPileToNote(noteId, ref, config) {
+  if (/^p\d+$/i.test(ref) || /^[0-9a-f]{24}$/i.test(ref)) {
+    const id = /^p\d+$/i.test(ref)
+      ? (await resolveByNick(ref, config))?.id
+      : ref
+    if (!id) throw new Error(`Could not resolve pile ref ${ref}`)
+    await api('PUT', `note/${noteId}/pile`, { id }, config)
+    return
+  }
+  await api('PUT', `note/${noteId}/pile/create`, { name: ref }, config)
 }
 
 async function cmdOpen(args, config) {
@@ -943,36 +1003,37 @@ async function cmdDelete(args, config) {
 }
 
 async function cmdRm(args, config) {
-  // `cp rm <noteId> [--idea NAME|--pile NAME|--author NAME|--work]`
+  // `cp rm <noteId> [--idea REF|--pile REF|--author REF|--work]`
   // Detaches a relation from a note. --work has no value (clears the work).
+  // REF accepts nick, ObjectId, or exact name.
   const noteId = args[0]
-  if (!noteId) { console.error('Usage: cp rm <noteId> [--idea NAME|--pile NAME|--author NAME|--work]'); return }
+  if (!noteId) { console.error('Usage: cp rm <noteId> [--idea REF|--pile REF|--author REF|--work]'); return }
   const { flags } = parseFlags(args.slice(1))
 
   if (flags.idea) {
-    const ac = await api('POST', 'idea/autocomplete', { string: flags.idea }, config)
-    const idea = (ac?.data || []).find(i => i.name === flags.idea) || (ac?.data || [])[0]
-    if (!idea) { console.error(`No idea matching "${flags.idea}".`); return }
-    await api('DELETE', `note/${noteId}/idea/${idea._id}`, null, config)
-    console.log(`${DIM}  idea ✕ ${idea.name}${RESET}`)
+    const target = await resolveExisting('idea', flags.idea, config)
+    if (!target) { console.error(`No idea matching "${flags.idea}".`); return }
+    await api('DELETE', `note/${noteId}/idea/${target.id}`, null, config)
+    console.log(`${DIM}  idea ✕ ${target.name || flags.idea}${RESET}`)
   }
 
   if (flags.pile) {
-    const ac = await api('POST', 'pile/autocomplete', { string: flags.pile }, config)
-    const pile = (ac?.data || []).find(p => p.name === flags.pile) || (ac?.data || [])[0]
-    if (!pile) { console.error(`No pile matching "${flags.pile}".`); return }
-    await api('DELETE', `note/${noteId}/pile/${pile._id}`, null, config)
-    console.log(`${DIM}  pile ✕ ${pile.name}${RESET}`)
+    const target = await resolveExisting('pile', flags.pile, config)
+    if (!target) { console.error(`No pile matching "${flags.pile}".`); return }
+    await api('DELETE', `note/${noteId}/pile/${target.id}`, null, config)
+    console.log(`${DIM}  pile ✕ ${target.name || flags.pile}${RESET}`)
   }
 
   if (flags.author) {
-    // Removing an author = rewrite the authors array without that one.
+    const target = await resolveExisting('auth', flags.author, config)
+    if (!target) { console.error(`No author matching "${flags.author}".`); return }
+    // Removing an author = rewrite the authors array without that id.
     const noteRes = await api('GET', `note/${noteId}`, null, config)
     const note = Array.isArray(noteRes?.data) ? noteRes.data[0] : noteRes?.data
     const current = (note?.authors || []).filter(a => a)
-    const filtered = current.filter(a => (a.name || '') !== flags.author)
+    const filtered = current.filter(a => String(a._id) !== String(target.id))
     await api('PUT', `note/${noteId}`, { authors: filtered.map(a => a._id) }, config)
-    console.log(`${DIM}  author ✕ ${flags.author}${RESET}`)
+    console.log(`${DIM}  author ✕ ${target.name || flags.author}${RESET}`)
   }
 
   if (flags.work !== undefined) {
