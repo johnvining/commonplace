@@ -569,17 +569,30 @@ async function attachPileToNote(noteId, ref, config) {
 }
 
 async function cmdOpen(args, config) {
-  let id = args[0]
-  if (!id) { console.error('Usage: cplace open <id|nick>'); return }
-  let type = 'note'
-  if (/^[nwip]\d+$/.test(id)) {
-    const nickRes = await api('GET', `nick/${id}`, null, config)
-    const data = nickRes?.data
-    if (!data) { console.error('Nick not found.'); return }
-    if (data.note)  { id = data.note; type = 'note' }
-    if (data.work)  { id = data.work; type = 'work' }
-    if (data.idea)  { id = data.idea; type = 'idea' }
-    if (data.pile)  { id = data.pile; type = 'pile' }
+  // `cp open <nick|ObjectId|name> [--type T]`
+  // Routes through resolveTarget so all three input shapes work for every
+  // entity type. ObjectId without --type falls back to the original
+  // "treat as note" behavior for backwards compatibility with the most
+  // common call shape.
+  const typeFlag = args.find(a => a.startsWith('--type='))?.split('=')[1]
+  const positional = args.filter(a => !a.startsWith('--'))
+  const input = positional.join(' ')
+  if (!input) {
+    console.error('Usage: cp open <nick|ObjectId|name> [--type T]')
+    return
+  }
+  const target = await resolveTarget(input, typeFlag, config)
+  let type, id
+  if (target) {
+    ({ type, id } = target)
+  } else if (/^[0-9a-f]{24}$/i.test(input)) {
+    // Back-compat: bare ObjectId with no --type and no resolveTarget hit
+    // gets treated as a note id (the original cmdOpen behavior).
+    type = 'note'
+    id = input
+  } else {
+    console.error(`Could not resolve "${input}".`)
+    return
   }
   const url = urlFor(type, id)
   console.log(url)
