@@ -577,12 +577,88 @@ async function cmdWorks(args, config) {
 async function cmdPiles(args, config) {
   const jsonFlag = args.includes('--json')
   const query = args.filter(a => a !== '--json').join(' ')
-  if (!query) { console.error('Usage: cp piles <query> [--json]'); return }
-  const res = await api('POST', 'pile/autocomplete', { string: query }, config)
-  const piles = res?.data || []
+  if (!query) {
+    console.error('Usage: cp piles <query> [--json]')
+    console.error('  Wildcards: `*` and `?` match any chars / one char.')
+    console.error('  Range:     `Prefix: YYYY-MM..YYYY-MM` expands to a month range.')
+    console.error('  Examples:')
+    console.error('    cp piles "Reading: 2025-*"')
+    console.error('    cp piles "Reading: 2025-07..2026-05"')
+    return
+  }
+  const piles = await matchPiles(query, config)
   if (jsonFlag) { console.log(JSON.stringify(piles)); return }
   if (!piles.length) { console.log('No piles found.'); return }
   piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}  ${DIM}${p._id}${RESET}`))
+}
+
+// Resolves a pile query string to a list of piles. Three modes:
+//   1. Range `<prefix><YYYY-MM>..<YYYY-MM>` — enumerates each month between
+//      the two endpoints (inclusive) and looks each up.
+//   2. Glob — `*` / `?` are translated to regex.
+//   3. Plain substring — falls through to the autocomplete endpoint, which
+//      is the legacy behavior.
+// For glob and range, we narrow server-side via autocomplete on the literal
+// prefix (the substring before the first wildcard / range marker), then
+// filter the result client-side. We never use `pile/all` because that
+// endpoint caps at 100 records.
+async function matchPiles(query, config) {
+  const rangeMatch = query.match(/^(.*?)(\d{4})-(\d{2})\.\.(\d{4})-(\d{2})\s*$/)
+  if (rangeMatch) {
+    const [, prefix, fromY, fromM, toY, toM] = rangeMatch
+    const months = enumerateMonths(parseInt(fromY), parseInt(fromM), parseInt(toY), parseInt(toM))
+    if (!months.length) return []
+    const candidates = await searchPilesByPrefix(prefix, config)
+    const wanted = new Set(months.map(m => prefix + m))
+    return candidates.filter(p => wanted.has(p.name))
+  }
+
+  if (/[*?]/.test(query)) {
+    const firstWild = Math.min(
+      query.indexOf('*') === -1 ? Infinity : query.indexOf('*'),
+      query.indexOf('?') === -1 ? Infinity : query.indexOf('?'),
+    )
+    const literalPrefix = query.slice(0, firstWild)
+    const pattern = '^' + query.split('').map(c => {
+      if (c === '*') return '.*'
+      if (c === '?') return '.'
+      return c.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    }).join('') + '$'
+    const re = new RegExp(pattern, 'i')
+    const candidates = await searchPilesByPrefix(literalPrefix, config)
+    return candidates.filter(p => re.test(p.name))
+  }
+
+  const res = await api('POST', 'pile/autocomplete', { string: query }, config)
+  return res?.data || []
+}
+
+// `pile/autocomplete` is substring-regex over names with no documented
+// result cap — sufficient for narrowing a wildcard query to a manageable
+// candidate set without ever touching `pile/all` (which caps at 100).
+async function searchPilesByPrefix(prefix, config) {
+  if (!prefix) {
+    // No literal anchor — caller asked for `*` or similar. Fall back to
+    // `pile/all` and accept the 100-pile cap. Anything broader would
+    // require a new server endpoint.
+    return (await api('GET', 'pile/all', null, config))?.data || []
+  }
+  const res = await api('POST', 'pile/autocomplete', { string: prefix }, config)
+  return res?.data || []
+}
+
+function enumerateMonths(fromY, fromM, toY, toM) {
+  const out = []
+  let y = fromY, m = fromM
+  // Cap at 600 months so a backwards / huge range can't loop forever.
+  for (let i = 0; i < 600; i++) {
+    out.push(`${y}-${String(m).padStart(2, '0')}`)
+    if (y === toY && m === toM) return out
+    m++
+    if (m > 12) { m = 1; y++ }
+    if (y > toY || (y === toY && m > toM)) return out
+  }
+  return out
 }
 
 async function cmdFlip(args, config) {
