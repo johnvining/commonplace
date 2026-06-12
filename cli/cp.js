@@ -1063,6 +1063,43 @@ async function cmdEarliest(args, config) {
   })
 }
 
+async function cmdExport(args, config) {
+  // `cp export --piles <query>` — dumps every matching pile along with its
+  // works and notes in one CLI call. Designed for agent-driven bulk reads
+  // where issuing N separate commands would mean N permission prompts.
+  // Output is always JSON; the --json flag is accepted as a no-op for
+  // consistency with the other read commands.
+  const pilesFlag = args.find(a => a === '--piles' || a === '--pile')
+  const pilesIdx = pilesFlag ? args.indexOf(pilesFlag) : -1
+  const pilesQuery = pilesIdx >= 0 ? args[pilesIdx + 1] : null
+
+  if (!pilesQuery) {
+    console.error('Usage: cp export --piles "<query>"')
+    console.error('  query supports the same wildcards / ranges as `cp piles`:')
+    console.error('    cp export --piles "Reading: 2025-*"')
+    console.error('    cp export --piles "Reading: 2025-07..2026-05"')
+    console.error('    cp export --piles "Reading: 2026-03"')
+    console.error('  Output: JSON array of {pile, works, notes}.')
+    return
+  }
+
+  const piles = await matchPiles(pilesQuery, config)
+  if (!piles.length) { console.log('[]'); return }
+
+  const bundles = await Promise.all(piles.map(async pile => {
+    const [worksRes, notesRes] = await Promise.all([
+      api('GET', `pile/${pile._id}/works`, null, config),
+      api('GET', `pile/${pile._id}/notes`, null, config),
+    ])
+    return {
+      pile,
+      works: worksRes?.data || [],
+      notes: notesRes?.data || [],
+    }
+  }))
+  console.log(JSON.stringify(bundles))
+}
+
 async function cmdPile(args, config) {
   // `cp pile <subcommand> ...` — manage piles and their relationships to works.
   // The relationship between notes and piles is already covered by `cp set
@@ -1295,6 +1332,10 @@ ${BOLD}Piles${RESET}
   pile add-work <pile> <work> Add a work to a pile (each accepts nick/ObjectId/name)
   pile rm-work  <pile> <work> Remove a work from a pile
 
+${BOLD}Bulk export${RESET}
+  export --piles "<query>"   Dump matching piles with works+notes as JSON
+                             (wildcards and ranges work the same as \`piles\`)
+
 ${BOLD}Creating & editing${RESET}
   add [title]        Create a new note and open in browser
   quick <title>      Create a note without opening browser
@@ -1384,6 +1425,7 @@ const commands = {
   import:  cmdImport,
   update:  cmdUpdate,
   'recent-items': cmdRecentItems,
+  export:  cmdExport,
   logout:  cmdLogout,
   'backfill-nicks': cmdBackfillNicks,
   'backfill-embeddings': cmdBackfillEmbeddings,
