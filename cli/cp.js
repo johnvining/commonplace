@@ -1229,6 +1229,64 @@ async function cmdPile(args, config) {
   console.error(`Unknown pile subcommand: ${sub}`)
 }
 
+async function cmdWork(args, config) {
+  // `cp work <subcommand> ...` — manage works and their author list. The
+  // pile<->work side is handled by `cp pile add-work/rm-work`; this is
+  // the symmetric surface for the author<->work side, which had no CLI
+  // path before.
+  //
+  // The server has no add-existing-author endpoint on /work — only
+  // `PUT /work/:id/auth/create` which creates a new author by name. So we
+  // implement add/rm as a read-modify-write on `PUT /work/:id { authors }`.
+  // Order is preserved (first listed = primary byline).
+  const sub = args[0]
+  const rest = args.slice(1)
+  if (!sub) {
+    console.error('Usage: cp work <add-author|rm-author> <workTarget> <authorTarget>')
+    return
+  }
+
+  if (sub === 'add-author' || sub === 'rm-author') {
+    const [workInput, authorInput] = rest
+    if (!workInput || !authorInput) {
+      console.error(`Usage: cp work ${sub} <workTarget> <authorTarget>`)
+      return
+    }
+    const workTarget = await resolveTarget(workInput, 'work', config)
+    if (!workTarget) { console.error(`Could not resolve work "${workInput}".`); return }
+    const authorTarget = await resolveTarget(authorInput, 'auth', config)
+    if (!authorTarget) { console.error(`Could not resolve author "${authorInput}".`); return }
+
+    const info = (await api('GET', `work/${workTarget.id}`, null, config))?.data
+    if (!info) { console.error(`Work ${workTarget.id} not found.`); return }
+    const current = (info.authors || []).map(a => String(a._id || a))
+    const authorId = String(authorTarget.id)
+
+    let next
+    if (sub === 'add-author') {
+      if (current.includes(authorId)) {
+        console.log(`${DIM}Already attached.${RESET}`)
+        return
+      }
+      next = [...current, authorId]
+    } else {
+      if (!current.includes(authorId)) {
+        console.log(`${DIM}Author not on this work.${RESET}`)
+        return
+      }
+      next = current.filter(id => id !== authorId)
+    }
+
+    await api('PUT', `work/${workTarget.id}`, { authors: next }, config)
+    const verb = sub === 'add-author' ? 'Added' : 'Removed'
+    const prep = sub === 'add-author' ? 'to' : 'from'
+    console.log(`${GREEN}${verb}${RESET} author ${authorTarget.id} ${prep} work ${workTarget.id}`)
+    return
+  }
+
+  console.error(`Unknown work subcommand: ${sub}`)
+}
+
 async function cmdAllPiles(args, config) {
   const jsonFlag = args.includes('--json')
   const res = await api('GET', 'pile/all', null, config)
@@ -1406,6 +1464,10 @@ ${BOLD}Piles${RESET}
   pile add-work <pile> <work> Add a work to a pile (each accepts nick/ObjectId/name)
   pile rm-work  <pile> <work> Remove a work from a pile
 
+${BOLD}Works${RESET}
+  work add-author <work> <author>  Attach an existing author to a work
+  work rm-author  <work> <author>  Detach an author from a work
+
 ${BOLD}Bulk export${RESET}
   export --piles "<query>"   Dump matching piles with works+notes as JSON
                              (wildcards and ranges work the same as \`piles\`)
@@ -1479,6 +1541,7 @@ const commands = {
   works:   cmdWorks,
   piles:   cmdPiles,
   pile:    cmdPile,
+  work:    cmdWork,
   'all-piles': cmdAllPiles,
   nick:    cmdNick,
   'nick-gen': cmdNickGen,
