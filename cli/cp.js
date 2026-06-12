@@ -130,17 +130,47 @@ async function resolveByNick(nick, config) {
   return null
 }
 
-// Resolve <id-or-nick> to {type, id}. If a nick prefix matches the
-// nick-pattern (letter + digits), look it up; otherwise treat as an
-// ObjectId and require a fallbackType.
-async function resolveTarget(input, fallbackType, config) {
+// Resolve <input> to {type, id}. Accepts three forms:
+//
+//   1. Nick pattern (n12345 / w12345 / p12345 / i12345) — looks up the nick.
+//   2. Raw ObjectId (24-char hex) — requires a hintedType OR probes each
+//      resource's GET endpoint until one returns a doc.
+//   3. Freeform name — autocomplete by hintedType (or try pile / work /
+//      idea / auth in priority order) and accept only an exact name match.
+//
+// Returns null if nothing resolves unambiguously.
+async function resolveTarget(input, hintedType, config) {
   if (!input) return null
+
   if (/^[nwip]\d+$/i.test(input)) {
     const resolved = await resolveByNick(input, config)
     if (resolved) return resolved
     return null
   }
-  if (fallbackType) return { type: fallbackType, id: input }
+
+  if (/^[0-9a-f]{24}$/i.test(input)) {
+    if (hintedType) return { type: hintedType, id: input }
+    for (const t of ['note', 'work', 'idea', 'pile', 'auth']) {
+      try {
+        const res = await api('GET', `${t}/${input}`, null, config)
+        if (res?.data?._id || res?.data?.[0]?._id) return { type: t, id: input }
+      } catch {}
+    }
+    return null
+  }
+
+  // Name: try the hinted type, else search all "named" types in priority.
+  // Note titles aren't autocomplete-indexed the same way, so notes are
+  // excluded from the auto-probe (use the nick or ObjectId for those).
+  const types = hintedType ? [hintedType] : ['pile', 'work', 'idea', 'auth']
+  for (const t of types) {
+    try {
+      const ac = await api('POST', `${t}/autocomplete`, { string: input }, config)
+      const items = ac?.data || []
+      const exact = items.find(i => (i.name || '') === input)
+      if (exact) return { type: t, id: exact._id }
+    } catch {}
+  }
   return null
 }
 
@@ -597,26 +627,37 @@ async function cmdBackfillNicks(args, config) {
 }
 
 async function cmdShow(args, config) {
-  const input = args[0]
+  const typeFlag = args.find(a => a.startsWith('--type='))?.split('=')[1]
+  const positional = args.filter(a => !a.startsWith('--'))
+  const input = positional.join(' ')
   if (!input) {
-    console.error('Usage: cp show <id|nick>')
-    console.error('  Shows the entity and its contents (pile→notes+works, work→notes,')
-    console.error('  auth→works+notes, idea→notes, note→full).')
+    console.error('Usage: cp show <nick|ObjectId|name> [--type T]')
+    console.error('  Examples:')
+    console.error('    cp show p12345')
+    console.error('    cp show 5f5...02 --type pile')
+    console.error('    cp show "Reading: 2025-11"')
+    console.error('  Type defaults to auto-detect (nick → pile → work → idea → auth).')
     return
   }
-  // Without a nick prefix we can't infer type — require a nick.
-  const target = await resolveTarget(input, null, config)
+  const target = await resolveTarget(input, typeFlag, config)
   if (!target) {
-    console.error('Could not resolve — pass a nick (e.g. p12345) or use a type-specific command.')
+    console.error(`Could not resolve "${input}".`)
+    console.error('  Try a nick (p12345), an ObjectId + --type, or the exact entity name.')
     return
   }
   const { type, id } = target
+
+  // Pass the original input through as the displayed nick only when it
+  // actually looked like one — for ObjectIds / names, look up the real
+  // nick so the header doesn't show a hex string in the "nick" slot.
+  const looksLikeNick = /^[nwip]\d+$/i.test(input)
+  const displayNick = looksLikeNick ? input : await fetchNick(type, id, config)
 
   if (type === 'note') {
     const res = await api('GET', `note/${id}`, null, config)
     const note = Array.isArray(res?.data) ? res.data[0] : res?.data
     if (!note) { console.log('Not found.'); return }
-    note.nick = input
+    note.nick = displayNick
     console.log('\n' + formatNote(note, { full: true }))
     return
   }
@@ -625,7 +666,7 @@ async function cmdShow(args, config) {
   let info = null
   try { info = (await api('GET', `${type}/${id}`, null, config))?.data } catch {}
   const header = info
-    ? formatEntity(type, { ...info, nick: input })
+    ? formatEntity(type, { ...info, nick: displayNick })
     : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
   console.log('\n' + header)
 
