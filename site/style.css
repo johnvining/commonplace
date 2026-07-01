@@ -2484,6 +2484,12 @@ mark.search-highlight {
   margin-bottom: 8px;
   width: 100%;
 }
+.pill-input.compact {
+  margin-bottom: 0;
+}
+.pill-input.compact .pill-input-control {
+  min-height: 42px;
+}
 .pill-input .pill-input-control {
   display: flex;
   flex-wrap: wrap;

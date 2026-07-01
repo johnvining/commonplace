@@ -1866,6 +1866,17 @@ mark.search-highlight {
   margin-bottom: 8px;
   width: 100%;
 
+  &.compact {
+    // Modifier used when the pill-input sits inline next to a same-row
+    // button (e.g. entity-page-header edit mode). Matches .button height
+    // and drops the below-margin that only makes sense in stacked layout.
+    margin-bottom: 0;
+
+    .pill-input-control {
+      min-height: 42px;
+    }
+  }
+
   .pill-input-control {
     display: flex;
     flex-wrap: wrap;

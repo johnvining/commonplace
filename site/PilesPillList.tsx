@@ -20,6 +20,7 @@ interface Props {
   onExit?: () => void
   inputId?: string
   dontAutofocus?: boolean
+  compact?: boolean
 }
 
 // Split a `Prefix: Name` pile name into `{ pre, label }`. If there is no
@@ -158,7 +159,7 @@ export default function PilesPillList(props: Props) {
   }
 
   return (
-    <div className="pill-input piles" ref={containerRef} onBlur={handleBlur}>
+    <div className={'pill-input piles' + (props.compact ? ' compact' : '')} ref={containerRef} onBlur={handleBlur}>
       <div className="pill-input-control" onClick={() => inputRef.current?.focus()}>
         {value.map((pile, index) => (
           <span key={pile._id ?? index} className="pill pill-pile">

@@ -375,8 +375,10 @@ function Work(props: any) {
                 <div
                   style={{
                     display: 'flex',
-                    alignItems: 'flex-start',
+                    alignItems: 'center',
                     gap: '8px',
+                    width: '360px',
+                    maxWidth: '100%',
                   }}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -387,6 +389,7 @@ function Work(props: any) {
                       onRemove={(id) => handlePileRemove(id)}
                       onExit={() => setEditPiles(false)}
                       inputId="work-work-pile"
+                      compact
                     />
                   </div>
                   <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
