@@ -823,6 +823,12 @@ class Note extends React.Component<any, any> {
                 <AuthorsChipList
                   value={this.state.pendingAuthors}
                   onChange={this.handleUpdateAuthors}
+                  onExit={() =>
+                    this.props.setNoteMode(
+                      this.props.id,
+                      constants.note_modes.SELECTED,
+                    )
+                  }
                   inputId={this.props.id + 'add-author'}
                   dontAutofocus
                 />
@@ -1022,7 +1028,12 @@ class Note extends React.Component<any, any> {
                   onAddExisting={(idea) => this.handleNewIdea(idea._id)}
                   onCreateNew={(name) => this.handleCreateIdeaAndAddToNote(name)}
                   onRemove={(id) => this.removeIdea(id)}
-                  onExit={() => this.setState({ edit_ideas: false })}
+                  onExit={() =>
+                    this.props.setNoteMode(
+                      this.props.id,
+                      constants.note_modes.SELECTED,
+                    )
+                  }
                   fetchAiSuggestions={async () => {
                     const res: any = await db.getIdeaSuggestions(this.props.id)
                     const names: string[] = res?.data?.suggested_ideas ?? []
@@ -1036,7 +1047,12 @@ class Note extends React.Component<any, any> {
                   onAddExisting={(pile) => this.handleNewPile(pile._id)}
                   onCreateNew={(name) => this.handleCreatePileAndAssign(name)}
                   onRemove={(id) => this.handlePileRemove(id)}
-                  onExit={() => this.setState({ edit_piles: false })}
+                  onExit={() =>
+                    this.props.setNoteMode(
+                      this.props.id,
+                      constants.note_modes.SELECTED,
+                    )
+                  }
                   inputId={this.props.id + 'pile'}
                 />
               ) : edit_links ? (

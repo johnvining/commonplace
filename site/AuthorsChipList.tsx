@@ -14,6 +14,9 @@ import { AuthorLike } from './authorsDisplay'
 interface Props {
   value: AuthorLike[]
   onChange: (next: AuthorLike[]) => void
+  // Esc with an empty input + closed dropdown calls this — typically used
+  // to exit the wider "edit" mode the parent is in.
+  onExit?: () => void
   inputId?: string
   dontAutofocus?: boolean
 }
@@ -128,7 +131,11 @@ export default function AuthorsChipList(props: Props) {
     }
     if (e.key === 'Escape') {
       e.stopPropagation()
-      setOpen(false)
+      if (open) {
+        setOpen(false)
+      } else if (props.onExit) {
+        props.onExit()
+      }
       return
     }
   }

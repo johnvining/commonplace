@@ -309,6 +309,7 @@ function Work(props: any) {
           <AuthorsChipList
             value={pendingAuthors}
             onChange={setPendingAuthors}
+            onExit={handleFinishEditing}
             inputId="add-author"
             dontAutofocus
           />
