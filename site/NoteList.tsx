@@ -139,7 +139,11 @@ class NoteList extends React.Component<any, any> {
       }
     }
 
-    if (shortcuts.noteList.deselect(event)) {
+    // Only claim Escape when there's a selection to clear; otherwise let
+    // it through, e.g. to close the entity editor on an idea or work page.
+    const hasSelection =
+      this.state.selectedNote || this.state.selectedArray.some((x: any) => x)
+    if (shortcuts.noteList.deselect(event) && hasSelection) {
       if (this.state.selectedNote) {
         var divToFocus = document.getElementById(this.state.selectedNote)
         if (divToFocus) divToFocus.focus()
