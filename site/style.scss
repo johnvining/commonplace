@@ -2278,3 +2278,12 @@ mark.search-highlight {
   opacity: 0.7;
   margin: 4px 0 8px;
 }
+
+// Pile and idea pickers at the top of the AND filter page (#279).
+.filter-pickers {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}

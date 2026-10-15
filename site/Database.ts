@@ -128,6 +128,17 @@ export async function getNotesAboutAuthor(authorId: string) {
   return axios.get(url_api + 'auth/' + authorId + '/notes-about')
 }
 
+// Notes in every given pile and with every given idea (#279), one page.
+export async function getFilteredNotes(pileIds: string[], ideaIds: string[], page: number = 1) {
+  return axios.get(url_api + 'note/filter', {
+    params: {
+      ...(pileIds.length ? { piles: pileIds.join(',') } : {}),
+      ...(ideaIds.length ? { ideas: ideaIds.join(',') } : {}),
+      ...entityPageParams(page),
+    },
+  })
+}
+
 // All notes for an author, including notes on their works
 export async function getAllNotesForAuthor(authorId: string, page: number = 1) {
   return axios.get(url_api + 'auth/' + authorId + '/all-notes', {

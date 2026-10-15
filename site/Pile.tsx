@@ -223,6 +223,10 @@ function Pile(props: any) {
                   />
                 )}
                 <TopLevelStandardButton
+                  name="Narrow"
+                  onClick={() => navigate('/filter?piles=' + id)}
+                />
+                <TopLevelStandardButton
                   name="Delete"
                   onClick={handleDeletePile}
                 />

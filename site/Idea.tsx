@@ -206,6 +206,10 @@ function Idea(props: any) {
                     setEdit(true)
                   }}
                 />
+                <TopLevelStandardButton
+                  name="Narrow"
+                  onClick={() => navigate('/filter?ideas=' + id)}
+                />
                 <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
               </TopLevelStandardButtonContainer>
             </div>

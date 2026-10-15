@@ -2890,4 +2890,12 @@ mark.search-highlight {
   margin: 4px 0 8px;
 }
 
+.filter-pickers {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
 /*# sourceMappingURL=style.css.map */
