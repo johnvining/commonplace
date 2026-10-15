@@ -2098,6 +2098,20 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+// Marks a note title that AI suggested and nobody has edited (#330).
+.ai-title-tag {
+  margin-left: 8px;
+  font-family: $sans_font;
+  font-size: 10px;
+  font-weight: normal;
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: $semantic_idea;
+  color: $font_color;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
 // A work's title in its original language, after or under the title it
 // was read in (#221).
 .work-original-name {

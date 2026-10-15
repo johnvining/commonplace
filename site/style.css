@@ -2725,6 +2725,19 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+.ai-title-tag {
+  margin-left: 8px;
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
+  font-size: 10px;
+  font-weight: normal;
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: var(--semantic-idea);
+  color: var(--font-color);
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
 .work-original-name {
   font-style: italic;
   opacity: 0.7;

@@ -99,6 +99,9 @@ class NoteResult extends React.PureComponent<any> {
                 </>
               ) : null}
               {primaryContent}
+              {title && title === note.aiTitle ? (
+                <span className="ai-title-tag" title="Title suggested by AI">AI</span>
+              ) : null}
               {fallback}
             </span>
             {this.props.semantic ? <span className="semantic-badge">~</span> : null}

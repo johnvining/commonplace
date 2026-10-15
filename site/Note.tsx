@@ -46,6 +46,14 @@ function isFieldOutsideNote(target: any, noteId: string) {
   return !target.closest(`[data-note-id="${noteId}"]`)
 }
 
+function AiTitleTag() {
+  return (
+    <span className="ai-title-tag" title="Title suggested by AI. Edit it to remove this mark.">
+      AI
+    </span>
+  )
+}
+
 class Note extends React.Component<any, any> {
   state: any = {
     largeImage: -1,
@@ -415,11 +423,21 @@ class Note extends React.Component<any, any> {
     this.props.refetchMe(this.props.index)
   }
 
+  // True while the title is exactly what AI suggested (#330); editing it
+  // clears the mark. The server remembers the suggestion as aiTitle; a
+  // suggestion fetched in this editor counts before it's saved.
+  isAiTitle() {
+    const title = this.state.pendingTitle
+    const suggested = this.state.suggestedTitle ?? this.props.note.aiTitle
+    return Boolean(title) && title === suggested
+  }
+
   async generateTitleSuggestion() {
     this.setState({ fetchingTitleSuggestion: true })
     await db.getTitleSuggestion(this.props.id).then((response: any) => {
       this.setState({
         pendingTitle: response.data.suggested_title,
+        suggestedTitle: response.data.suggested_title,
         fetchingTitleSuggestion: false,
       })
     })
@@ -698,6 +716,7 @@ class Note extends React.Component<any, any> {
                       ? 'Fetching'
                       : 'Suggest'}
                   </ClickableLabelButton>
+                  {this.isAiTitle() ? <AiTitleTag /> : null}
                 </label>
 
                 <input
@@ -711,7 +730,10 @@ class Note extends React.Component<any, any> {
             </>
           ) : this.state.pendingTitle ? (
             <div className="width-100">
-              <div className="note-full title">{this.state.pendingTitle}</div>
+              <div className="note-full title">
+                {this.state.pendingTitle}
+                {this.isAiTitle() ? <AiTitleTag /> : null}
+              </div>
             </div>
           ) : null}
 
