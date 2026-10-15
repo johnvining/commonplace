@@ -28,6 +28,9 @@ function Author(props: any) {
   const [pendingUsernames, setPendingUsernames] = useState('')
   const [works, setWorks] = useState<any>(null)
   const [authorOnlyNotes, setAuthorOnlyNotes] = useState<any[]>([])
+  // Notes the server holds beyond the first page fetched below; when
+  // non-zero the list here is incomplete and we link to the paged view.
+  const [unfetchedNoteCount, setUnfetchedNoteCount] = useState(0)
   const navigate = useNavigate()
 
   const fetchAuthorInfo = (id: any) => {
@@ -59,10 +62,12 @@ function Author(props: any) {
   useEffect(() => {
     if (works === null) return
     let cancelled = false
-    db.getRecordsWithFilter(db.types.note, db.types.auth, id)
+    db.getNotesPageForEntity(db.types.auth, id)
       .then((response: any) => {
         if (cancelled) return
         const allNotes: any[] = response?.data?.data ?? []
+        const total = db.notePageTotal(response)
+        setUnfetchedNoteCount(total === null ? 0 : Math.max(0, total - allNotes.length))
         const workIds = new Set((works ?? []).map((w: any) => String(w._id)))
         const filtered = allNotes.filter((n: any) => {
           const wid = n.work?._id ? String(n.work._id) : null
@@ -208,6 +213,20 @@ function Author(props: any) {
       {authorOnlyNotes.map((note: any) => (
         <NoteResult note={note} key={'auth-note-' + note._id} />
       ))}
+      {unfetchedNoteCount > 0 ? (
+        <div className="search-empty-state">
+          {unfetchedNoteCount.toLocaleString()} more notes not shown.{' '}
+          <a
+            href={`/auth/${id}/notes`}
+            onClick={e => {
+              e.preventDefault()
+              navigate(`/auth/${id}/notes`)
+            }}
+          >
+            See all notes
+          </a>
+        </div>
+      ) : null}
     </div>
   )
 }
