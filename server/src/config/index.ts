@@ -8,7 +8,6 @@ dotenv.config()
 interface Secrets {
   jwt?: string
   jwtExp: string
-  ngrokAuth: string
   openaiorg?: string
   openaikey?: string
 }
@@ -18,7 +17,6 @@ interface Config {
   isDev: boolean
   port: number
   secrets: Secrets
-  ngrokUrl: string
   dbUrl: string
   imageStorePath: string
 }
@@ -35,11 +33,9 @@ const baseConfig = {
   secrets: {
     jwt: process.env.JWT_SECRET,
     jwtExp: '100d',
-    ngrokAuth: process.env.NGROK_AUTH ?? '',
     openaiorg: process.env.OPENAI_ORG,
     openaikey: process.env.OPENAI_API_KEY,
   },
-  ngrokUrl: '',
 }
 
 let envConfig: Partial<Config> = {}
@@ -69,7 +65,7 @@ switch (env) {
 }
 
 // Non-secret config keeps the old behavior: file values override baseConfig
-// defaults (port, ngrokUrl, etc). Secrets are overlaid below so env vars win.
+// defaults (port, etc). Secrets are overlaid below so env vars win.
 const merged = merge({}, baseConfig, envConfig) as Config
 
 // For secrets, env vars take precedence when defined; fall back to whatever
