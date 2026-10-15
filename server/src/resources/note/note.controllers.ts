@@ -377,6 +377,8 @@ export const reqGetSuggestionForNoteTitle = async function (req: Request, res: R
       return
     }
     const suggestion = await getSuggestedTitle(note.text ?? '')
+    // Remember it, so if it's saved as the title it's marked as AI-made.
+    await Note.updateOne({ _id: note._id }, { $set: { aiTitle: suggestion } })
     res.send({ suggested_title: suggestion })
   } catch (e) {
     console.error(e)
@@ -555,7 +557,7 @@ export const reqBulkSuggestTitlesForNotes = async (req: Request, res: Response) 
       if (!note.title && note.text) {
         let suggestion = await getSuggestedTitle(note.text)
 
-        await Note.updateOne({ _id: noteId }, { $set: { title: suggestion } })
+        await Note.updateOne({ _id: noteId }, { $set: { title: suggestion, aiTitle: suggestion } })
 
         return {
           noteId: noteId,

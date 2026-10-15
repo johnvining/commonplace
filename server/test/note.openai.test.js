@@ -151,4 +151,33 @@ describe('note OpenAI-backed endpoints', () => {
       expect(typeof res.body.data.processed).toBe('number')
     })
   })
+
+  describe('AI-generated title mark', () => {
+    it('records bulk-suggested titles as AI-made', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: '', text: 'has text' })
+      await agent.post('/api/note/bulk-suggest-titles').send({ noteIds: [note._id] }).expect(200)
+      const saved = (await agent.get(`/api/note/${note._id}`).expect(200)).body.data[0]
+      expect(saved.aiTitle).toBe(saved.title)
+    })
+
+    it('records a single suggestion, which matches the title once saved', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: '', text: 'Lorem ipsum' })
+      const { suggested_title } = (await agent.get(`/api/note/${note._id}/title/suggest`).expect(200)).body
+      await agent.put(`/api/note/${note._id}`).send({ title: suggested_title }).expect(200)
+      let saved = (await agent.get(`/api/note/${note._id}`).expect(200)).body.data[0]
+      expect(saved.title).toBe(saved.aiTitle)
+
+      await agent.put(`/api/note/${note._id}`).send({ title: suggested_title + ', edited' }).expect(200)
+      saved = (await agent.get(`/api/note/${note._id}`).expect(200)).body.data[0]
+      expect(saved.title).not.toBe(saved.aiTitle)
+    })
+
+    it('cannot be set by clients', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'Mine' })
+      await agent.put(`/api/note/${note._id}`).send({ aiTitle: 'Mine' }).expect(400)
+    })
+  })
 })

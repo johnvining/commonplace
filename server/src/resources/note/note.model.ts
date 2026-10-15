@@ -15,6 +15,7 @@ export interface NoteDoc {
   piles: Types.ObjectId[]
   take?: string
   ocrText?: string
+  aiTitle?: string
   embedding: number[]
   embeddingHash?: string
   createdAt: Date
@@ -40,6 +41,10 @@ const noteSchema = new Schema<NoteDoc>(
     piles: [{ type: Schema.Types.ObjectId, ref: 'pile' }],
     take: String,
     ocrText: String,
+    // The last title suggested for this note. While the title still
+    // equals it, the title is marked as AI-generated (#330); editing the
+    // title clears the mark.
+    aiTitle: String,
     embedding: [Number],
     embeddingHash: String,
   },
