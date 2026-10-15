@@ -51,31 +51,75 @@ type PopulatedNote = Record<string, unknown> & {
   _semantic?: boolean
 }
 
-export const reqFindNotesByString = async (req: Request, res: Response) => {
-  const escaped = sanitizeSearchInput(req.body.searchString)
-    .replace(/\\/g, '\\\\')
-    .replace(/"/g, '\\"')
-  const notes = (await Note.find(
-    { $text: { $search: escaped } },
-    { score: { $meta: 'textScore' } }
-  )
-    .sort({ score: { $meta: 'textScore' } })
-    .select(LIST_OMIT)
-    .populate('authors')
-    .populate('people')
-    .populate('ideas')
-    .populate('piles')
-    .populate({ path: 'work', populate: { path: 'authors' } })
-    .lean()
-    .exec()) as PopulatedNote[]
+// Keyword search over notes (#297), used by unified search and
+// PUT /note/find. Two parts, merged:
+// - Mongo $text: ranked by textScore, any of the words matches (with
+//   stemming), "quoted phrases" must appear. Mongo drops stop words, so
+//   a query made of them ("not at all") finds nothing this way.
+// - The whole query as a case-insensitive phrase in the title, text,
+//   take or OCR text. That catches the stop-word case, and those exact
+//   hits rank first.
+// Each note gets `score`, highest first.
+const PHRASE_FIELDS = ['title', 'text', 'take', 'ocrText'] as const
 
-  const noteIds = notes.map((n) => n._id)
-  const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
+async function keywordSearchNotes(rawQuery: string, limit: number): Promise<PopulatedNote[]> {
+  const query = sanitizeSearchInput(rawQuery).trim()
+  if (!query) return []
+  const populate = (q: any) =>
+    q
+      .select(LIST_OMIT)
+      .populate('authors')
+      .populate('people')
+      .populate('ideas')
+      .populate('piles')
+      .populate({ path: 'work', populate: { path: 'authors' } })
+      .lean()
+      .exec() as Promise<PopulatedNote[]>
+
+  // The phrase is the query without its quote marks.
+  const phrase = query.replace(/"/g, '').trim()
+  const phraseRegex = new RegExp(escapeRegexInput(phrase), 'i')
+  const [textHits, phraseHits] = await Promise.all([
+    populate(
+      Note.find(
+        { $text: { $search: query.replace(/\\/g, '\\\\') } },
+        { score: { $meta: 'textScore' } }
+      )
+        .sort({ score: { $meta: 'textScore' } })
+        .limit(limit)
+    ),
+    phrase
+      ? populate(
+          Note.find({ $or: PHRASE_FIELDS.map((f) => ({ [f]: phraseRegex })) })
+            .sort({ updatedAt: -1 })
+            .limit(limit)
+        )
+      : Promise.resolve([] as PopulatedNote[]),
+  ])
+
+  // Phrase hits outrank any text score; text hits keep their order.
+  const maxText = Math.max(1, ...textHits.map((n) => n.score || 0))
+  const byId = new Map<string, PopulatedNote>()
+  for (const n of textHits) byId.set(String(n._id), { ...n, score: (n.score || 0) / maxText })
+  for (const n of phraseHits) {
+    const prev = byId.get(String(n._id))
+    byId.set(String(n._id), { ...(prev ?? n), score: 1 + (prev?.score ?? 0) })
+  }
+  return [...byId.values()].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, limit)
+}
+
+async function attachNicks(notes: PopulatedNote[]) {
+  const nicks = await Nick.find({ note: { $in: notes.map((n) => n._id) } }).lean().exec()
   const nickMap: Record<string, string> = {}
   nicks.forEach((nick) => {
     if (nick.note && nick.key) nickMap[String(nick.note)] = nick.key
   })
   notes.forEach((note) => { note.nick = nickMap[String(note._id)] || null })
+}
+
+export const reqFindNotesByString = async (req: Request, res: Response) => {
+  const notes = await keywordSearchNotes(req.body.searchString, 200)
+  await attachNicks(notes)
   return notes
 }
 
@@ -641,20 +685,7 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
   if (!query.trim()) return []
 
   const [keywordNotes, queryEmbedding] = await Promise.all([
-    Note.find(
-      { $text: { $search: query.replace(/\\/g, '\\\\').replace(/"/g, '\\"') } },
-      { score: { $meta: 'textScore' } }
-    )
-      .sort({ score: { $meta: 'textScore' } })
-      .limit(50)
-      .select(LIST_OMIT)
-      .populate('authors')
-      .populate('people')
-      .populate('ideas')
-      .populate('piles')
-      .populate({ path: 'work', populate: { path: 'authors' } })
-      .lean()
-      .exec() as Promise<PopulatedNote[]>,
+    keywordSearchNotes(query, Math.max(50, limit)),
     generateEmbedding(query),
   ])
 

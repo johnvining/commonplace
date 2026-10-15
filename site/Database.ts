@@ -259,11 +259,6 @@ export async function createNewNoteWithImageForWork(workId: string, image: File 
   return addImageToNote(createdNote.data._id, image)
 }
 
-export async function searchNotes(searchString: string) {
-  const data = { searchString: searchString }
-  return axios.put(url_api + 'note/find', data)
-}
-
 export async function unifiedSearch(query: string, limit = 50, signal?: AbortSignal) {
   const opts = signal ? { signal } : {}
   return axios.post(url_api + 'note/unified-search', { query, limit }, opts)
