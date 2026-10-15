@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 import * as constants from './constants'
 import NoteList from './NoteList'
+import WorkList from './WorkList'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import {
@@ -191,6 +192,11 @@ function Idea(props: any) {
         )}
       </div>
 
+      <WorkList
+        key={'ideaWorks' + id}
+        getListOfWorks={() => db.getRecordsWithFilter(db.types.work, db.types.idea, id)}
+        hideWhenEmpty
+      />
       <NoteList
         key={'idea' + id}
         viewMode={props.viewMode}

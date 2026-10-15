@@ -52,6 +52,15 @@ class ResultWork extends React.Component<any, any> {
             edit={false}
             piles={pilesToShow}
           />
+          {work.ideas?.length ? (
+            <div>
+              {work.ideas.map((idea: any) => (
+                <span className="idea label" key={idea._id}>
+                  {idea.name}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
       </Link>
     )
