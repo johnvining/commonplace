@@ -90,15 +90,27 @@ export const reqGetNoteByNick = async (req: Request, res: Response) => {
 export const reqDeleteNote = async (req: Request, res: Response) => {
   const id = req.params.id
   const note = await Note.findOne({ _id: id }).lean()
-  if (note?.images?.length) {
-    await Promise.allSettled(
-      note.images.map((img) => fs.promises.unlink(config.imageStorePath + '/' + img))
-    )
-  }
+  if (note) await deleteNoteImageFiles(note)
   await Note.deleteOne({ _id: id })
   invalidateEmbedding(id)
   await deleteNickFor('note', id)
   res.status(200).end()
+}
+
+// Remove a note's images from disk: each file it lists, then its whole
+// <imageStorePath>/<noteId>/ directory, which also catches files the note
+// no longer lists (e.g. an upload whose DB update failed). The directory
+// name comes from the stored _id, never the request: Mongoose accepts any
+// 12-character string as an ObjectId, so a URL param isn't safe to rm -r.
+async function deleteNoteImageFiles(note: { _id: unknown; images?: string[] }) {
+  await Promise.allSettled(
+    (note.images ?? []).map((img) => fs.promises.unlink(config.imageStorePath + '/' + img))
+  )
+  const noteId = String(note._id)
+  if (!/^[0-9a-f]{24}$/.test(noteId)) return
+  await fs.promises
+    .rm(config.imageStorePath + '/' + noteId, { recursive: true, force: true })
+    .catch((e) => console.error(`Could not remove images for note ${noteId}`, e))
 }
 
 export const reqGetRecentNotes = async (req: Request, res: Response) => {

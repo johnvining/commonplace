@@ -95,7 +95,64 @@ describe('note images', () => {
     })
   })
 
-  describe('DELETE /api/note/:id', () => {
+  describe('DELETE /api/note/:id (image cleanup)', () => {
+    const upload = (agent, id, name) =>
+      agent.put(`/api/note/${id}/image`).attach('image', Buffer.from('bytes-' + name), name).expect(200)
+
+    it("removes the note's image files and its image directory", async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'doomed' })
+      await upload(agent, note._id, 'one.jpg')
+      const res = await upload(agent, note._id, 'two.jpg')
+      const files = res.body.data.newNote.images.map(f => path.join(imageStoreRoot, f))
+      const dir = path.join(imageStoreRoot, String(note._id))
+      // A file in the note's directory that the note no longer lists
+      // (e.g. an upload whose DB update failed) must go too.
+      await fs.promises.writeFile(path.join(dir, 'stray.jpg'), 'stray')
+      files.forEach(f => expect(fs.existsSync(f)).toBe(true))
+
+      await agent.delete(`/api/note/${note._id}`).expect(200)
+
+      files.forEach(f => expect(fs.existsSync(f)).toBe(false))
+      expect(fs.existsSync(dir)).toBe(false)
+      expect(fs.existsSync(imageStoreRoot)).toBe(true)
+    })
+
+    it("leaves other notes' images alone", async () => {
+      const agent = await authedAgent()
+      const doomed = await createNote(agent, { title: 'doomed' })
+      const kept = await createNote(agent, { title: 'kept' })
+      await upload(agent, doomed._id, 'a.jpg')
+      const keptRes = await upload(agent, kept._id, 'b.jpg')
+      const keptFile = path.join(imageStoreRoot, keptRes.body.data.newNote.images[0])
+
+      await agent.delete(`/api/note/${doomed._id}`).expect(200)
+
+      expect(fs.existsSync(keptFile)).toBe(true)
+      const img = await agent.get(`/api/note/${kept._id}/images/1`).expect(200)
+      expect(img.body.toString()).toBe('bytes-b.jpg')
+    })
+
+    it('deletes a note that never had images', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'plain' })
+      await agent.delete(`/api/note/${note._id}`).expect(200)
+      await agent.get(`/api/note/${note._id}`).expect(200).then(r => expect(r.body.data).toHaveLength(0))
+    })
+
+    it('never removes a directory named by an id that matches no note', async () => {
+      const agent = await authedAgent()
+      // Mongoose treats any 12-character string as a valid ObjectId, so the
+      // directory to remove must come from the stored note, not the URL.
+      for (const id of ['aaaaaaaaaaaa', '507f1f77bcf86cd799439011']) {
+        const dir = path.join(imageStoreRoot, id)
+        await fs.promises.mkdir(dir, { recursive: true })
+        await fs.promises.writeFile(path.join(dir, 'keep.jpg'), 'keep')
+        await agent.delete(`/api/note/${id}`)
+        expect(fs.existsSync(path.join(dir, 'keep.jpg')), id).toBe(true)
+      }
+    })
+
     it('rejects ids that are not ObjectIds', async () => {
       const agent = await authedAgent()
       await agent.delete('/api/note/not-an-id').expect(400)
