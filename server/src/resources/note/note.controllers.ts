@@ -725,7 +725,10 @@ function scoreEntityName(name: string | undefined, query: string): number {
 
 export const reqUnifiedSearch = async (req: Request, res: Response) => {
   const query = sanitizeSearchInput(req.body.query)
-  const limit = req.body.limit ?? 50
+  // Notes to return; the tagging view (#319) asks for up to the cap.
+  const MAX_NOTES = 200
+  const requested = Number(req.body.limit)
+  const limit = Number.isFinite(requested) && requested > 0 ? Math.min(requested, MAX_NOTES) : 50
   if (!query.trim()) return []
 
   const regex = new RegExp(escapeRegexInput(query), 'i')

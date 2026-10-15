@@ -131,6 +131,15 @@ describe('note OpenAI-backed endpoints', () => {
       expect(res.body.data.some(r => r.type === 'auth' && r.item.name === 'Aristotle')).toBe(true)
     })
 
+    it('accepts any limit, capping it', async () => {
+      const agent = await authedAgent()
+      await agent.post('/api/auth/').send({ name: 'Aristotle' }).expect(201)
+      for (const limit of [100000, 'lots', -5]) {
+        const res = await agent.post('/api/note/unified-search').send({ query: 'Aris', limit }).expect(200)
+        expect(res.body.data.some(r => r.item.name === 'Aristotle')).toBe(true)
+      }
+    })
+
     it('returns empty array for empty query', async () => {
       const agent = await authedAgent()
       const res = await agent
