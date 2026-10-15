@@ -1,6 +1,6 @@
 import User from '../user/user.model.js'
 import bcrypt from 'bcryptjs'
-import jwt, { type VerifyErrors, type JwtPayload } from 'jsonwebtoken'
+import jwt, { type JwtPayload } from 'jsonwebtoken'
 import config from '../../config'
 import type { Request, Response, NextFunction } from 'express'
 
@@ -109,28 +109,39 @@ export const reqAuthorizeUser = async (req: Request, res: Response) => {
   }
 }
 
-export const reqAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
+// Express middleware. Synchronous on purpose: Express 4 doesn't catch
+// errors from async middleware or from a jwt.verify callback, so anything
+// thrown there would leave the request hanging. Errors go to next() instead.
+export const reqAuthenticate = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.jwt
   if (!token) {
     return res.status(401).json({ message: 'Not authorized, token not available' })
   }
-  jwt.verify(token, jwtSecret(), (err: VerifyErrors | null, decodedToken: JwtPayload | string | undefined) => {
-    if (err || !decodedToken || typeof decodedToken === 'string') {
-      return res.status(401).json({ message: 'Not authorized' })
-    } else if (decodedToken.username != 'commonplace') {
-      return res.status(401).json({ message: 'Wrong username' })
-    } else {
-      // Sliding refresh: if the token has been around for more than the
-      // refresh threshold, re-issue. Steady use keeps the user signed in
-      // indefinitely; a week of idle and the cookie expires for real.
-      const issuedAt = typeof decodedToken.iat === 'number' ? decodedToken.iat : null
-      const nowSeconds = Math.floor(Date.now() / 1000)
-      if (issuedAt && nowSeconds - issuedAt > TOKEN_REFRESH_AFTER_SECONDS) {
-        signAuthCookie(res, decodedToken.id, decodedToken.username)
-      }
-      next()
+  let decodedToken: JwtPayload | string
+  try {
+    decodedToken = jwt.verify(token, jwtSecret())
+  } catch {
+    return res.status(401).json({ message: 'Not authorized' })
+  }
+  if (typeof decodedToken === 'string') {
+    return res.status(401).json({ message: 'Not authorized' })
+  }
+  if (decodedToken.username != 'commonplace') {
+    return res.status(401).json({ message: 'Wrong username' })
+  }
+  try {
+    // Sliding refresh: if the token has been around for more than the
+    // refresh threshold, re-issue. Steady use keeps the user signed in
+    // indefinitely; a week of idle and the cookie expires for real.
+    const issuedAt = typeof decodedToken.iat === 'number' ? decodedToken.iat : null
+    const nowSeconds = Math.floor(Date.now() / 1000)
+    if (issuedAt && nowSeconds - issuedAt > TOKEN_REFRESH_AFTER_SECONDS) {
+      signAuthCookie(res, decodedToken.id, decodedToken.username)
     }
-  })
+  } catch (e) {
+    return next(e)
+  }
+  next()
 }
 
 export const reqCheckAuth = (req: Request, res: Response) => {

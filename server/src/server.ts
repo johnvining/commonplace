@@ -69,7 +69,9 @@ app.use(cookieParser())
 app.use('/api', requireXhr)
 
 app.use('/api/user', userRouter)
-app.all('*', reqAuthenticate) // TODO: Callback function
+// Everything else under /api needs a signed-in user. (Was app.all('*'),
+// which registers a catch-all route rather than middleware.)
+app.use('/api', reqAuthenticate)
 
 app.use('/api/note', noteRouter)
 app.use('/api/auth', authRouter)
