@@ -52,6 +52,7 @@ class Note extends React.Component<any, any> {
     overlayMode: false,
     focusEdit: false,
     pendingAuthors: [] as import('./authorsDisplay').AuthorLike[],
+    pendingPeople: [] as import('./authorsDisplay').AuthorLike[],
     pendingPage: '',
     pendingTake: '',
     pendingText: '',
@@ -116,6 +117,7 @@ class Note extends React.Component<any, any> {
 
     this.setState({
       pendingAuthors: Array.isArray(this.props.note.authors) ? this.props.note.authors : [],
+      pendingPeople: Array.isArray(this.props.note.people) ? this.props.note.people : [],
       pendingPage: this.props.note.page,
       pendingTake: this.props.note.take,
       pendingText: this.props.note.text,
@@ -346,6 +348,10 @@ class Note extends React.Component<any, any> {
     this.setState({ pendingAuthors: authors })
   }
 
+  handleUpdatePeople = (people: import('./authorsDisplay').AuthorLike[]) => {
+    this.setState({ pendingPeople: people })
+  }
+
   handleUpdateWork = (workId: any, workName: any) => {
     this.setState({ pendingWorkId: workId, pendingWorkName: workName })
   }
@@ -362,6 +368,7 @@ class Note extends React.Component<any, any> {
   async handleAccept() {
     const updateObject: any = {
       authors: this.state.pendingAuthors.map((a: any) => a._id).filter(Boolean),
+      people: this.state.pendingPeople.map((p: any) => p._id).filter(Boolean),
       page: this.state.pendingPage,
       take: this.state.pendingTake,
       text: this.state.pendingText,
@@ -867,6 +874,21 @@ class Note extends React.Component<any, any> {
                   dontAutofocus
                 />
               </div>
+              <div data-name="people" className="width-100">
+                <label className="note-full form-label">About</label>
+                <AuthorsChipList
+                  value={this.state.pendingPeople}
+                  onChange={this.handleUpdatePeople}
+                  onExit={() =>
+                    this.props.setNoteMode(
+                      this.props.id,
+                      constants.note_modes.SELECTED,
+                    )
+                  }
+                  inputId={this.props.id + 'add-person'}
+                  dontAutofocus
+                />
+              </div>
               <div data-name="work" className="width-100">
                 <label htmlFor="work" className="note-full form-label">
                   Work
@@ -936,6 +958,7 @@ class Note extends React.Component<any, any> {
           ) : null}
           {note.piles?.length > 0 ||
           note.ideas?.length > 0 ||
+          note.people?.length > 0 ||
           Object.keys(this.state.linkedNotes).length > 0 ? (
             <div className={'note-full container width-100'}>
               {/* In edit_piles mode the PilesPillList below renders the
@@ -970,6 +993,16 @@ class Note extends React.Component<any, any> {
                     tabIndex={selected ? undefined : -1}
                   >
                     {idea.name}
+                  </button>
+                </Link>
+              ))}
+              {note.people?.map((person: any) => (
+                <Link to={'/auth/' + person._id} key={'person-link' + person._id} tabIndex={-1}>
+                  <button
+                    className="person label"
+                    tabIndex={selected ? undefined : -1}
+                  >
+                    {person.name}
                   </button>
                 </Link>
               ))}

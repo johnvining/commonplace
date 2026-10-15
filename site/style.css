@@ -1227,6 +1227,7 @@ div .top-bar {
 
 .idea.container,
 .pile.container,
+.person.container,
 .link.container {
   background-color: transparent;
   width: 60%;
@@ -1237,6 +1238,7 @@ div .top-bar {
 }
 .idea.search-box,
 .pile.search-box,
+.person.search-box,
 .link.search-box {
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   border: solid;
@@ -1247,21 +1249,25 @@ div .top-bar {
 }
 .idea.search-box:focus,
 .pile.search-box:focus,
+.person.search-box:focus,
 .link.search-box:focus {
   outline: none;
 }
 .idea.search-box.pile,
 .pile.search-box.pile,
+.person.search-box.pile,
 .link.search-box.pile {
   border-color: var(--semantic-pile);
 }
 .idea.search-box.idea,
 .pile.search-box.idea,
+.person.search-box.idea,
 .link.search-box.idea {
   border-color: var(--semantic-idea);
 }
 .idea.label,
 .pile.label,
+.person.label,
 .link.label {
   border-radius: 4px;
   border-style: none;
@@ -1274,22 +1280,26 @@ div .top-bar {
 }
 .idea.label:focus,
 .pile.label:focus,
+.person.label:focus,
 .link.label:focus {
   border-color: var(--high-intensity-border);
 }
 .idea.label:hover,
 .pile.label:hover,
+.person.label:hover,
 .link.label:hover {
   background-color: var(--semantic-selection);
   cursor: pointer;
 }
 .idea.label.edit:hover,
 .pile.label.edit:hover,
+.person.label.edit:hover,
 .link.label.edit:hover {
   background-color: var(--semantic-removal);
 }
 .idea.label.edit::after,
 .pile.label.edit::after,
+.person.label.edit::after,
 .link.label.edit::after {
   background-image: url("/icons/cross.svg");
   background-size: 15px 15px;
@@ -1300,16 +1310,26 @@ div .top-bar {
 }
 .idea.label.pile,
 .pile.label.pile,
+.person.label.pile,
 .link.label.pile {
   background-color: var(--semantic-pile);
 }
 .idea.label.idea,
 .pile.label.idea,
+.person.label.idea,
 .link.label.idea {
   background-color: var(--semantic-idea);
 }
+.idea.label.person,
+.pile.label.person,
+.person.label.person,
+.link.label.person {
+  background-color: transparent;
+  border: 1px solid var(--semantic-idea);
+}
 .idea.label.link,
 .pile.label.link,
+.person.label.link,
 .link.label.link {
   background-color: transparent;
   font-family: "Courier New", Courier, monospace;
@@ -1317,6 +1337,7 @@ div .top-bar {
 }
 .idea.pre,
 .pile.pre,
+.person.pre,
 .link.pre {
   font-size: var(--font-size-xs);
   background-color: var(--note-background);
@@ -1328,6 +1349,7 @@ div .top-bar {
 }
 .idea.ul,
 .pile.ul,
+.person.ul,
 .link.ul {
   display: block;
   margin: 0px;
@@ -1335,6 +1357,7 @@ div .top-bar {
 }
 .idea.li,
 .pile.li,
+.person.li,
 .link.li {
   display: inline;
   margin: 0px;
@@ -1342,11 +1365,13 @@ div .top-bar {
 }
 .idea.autocomplete-div,
 .pile.autocomplete-div,
+.person.autocomplete-div,
 .link.autocomplete-div {
   text-align: right;
 }
 .idea .option,
 .pile .option,
+.person .option,
 .link .option {
   border-radius: 4px;
   border-style: none;
@@ -1361,21 +1386,25 @@ div .top-bar {
 }
 .idea .option.pile,
 .pile .option.pile,
+.person .option.pile,
 .link .option.pile {
   background-color: var(--semantic-pile);
 }
 .idea .option.idea,
 .pile .option.idea,
+.person .option.idea,
 .link .option.idea {
   background-color: var(--semantic-idea);
 }
 .idea .option::after,
 .pile .option::after,
+.person .option::after,
 .link .option::after {
   content: "? ";
 }
 .idea .option.new::before,
 .pile .option.new::before,
+.person .option.new::before,
 .link .option.new::before {
   background-image: url("/icons/plus.svg");
   background-size: 17px 17px;
