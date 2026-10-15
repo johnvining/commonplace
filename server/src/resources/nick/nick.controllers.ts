@@ -2,7 +2,7 @@ import Nick from '../nick/nick.model.js'
 import type { Request, Response } from 'express'
 
 
-type NickEntityType = 'note' | 'work' | 'idea' | 'pile'
+export type NickEntityType = 'note' | 'work' | 'idea' | 'pile'
 
 const PREFIX: Record<NickEntityType, string> = { note: 'n', work: 'w', idea: 'i', pile: 'p' }
 

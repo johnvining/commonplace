@@ -11,6 +11,7 @@ import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
 import * as PileControllers from '../resources/pile/pile.controllers.js'
+import { generateNick, type NickEntityType } from '../resources/nick/nick.controllers.js'
 
 export async function importCSV(filePath: string, recordType: number) {
   console.log('Importing records from file ' + filePath)
@@ -237,6 +238,16 @@ interface NewNoteFields {
   take: string
 }
 
+// Records create their nicks in the background. Wait for each row's nicks
+// so a CLI run can't disconnect with one still in flight and leave that
+// record without a nick (#223). generateNick returns an existing nick, so
+// racing the background call is harmless.
+async function ensureNicks(records: [NickEntityType, unknown][]) {
+  await Promise.all(
+    records.filter(([, id]) => id).map(([type, id]) => generateNick(type, id))
+  )
+}
+
 async function importNote(importObject: NoteImportObject) {
   const [author, work] = await Promise.all([
     AuthControllers.findOrCreateAuthor(importObject.authorName),
@@ -272,6 +283,12 @@ async function importNote(importObject: NoteImportObject) {
   }
 
   const createdNote = await NoteControllers.createNoteObj(newNote)
+  await ensureNicks([
+    ['note', createdNote._id],
+    ['work', work?._id],
+    ...ideas.map((i): [NickEntityType, unknown] => ['idea', i?._id]),
+    ...piles.map((p): [NickEntityType, unknown] => ['pile', p?._id]),
+  ])
 
   if (
     importObject.externalImageUrls.length == 1 &&
@@ -310,6 +327,10 @@ async function importInstapaperNote(importObject: NoteImportObject) {
   }
 
   const createdNote = await NoteControllers.createNoteObj(newNote)
+  await ensureNicks([
+    ['note', createdNote._id],
+    ['work', work?._id],
+  ])
 
   if (
     importObject.externalImageUrls.length == 1 &&
@@ -380,4 +401,8 @@ async function importWork(importObject: WorkImportObject) {
   const work = await WorkControllers.findOrCreateWork(importObject.title)
   if (!work) return
   await WorkControllers.updateWorkInfo(String(work._id), updateObject)
+  await ensureNicks([
+    ['work', work._id],
+    ...piles.map((p): [NickEntityType, unknown] => ['pile', p?._id]),
+  ])
 }
