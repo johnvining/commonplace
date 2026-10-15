@@ -11,7 +11,7 @@ import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import { renderMarkdown } from './safeMarkdown'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
-import { saveAndExitEdit } from './saveAndExitEdit'
+import { useEntityEditor } from './useEntityEditor'
 import AuthorsChipList from './AuthorsChipList'
 import PilesPillList from './PilesPillList'
 import IdeasPillList from './IdeasPillList'
@@ -36,18 +36,21 @@ import { togglePinned } from './pinned'
 
 function Work(props: any) {
   const { id = '' } = useParams()
-  const [edit, setEdit] = useState(false)
   const [importMode, setImportMode] = useState(false)
   const [pendingImportText, setPendingImportText] = useState('')
   const [editPiles, setEditPiles] = useState(false)
   const [editIdeas, setEditIdeas] = useState(false)
   // TODO: Create pending object
-  const [pendingWorkTitle, setPendingWorkTitle] = useState('')
-  const [pendingUrl, setPendingUrl] = useState('')
-  const [pendingYear, setPendingYear] = useState('')
-  const [pendingAuthors, setPendingAuthors] = useState<import('./authorsDisplay').AuthorLike[]>([])
-  const [pendingSummary, setPendingSummary] = useState('')
-  const [pendingCitationInfo, setPendingCitationInfo] = useState('')
+  const editor = useEntityEditor(db.types.work, id, {
+    name: '',
+    url: '',
+    year: '' as number | string,
+    // Edited as author records; sent as ids.
+    authors: [] as import('./authorsDisplay').AuthorLike[],
+    summary: '',
+    citation_information: '',
+  })
+  const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [piles, setPiles] = useState<any[]>([])
   const [ideas, setIdeas] = useState<any[]>([])
   const [nick, setNick] = useState<any>()
@@ -106,14 +109,16 @@ function Work(props: any) {
       db.getWorkNick(workId),
     ]).then(([infoResponse, nickResponse]) => {
       const work = infoResponse.data.data
-      setPendingWorkTitle(work.name)
+      editor.load({
+        name: work.name,
+        url: work.url ?? '',
+        year: work.year ?? '',
+        authors: Array.isArray(work.authors) ? work.authors : [],
+        summary: work.summary ?? '',
+        citation_information: work.citation_information ?? '',
+      })
       setPiles(work.piles)
       setIdeas(work.ideas ?? [])
-      setPendingAuthors(Array.isArray(work.authors) ? work.authors : [])
-      setPendingUrl(work.url)
-      setPendingYear(work.year)
-      setPendingSummary(work.summary)
-      setPendingCitationInfo(work.citation_information)
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
       console.error(error)
@@ -151,7 +156,7 @@ function Work(props: any) {
         }
       }, 0)
     }
-  }, [edit, pendingSummary])
+  }, [edit, pending.summary])
 
   const getListOfNotes = async (_index: any, page: number) => {
     var notesResponse
@@ -168,7 +173,7 @@ function Work(props: any) {
   }
 
   const deleteWork = async () => {
-    if (!confirm(`Do you want to permanently delete '${pendingWorkTitle}'?`)) {
+    if (!confirm(`Do you want to permanently delete '${pending.name}'?`)) {
       return
     }
 
@@ -176,21 +181,8 @@ function Work(props: any) {
     navigate('/')
   }
 
-  const handleAcceptUpdates = async () => {
-    var updateObject = {
-      authors: pendingAuthors.map((a) => a._id).filter(Boolean),
-      year: pendingYear,
-      url: pendingUrl,
-      name: pendingWorkTitle,
-      summary: pendingSummary,
-      citation_information: pendingCitationInfo,
-    }
-
-    await saveAndExitEdit(
-      () => db.updateRecord(db.types.work, id, updateObject),
-      setEdit
-    )
-  }
+  const handleAcceptUpdates = () =>
+    editor.save((v) => ({ ...v, authors: v.authors.map((a) => a._id).filter(Boolean) }))
 
   const handleImport = async () => {
     let importText = pendingImportText
@@ -215,8 +207,9 @@ function Work(props: any) {
     )
   }
 
+  // Leaves any edit mode; an unsaved edit of the work's fields is dropped.
   const handleFinishEditing = async () => {
-    setEdit(false)
+    editor.cancel()
     setEditPiles(false)
     setEditIdeas(false)
   }
@@ -296,7 +289,7 @@ function Work(props: any) {
     togglePinned({
       type: 'work',
       id,
-      label: pendingWorkTitle,
+      label: pending.name,
       href: `/work/${id}`,
     })
   }
@@ -320,7 +313,7 @@ function Work(props: any) {
     onToggleStar: toggleStar,
   })
 
-  props.setPageTitle(titleWithNick(pendingWorkTitle, nick))
+  props.setPageTitle(titleWithNick(pending.name, nick))
 
   return (
     <>
@@ -330,15 +323,15 @@ function Work(props: any) {
             name="Title"
             id="title"
             autoFocus
-            defaultValue={pendingWorkTitle}
+            defaultValue={pending.name}
             onChange={(e: any) => {
-              setPendingWorkTitle(e.target.value)
+              editor.set('name', e.target.value)
             }}
           />
           <label htmlFor="add-author" className="top-level form-label">Authors</label>
           <AuthorsChipList
-            value={pendingAuthors}
-            onChange={setPendingAuthors}
+            value={pending.authors}
+            onChange={(authors) => editor.set('authors', authors)}
             onExit={handleFinishEditing}
             inputId="add-author"
             dontAutofocus
@@ -346,34 +339,34 @@ function Work(props: any) {
           <TopLevelFormInput
             name="Citation Information"
             id="citation-info"
-            defaultValue={pendingCitationInfo}
+            defaultValue={pending.citation_information}
             onChange={(e: any) => {
-              setPendingCitationInfo(e.target.value)
+              editor.set('citation_information', e.target.value)
             }}
           />
           {/* TODO: Create a mode for smaller input */}
           <TopLevelFormInput
             name="URL"
             id="url"
-            defaultValue={pendingUrl}
+            defaultValue={pending.url}
             onChange={(e: any) => {
-              setPendingUrl(e.target.value)
+              editor.set('url', e.target.value)
             }}
           />
           <TopLevelFormInput
             name="Year"
             id="year"
-            defaultValue={pendingYear}
+            defaultValue={pending.year}
             onChange={(e: any) => {
-              setPendingYear(e.target.value)
+              editor.set('year', e.target.value)
             }}
           />
           <TopLevelFormTextArea
             name="Summary"
             id="summary"
-            value={pendingSummary}
+            value={pending.summary}
             onChange={(e: any) => {
-              setPendingSummary(e.target.value)
+              editor.set('summary', e.target.value)
               autosize(document.querySelector('#summary') as HTMLElement)
             }}
           />
@@ -384,15 +377,15 @@ function Work(props: any) {
             <div className="entity-page-header-left">
               <div className="entity-page-title">
                 <WorkCitationSpan
-                  workTitle={pendingWorkTitle}
+                  workTitle={pending.name}
                   workID={null}
-                  spaceAfter={pendingYear || pendingUrl}
+                  spaceAfter={pending.year || pending.url}
                 />
-                <YearUrlComboSpan year={pendingYear} url={pendingUrl} />
+                <YearUrlComboSpan year={pending.year} url={pending.url} />
               </div>
-              {pendingAuthors.length > 0 && (
+              {pending.authors.length > 0 && (
                 <div className="entity-page-byline">
-                  <WorkCitationSpan authors={pendingAuthors} />
+                  <WorkCitationSpan authors={pending.authors} />
                 </div>
               )}
               {nick && (
@@ -453,7 +446,7 @@ function Work(props: any) {
                     <TopLevelStarButton
                       type="work"
                       id={id}
-                      label={pendingWorkTitle}
+                      label={pending.name}
                       href={`/work/${id}`}
                     />
                     <TopLevelStandardButton
@@ -537,17 +530,17 @@ function Work(props: any) {
               )}
             </div>
           </div>
-          {(pendingCitationInfo || pendingSummary) && (
+          {(pending.citation_information || pending.summary) && (
             <details className="work-summary-collapse">
               <summary>Summary</summary>
               <div className="work-summary-content">
-                {pendingCitationInfo}
-                {pendingCitationInfo && pendingSummary && <br />}
-                {pendingCitationInfo && pendingSummary && <br />}
+                {pending.citation_information}
+                {pending.citation_information && pending.summary && <br />}
+                {pending.citation_information && pending.summary && <br />}
                 <div
                   className="work-summary"
                   dangerouslySetInnerHTML={{
-                    __html: processHtmlForNicks(renderMarkdown(pendingSummary)),
+                    __html: processHtmlForNicks(renderMarkdown(pending.summary)),
                   }}
                 />
               </div>
