@@ -31,6 +31,9 @@ function Author(props: any) {
   // Notes the server holds beyond the first page fetched below; when
   // non-zero the list here is incomplete and we link to the paged view.
   const [unfetchedNoteCount, setUnfetchedNoteCount] = useState(0)
+  // Notes about this person, as opposed to by them (#246).
+  const [notesAbout, setNotesAbout] = useState<any[]>([])
+  const [notesAboutTotal, setNotesAboutTotal] = useState(0)
   const navigate = useNavigate()
 
   const fetchAuthorInfo = (id: any) => {
@@ -82,6 +85,19 @@ function Author(props: any) {
   useEffect(() => {
     fetchAuthorInfo(id)
     fetchAuthorWorks(id)
+  }, [id])
+
+  useEffect(() => {
+    let cancelled = false
+    db.getNotesAboutAuthor(id)
+      .then((response: any) => {
+        if (cancelled) return
+        const notes = response?.data?.data ?? []
+        setNotesAbout(notes)
+        setNotesAboutTotal(db.notePageTotal(response) ?? notes.length)
+      })
+      .catch((err: any) => console.error(err))
+    return () => { cancelled = true }
   }, [id])
 
   const handleAcceptUpdates = async () => {
@@ -213,6 +229,19 @@ function Author(props: any) {
       {authorOnlyNotes.map((note: any) => (
         <NoteResult note={note} key={'auth-note-' + note._id} />
       ))}
+      {notesAbout.length > 0 ? (
+        <>
+          <div className="entity-page-section-heading">
+            Notes about {pendingName}
+            {notesAboutTotal > notesAbout.length
+              ? ` (showing ${notesAbout.length.toLocaleString()} of ${notesAboutTotal.toLocaleString()})`
+              : ''}
+          </div>
+          {notesAbout.map((note: any) => (
+            <NoteResult note={note} key={'about-note-' + note._id} />
+          ))}
+        </>
+      ) : null}
       {unfetchedNoteCount > 0 ? (
         <div className="search-empty-state">
           {unfetchedNoteCount.toLocaleString()} more notes not shown.{' '}

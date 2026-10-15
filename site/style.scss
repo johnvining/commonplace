@@ -2096,6 +2096,17 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+// Heading over a secondary list on an entity page, styled like the
+// sidebar's section titles.
+.entity-page-section-heading {
+  font-size: var(--font-size-sm);
+  font-family: $sans_font;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: $grey3;
+  margin: 16px 0 8px;
+}
+
 // Collapsible summary block below the header. Starts collapsed; opens
 // on click. Uses native <details>/<summary> so it's accessible.
 .work-summary-collapse {

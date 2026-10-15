@@ -2717,6 +2717,15 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+.entity-page-section-heading {
+  font-size: var(--font-size-sm);
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: darkgray;
+  margin: 16px 0 8px;
+}
+
 .work-summary-collapse {
   margin: 0 0 12px 0;
   border: 1px solid var(--note-border);

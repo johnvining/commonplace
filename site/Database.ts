@@ -123,6 +123,11 @@ export async function getNotesPageForEntity(
   })
 }
 
+// Notes about a person (an author), as opposed to notes by them.
+export async function getNotesAboutAuthor(authorId: string) {
+  return axios.get(url_api + 'auth/' + authorId + '/notes-about')
+}
+
 // All notes for an author, including notes on their works
 export async function getAllNotesForAuthor(authorId: string, page: number = 1) {
   return axios.get(url_api + 'auth/' + authorId + '/all-notes', {
