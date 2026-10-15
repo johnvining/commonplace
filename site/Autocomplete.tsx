@@ -147,20 +147,23 @@ class Autocomplete extends React.Component<any, any> {
   }
 
   handleTextUpdate = () => {
+    // Ignore surrounding spaces: in the search bar, "auth john" leaves
+    // " john" in this input, which matched nothing.
+    const query = (this.state.currentTypedText ?? '').trim()
     if (!this.state.currentTypedText) {
       if (this.props.onClearText) this.props.onClearText()
       return
-    } else if (this.state.currentTypedText.length < 3) {
+    } else if (query.length < 3) {
       this.setState({ responses: [] })
       return
     }
     this.props
-      .getSuggestions(this.props.apiType, this.state.currentTypedText)
+      .getSuggestions(this.props.apiType, query)
       .then((response: any) => {
         let options = response.data.data
         let hasExact = false
         for (let i = 0; i < options.length; i++) {
-          if (this.state.currentTypedText == options[i].name) {
+          if (query == options[i].name) {
             hasExact = true
             break
           }
@@ -246,7 +249,7 @@ class Autocomplete extends React.Component<any, any> {
   }
 
   handleNewSelect = () => {
-    this.props.handleNewSelect(this.state.currentTypedText)
+    this.props.handleNewSelect((this.state.currentTypedText ?? '').trim())
     this.setState({ hideResults: true })
     if (this.props.clearOnSelect) {
       ;(document.getElementById(this.props.inputName) as HTMLInputElement).value = ''
