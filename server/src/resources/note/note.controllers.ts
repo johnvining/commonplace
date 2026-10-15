@@ -238,20 +238,24 @@ export const reqUpdateNote = async (req: Request, res: Response) => {
     await inferWorkUrl(updated.work, url)
   }
 
-  if (updated) {
-    embedNoteIfStale(updated)
-      .then(async (embeddingUpdate) => {
-        if (embeddingUpdate) {
-          await Note.findByIdAndUpdate(req.params.id, embeddingUpdate)
-          upsertEmbedding(req.params.id, embeddingUpdate.embedding)
-        }
-      })
-      .catch((err) => console.error('[embed] error for note', req.params.id, err))
-  }
+  if (updated) reembedInBackground(req.params.id, updated)
 
   return updated
 }
 
+
+// Refresh a note's search embedding after its content changed, without
+// holding up the response.
+function reembedInBackground(noteId: string, note: Parameters<typeof embedNoteIfStale>[0]) {
+  embedNoteIfStale(note)
+    .then(async (embeddingUpdate) => {
+      if (embeddingUpdate) {
+        await Note.findByIdAndUpdate(noteId, embeddingUpdate)
+        upsertEmbedding(noteId, embeddingUpdate.embedding)
+      }
+    })
+    .catch((err) => console.error('[embed] error for note', noteId, err))
+}
 
 // TODO: Create specific file for note.image.controllers
 export const reqAddImageToNote = async (req: Request, res: Response) => {
