@@ -1,5 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import { titleWithNick } from './utils'
 import * as constants from './constants'
 import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
@@ -319,7 +320,7 @@ function Work(props: any) {
     onToggleStar: toggleStar,
   })
 
-  props.setPageTitle(pendingWorkTitle)
+  props.setPageTitle(titleWithNick(pendingWorkTitle, nick))
 
   return (
     <>

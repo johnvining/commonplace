@@ -16,3 +16,15 @@ export function guessYearFromURL(url: string | undefined): number | null {
   if (val < 1900 || val > new Date().getFullYear() + 1) return null
   return val
 }
+
+// Browser tab title with the nick first ("n12345 — My note"), so tabs,
+// history and bookmarks can be found by nick (#318).
+export function titleWithNick(title: string, nick?: string | null): string {
+  return nick ? `${nick} — ${title}` : title
+}
+
+// Tab title for a note: its title, else its text, else "Untitled Note".
+export function notePageTitle(note: { title?: string; text?: string; nick?: string | null }): string {
+  const label = note.title || note.text || 'Untitled Note'
+  return titleWithNick(label, note.nick)
+}

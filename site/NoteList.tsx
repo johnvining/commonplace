@@ -5,6 +5,7 @@ import NoteGrid from './NoteGrid'
 import NoteTile from './NoteTile'
 import NoteResult from './NoteResult'
 import * as db from './Database'
+import { notePageTitle } from './utils'
 import Autocomplete from './Autocomplete'
 import * as constants from './constants'
 import { joinAuthorNames, authorsWithWorkFallback } from './authorsDisplay'
@@ -216,7 +217,7 @@ class NoteList extends React.Component<any, any> {
     this.setState({ notes: notes })
 
     if (this.props.fromNoteView) {
-      this.props.setPageTitle(notes[0].title)
+      this.props.setPageTitle(notePageTitle(notes[0]))
     }
   }
 

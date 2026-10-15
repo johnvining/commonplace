@@ -1,5 +1,6 @@
 import * as constants from './constants'
 import * as db from './Database'
+import { notePageTitle } from './utils'
 import NoteList from './NoteList'
 import { useParams } from 'react-router-dom'
 
@@ -35,13 +36,7 @@ function NoteView(props: any) {
     const note = notesResponse?.data?.data?.[0]
     if (!note) return notesResponse
 
-    if (note.title) {
-      props.setPageTitle(note.title)
-    } else if (note.text) {
-      props.setPageTitle(note.text)
-    } else {
-      props.setPageTitle('Untitled Note')
-    }
+    props.setPageTitle(notePageTitle(note))
 
     return notesResponse
   }

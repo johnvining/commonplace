@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as constants from './constants'
 import * as db from './Database'
+import { titleWithNick } from './utils'
 import NoteList from './NoteList'
 import WorkList from './WorkList'
 import YearSpan from './YearSpan'
@@ -135,7 +136,7 @@ function Pile(props: any) {
     onToggleStar: toggleStar,
   })
 
-  props.setPageTitle(pendingName)
+  props.setPageTitle(titleWithNick(pendingName, nick))
   return (
     <div>
       {/* Header and Edit */}

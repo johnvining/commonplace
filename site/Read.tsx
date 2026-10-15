@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import { titleWithNick } from './utils'
 import { useState, useEffect } from 'react'
 import YearUrlComboSpan from './YearUrlComboSpan'
 import * as constants from './constants'
@@ -92,7 +93,7 @@ function Read(props: any) {
     onNewNote: createNoteForWork,
   })
 
-  props.setPageTitle(workTitle)
+  props.setPageTitle(titleWithNick(workTitle, nick))
 
   return (
     <>

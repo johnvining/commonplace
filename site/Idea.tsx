@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import { titleWithNick } from './utils'
 import * as constants from './constants'
 import NoteList from './NoteList'
 import WorkList from './WorkList'
@@ -124,7 +125,7 @@ function Idea(props: any) {
     onToggleStar: toggleStar,
   })
 
-  props.setPageTitle(pendingName)
+  props.setPageTitle(titleWithNick(pendingName, nick))
 
   return (
     <div>
