@@ -2185,3 +2185,47 @@ mark.search-highlight {
   margin-right: 4px;
   vertical-align: middle;
 }
+// Maintenance page (one-off data fixes after an update).
+.maintenance-task {
+  border: 1px solid $note_border;
+  border-radius: 4px;
+  background: $note_background;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.maintenance-task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.maintenance-task-title {
+  font-size: var(--font-size-lg);
+}
+
+.maintenance-task-status {
+  font-size: var(--font-size-sm);
+  opacity: 0.6;
+}
+
+.maintenance-task-description {
+  margin-top: 8px;
+}
+
+.maintenance-output {
+  margin-top: 8px;
+  max-height: 300px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: var(--font-size-sm);
+}
+
+.sidebar-maintenance {
+  font-size: var(--font-size-sm);
+  font-family: $sans_font;
+  color: $font_color;
+  text-decoration: underline;
+}

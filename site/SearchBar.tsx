@@ -83,7 +83,7 @@ function SearchBar(props: any) {
     // Direct navigation commands
     if (
       !currentModifier &&
-      [constants.modifiers.flip, constants.modifiers.file, constants.modifiers.home, constants.modifiers.load].includes(currentText)
+      [constants.modifiers.flip, constants.modifiers.file, constants.modifiers.home, constants.modifiers.load, constants.modifiers.maintenance].includes(currentText)
     ) {
       let destination = currentText
       if (currentText === constants.modifiers.home) {

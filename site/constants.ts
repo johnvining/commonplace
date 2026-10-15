@@ -40,6 +40,7 @@ export const modifiers = {
   tile: 'tile',
   load: 'load',
   read: 'read',
+  maintenance: 'maintenance',
 }
 
 export const keyCodes = {

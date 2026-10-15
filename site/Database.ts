@@ -291,6 +291,18 @@ export async function bulkOcrForNotes(noteIds: string[]) {
   return axios.post(url_api + 'note/bulk-ocr', data)
 }
 
+export async function getMaintenanceTasks() {
+  return axios.get(url_api + 'maintenance/')
+}
+
+export async function startMaintenanceTask(taskId: string, dryRun: boolean) {
+  return axios.post(url_api + 'maintenance/' + taskId + '/run', { dryRun })
+}
+
+export async function getMaintenanceJob(jobId: string) {
+  return axios.get(url_api + 'maintenance/jobs/' + jobId)
+}
+
 export async function getStats() {
   return axios.get(url_api + 'stats')
 }

@@ -2796,4 +2796,48 @@ mark.search-highlight {
   vertical-align: middle;
 }
 
+.maintenance-task {
+  border: 1px solid var(--note-border);
+  border-radius: 4px;
+  background: var(--note-background);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.maintenance-task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.maintenance-task-title {
+  font-size: var(--font-size-lg);
+}
+
+.maintenance-task-status {
+  font-size: var(--font-size-sm);
+  opacity: 0.6;
+}
+
+.maintenance-task-description {
+  margin-top: 8px;
+}
+
+.maintenance-output {
+  margin-top: 8px;
+  max-height: 300px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-size: var(--font-size-sm);
+}
+
+.sidebar-maintenance {
+  font-size: var(--font-size-sm);
+  font-family: "Avenir", "Candara", "Arial", sans-serif;
+  color: var(--font-color);
+  text-decoration: underline;
+}
+
 /*# sourceMappingURL=style.css.map */

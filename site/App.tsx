@@ -50,6 +50,7 @@ import HelpOverlay from './HelpOverlay'
 // Route-specific components — lazy-loaded so they don't bloat the initial bundle
 const Author      = React.lazy(() => import('./Author'))
 const AuthorNotes = React.lazy(() => import('./AuthorNotes'))
+const Maintenance = React.lazy(() => import('./Maintenance'))
 const FileList    = React.lazy(() => import('./FileList'))
 const FlipList    = React.lazy(() => import('./FlipList'))
 const Find        = React.lazy(() => import('./Find'))
@@ -249,6 +250,10 @@ class App extends React.Component<any, any> {
               <Route
                 path="/load"
                 element={<Load setPageTitle={this.setPageTitle.bind(this)} />}
+              />
+              <Route
+                path="/maintenance"
+                element={<Maintenance setPageTitle={this.setPageTitle.bind(this)} />}
               />
               <Route
                 path="/find/:search"

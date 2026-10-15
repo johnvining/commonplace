@@ -30,6 +30,13 @@ function Sidebar() {
   const [recentPiles, setRecentPiles] = useState<any[]>(cached?.piles || [])
   const [pinnedItems, setPinnedItems] = useState<import('./pinned').PinnedItem[]>([])
   const [loading, setLoading] = useState(!cached)
+  // Maintenance tasks still to run after an update.
+  const [pendingTasks, setPendingTasks] = useState(0)
+  useEffect(() => {
+    db.getMaintenanceTasks()
+      .then((res: any) => setPendingTasks(res.data.data.filter((t: any) => t.pending).length))
+      .catch(() => {})
+  }, [])
   useEffect(() => {
     let isMounted = true
 
@@ -90,6 +97,13 @@ function Sidebar() {
 
   return (
     <aside className="sidebar">
+      {pendingTasks > 0 ? (
+        <div className="sidebar-section">
+          <Link to="/maintenance" className="sidebar-maintenance">
+            {pendingTasks} maintenance {pendingTasks === 1 ? 'task' : 'tasks'} to run
+          </Link>
+        </div>
+      ) : null}
       <div className="sidebar-section">
         <div className="sidebar-title">Starred Items</div>
         {pinnedItems.length ? (
