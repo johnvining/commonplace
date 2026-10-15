@@ -8,12 +8,14 @@ import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { useEntityEditor } from './useEntityEditor'
+import EntityOverview from './EntityOverview'
+import autosize from 'autosize'
 import ClickToCopyNick from './ClickToCopyNick'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
-import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
+import { TopLevelFormInput, TopLevelFormContainer, TopLevelFormTextArea } from './TopLevelFormItems'
 import {
   TopLevelSubTitle,
   TopLevelTitle,
@@ -28,6 +30,7 @@ function Pile(props: any) {
     name: '',
     start_year: '' as number | string,
     end_year: '' as number | string,
+    text: '',
   })
   const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [nick, setNick] = useState('')
@@ -43,6 +46,7 @@ function Pile(props: any) {
         name: pile.name,
         start_year: pile.start_year ?? '',
         end_year: pile.end_year ?? '',
+        text: pile.text ?? '',
       })
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
@@ -161,6 +165,15 @@ function Pile(props: any) {
                 editor.set('end_year', e.target.value)
               }}
             />
+            <TopLevelFormTextArea
+              name="Overview"
+              id="overview"
+              value={pending.text}
+              onChange={(e: any) => {
+                editor.set('text', e.target.value)
+                autosize(document.querySelector('#overview') as HTMLElement)
+              }}
+            />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
@@ -219,6 +232,7 @@ function Pile(props: any) {
         )}
       </div>
 
+      {edit ? null : <EntityOverview text={pending.text} />}
       {/* Note and Work List */}
       {props.showNotes ? (
         <NoteList

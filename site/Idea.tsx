@@ -10,7 +10,7 @@ import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
-import { TopLevelFormContainer, TopLevelFormInput } from './TopLevelFormItems'
+import { TopLevelFormContainer, TopLevelFormInput, TopLevelFormTextArea } from './TopLevelFormItems'
 import {
   TopLevelSubTitle,
   TopLevelTitle,
@@ -21,6 +21,8 @@ import { TopLevelStarButton } from './PinButton'
 import ClickToCopyNick from './ClickToCopyNick'
 import { togglePinned } from './pinned'
 import { useEntityEditor } from './useEntityEditor'
+import EntityOverview from './EntityOverview'
+import autosize from 'autosize'
 
 function Idea(props: any) {
   const { id = '' } = useParams()
@@ -29,6 +31,7 @@ function Idea(props: any) {
     start_year: '' as number | string,
     end_year: '' as number | string,
     person: false,
+    text: '',
   })
   const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [nick, setNick] = useState('')
@@ -45,6 +48,7 @@ function Idea(props: any) {
         start_year: idea.start_year ?? '',
         end_year: idea.end_year ?? '',
         person: Boolean(idea.person),
+        text: idea.text ?? '',
       })
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
@@ -158,6 +162,15 @@ function Idea(props: any) {
               />{' '}
               This idea is a person
             </label>
+            <TopLevelFormTextArea
+              name="Overview"
+              id="overview"
+              value={pending.text}
+              onChange={(e: any) => {
+                editor.set('text', e.target.value)
+                autosize(document.querySelector('#overview') as HTMLElement)
+              }}
+            />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
@@ -200,6 +213,7 @@ function Idea(props: any) {
         )}
       </div>
 
+      {edit ? null : <EntityOverview text={pending.text} />}
       <WorkList
         key={'ideaWorks' + id}
         getListOfWorks={() => db.getRecordsWithFilter(db.types.work, db.types.idea, id)}
