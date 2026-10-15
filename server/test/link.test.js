@@ -8,6 +8,27 @@ async function nickFor(agent, noteId) {
 
 describe('link', () => {
   describe('PUT /api/link/ (create link)', () => {
+    it('creates a link between two notes by their IDs without requiring nicks', async () => {
+      const agent = await authedAgent()
+      const a = await createNote(agent, { title: 'A' })
+      const b = await createNote(agent, { title: 'B' })
+      const res = await agent
+        .put('/api/link/')
+        .send({ fromId: String(a._id), toId: String(b._id) })
+        .expect(200)
+      expect(String(res.body.data.left_note)).toBe(String(a._id))
+      expect(String(res.body.data.right_note)).toBe(String(b._id))
+    })
+
+    it('returns a useful error for malformed note IDs', async () => {
+      const agent = await authedAgent()
+      const res = await agent
+        .put('/api/link/')
+        .send({ fromId: 'not-an-id', toId: '507f1f77bcf86cd799439011' })
+        .expect(400)
+      expect(res.body.message).toBe('Invalid fromId')
+    })
+
     it('creates a link between two notes by their nicks', async () => {
       const agent = await authedAgent()
       const a = await createNote(agent, { title: 'A' })
