@@ -28,6 +28,7 @@ class ResultWork extends React.Component<any, any> {
             <div>
               {work.authors?.length ? <>{joinAuthorNames(work.authors)},&nbsp;</> : null}
               <em>{work.name}</em>
+              {work.original_name ? <span className="work-original-name"> ({work.original_name})</span> : null}
               {work.year ? <span className="date">{work.year}</span> : null}
             </div>
               <PinButton

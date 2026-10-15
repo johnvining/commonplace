@@ -43,6 +43,7 @@ function Work(props: any) {
   // TODO: Create pending object
   const editor = useEntityEditor(db.types.work, id, {
     name: '',
+    original_name: '',
     url: '',
     year: '' as number | string,
     // Edited as author records; sent as ids.
@@ -111,6 +112,7 @@ function Work(props: any) {
       const work = infoResponse.data.data
       editor.load({
         name: work.name,
+        original_name: work.original_name ?? '',
         url: work.url ?? '',
         year: work.year ?? '',
         authors: Array.isArray(work.authors) ? work.authors : [],
@@ -328,6 +330,14 @@ function Work(props: any) {
               editor.set('name', e.target.value)
             }}
           />
+          <TopLevelFormInput
+            name="Original title (if Title is a translation)"
+            id="originalTitle"
+            defaultValue={pending.original_name}
+            onChange={(e: any) => {
+              editor.set('original_name', e.target.value)
+            }}
+          />
           <label htmlFor="add-author" className="top-level form-label">Authors</label>
           <AuthorsChipList
             value={pending.authors}
@@ -383,6 +393,11 @@ function Work(props: any) {
                 />
                 <YearUrlComboSpan year={pending.year} url={pending.url} />
               </div>
+              {pending.original_name && (
+                <div className="entity-page-byline work-original-name">
+                  {pending.original_name}
+                </div>
+              )}
               {pending.authors.length > 0 && (
                 <div className="entity-page-byline">
                   <WorkCitationSpan authors={pending.authors} />

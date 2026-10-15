@@ -2098,6 +2098,13 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+// A work's title in its original language, after or under the title it
+// was read in (#221).
+.work-original-name {
+  font-style: italic;
+  opacity: 0.7;
+}
+
 // Stand-in text for a search result with no title or text.
 .result-box-placeholder {
   font-style: italic;

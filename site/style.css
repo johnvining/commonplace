@@ -2725,6 +2725,11 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+.work-original-name {
+  font-style: italic;
+  opacity: 0.7;
+}
+
 .result-box-placeholder {
   font-style: italic;
   opacity: 0.6;
