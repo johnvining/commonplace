@@ -329,6 +329,7 @@ function Work(props: any) {
           <TopLevelFormInput
             name="Title"
             id="title"
+            autoFocus
             defaultValue={pendingWorkTitle}
             onChange={(e: any) => {
               setPendingWorkTitle(e.target.value)

@@ -12,6 +12,7 @@ export function TopLevelFormInput(props: any) {
         defaultValue={props.defaultValue}
         onChange={props.onChange}
         type={props.type}
+        autoFocus={props.autoFocus}
       />
     </>
   )

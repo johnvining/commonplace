@@ -141,6 +141,7 @@ function Author(props: any) {
             <TopLevelFormInput
               id="name"
               name="Name"
+              autoFocus
               defaultValue={pendingName}
               onChange={(e: any) => {
                 setPendingName(e.target.value)

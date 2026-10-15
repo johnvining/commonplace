@@ -146,6 +146,7 @@ function Pile(props: any) {
             <TopLevelFormInput
               name="Name"
               id="title"
+              autoFocus
               defaultValue={pendingName}
               onChange={(e: any) => {
                 setPendingName(e.target.value)
