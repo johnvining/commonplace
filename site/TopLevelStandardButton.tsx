@@ -28,6 +28,9 @@ export function TopLevelStandardButton(props: any) {
       onClick={props.onClick}
       style={{ userSelect: 'none' }} // Avoids accidentally clicking button text when selecting other text
       type={props.type}
+      // For icon-only buttons: accessible name and tooltip.
+      aria-label={props.label}
+      title={props.label}
     >
       {props.name ?? props.children}
     </button>

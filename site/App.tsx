@@ -44,6 +44,7 @@ import RecentList from './RecentList'
 import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
 import Stats from './Stats'
+import { TopLevelStandardButton } from './TopLevelStandardButton'
 import ViewSelector from './ViewSelector'
 import HelpOverlay from './HelpOverlay'
 
@@ -147,36 +148,36 @@ class App extends React.Component<any, any> {
           </div>
           <div className="top-action-bar">
             <div className="tool-bar div">
-              <button
-                className="button left-right"
-                onClick={async () => {
+              <TopLevelStandardButton
+                label="Search (Ctrl-O)"
+                onClick={() => {
                   this.setState({ barOpen: true })
                 }}
               >
-                <img src={search} />
-              </button>
+                <img src={search} alt="" />
+              </TopLevelStandardButton>
             </div>
             <div className="tool-bar div">
-              <button
-                className="button left-right"
-                onClick={async () => {
+              <TopLevelStandardButton
+                label="Home"
+                onClick={() => {
                   window.location.href = '/'
                 }}
               >
-                <img src={home_door} />
-              </button>
+                <img src={home_door} alt="" />
+              </TopLevelStandardButton>
             </div>
             <div className="tool-bar div">
-              <button
-                className="button left-right"
+              <TopLevelStandardButton
+                label="New note"
                 onClick={async () => {
                   const response = await createNewNoteFromTitle('')
                   window.location.href =
                     '/note/' + response.data._id + '/edit'
                 }}
               >
-                <img src={plus} />
-              </button>
+                <img src={plus} alt="" />
+              </TopLevelStandardButton>
             </div>
             <div className="tool-bar div">
               <ViewSelector
