@@ -99,6 +99,6 @@ router
   .route('/:id')
   .get(asyncWrapper(reqGetNoteDetails, 200))
   .put(asyncWrapper(reqUpdateNote, 200))
-  .delete(reqDeleteNote)
+  .delete(requireObjectIdParam('id'), asyncWrapper(reqDeleteNote, 200))
 
 export default router

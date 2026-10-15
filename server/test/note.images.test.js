@@ -94,4 +94,11 @@ describe('note images', () => {
         .expect(400)
     })
   })
+
+  describe('DELETE /api/note/:id', () => {
+    it('rejects ids that are not ObjectIds', async () => {
+      const agent = await authedAgent()
+      await agent.delete('/api/note/not-an-id').expect(400)
+    })
+  })
 })
