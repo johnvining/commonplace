@@ -11,7 +11,7 @@ export interface IdeaDoc {
 
 const ideaSchema = new Schema<IdeaDoc>(
   {
-    name: String,
+    name: { type: String, required: true, trim: true },
     start_year: Number,
     end_year: Number,
   },

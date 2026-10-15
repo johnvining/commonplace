@@ -12,7 +12,7 @@ export interface AuthDoc {
 
 const authSchema = new Schema<AuthDoc>(
   {
-    name: String,
+    name: { type: String, required: true, trim: true },
     birth_year: Number,
     death_year: Number,
     usernames: [{ type: String }],

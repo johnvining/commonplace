@@ -15,7 +15,7 @@ export interface WorkDoc {
 
 const workSchema = new Schema<WorkDoc>(
   {
-    name: String,
+    name: { type: String, required: true, trim: true },
     authors: [{ type: Schema.Types.ObjectId, ref: 'author' }],
     url: String,
     year: Number,

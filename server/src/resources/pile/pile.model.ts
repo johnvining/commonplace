@@ -11,7 +11,7 @@ export interface PileDoc {
 
 const pileSchema = new Schema<PileDoc>(
   {
-    name: String,
+    name: { type: String, required: true, trim: true },
     start_year: Number,
     end_year: Number,
   },
