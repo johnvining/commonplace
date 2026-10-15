@@ -72,7 +72,12 @@ class NoteList extends React.Component<any, any> {
           return
         }
 
-        if (this.props.fromNoteView) {
+        // A note on its own page, or the only note in a list, starts
+        // selected so note shortcuts (Ctrl-E, ...) work right away (#310).
+        const onlyNote =
+          this.state.notes.length === 1 &&
+          this.props.viewMode == constants.view_modes.FULL
+        if (this.props.fromNoteView || onlyNote) {
           this.setNoteMode(firstNoteId, constants.note_modes.SELECTED)
         }
       }

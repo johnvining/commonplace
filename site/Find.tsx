@@ -116,6 +116,17 @@ function Find(props: any) {
   const { search = '', category } = useParams()
   const [results, setResults] = React.useState<any>(null)
   const [page, setPage] = React.useState(1)
+  const resultsRef = React.useRef<HTMLDivElement>(null)
+
+  // Start keyboard work on the first result when results arrive or the
+  // page changes (#310).
+  React.useEffect(() => {
+    if (!results?.length) return
+    const id = requestAnimationFrame(() => {
+      resultsRef.current?.querySelector<HTMLElement>('a[href]')?.focus()
+    })
+    return () => cancelAnimationFrame(id)
+  }, [results, page])
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -216,9 +227,11 @@ function Find(props: any) {
         <div className="search-no-results">No results for "{search}"</div>
       ) : (
         <>
-          {pageItems.map((entry: any) => (
-            <UnifiedResult key={entry.type + '-' + String(entry.item._id)} entry={entry} query={search} />
-          ))}
+          <div ref={resultsRef}>
+            {pageItems.map((entry: any) => (
+              <UnifiedResult key={entry.type + '-' + String(entry.item._id)} entry={entry} query={search} />
+            ))}
+          </div>
 
           {totalPages > 1 && (
             <TopLevelStandardButtonContainer>

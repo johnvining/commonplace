@@ -81,7 +81,7 @@ class NoteResult extends React.PureComponent<any> {
     }
 
     return (
-      <Link to={`/note/${note._id}`} key={'note-list-' + note._id}>
+      <Link to={`/note/${note._id}`} key={'note-list-' + note._id} data-note-id={note._id}>
         <div className="result-box">
           <div className="result-box header">
             <img src={note_img} />
