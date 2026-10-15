@@ -12,25 +12,15 @@
 
 Triaged on review of all 46 open issues. Listed by number, low-hanging fruit only — larger features (timeline #187, mobile styling #108, AI features #329/#330, merge auth+ideas #313, kindle import #64, etc.) are out of scope for this list.
 
-- **#102 — Fix year regex in Safari.** Probably a lookbehind/lookahead used in `guessYearFromUrl` that Safari's older versions don't support. Test in Safari and rewrite with simpler grouping if needed.
 - **#233 — Consolidate update framework on auth/pile/work/idea.** Each entity has its own `handleAcceptUpdates` + pending state. Extract a shared helper (`useEntityEditState<T>(entity, writableFields)`) so the four pages stop drifting apart.
-- **#255 — Show exact tag if it exists when too many results.** Autocomplete elsewhere returns top N matches; if the exact-typed string matches a real entity that fell off the list, surface it explicitly at the top.
 - **#298 / #302 — Standardize note-button component & move existing usages.** A lot of ad-hoc `<button className="...">` calls. Extract a `NoteButton` (matching the existing `TopLevelStandardButton` shape) and sweep call sites.
 - **#299 — Support uploading multiple images at once.** The existing `<ImageUploader allowMultiple={true} />` already handles this for the Work toolbar; some other call sites still pass `allowMultiple={false}`. Audit and flip where it makes sense.
 - **#304 — Disable password managers on fields.** Add `autoComplete="off"` (and arguably `data-1p-ignore` / `data-lpignore="true"`) on inputs that don't want autofill. Most notably the autocomplete pickers for ideas / piles / authors / works.
-- **#307 — Enter in search bar defaults to search.** Today Enter on the search bar selects the first autocomplete suggestion. If nothing's highlighted (or after Esc), Enter should run a search instead of doing nothing.
-- **#308 — Nick doesn't work for non-notes via URL.** `/n12345` resolves to a note nick, but `/w12345` / `/i12345` / `/p12345` don't have the same URL routing. Add routes that look up by nick prefix.
 - **#310 — Auto-focus first note in a list.** When a list mounts (or shrinks to one), focus should land on that note so keyboard nav works without an extra Tab. Currently focus stays on the search bar / nothing.
 - **#311 — Outline color when editing ideas/piles on note-full.** Change the note-full border to `$semantic_idea` (blue) when `edit_ideas` is active and `$semantic_pile` (purple) when `edit_piles` is. Visual signal of which mode you're in.
 - **#312 — Ctrl-E opens edit for work on the work page.** Wire `Ctrl-E` in the `ENTITY_PAGE` scope on Work.tsx to toggle the work editor — the keyboard hook (`useEntityKeyboardShortcuts`) already exists, just hook in.
-- **#314 — Search results show a snippet of the matched note.** Partially done: `NoteResult` already renders body/title snippets with highlight. Remaining: ensure all blank-bodied notes still show *something* (title, citation, ideas) rather than an empty result row.
-- **#315 — Show birth/death (auth) and start/end (idea) in autocomplete results.** The autocomplete dropdown row currently just shows the name. Append the years (`Tyler Cowen (b. 1962)` / `Cold War (1947–1991)`) for disambiguation.
-- **#318 — Put nick number in browser tab title.** `<title>` currently shows the note title. Append the nick (`n12345 — My Note`) so bookmark/tab search picks up the nick token.
-- **#322 — Remove trailing space from suggested OpenAI title.** One-line trim in `reqGetSuggestionForNoteTitle` (or wherever the OpenAI response is shaped). Probably `.trim()` after `.replace(/^["']|["']$/g, '')`.
-- **#325 — Sort linked notes by `updatedAt`.** Linked-notes list currently uses insertion order, so the order shifts every time you re-render. Add `sort({ updatedAt: -1 })` in the linked-notes fetch.
 - **#327 — Resolve Express callback TODO in server.ts.** There's a `// TODO: Callback function` next to the `app.all('*', reqAuthenticate)` line. The Express docs explain — likely just rewrite with the modern middleware signature.
 - **#328 — Remove unneeded ngrok React code.** Dead code from when ngrok was integrated client-side. Now ngrok is a separate docker-compose service — none of the React code paths should reference it. Grep for "ngrok" in `site/` and delete what's unused.
-- **#336 — Hide total notes status when the top bar shrinks.** Pure CSS — wrap the `9,007 notes 1,013 authors …` line in a `@media` query that `display: none`s it below some viewport width.
 
 ## Other open issues (larger / require design)
 
