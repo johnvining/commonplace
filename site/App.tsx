@@ -286,6 +286,17 @@ class App extends React.Component<any, any> {
                 path="/nick/:nick"
                 element={<NickView setPageTitle={this.setPageTitle.bind(this)} />}
               />
+              {/* Short nick URLs: /n123456, /w123456, /i123456, /p123456
+                  (#308). Static routes like /piles still win. */}
+              <Route
+                path="/:nick"
+                element={
+                  <NickView
+                    setPageTitle={this.setPageTitle.bind(this)}
+                    shortUrl
+                  />
+                }
+              />
               <Route
                 path="/note/:id/edit"
                 element={

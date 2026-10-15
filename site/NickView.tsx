@@ -2,17 +2,24 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 
+// Every nick is a type letter and six digits: n (note), w (work),
+// i (idea), p (pile).
+const NICK_PATTERN = /^[nwip]\d{6}$/
+
 function NickView(props: any) {
   const { nick } = useParams()
   const navigate = useNavigate()
   const { setPageTitle } = props
   const [error, setError] = useState(false)
+  // At /:nick any unknown one-segment URL lands here; only nick-shaped
+  // ones are looked up.
+  const notANick = props.shortUrl && !NICK_PATTERN.test(nick ?? '')
 
   useEffect(() => {
     let isMounted = true
 
     const resolveNick = async () => {
-      if (!nick) {
+      if (!nick || notANick) {
         return
       }
       if (setPageTitle) {
@@ -59,7 +66,11 @@ function NickView(props: any) {
     return () => {
       isMounted = false
     }
-  }, [nick, navigate, setPageTitle])
+  }, [nick, navigate, setPageTitle, notANick])
+
+  if (notANick) {
+    return <div>Page not found</div>
+  }
 
   if (error) {
     return <div>Nick not found</div>
