@@ -7,7 +7,7 @@ import { removePileFromWork } from '../work/work.controllers.js'
 import { deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { generateNick } from '../nick/nick.controllers.js'
-import { escapeRegexInput } from '../../utils/searchInput.js'
+import { escapeRegexInput, rankByName } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
@@ -57,9 +57,10 @@ export const reqDeletePile = async (req: Request, res: Response) => {
 }
 
 export const filePilesByString = async function (string: string, withCounts: boolean) {
-  const piles = await Pile.find({ name: new RegExp(escapeRegexInput(string), 'i') })
-    .lean()
-    .exec()
+  const piles = rankByName(
+    await Pile.find({ name: new RegExp(escapeRegexInput(string), 'i') }).lean().exec(),
+    string
+  )
   if (!withCounts || !piles.length) return piles
 
   // Was N+1: one countDocuments per matched pile for both Note and Work.

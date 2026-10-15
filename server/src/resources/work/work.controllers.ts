@@ -9,7 +9,7 @@ import { createIdea } from '../idea/idea.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
-import { escapeRegexInput } from '../../utils/searchInput.js'
+import { escapeRegexInput, rankByName } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
@@ -154,10 +154,13 @@ export const reqRemovePileFromWork = async (req: Request, res: Response) => {
 }
 
 export const findWorksByString = async function(string: string, withCounts = false) {
-  const works = await Work.find({ name: new RegExp(escapeRegexInput(string), 'i') })
-    .populate('authors')
-    .lean()
-    .exec()
+  const works = rankByName(
+    await Work.find({ name: new RegExp(escapeRegexInput(string), 'i') })
+      .populate('authors')
+      .lean()
+      .exec(),
+    string
+  )
   if (!withCounts || !works.length) return works
 
   const workIds = works.map(w => w._id)
