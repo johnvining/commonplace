@@ -21,6 +21,7 @@ import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../u
 import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
 import { sanitizeSearchInput, escapeRegexInput } from '../../utils/searchInput.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
+import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
 import type { Request, Response } from 'express'
 
 
@@ -291,11 +292,26 @@ export const reqAddImageToNote = async (req: Request, res: Response) => {
         .lean()
         .exec()
 
+      // Read the new image into the note's text (#331). The upload has
+      // already succeeded, so an OCR failure only gets logged.
+      let note = newNote
+      if (isOcrConfigured()) {
+        try {
+          const ocrNote = await autoOcrNote(req.params.id, [localPath])
+          if (ocrNote) {
+            note = ocrNote
+            reembedInBackground(req.params.id, ocrNote)
+          }
+        } catch (e) {
+          console.error('[auto-ocr] failed for note', req.params.id, e)
+        }
+      }
+
       res.send({
         status: true,
         message: 'File uploaded',
         data: {
-          newNote,
+          newNote: note,
         },
       })
     }
