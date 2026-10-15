@@ -3,7 +3,7 @@ import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
-import { escapeRegexInput, rankByName } from '../../utils/searchInput.js'
+import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
@@ -70,7 +70,7 @@ export const findAuthorByUrl = async function (url: string) {
 
 export const findAuthorsByString = async function (str: string, withCounts: boolean) {
   const authors = rankByName(
-    await Auth.find({ name: new RegExp(escapeRegexInput(str), 'i') }).lean().exec(),
+    await Auth.find(wordPrefixFilter('name', str)).lean().exec(),
     str
   )
   if (!withCounts || !authors.length) return authors

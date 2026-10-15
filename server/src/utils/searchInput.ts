@@ -28,3 +28,18 @@ export function rankByName<T extends { name?: string | null }>(docs: T[], query:
     .sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name))
     .map(({ doc }) => doc)
 }
+
+// Characters that can come right before a word in a name.
+const WORD_START = `(^|[\\s\\-–—/(\\[{"'“‘:,.;&])`
+
+// Mongo filter for name search (#297): every word typed must match the
+// start of a word in `field`. "all" no longer finds "Donald Hall"; "don
+// ha" does. The separators are listed rather than using \\p{L}, which
+// Mongo 4.4's regex engine doesn't handle reliably.
+export function wordPrefixFilter(field: string, query: unknown): Record<string, unknown> {
+  const words = sanitizeSearchInput(query).trim().split(/\s+/).filter(Boolean)
+  if (!words.length) return { [field]: { $in: [] } }
+  return {
+    $and: words.map((w) => ({ [field]: new RegExp(WORD_START + escapeRegexInput(w), 'i') })),
+  }
+}

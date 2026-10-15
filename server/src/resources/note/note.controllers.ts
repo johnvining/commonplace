@@ -19,7 +19,7 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
 import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
-import { sanitizeSearchInput, escapeRegexInput } from '../../utils/searchInput.js'
+import { sanitizeSearchInput, escapeRegexInput, wordPrefixFilter } from '../../utils/searchInput.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
 import type { Request, Response } from 'express'
@@ -764,14 +764,14 @@ export const reqUnifiedSearch = async (req: Request, res: Response) => {
   const limit = Number.isFinite(requested) && requested > 0 ? Math.min(requested, MAX_NOTES) : 50
   if (!query.trim()) return []
 
-  const regex = new RegExp(escapeRegexInput(query), 'i')
+  const byName = wordPrefixFilter('name', query)
 
   const [notes, authors, works, ideas, piles] = await Promise.all([
     hybridSearch(query, limit),
-    Auth.find({ name: regex }).lean().exec(),
-    Work.find({ name: regex }).populate('authors').lean().exec(),
-    Idea.find({ name: regex }).lean().exec(),
-    Pile.find({ name: regex }).lean().exec(),
+    Auth.find(byName).lean().exec(),
+    Work.find({ $or: [byName, wordPrefixFilter('original_name', query)] }).populate('authors').lean().exec(),
+    Idea.find(byName).lean().exec(),
+    Pile.find(byName).lean().exec(),
   ])
 
   interface SearchResult {

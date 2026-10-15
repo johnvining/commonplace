@@ -9,7 +9,7 @@ import {
 } from '../note/note.controllers'
 import { deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
-import { escapeRegexInput, rankByName } from '../../utils/searchInput.js'
+import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
@@ -41,7 +41,7 @@ export const reqGetAutoComplete = async (req: Request, res: Response, withCounts
 
 export const findIdeasByString = async function(string: string, withCounts = false) {
   const ideas = rankByName(
-    await Idea.find({ name: new RegExp(escapeRegexInput(string), 'i') }).lean().exec(),
+    await Idea.find(wordPrefixFilter('name', string)).lean().exec(),
     string
   )
   if (!withCounts || !ideas.length) return ideas

@@ -9,7 +9,7 @@ import { createIdea } from '../idea/idea.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
-import { escapeRegexInput, rankByName } from '../../utils/searchInput.js'
+import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
@@ -157,10 +157,7 @@ export const findWorksByString = async function(string: string, withCounts = fal
   const works = rankByName(
     // Match the original title too, so either name finds the work.
     await Work.find({
-      $or: [
-        { name: new RegExp(escapeRegexInput(string), 'i') },
-        { original_name: new RegExp(escapeRegexInput(string), 'i') },
-      ],
+      $or: [wordPrefixFilter('name', string), wordPrefixFilter('original_name', string)],
     })
       .populate('authors')
       .lean()

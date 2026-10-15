@@ -7,7 +7,7 @@ import { removePileFromWork } from '../work/work.controllers.js'
 import { deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { generateNick } from '../nick/nick.controllers.js'
-import { escapeRegexInput, rankByName } from '../../utils/searchInput.js'
+import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
@@ -58,7 +58,7 @@ export const reqDeletePile = async (req: Request, res: Response) => {
 
 export const filePilesByString = async function (string: string, withCounts: boolean) {
   const piles = rankByName(
-    await Pile.find({ name: new RegExp(escapeRegexInput(string), 'i') }).lean().exec(),
+    await Pile.find(wordPrefixFilter('name', string)).lean().exec(),
     string
   )
   if (!withCounts || !piles.length) return piles
