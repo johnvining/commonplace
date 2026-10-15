@@ -1,9 +1,11 @@
 import Work from '../work/work.model.js'
 import Note from '../note/note.model.js'
 import Pile from '../pile/pile.model.js'
+import Idea from '../idea/idea.model.js'
 import { createAuthor, findAuthorByUrl } from '../auth/auth.controllers.js'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
+import { createIdea } from '../idea/idea.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
@@ -14,6 +16,7 @@ import type { Request, Response } from 'express'
 
 const WORK_WRITABLE = [
   'name', 'authors', 'url', 'year', 'citation_information', 'summary', 'piles',
+  'ideas',
 ] as const
 
 
@@ -106,6 +109,42 @@ export const reqAutocompleteOnName = async (req: Request, res: Response, withCou
   return doc
 }
 
+export const reqAddIdea = async (req: Request, res: Response) => {
+  return addIdeaToWork(req.params.id, req.body.id)
+}
+
+export const reqAddNewIdea = async (req: Request, res: Response) => {
+  const newIdea = await createIdea(req.body.name)
+  return addIdeaToWork(req.params.id, newIdea._id)
+}
+
+export const reqRemoveIdeaFromWork = async (req: Request, res: Response) => {
+  const doc = await Work.findOneAndUpdate(
+    { _id: req.params.id },
+    { $pull: { ideas: req.params.ideaId } },
+    { new: true }
+  )
+    .populate('ideas')
+    .lean()
+    .exec()
+  if (!doc) return res.status(400).end()
+  await touchIdea(req.params.ideaId)
+  return doc
+}
+
+const addIdeaToWork = async (workId: string, ideaId: unknown) => {
+  const doc = await Work.findOneAndUpdate(
+    { _id: workId },
+    { $addToSet: { ideas: ideaId } },
+    { new: true }
+  )
+    .populate('ideas')
+    .lean()
+    .exec()
+  await touchIdea(ideaId)
+  return doc
+}
+
 export const reqRemovePileFromWork = async (req: Request, res: Response) => {
   const doc = await removePileFromWork(req.params.id, req.params.pileId)
   if (!doc) {
@@ -140,6 +179,7 @@ export const getWorkInfo = async function(workId: string) {
   const results = await Work.findOne({ _id: workId })
     .populate('authors')
     .populate('piles')
+    .populate('ideas')
     .lean()
     .exec()
   return results
@@ -204,4 +244,9 @@ export default defaultControllers(Work, { writable: WORK_WRITABLE })
 const touchPile = async (pileId: unknown) => {
   if (!pileId) return
   await Pile.findByIdAndUpdate(pileId, { $set: { updatedAt: new Date() } })
+}
+
+const touchIdea = async (ideaId: unknown) => {
+  if (!ideaId) return
+  await Idea.findByIdAndUpdate(ideaId, { $set: { updatedAt: new Date() } })
 }

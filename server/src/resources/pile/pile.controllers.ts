@@ -134,6 +134,7 @@ export const getWorksForPile = async function (pileId: string) {
   return Work.find({ piles: pileId })
     .populate('authors')
     .populate('piles')
+    .populate('ideas')
     .lean()
     .exec()
 }

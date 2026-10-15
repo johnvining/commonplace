@@ -1,5 +1,6 @@
 import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
+import Work from '../work/work.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { generateNick } from '../nick/nick.controllers.js'
 import {
@@ -14,6 +15,16 @@ import type { Request, Response } from 'express'
 
 export const reqGetNotesForIdea = async (req: Request, res: Response) => {
   return findEntityNotesPage(req, res, { ideas: req.params.id }, { updatedAt: -1 })
+}
+
+export const reqGetWorksForIdea = async (req: Request, res: Response) => {
+  return Work.find({ ideas: req.params.id })
+    .populate('authors')
+    .populate('piles')
+    .populate('ideas')
+    .sort({ year: 1 })
+    .lean()
+    .exec()
 }
 
 export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) => {
@@ -85,6 +96,7 @@ export const deleteIdea = async function(ideaId: string) {
   const steps: Array<() => Promise<unknown>> = notes.map(
     (note) => () => removeIdeaFromNote(note._id, ideaId)
   )
+  steps.push(() => Work.updateMany({ ideas: ideaId }, { $pull: { ideas: ideaId } }))
   steps.push(() => deleteNickFor('idea', ideaId))
   await runCascadeSteps('deleteIdea', steps)
   await Idea.findOneAndDelete({ _id: ideaId })

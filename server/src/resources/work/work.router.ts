@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import {
+  reqAddIdea,
+  reqAddNewIdea,
   reqAddNewPile,
   reqAddPile,
   reqAutocompleteOnName,
@@ -9,6 +11,7 @@ import {
   reqGetAutoCompleteWithCounts,
   reqGetNotesForWork,
   reqGetWorkInfo,
+  reqRemoveIdeaFromWork,
   reqRemovePileFromWork,
   reqUpdateWork
 } from './work.controllers'
@@ -29,6 +32,12 @@ router.route('/:id/pile/create').put(asyncWrapper(reqAddNewPile, 201))
 router
   .route('/:id/pile/:pileId')
   .delete(asyncWrapper(reqRemovePileFromWork, 200))
+
+router.route('/:id/idea').put(asyncWrapper(reqAddIdea, 200))
+router.route('/:id/idea/create').put(asyncWrapper(reqAddNewIdea, 201))
+router
+  .route('/:id/idea/:ideaId')
+  .delete(asyncWrapper(reqRemoveIdeaFromWork, 200))
 
 router.route('/:id').get(asyncWrapper(reqGetWorkInfo, 200))
 router.route('/:id').put(asyncWrapper(reqUpdateWork, 200))
