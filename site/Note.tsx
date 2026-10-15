@@ -805,7 +805,7 @@ class Note extends React.Component<any, any> {
                     : '')
                 }
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(this.state.pendingText),
+                  __html: renderMarkdown(this.state.pendingText, { tabbableLinks: selected }),
                 }}
               />
             </div>
@@ -829,7 +829,7 @@ class Note extends React.Component<any, any> {
               <div
                 className="note-full note-take markdown"
                 dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(this.state.pendingTake),
+                  __html: renderMarkdown(this.state.pendingTake, { tabbableLinks: selected }),
                 }}
               />
             </div>
@@ -949,7 +949,7 @@ class Note extends React.Component<any, any> {
                   pills with their own × buttons, so we skip the inline
                   chip row to avoid duplication. */}
               {!edit_ideas && note.ideas?.map((idea: any) => (
-                <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id}>
+                <Link to={'/idea/' + idea._id} key={'idea-link' + idea._id} tabIndex={-1}>
                   <button
                     className="idea label"
                     key={'idea-button' + idea._id}
@@ -961,7 +961,7 @@ class Note extends React.Component<any, any> {
               ))}
               {Object.keys(this.state.linkedNotes).length > 0 &&
                 Object.keys(this.state.linkedNotes).map((note: any) => (
-                  <Link key={note} to={'/note/' + note}>
+                  <Link key={note} to={'/note/' + note} tabIndex={-1}>
                     <button
                       className="link label"
                       key={'link-button' + note}
@@ -1142,7 +1142,7 @@ class Note extends React.Component<any, any> {
                   >
                     <img src={tags}></img>
                   </button>
-                  <Link to={'/note/' + this.props.id}>
+                  <Link to={'/note/' + this.props.id} tabIndex={-1}>
                     <button
                       className={'button action-button'}
                       tabIndex={selected ? this.props.tabIndex : '-1'}
