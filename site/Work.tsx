@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
 import * as constants from './constants'
 import Autocomplete from './Autocomplete'
@@ -13,6 +13,7 @@ import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { saveAndExitEdit } from './saveAndExitEdit'
 import AuthorsChipList from './AuthorsChipList'
 import PilesPillList from './PilesPillList'
+import IdeasPillList from './IdeasPillList'
 import ClickToCopyNick from './ClickToCopyNick'
 import ImageUploader from './ImageUploader'
 import {
@@ -38,6 +39,7 @@ function Work(props: any) {
   const [importMode, setImportMode] = useState(false)
   const [pendingImportText, setPendingImportText] = useState('')
   const [editPiles, setEditPiles] = useState(false)
+  const [editIdeas, setEditIdeas] = useState(false)
   // TODO: Create pending object
   const [pendingWorkTitle, setPendingWorkTitle] = useState('')
   const [pendingUrl, setPendingUrl] = useState('')
@@ -46,6 +48,7 @@ function Work(props: any) {
   const [pendingSummary, setPendingSummary] = useState('')
   const [pendingCitationInfo, setPendingCitationInfo] = useState('')
   const [piles, setPiles] = useState<any[]>([])
+  const [ideas, setIdeas] = useState<any[]>([])
   const [nick, setNick] = useState<any>()
   const [notesRefreshKey, setNotesRefreshKey] = useState(0)
   const navigate = useNavigate()
@@ -104,6 +107,7 @@ function Work(props: any) {
       const work = infoResponse.data.data
       setPendingWorkTitle(work.name)
       setPiles(work.piles)
+      setIdeas(work.ideas ?? [])
       setPendingAuthors(Array.isArray(work.authors) ? work.authors : [])
       setPendingUrl(work.url)
       setPendingYear(work.year)
@@ -213,6 +217,27 @@ function Work(props: any) {
   const handleFinishEditing = async () => {
     setEdit(false)
     setEditPiles(false)
+    setEditIdeas(false)
+  }
+
+  const handleNewIdea = (ideaId: any) => {
+    db.addLinkToRecord(db.types.idea, ideaId, db.types.work, id).then(() => {
+      fetchWorkInfo(id)
+    })
+  }
+
+  const handleCreateIdeaAndAssign = (ideaName: any) => {
+    db.createAndLinkToRecord(db.types.idea, ideaName, db.types.work, id).then(
+      () => {
+        fetchWorkInfo(id)
+      },
+    )
+  }
+
+  const handleIdeaRemove = (ideaId: any) => {
+    db.removeFromRecord(db.types.idea, ideaId, db.types.work, id).then(() => {
+      fetchWorkInfo(id)
+    })
   }
 
   const handlePileRemove = async (pileId: any) => {
@@ -277,16 +302,18 @@ function Work(props: any) {
 
   // Section 3.1 & 3.2: Work page keyboard shortcuts
   useEntityKeyboardShortcuts({
-    isEditing: edit || editPiles,
+    isEditing: edit || editPiles || editIdeas,
     onEdit: () => {
       setEdit(true)
       setEditPiles(false)
+      setEditIdeas(false)
     },
     onSave: handleAcceptUpdates,
     onExitEdit: handleFinishEditing,
     onNewNote: createNoteForWork,
     onEditPiles: () => {
       setEdit(false)
+      setEditIdeas(false)
       setEditPiles(true)
     },
     onToggleStar: toggleStar,
@@ -396,6 +423,28 @@ function Work(props: any) {
                   </div>
                   <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
                 </div>
+              ) : editIdeas ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    width: '360px',
+                    maxWidth: '100%',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <IdeasPillList
+                      value={ideas}
+                      onAddExisting={(idea) => handleNewIdea(idea._id)}
+                      onCreateNew={(name) => handleCreateIdeaAndAssign(name)}
+                      onRemove={(ideaId) => handleIdeaRemove(ideaId)}
+                      onExit={() => setEditIdeas(false)}
+                      inputId="work-idea"
+                    />
+                  </div>
+                  <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
+                </div>
               ) : (
                 <>
                   <TopLevelStandardButtonContainer className="top-level-toolbar">
@@ -410,13 +459,23 @@ function Work(props: any) {
                       onClick={() => {
                         setEdit(true)
                         setEditPiles(false)
+                        setEditIdeas(false)
                       }}
                     />
                     <TopLevelStandardButton
                       name="Piles"
                       onClick={() => {
                         setEdit(false)
+                        setEditIdeas(false)
                         setEditPiles(true)
+                      }}
+                    />
+                    <TopLevelStandardButton
+                      name="Ideas"
+                      onClick={() => {
+                        setEdit(false)
+                        setEditPiles(false)
+                        setEditIdeas(true)
                       }}
                     />
                     <TopLevelStandardButton name="Delete" onClick={deleteWork} />
@@ -461,6 +520,15 @@ function Work(props: any) {
                         allowTabbing={true}
                         onPileRemove={handlePileRemove}
                       />
+                    </div>
+                  )}
+                  {ideas.length > 0 && (
+                    <div className="entity-page-piles">
+                      {ideas.map((idea: any) => (
+                        <Link to={'/idea/' + idea._id} key={idea._id} tabIndex={-1}>
+                          <button className="idea label">{idea.name}</button>
+                        </Link>
+                      ))}
                     </div>
                   )}
                 </>
