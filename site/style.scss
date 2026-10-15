@@ -2271,3 +2271,10 @@ mark.search-highlight {
 .worn-3 {
   --worn-color: rgba(196, 140, 60, 0.95);
 }
+
+// How-to line above the taggable list of search-result notes (#319).
+.search-tag-hint {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  margin: 4px 0 8px;
+}

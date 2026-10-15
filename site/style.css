@@ -2884,4 +2884,10 @@ mark.search-highlight {
   --worn-color: rgba(196, 140, 60, 0.95);
 }
 
+.search-tag-hint {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  margin: 4px 0 8px;
+}
+
 /*# sourceMappingURL=style.css.map */

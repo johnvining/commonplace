@@ -7,7 +7,7 @@ import IdeaList from './IdeaList'
 import AuthorList from './AuthorList'
 import PileList from './PileList'
 import React from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { joinAuthorNames } from './authorsDisplay'
 import work_img from 'url:./icons/work.svg'
 import author_img from 'url:./icons/author.svg'
@@ -117,6 +117,7 @@ function Find(props: any) {
   const { search = '', category } = useParams()
   const [results, setResults] = React.useState<any>(null)
   const [page, setPage] = React.useState(1)
+  const navigate = useNavigate()
   const resultsRef = React.useRef<HTMLDivElement>(null)
 
   // Start keyboard work on the first result when results arrive or the
@@ -143,7 +144,14 @@ function Find(props: any) {
     return () => controller.abort()
   }, [search])
 
-  const getListOfNotes = async () => db.searchNotes(search)
+  // The notes from the unified search, as a normal note list, so they can
+  // be selected and tagged together (#319). Same results as the main
+  // search page, unlike the old $text search this view used before.
+  const getListOfNotes = async () => {
+    const res = await db.unifiedSearch(search, 200)
+    const notes = (res.data.data ?? []).filter((r: any) => r.type === 'note').map((r: any) => r.item)
+    return { data: { data: notes } }
+  }
   const getListOfWorks = async () => db.getSuggestions(db.types.work, search, true)
   const getListOfIdeas = async () => db.getSuggestions(db.types.idea, search, true)
   const getListOfAuthors = async () => db.getSuggestions(db.types.auth, search, true)
@@ -159,6 +167,10 @@ function Find(props: any) {
           <TopLevelTitle>{search}</TopLevelTitle>
           <TopLevelSubTitle>Notes</TopLevelSubTitle>
         </TopLevelTitleContainer>
+        <div className="search-tag-hint">
+          Select notes (click the circles, or Select All), then add an idea,
+          work, author or pile to all of them.
+        </div>
         <NoteList
           key={'notes-all-' + search}
           viewMode={constants.view_modes.SLIM}
@@ -228,6 +240,14 @@ function Find(props: any) {
         <div className="search-no-results">No results for "{search}"</div>
       ) : (
         <>
+          {results.some((r: any) => r.type === 'note') ? (
+            <TopLevelStandardButtonContainer>
+              <TopLevelStandardButton
+                name="Tag notes in these results"
+                onClick={() => navigate('/find/' + encodeURIComponent(search) + '/notes')}
+              />
+            </TopLevelStandardButtonContainer>
+          ) : null}
           <div ref={resultsRef}>
             {pageItems.map((entry: any) => (
               <UnifiedResult key={entry.type + '-' + String(entry.item._id)} entry={entry} query={search} />
