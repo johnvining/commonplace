@@ -2098,6 +2098,14 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+// Years after a name in a picker or autocomplete row ("1924–2020"), to
+// tell same-named records apart (#315).
+.pill-input-years {
+  margin-left: 8px;
+  font-size: var(--font-size-xs);
+  opacity: 0.6;
+}
+
 // Heading over a secondary list on an entity page, styled like the
 // sidebar's section titles.
 .entity-page-section-heading {

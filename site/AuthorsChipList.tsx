@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as db from './Database'
+import { yearsLabel } from './utils'
 import { AuthorLike } from './authorsDisplay'
 
 // Ordered, editable list of authors as inline pills sharing a single
@@ -190,6 +191,7 @@ export default function AuthorsChipList(props: Props) {
                 onMouseEnter={() => setHighlighted(i)}
               >
                 {s.name}
+                {yearsLabel(s) && <span className="pill-input-years">{yearsLabel(s)}</span>}
               </button>
             </li>
           ))}

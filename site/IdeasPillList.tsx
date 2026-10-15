@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as db from './Database'
+import { yearsLabel } from './utils'
 import lightbulb from 'url:./icons/lightbulb.svg'
 
 // Pill-input multi-select for ideas on a note. Same shape as
@@ -229,6 +230,7 @@ export default function IdeasPillList(props: Props) {
                 onMouseEnter={() => setHighlighted(i)}
               >
                 {entry.item.name}
+                {yearsLabel(entry.item) && <span className="pill-input-years">{yearsLabel(entry.item)}</span>}
                 {entry.source === 'ai' && <span className="pill-input-ai-tag">AI</span>}
               </button>
             </li>

@@ -28,3 +28,33 @@ export function notePageTitle(note: { title?: string; text?: string; nick?: stri
   const label = note.title || note.text || 'Untitled Note'
   return titleWithNick(label, note.nick)
 }
+
+// Year as YearSpan shows it: negative years are BC.
+function formatYear(year: number): string {
+  return year < 0 ? `${-year} BC` : String(year)
+}
+
+const asYear = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === '') return null
+  const n = Number(v)
+  return Number.isFinite(n) ? n : null
+}
+
+// Short years label for picker rows, to tell same-named records apart
+// (#315). Authors: "1924–2020", "b. 1962", "d. 1980". Ideas and piles:
+// "1947–1991", "1947–", "–1991", or "1783" when both are the same year.
+// Empty when there are no years.
+export function yearsLabel(record: object): string {
+  const item = record as Record<string, unknown>
+  const birth = asYear(item.birth_year)
+  const death = asYear(item.death_year)
+  if (birth !== null || death !== null) {
+    if (birth !== null && death !== null) return `${formatYear(birth)}–${formatYear(death)}`
+    return birth !== null ? `b. ${formatYear(birth)}` : `d. ${formatYear(death!)}`
+  }
+  const start = asYear(item.start_year)
+  const end = asYear(item.end_year)
+  if (start === null && end === null) return ''
+  if (start === end) return formatYear(start!)
+  return `${start !== null ? formatYear(start) : ''}–${end !== null ? formatYear(end) : ''}`
+}

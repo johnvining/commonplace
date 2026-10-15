@@ -2717,6 +2717,12 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+.pill-input-years {
+  margin-left: 8px;
+  font-size: var(--font-size-xs);
+  opacity: 0.6;
+}
+
 .entity-page-section-heading {
   font-size: var(--font-size-sm);
   font-family: "Avenir", "Candara", "Arial", sans-serif;
