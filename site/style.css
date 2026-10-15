@@ -76,6 +76,14 @@
   background-color: var(--note-background-edit);
   border-color: var(--note-border-edit);
 }
+.note-full.outer.edit-ideas {
+  border-color: var(--semantic-idea);
+  box-shadow: 0 0 0 3px var(--semantic-idea);
+}
+.note-full.outer.edit-piles {
+  border-color: var(--semantic-pile);
+  box-shadow: 0 0 0 3px var(--semantic-pile);
+}
 .note-full.outer.not-selected {
   background-color: var(--note-background-not-selected);
 }

@@ -24,6 +24,19 @@
       border-color: $note_border_edit;
     }
 
+    // Show which list is being edited: ideas blue, piles purple (#311).
+    // The palette colors are pale, so add a ring outside the 1px border
+    // (box-shadow, so the layout doesn't shift).
+    &.edit-ideas {
+      border-color: $semantic_idea;
+      box-shadow: 0 0 0 3px $semantic_idea;
+    }
+
+    &.edit-piles {
+      border-color: $semantic_pile;
+      box-shadow: 0 0 0 3px $semantic_pile;
+    }
+
     &.not-selected {
       background-color: $note_background_not_selected;
     }

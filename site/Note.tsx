@@ -568,11 +568,11 @@ class Note extends React.Component<any, any> {
         edit = true
         break
       case constants.note_modes.EDIT_IDEAS:
-        class_name = 'note-full edit-note '
+        class_name = 'note-full edit-note edit-ideas '
         edit_ideas = true
         break
       case constants.note_modes.EDIT_PILES:
-        class_name = 'note-full edit-note '
+        class_name = 'note-full edit-note edit-piles '
         edit_piles = true
         break
       case constants.note_modes.EDIT_LINKS:
