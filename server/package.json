@@ -11,6 +11,7 @@
     "dev": "NODE_ENV=development nodemon --exec npm run restart",
     "import": "node dist/cli/importCsv.js",
     "ocr-backlog": "node dist/cli/ocrBacklog.js",
+    "maintenance": "node dist/cli/maintenance.js",
     "restart": "rimraf dist && npm run build && npm run start",
     "start": "node dist/index.js",
     "test": "vitest run",
