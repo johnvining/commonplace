@@ -109,6 +109,9 @@ class Autocomplete extends React.Component<any, any> {
     if (event.keyCode === constants.keyCodes.enter) {
       event.preventDefault()
       event.stopPropagation()
+      // Let the parent act on Enter in the input (the search bar runs a
+      // search); otherwise it does nothing.
+      if (this.props.onEnter) this.props.onEnter(this.state.currentTypedText ?? '')
     }
   }
 

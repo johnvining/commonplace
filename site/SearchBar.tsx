@@ -5,11 +5,39 @@ import * as db from './Database'
 import * as constants from './constants'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
+// A nick is a type letter (note, work, idea, pile) and six digits.
+const NICK_PATTERN = /^[nwip]\d{6}$/
+
 function SearchBar(props: any) {
   const [modifier, setModifier] = useState('')
   const [typedText, setTypedText] = useState('')
   const [searchError, setSearchError] = useState('')
   const navigate = useNavigate()
+
+  // With an entity modifier ("idea Stoic"), Enter opens the record whose
+  // name matches exactly; otherwise it searches that category. Tab still
+  // moves into the suggestions to pick one.
+  const openOrSearchEntity = async (currentModifier: string, rawText: string) => {
+    const text = (rawText || '').trim()
+    const dbType = modifierToDbTypes(currentModifier)
+    if (!text || !dbType) return
+    try {
+      const response = await db.getSuggestions(dbType, text)
+      const options = response?.data?.data || []
+      const exactMatch = options.find(
+        (item: any) => item?.name?.trim().toLowerCase() === text.toLowerCase()
+      )
+      const id = exactMatch?._id || exactMatch?.id
+      props.beforeNavigate()
+      if (id) {
+        navigate('/' + currentModifier + '/' + id)
+      } else {
+        navigate('/find/' + encodeURIComponent(text) + '/' + findCategory(dbType))
+      }
+    } catch (error: any) {
+      console.error('Error fetching suggestions', error)
+    }
+  }
 
   const handleExecute = async () => {
     const currentModifier = modifier
@@ -36,10 +64,11 @@ function SearchBar(props: any) {
 
     // Find/search
     if (currentModifier === constants.modifiers.find) {
-      const search = currentText
+      const search = (currentText || '').trim()
+      if (!search) return
       setTypedText('')
       props.beforeNavigate()
-      navigate('/find/' + search)
+      navigate('/find/' + encodeURIComponent(search))
       return
     }
 
@@ -97,52 +126,27 @@ function SearchBar(props: any) {
     }
 
     // Entity navigation by name
-    if (
-      [
-        constants.modifiers.auth,
-        constants.modifiers.idea,
-        constants.modifiers.work,
-        constants.modifiers.pile,
-        constants.modifiers.read,
-      ].includes(currentModifier)
-    ) {
-      if (!currentText) {
-        return
-      }
-      const dbType = modifierToDbTypes(currentModifier)
-      if (!dbType) {
-        return
-      }
-      try {
-        const response = await db.getSuggestions(dbType, currentText)
-        const options = response?.data?.data || []
-        if (!options.length) {
-          return
-        }
-        const normalized = currentText.trim().toLowerCase()
-        const exactMatch =
-          options.find((item: any) => item?.name?.toLowerCase() === normalized) ||
-          options[0]
-        const id = exactMatch?._id || exactMatch?.id
-        if (!id) {
-          return
-        }
-        props.beforeNavigate()
-        navigate('/' + currentModifier + '/' + id)
-        return
-      } catch (error: any) {
-        console.error('Error fetching suggestions', error)
-        return
-      }
+    if (modifierToDbTypes(currentModifier)) {
+      await openOrSearchEntity(currentModifier, currentText)
+      return
     }
 
-    if (!currentText) {
+    const text = (currentText || '').trim()
+    if (!text) {
+      return
+    }
+
+    // Anything that isn't a nick runs a search (#307).
+    if (!NICK_PATTERN.test(text)) {
+      setTypedText('')
+      props.beforeNavigate()
+      navigate('/find/' + encodeURIComponent(text))
       return
     }
 
     // Nick lookup
     try {
-      const nickResponse = await db.getNick(currentText)
+      const nickResponse = await db.getNick(text)
       const nickData = nickResponse?.data?.data
       if (!nickData) {
         setSearchError('Nick not found')
@@ -286,6 +290,10 @@ function SearchBar(props: any) {
     return null
   }
 
+  // Category names used by /find/:search/:category.
+  const findCategory = (dbType: string) =>
+    dbType === db.types.note ? 'notes' : dbType
+
   const handleEscape = () => {
     setTypedText(modifier)
     setModifier('')
@@ -320,6 +328,7 @@ function SearchBar(props: any) {
           onSelect={handleUpdate}
           getSuggestions={getSuggestions}
           handleNewSelect={handleCreate}
+          onEnter={(text: string) => void openOrSearchEntity(modifier, text)}
           escape={handleEscape}
           onClose={props.onClose}
         />
