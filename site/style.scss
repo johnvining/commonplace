@@ -2098,6 +2098,12 @@ mark.search-highlight {
   margin-top: 6px;
 }
 
+// Stand-in text for a search result with no title or text.
+.result-box-placeholder {
+  font-style: italic;
+  opacity: 0.6;
+}
+
 // Years after a name in a picker or autocomplete row ("1924–2020"), to
 // tell same-named records apart (#315).
 .pill-input-years {

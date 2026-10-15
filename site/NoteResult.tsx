@@ -56,7 +56,29 @@ class NoteResult extends React.PureComponent<any> {
       : null
 
     const labelText = title || body || 'Untitled Note'
-    const ideas = note.ideas?.length ? note.ideas : null
+    let ideas = note.ideas?.length ? note.ideas : null
+
+    // A note with no title, text or take would otherwise render an empty
+    // row (or a citation followed by a dangling ": "). Fall back to its
+    // citation alone, then its ideas, then a muted placeholder (#314).
+    let fallback = null
+    if (!primaryText && !hasAttribution) {
+      if (ideas) {
+        fallback = ideas.map((i: any) => i.name).join(', ')
+        ideas = null
+      } else {
+        const imageCount = note.images?.length ?? 0
+        fallback = (
+          <span className="result-box-placeholder">
+            {imageCount === 1
+              ? 'Image note'
+              : imageCount > 1
+                ? `Image note (${imageCount} images)`
+                : 'Untitled note'}
+          </span>
+        )
+      }
+    }
 
     return (
       <Link to={`/note/${note._id}`} key={'note-list-' + note._id}>
@@ -73,10 +95,11 @@ class NoteResult extends React.PureComponent<any> {
                     spaceAfter={false}
                     plain={true}
                   />
-                  {': '}
+                  {primaryContent ? ': ' : null}
                 </>
               ) : null}
               {primaryContent}
+              {fallback}
             </span>
             {this.props.semantic ? <span className="semantic-badge">~</span> : null}
             <PinButton
