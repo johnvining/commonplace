@@ -63,14 +63,22 @@ function Read(props: any) {
     return notesResponse
   }
 
-  const createNoteWithImageForWork = async (image: any) => {
-    let now = new Date()
-    let title =
-      'Quick Photo Note — ' +
-      now.toDateString() +
-      ' ' +
-      now.toLocaleTimeString('en-US')
-    const response = await db.createNewNoteWithImageForWork(id, image, title)
+  // One "Quick Photo Note" per image; the upload reads each image into its
+  // note's text. Reload once at the end so the new notes show.
+  const createNotesWithImagesForWork = async (images: any[], onProgress: any) => {
+    let done = 0
+    for (const image of images) {
+      const now = new Date()
+      const title =
+        'Quick Photo Note — ' + now.toDateString() + ' ' + now.toLocaleTimeString('en-US')
+      try {
+        await db.createNewNoteWithImageForWork(id, image, title)
+      } catch (error: any) {
+        console.error('Error creating note from image', error)
+      }
+      done += 1
+      if (onProgress) onProgress(done, images.length)
+    }
 
     // TODO: Janky
     window.location.reload()
@@ -116,7 +124,8 @@ function Read(props: any) {
       <TopLevelStandardButtonContainer nick={nick}>
         <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
         <ImageUploader
-          onImageUpload={createNoteWithImageForWork}
+          onImagesUpload={createNotesWithImagesForWork}
+          allowMultiple={true}
           buttonClassName="button left-right"
         />
       </TopLevelStandardButtonContainer>

@@ -1100,6 +1100,7 @@ class Note extends React.Component<any, any> {
                   <div className="left-div">
                     <ImageUploader
                       onImageUpload={this.onImageUpload.bind(this)}
+                      allowMultiple={true}
                       buttonClassName="action-button"
                       iconOnly={true}
                     />
