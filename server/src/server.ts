@@ -6,6 +6,7 @@ import helmet from 'helmet'
 import config from './config'
 import cors from 'cors'
 import { connect } from './utils/db'
+import { TOTAL_COUNT_HEADER } from './utils/pagination'
 import Note from './resources/note/note.model'
 import noteRouter from './resources/note/note.router'
 import authRouter from './resources/auth/auth.router'
@@ -57,6 +58,7 @@ app.use(
 app.use(cors({
   origin: config.isDev ? true : false, // reflect request origin in dev; same-origin in prod via nginx
   credentials: true,
+  exposedHeaders: [TOTAL_COUNT_HEADER],
 }))
 app.use(json({ limit: '5mb' }))
 app.use(urlencoded({ extended: true, limit: '5mb' }))

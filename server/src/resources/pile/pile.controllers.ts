@@ -8,23 +8,12 @@ import { deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { generateNick } from '../nick/nick.controllers.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
-import { pageParams } from '../../utils/pagination.js'
+import { findEntityNotesPage } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
 
 export const reqGetNotesForPile = async (req: Request, res: Response) => {
-  const { skip, limit } = pageParams(req)
-  const doc = await findNotesAndPopulate(
-    { piles: req.params.id },
-    { updatedAt: -1 },
-    false,
-    skip,
-    limit
-  )
-  if (!doc) {
-    return res.status(400).end()
-  }
-  return doc
+  return findEntityNotesPage(req, res, { piles: req.params.id }, { updatedAt: -1 })
 }
 
 export const reqGetPileList = async (req: Request, res: Response) => {

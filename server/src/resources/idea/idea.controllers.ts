@@ -9,22 +9,11 @@ import {
 import { deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
-import { pageParams } from '../../utils/pagination.js'
+import { findEntityNotesPage } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
 export const reqGetNotesForIdea = async (req: Request, res: Response) => {
-  const { skip, limit } = pageParams(req)
-  const doc = await findNotesAndPopulate(
-    { ideas: req.params.id },
-    { updatedAt: -1 },
-    false,
-    skip,
-    limit
-  )
-  if (!doc) {
-    return res.status(400).end()
-  }
-  return doc
+  return findEntityNotesPage(req, res, { ideas: req.params.id }, { updatedAt: -1 })
 }
 
 export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) => {

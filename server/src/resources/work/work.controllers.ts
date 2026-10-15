@@ -8,7 +8,7 @@ import { defaultControllers } from '../../utils/default.controllers.js'
 import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
-import { pageParams } from '../../utils/pagination.js'
+import { findEntityNotesPage } from '../../utils/pagination.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
 
@@ -19,12 +19,8 @@ const WORK_WRITABLE = [
 
 // Request response
 export const reqGetNotesForWork = async (req: Request, res: Response) => {
-  const { skip, limit } = pageParams(req)
-  const doc = await findNotesAndPopulate({ work: req.params.id }, {}, false, skip, limit)
-  if (!doc) {
-    return res.status(400).end()
-  }
-  return doc
+  // Insertion order (the order notes were added to the work).
+  return findEntityNotesPage(req, res, { work: req.params.id }, { _id: 1 })
 }
 
 export const reqGetWorkInfo = async (req: Request, res: Response) => {

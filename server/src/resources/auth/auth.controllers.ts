@@ -1,38 +1,25 @@
 import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
-import { findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { escapeRegexInput } from '../../utils/searchInput.js'
-import { pageParams } from '../../utils/pagination.js'
+import { findEntityNotesPage } from '../../utils/pagination.js'
 import type { Request, Response } from 'express'
 
 
 export const reqGetNotesForAuthor = async (req: Request, res: Response) => {
-  const { skip, limit } = pageParams(req)
-  const doc = await findNotesAndPopulate(
-    { authors: req.params.id },
-    { updatedAt: -1 },
-    false,
-    skip,
-    limit
-  )
-  if (!doc) {
-    return res.status(400).end()
-  }
-  return doc
+  return findEntityNotesPage(req, res, { authors: req.params.id }, { updatedAt: -1 })
 }
 
 export const reqGetAllNotesForAuthor = async (req: Request, res: Response) => {
-  const { skip, limit } = pageParams(req)
   const authorId = req.params.id
   const works = await Work.find({ authors: authorId }, { _id: 1 }).lean().exec()
   const workIds = works.map(w => w._id)
   const query = workIds.length
     ? { $or: [{ authors: authorId }, { work: { $in: workIds } }] }
     : { authors: authorId }
-  return findNotesAndPopulate(query, { updatedAt: -1 }, false, skip, limit)
+  return findEntityNotesPage(req, res, query, { updatedAt: -1 })
 }
 
 export const getAutoCompleteWithCounts = async (req: Request, res: Response) => {
