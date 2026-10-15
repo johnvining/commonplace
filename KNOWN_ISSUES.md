@@ -10,20 +10,12 @@
 
 ## Small bugs & improvements (from GitHub)
 
-Triaged on review of all 46 open issues. Listed by number, low-hanging fruit only — larger features (timeline #187, mobile styling #108, AI features #329/#330, merge auth+ideas #313, kindle import #64, etc.) are out of scope for this list.
+Triaged on review of all 46 open issues. Listed by number, low-hanging fruit only — larger features (timeline #187, mobile styling #108, AI features #329, kindle import #64, etc.) are out of scope for this list.
 
-- **#233 — Consolidate update framework on auth/pile/work/idea.** Each entity has its own `handleAcceptUpdates` + pending state. Extract a shared helper (`useEntityEditState<T>(entity, writableFields)`) so the four pages stop drifting apart.
-- **#298 / #302 — Standardize note-button component & move existing usages.** A lot of ad-hoc `<button className="...">` calls. Extract a `NoteButton` (matching the existing `TopLevelStandardButton` shape) and sweep call sites.
 - **#299 — Support uploading multiple images at once.** The existing `<ImageUploader allowMultiple={true} />` already handles this for the Work toolbar; some other call sites still pass `allowMultiple={false}`. Audit and flip where it makes sense.
-- **#304 — Disable password managers on fields.** Add `autoComplete="off"` (and arguably `data-1p-ignore` / `data-lpignore="true"`) on inputs that don't want autofill. Most notably the autocomplete pickers for ideas / piles / authors / works.
-- **#310 — Auto-focus first note in a list.** When a list mounts (or shrinks to one), focus should land on that note so keyboard nav works without an extra Tab. Currently focus stays on the search bar / nothing.
-- **#311 — Outline color when editing ideas/piles on note-full.** Change the note-full border to `$semantic_idea` (blue) when `edit_ideas` is active and `$semantic_pile` (purple) when `edit_piles` is. Visual signal of which mode you're in.
-- **#312 — Ctrl-E opens edit for work on the work page.** Wire `Ctrl-E` in the `ENTITY_PAGE` scope on Work.tsx to toggle the work editor — the keyboard hook (`useEntityKeyboardShortcuts`) already exists, just hook in.
-- **#327 — Resolve Express callback TODO in server.ts.** There's a `// TODO: Callback function` next to the `app.all('*', reqAuthenticate)` line. The Express docs explain — likely just rewrite with the modern middleware signature.
-- **#328 — Remove unneeded ngrok React code.** Dead code from when ngrok was integrated client-side. Now ngrok is a separate docker-compose service — none of the React code paths should reference it. Grep for "ngrok" in `site/` and delete what's unused.
 
 ## Other open issues (larger / require design)
 
-Not bug-list material, but worth keeping in mind: #340 (iPad), #333 (open-count tracking), #330 (AI-generated title mark), #329 (AI birth/death + timeline), #319 (bulk-tag from search), #317 (notes field on ideas/piles), #313 (merge auth+ideas), #297 (Mongo text-search update), #279 (multi-pile AND search), #246 (note→person tag), #221 (original + translated work name), #187 (timeline view), #162 (responsive note-full), #155 (note view types refactor), #108 (mobile styling), #100 (translate via OpenAI), #64 (kindle import).
+Not bug-list material, but worth keeping in mind: #340 (iPad), #329 (AI birth/death + timeline), #187 (timeline view), #162 (responsive note-full), #155 (note view types refactor), #108 (mobile styling), #100 (translate via OpenAI), #64 (kindle import).
 
 - **Pi MongoDB is on EOL 4.4.8.** Pinned in `docker-compose.yml`. MongoDB 4.4 EOL'd in Feb 2024; no upstream security patches. App works fine — not blocking — but worth upgrading in a maintenance window. **Use dump/restore (mongodump + mongorestore), not the in-place FCV version walk.** Concretely: with the old container running, `docker exec commonplace-mongo-1 mongodump --out=/data/db/dump-pre-upgrade`; `docker-compose down`; reset the `mongo-data` volume; bump image to `mongo:7.0` (LTS through July 2027) in docker-compose.yml; `docker-compose up -d`; `docker exec commonplace-mongo-1 mongorestore /data/db/dump-pre-upgrade`. Cost: brief downtime + doubled disk during transfer. **Critical rule:** never start a binary against data more than one major version older — doing so rewrites WiredTiger checkpoints into a format the older binaries can no longer read, locking you between FCV-too-old and WT-too-new. Dump/restore sidesteps this entirely because BSON is version-portable.
