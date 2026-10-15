@@ -38,6 +38,7 @@ class NoteGrid extends React.Component<any, any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              tabIndex={-1}
             >
               <img src={check_circle} />
             </button>
@@ -45,6 +46,7 @@ class NoteGrid extends React.Component<any, any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              tabIndex={-1}
             >
               <img src={circle} />
             </button>
@@ -52,7 +54,7 @@ class NoteGrid extends React.Component<any, any> {
         </div>
 
         <div className="grid-link">
-          <Link to={'/note/' + this.props.id} tabIndex={this.props.tabIndex}>
+          <Link to={'/note/' + this.props.id} tabIndex={this.props.tabIndex} data-note-id={this.props.id}>
             <div className="grid-nick">
               <ClickToCopyNick nick={this.state.nick} disableClick={true} />
               <span className="grid-unprintable">|</span>

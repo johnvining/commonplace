@@ -36,6 +36,7 @@ class NoteSlim extends React.PureComponent<any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              tabIndex={-1}
             >
               <img src={check_circle} />
             </button>
@@ -43,13 +44,14 @@ class NoteSlim extends React.PureComponent<any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              tabIndex={-1}
             >
               <img src={circle} />
             </button>
           )}
         </div>
         <div className="note-slim">
-          <Link to={'/note/' + this.props.id} className="note-slim" tabIndex={this.props.tabIndex}>
+          <Link to={'/note/' + this.props.id} className="note-slim" tabIndex={this.props.tabIndex} data-note-id={this.props.id}>
             <div className="note-slim">
               <div className="note-slim inner truncate">
                 <WorkCitationSpan

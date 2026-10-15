@@ -41,6 +41,7 @@ class NoteTile extends React.PureComponent<any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              tabIndex={-1}
             >
               <img src={this.props.selected ? check_circle : circle} />
             </button>
@@ -48,6 +49,7 @@ class NoteTile extends React.PureComponent<any> {
               to={'/note/' + this.props.id}
               className="note-slim tile-title-link"
               tabIndex={this.props.tabIndex}
+              data-note-id={this.props.id}
             >
               <div className="note-slim tile-title">
                 <b>
@@ -59,7 +61,7 @@ class NoteTile extends React.PureComponent<any> {
               </div>
             </Link>
           </div>
-          <Link to={'/note/' + this.props.id} className="note-slim tile-link">
+          <Link to={'/note/' + this.props.id} className="note-slim tile-link" tabIndex={-1}>
             <div tabIndex={-1} className="note-slim">
               {hasImages ? (
                 <div

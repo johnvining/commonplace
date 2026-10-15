@@ -195,8 +195,12 @@ class NoteList extends React.Component<any, any> {
     if (!firstNoteId) {
       return
     }
+    // Every note view marks its focusable element with data-note-id, so
+    // the first Tab moves on to the second note in any view.
     requestAnimationFrame(() => {
-      const element = document.getElementById(firstNoteId)
+      const element = document.querySelector(
+        `[data-note-id="${firstNoteId}"]`
+      ) as HTMLElement | null
       if (element) {
         element.focus()
       }
@@ -722,7 +726,7 @@ class NoteList extends React.Component<any, any> {
                       id={note._id}
                       inFocus={this.state.inFocus}
                       key={note._id}
-                      tabIndex={index + 1}
+                      tabIndex={0}
                       text={note.text}
                       title={note.title}
                       work={note.work?.name}
@@ -743,7 +747,7 @@ class NoteList extends React.Component<any, any> {
                       markShiftChecked={this.markShiftChecked.bind(this)}
                       note={note}
                       selected={this.state.selectedArray[index]}
-                      tabIndex={index + 1}
+                      tabIndex={0}
                     />
                   ) : this.props.viewMode == constants.view_modes.SLIM ? (
                     <NoteSlim
@@ -756,7 +760,7 @@ class NoteList extends React.Component<any, any> {
                       markShiftChecked={this.markShiftChecked.bind(this)}
                       note={note}
                       selected={this.state.selectedArray[index]}
-                      tabIndex={index + 1}
+                      tabIndex={0}
                     />
                   ) : this.props.viewMode == constants.view_modes.RESULT ? (
                     <NoteResult note={note} id={note._id} key={note._id} />
@@ -765,7 +769,7 @@ class NoteList extends React.Component<any, any> {
                       note={note}
                       id={note._id}
                       key={note._id}
-                      tabIndex={index + 1}
+                      tabIndex={0}
                       index={index}
                       refetchMe={this.refetchNoteAtIndex.bind(this)}
                       getImagesForNoteAtIndex={this.getImagesForNoteAtIndex.bind(
