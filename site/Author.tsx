@@ -17,15 +17,18 @@ import {
 import { TopLevelStarButton } from './PinButton'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { togglePinned } from './pinned'
-import { saveAndExitEdit } from './saveAndExitEdit'
+import { useEntityEditor } from './useEntityEditor'
 
 function Author(props: any) {
   const { id = '' } = useParams()
-  const [edit, setEdit] = useState(false)
-  const [pendingName, setPendingName] = useState('')
-  const [pendingBirthYear, setPendingBirthYear] = useState('')
-  const [pendingDeathYear, setPendingDeathYear] = useState('')
-  const [pendingUsernames, setPendingUsernames] = useState('')
+  const editor = useEntityEditor(db.types.auth, id, {
+    name: '',
+    birth_year: '' as number | string,
+    death_year: '' as number | string,
+    // Edited as "a, b"; sent as a list.
+    usernames: '',
+  })
+  const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [works, setWorks] = useState<any>(null)
   const [authorOnlyNotes, setAuthorOnlyNotes] = useState<any[]>([])
   // Notes the server holds beyond the first page fetched below; when
@@ -39,10 +42,13 @@ function Author(props: any) {
   const fetchAuthorInfo = (id: any) => {
     db.getInfo(db.types.auth, id)
       .then((response: any) => {
-        setPendingName(response.data.data.name)
-        setPendingBirthYear(response.data.data.birth_year)
-        setPendingDeathYear(response.data.data.death_year)
-        setPendingUsernames((response.data.data.usernames ?? []).join(', '))
+        const author = response.data.data
+        editor.load({
+          name: author.name,
+          birth_year: author.birth_year ?? '',
+          death_year: author.death_year ?? '',
+          usernames: (author.usernames ?? []).join(', '),
+        })
       })
       .catch((error: any) => {
         console.error(error)
@@ -100,30 +106,22 @@ function Author(props: any) {
     return () => { cancelled = true }
   }, [id])
 
-  const handleAcceptUpdates = async () => {
-    var updateObject = {
-      name: pendingName,
-      birth_year: pendingBirthYear,
-      death_year: pendingDeathYear,
-      usernames: pendingUsernames.split(',').map(u => u.trim()).filter(Boolean),
-    }
-
-    await saveAndExitEdit(
-      () => db.updateRecord(db.types.auth, id, updateObject),
-      setEdit
-    )
-  }
+  const handleAcceptUpdates = () =>
+    editor.save((v) => ({
+      ...v,
+      usernames: v.usernames.split(',').map((u) => u.trim()).filter(Boolean),
+    }))
 
   useEntityKeyboardShortcuts({
     isEditing: edit,
     onEdit: () => setEdit(true),
     onSave: handleAcceptUpdates,
-    onExitEdit: () => setEdit(false),
-    onToggleStar: () => id && togglePinned({ type: 'auth', id, label: pendingName, href: `/auth/${id}` }),
+    onExitEdit: editor.cancel,
+    onToggleStar: () => id && togglePinned({ type: 'auth', id, label: pending.name, href: `/auth/${id}` }),
   })
 
   const deleteAuthor = async () => {
-    if (!confirm(`Do you want to permanently delete '${pendingName}'?`)) {
+    if (!confirm(`Do you want to permanently delete '${pending.name}'?`)) {
       return
     }
 
@@ -131,7 +129,7 @@ function Author(props: any) {
     navigate('/')
   }
 
-  props.setPageTitle(pendingName)
+  props.setPageTitle(pending.name)
   return (
     <div>
       {/* Header and Edit */}
@@ -142,33 +140,33 @@ function Author(props: any) {
               id="name"
               name="Name"
               autoFocus
-              defaultValue={pendingName}
+              defaultValue={pending.name}
               onChange={(e: any) => {
-                setPendingName(e.target.value)
+                editor.set('name', e.target.value)
               }}
             />
             <TopLevelFormInput
               id="birth-year"
               name="Birth Year"
-              defaultValue={pendingBirthYear}
+              defaultValue={pending.birth_year}
               onChange={(e: any) => {
-                setPendingBirthYear(e.target.value)
+                editor.set('birth_year', e.target.value)
               }}
             />
             <TopLevelFormInput
               id="death-year"
               name="Death Year"
-              defaultValue={pendingDeathYear}
+              defaultValue={pending.death_year}
               onChange={(e: any) => {
-                setPendingDeathYear(e.target.value)
+                editor.set('death_year', e.target.value)
               }}
             />
             <TopLevelFormInput
               id="usernames"
               name="Usernames"
-              defaultValue={pendingUsernames}
+              defaultValue={pending.usernames}
               onChange={(e: any) => {
-                setPendingUsernames(e.target.value)
+                editor.set('usernames', e.target.value)
               }}
             />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
@@ -176,21 +174,21 @@ function Author(props: any) {
         ) : (
           <div className="entity-page-header">
             <div className="entity-page-header-left">
-              <div className="entity-page-title">{pendingName}</div>
-              {(pendingBirthYear || pendingDeathYear) && (
+              <div className="entity-page-title">{pending.name}</div>
+              {(pending.birth_year || pending.death_year) && (
                 <div className="entity-page-byline">
-                  {pendingBirthYear ? (
-                    <>b. <YearSpan year={pendingBirthYear} /></>
+                  {pending.birth_year ? (
+                    <>b. <YearSpan year={pending.birth_year} /></>
                   ) : null}
-                  {pendingBirthYear && pendingDeathYear ? ' • ' : null}
-                  {pendingDeathYear ? (
-                    <>d. <YearSpan year={pendingDeathYear} /></>
+                  {pending.birth_year && pending.death_year ? ' • ' : null}
+                  {pending.death_year ? (
+                    <>d. <YearSpan year={pending.death_year} /></>
                   ) : null}
                 </div>
               )}
-              {pendingUsernames ? (
+              {pending.usernames ? (
                 <div className="entity-page-byline-secondary">
-                  {pendingUsernames.split(',').map(u => u.trim()).filter(Boolean).map(u => `@${u}`).join(', ')}
+                  {pending.usernames.split(',').map(u => u.trim()).filter(Boolean).map(u => `@${u}`).join(', ')}
                 </div>
               ) : null}
             </div>
@@ -199,7 +197,7 @@ function Author(props: any) {
                 <TopLevelStarButton
                   type="auth"
                   id={id}
-                  label={pendingName}
+                  label={pending.name}
                   href={`/auth/${id}`}
                 />
                 <TopLevelStandardButton
@@ -233,7 +231,7 @@ function Author(props: any) {
       {notesAbout.length > 0 ? (
         <>
           <div className="entity-page-section-heading">
-            Notes about {pendingName}
+            Notes about {pending.name}
             {notesAboutTotal > notesAbout.length
               ? ` (showing ${notesAbout.length.toLocaleString()} of ${notesAboutTotal.toLocaleString()})`
               : ''}
