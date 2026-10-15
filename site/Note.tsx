@@ -32,6 +32,7 @@ import ClickableLabelButton from './ClickableLabelButton'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import { togglePinned } from './pinned'
 import PinButton from './PinButton'
+import { NoteButton } from './TopLevelStandardButton'
 
 // True when the key event came from a text field that isn't part of the
 // note with this id.
@@ -1065,28 +1066,23 @@ class Note extends React.Component<any, any> {
                   </div>
 
                   <div className="right-div">
-                    <button
-                      className={'button action-button'}
+                    <NoteButton
+                      icon={check_circle}
+                      label="Save (Ctrl-A)"
                       onClick={this.handleAccept.bind(this)}
-                    >
-                      <img src={check_circle}></img>
-                    </button>
-                    <button
-                      className={'button action-button'}
+                    />
+                    <NoteButton
+                      icon={this.state.compactEdit ? eye : eye_closed}
+                      label={this.state.compactEdit ? 'Show all fields' : 'Show fewer fields'}
                       onClick={this.toggleCompact.bind(this)}
-                    >
-                      <img
-                        src={this.state.compactEdit ? eye : eye_closed}
-                      ></img>
-                    </button>
-                    <button
-                      className={'button action-button'}
+                    />
+                    <NoteButton
+                      icon={cross_circle}
+                      label="Cancel"
                       onClick={() => {
                         this.props.setNoteMode(this.props.id, '')
                       }}
-                    >
-                      <img src={cross_circle}></img>
-                    </button>
+                    />
                   </div>
                 </>
               ) : edit_ideas ? (
@@ -1166,69 +1162,59 @@ class Note extends React.Component<any, any> {
                         : '-1'
                     }
                   />
-                  <button
-                    className={'button action-button'}
+                  <NoteButton
+                    icon={pile_img}
+                    label="Piles (Ctrl-P)"
+                    tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
                         constants.note_modes.EDIT_PILES
                       )
                     }}
-                    tabIndex={selected ? this.props.tabIndex : '-1'}
-                  >
-                    <img src={pile_img}></img>
-                  </button>
-                  <button
-                    className={'button action-button'}
+                  />
+                  <NoteButton
+                    icon={tags}
+                    label="Ideas (Ctrl-T)"
+                    tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
                         constants.note_modes.EDIT_IDEAS
                       )
                     }}
-                    tabIndex={selected ? this.props.tabIndex : '-1'}
-                  >
-                    <img src={tags}></img>
-                  </button>
+                  />
                   <Link to={'/note/' + this.props.id} tabIndex={-1}>
-                    <button
-                      className={'button action-button'}
-                      tabIndex={selected ? this.props.tabIndex : '-1'}
-                    >
-                      <img src={document_image}></img>
-                    </button>
+                    <NoteButton icon={document_image} label="Open note" tabbable={selected} />
                   </Link>
-                  <button
-                    className={'button action-button'}
+                  <NoteButton
+                    icon={link}
+                    label="Links (Ctrl-L)"
+                    tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
                         constants.note_modes.EDIT_LINKS
                       )
                     }}
-                    tabIndex={selected ? this.props.tabIndex : '-1'}
-                  >
-                    <img src={link}></img>
-                  </button>
-                  <button
-                    className={'button action-button'}
+                  />
+                  <NoteButton
+                    icon={write}
+                    label="Edit (Ctrl-E)"
+                    tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(
                         this.props.id,
                         constants.note_modes.EDIT
                       )
                     }}
-                    tabIndex={selected ? this.props.tabIndex : '-1'}
-                  >
-                    <img src={write}></img>
-                  </button>
-                  <button
+                  />
+                  <NoteButton
+                    icon={trash}
+                    label="Delete"
+                    tabbable={selected}
                     onClick={this.handleDelete.bind(this)}
-                    className={'button action-button'}
-                    tabIndex={selected ? this.props.tabIndex : '-1'}
-                  >
-                    <img src={trash}></img>
-                  </button>
+                  />
                 </span>
               )}
             </div>

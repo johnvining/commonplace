@@ -47,3 +47,27 @@ export function TopLevelStandardButtonContainer(props: any) {
     </div>
   )
 }
+
+// Icon button in a note's action bar (#302). `label` is its accessible
+// name and tooltip (the buttons are icon-only). `tabbable` decides
+// whether Tab stops on it: only on the note being worked on, so Tab
+// moves between notes otherwise.
+export function NoteButton(props: {
+  icon: string
+  label: string
+  onClick?: (e: any) => void
+  tabbable?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      className="button action-button"
+      onClick={props.onClick}
+      aria-label={props.label}
+      title={props.label}
+      tabIndex={props.tabbable === false ? -1 : undefined}
+    >
+      <img src={props.icon} alt="" />
+    </button>
+  )
+}
