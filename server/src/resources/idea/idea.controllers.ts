@@ -69,7 +69,7 @@ export const findIdeaByString = async function(string: string) {
 }
 
 export const findOrCreateIdea = async function(name: string) {
-  if (name == '') return
+  if (!name?.trim()) return
   // TODO: Can this be done with a single mongo call?
   const idea = await findIdeaByString(name)
 

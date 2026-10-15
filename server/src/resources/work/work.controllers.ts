@@ -154,7 +154,7 @@ export const findWorkByString = async function(name: string) {
 }
 
 export const findOrCreateWork = async function(name: string) {
-  if (name == '') return null
+  if (!name?.trim()) return null
   // TODO: Can this be done with a single mongo call?
   const work = await findWorkByString(name)
   if (work?._id != null) {

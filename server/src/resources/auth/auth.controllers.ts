@@ -128,7 +128,7 @@ export const findAuthorByString = async function (str: string) {
 }
 
 export const findOrCreateAuthor = async function (name: string) {
-  if (name == '') return
+  if (!name?.trim()) return
   // TODO: Can this be done with a single mongo call?
   const author = await findAuthorByString(name)
 

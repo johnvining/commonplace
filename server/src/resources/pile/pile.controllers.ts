@@ -108,7 +108,9 @@ export const deletePile = async function (pileId: string) {
 }
 
 export const findOrCreatePile = async (name: string) => {
-  if (!name) return
+  // Blank names must be caught here: an upsert takes the name from the
+  // filter, which schema validators don't check.
+  if (!name?.trim()) return
   const pile = await Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
   generateNick('pile', pile._id).catch(() => {})
   return pile
