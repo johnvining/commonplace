@@ -34,7 +34,7 @@ export async function findEntityNotesPage(
   sort: Record<string, 1 | -1>
 ) {
   const { skip, limit } = pageParams(req)
-  const tiebreak = sort._id ? {} : { _id: (Object.values(sort)[0] ?? 1) as 1 | -1 }
+  const tiebreak: Record<string, 1 | -1> = sort._id ? {} : { _id: Object.values(sort)[0] ?? 1 }
   let fullSort: Record<string, 1 | -1> = { ...sort, ...tiebreak }
   // ?reverse=1 flips the whole order server-side; reversing each page on
   // the client would scramble the order across pages.
