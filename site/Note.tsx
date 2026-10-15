@@ -438,7 +438,21 @@ class Note extends React.Component<any, any> {
   }
 
   async onImageUpload(image: any) {
-    await db.addImageToNote(this.props.id, image)
+    // The editor keeps its own copy of the text. If it has no unsaved
+    // edits, take the text the server filled in from the image (auto OCR),
+    // or saving would write the old blank text back over it.
+    const savedText = this.props.note.text ?? ''
+    const noUnsavedEdits = () => (this.state.pendingText ?? '') === savedText
+    const editsBefore = !noUnsavedEdits()
+    const response: any = await db.addImageToNote(this.props.id, image)
+    const newText = response?.data?.data?.newNote?.text
+    // Check again: the user may have typed while the upload ran.
+    if (!editsBefore && noUnsavedEdits() && typeof newText === 'string' && newText !== savedText) {
+      this.setState({ pendingText: newText }, () => {
+        const textArea = document.querySelector('#text') as HTMLElement | null
+        if (textArea) autosize.update(textArea)
+      })
+    }
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
 
