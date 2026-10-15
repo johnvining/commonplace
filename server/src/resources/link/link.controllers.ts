@@ -71,7 +71,9 @@ export const reqGetLinksForNote = async (req: Request, res: Response) => {
     .filter(id => String(id) !== String(noteId))
 
   const [notes, nicks] = await Promise.all([
-    Note.find({ _id: { $in: linkedIds } }).lean().exec(),
+    // Most recently updated first, with _id as a tiebreak, so the order is
+    // stable between renders (#325).
+    Note.find({ _id: { $in: linkedIds } }).sort({ updatedAt: -1, _id: -1 }).lean().exec(),
     Nick.find({ note: { $in: linkedIds } }).lean().exec(),
   ])
 

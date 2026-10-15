@@ -1,5 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { authedAgent, createNote } from './setup.js'
+
+// Note updates re-embed in the background; keep that off OpenAI.
+vi.mock('../src/utils/embeddings.js', async (orig) => {
+  const actual = await orig()
+  return { ...actual, embedNoteIfStale: vi.fn().mockResolvedValue(null) }
+})
 
 async function nickFor(agent, noteId) {
   const res = await agent.put(`/api/nick/note/${noteId}`).expect(200)
@@ -92,4 +98,26 @@ describe('link', () => {
       expect(res.body.data).toHaveLength(0)
     })
   })
+
+describe('GET /api/link/note/:id order', () => {
+  it('lists linked notes most recently updated first', async () => {
+    const agent = await authedAgent()
+    const hub = await createNote(agent, { title: 'hub' })
+    const titles = ['old', 'middle', 'new']
+    const notes = []
+    for (const title of titles) notes.push(await createNote(agent, { title }))
+    // Link in an order unrelated to update time.
+    for (const n of [notes[1], notes[2], notes[0]]) {
+      await agent.put('/api/link/').send({ fromId: String(hub._id), toId: String(n._id) }).expect(200)
+    }
+    for (const n of notes) {
+      await agent.put(`/api/note/${n._id}`).send({ text: 'touched ' + n.title }).expect(200)
+      await new Promise(r => setTimeout(r, 15))
+    }
+    for (let i = 0; i < 3; i++) {
+      const res = await agent.get(`/api/link/note/${hub._id}`).expect(200)
+      expect(res.body.data.map(n => n.title)).toEqual(['new', 'middle', 'old'])
+    }
+  })
+})
 })
