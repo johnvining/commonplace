@@ -94,7 +94,15 @@ class Note extends React.Component<any, any> {
     ].includes(this.props.mode)
   }
 
+  // Text the editor last took from an upload response, until the note's
+  // props catch up (see onImageUpload). A refetch from an earlier upload
+  // can land with older text, so only let go once the props match.
+  _serverText: string | null = null
+
   componentDidUpdate(prevProps: any) {
+    if (this._serverText !== null && this.props.note?.text === this._serverText) {
+      this._serverText = null
+    }
     const wasEditing = [
       constants.note_modes.EDIT,
       constants.note_modes.EDIT_IDEAS,
@@ -396,6 +404,7 @@ class Note extends React.Component<any, any> {
     this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
     try {
       await db.updateRecord(db.types.note, this.props.id, updateObject)
+      this._serverText = null
       this.props.refetchMe(this.props.index)
     } catch (error) {
       // Stay in edit mode so the user can retry; the axios interceptor
@@ -466,18 +475,26 @@ class Note extends React.Component<any, any> {
   async onImageUpload(image: any) {
     // The editor keeps its own copy of the text. If it has no unsaved
     // edits, take the text the server filled in from the image (auto OCR),
-    // or saving would write the old blank text back over it.
-    const savedText = this.props.note.text ?? ''
-    const noUnsavedEdits = () => (this.state.pendingText ?? '') === savedText
-    const editsBefore = !noUnsavedEdits()
+    // or saving would write the old text back over it.
     const response: any = await db.addImageToNote(this.props.id, image)
     const newText = response?.data?.data?.newNote?.text
-    // Check again: the user may have typed while the upload ran.
-    if (!editsBefore && noUnsavedEdits() && typeof newText === 'string' && newText !== savedText) {
-      this.setState({ pendingText: newText }, () => {
-        const textArea = document.querySelector('#text') as HTMLElement | null
-        if (textArea) autosize.update(textArea)
-      })
+    if (typeof newText === 'string') {
+      // Decide in an updater. Updaters run in order against the latest
+      // editor text, so with several images each upload builds on the
+      // last one's text even before the note is refetched; anything typed
+      // meanwhile is kept.
+      this.setState(
+        (prev: any) => {
+          const lastServerText = this._serverText ?? this.props.note.text ?? ''
+          if (newText === lastServerText || (prev.pendingText ?? '') !== lastServerText) return null
+          this._serverText = newText
+          return { pendingText: newText }
+        },
+        () => {
+          const textArea = document.querySelector('#text') as HTMLElement | null
+          if (textArea) autosize.update(textArea)
+        }
+      )
     }
     this.props.getImagesForNoteAtIndex(this.props.index, true)
   }
