@@ -5,6 +5,7 @@ export interface IdeaDoc {
   name?: string
   start_year?: number
   end_year?: number
+  text?: string
   person?: boolean
   createdAt: Date
   updatedAt: Date
@@ -15,6 +16,8 @@ const ideaSchema = new Schema<IdeaDoc>(
     name: { type: String, required: true, trim: true },
     start_year: Number,
     end_year: Number,
+    // Free-form overview notes (#317).
+    text: String,
     // Marks an idea that is a person (#313).
     person: { type: Boolean, default: false },
   },

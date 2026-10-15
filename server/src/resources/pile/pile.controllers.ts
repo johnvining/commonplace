@@ -140,5 +140,5 @@ export const getWorksForPile = async function (pileId: string) {
     .exec()
 }
 
-const PILE_WRITABLE = ['name', 'start_year', 'end_year'] as const
+const PILE_WRITABLE = ['name', 'start_year', 'end_year', 'text'] as const
 export default defaultControllers(Pile, { writable: PILE_WRITABLE })
