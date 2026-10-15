@@ -31,6 +31,9 @@ class NoteList extends React.Component<any, any> {
     useGridView: 1,
     page: 1,
     pageLoading: false,
+    // Full match count when the list endpoint reports one (entity pages);
+    // null for lists that don't, which keep open-ended paging.
+    total: null,
   }
 
   getActiveNoteId(event: any) {
@@ -46,13 +49,10 @@ class NoteList extends React.Component<any, any> {
       this.state.page
     )
 
-    const notes = this.props.reverse
-      ? response.data.data.reverse()
-      : response.data.data
-
     this.setState(
       {
-        notes: notes,
+        notes: response.data.data,
+        total: db.notePageTotal(response),
       },
       () => {
         this.setupImageObserver()
@@ -156,6 +156,7 @@ class NoteList extends React.Component<any, any> {
     this.setState(
       {
         notes: response.data.data,
+        total: db.notePageTotal(response),
         page: this.state.page + 1,
         selectedArray: [],
         selectedNote: '',
@@ -177,6 +178,7 @@ class NoteList extends React.Component<any, any> {
     this.setState(
       {
         notes: response.data.data,
+        total: db.notePageTotal(response),
         page: this.state.page - 1,
         selectedArray: [],
         selectedNote: '',
@@ -554,14 +556,60 @@ class NoteList extends React.Component<any, any> {
     this.clearSelection()
   }
 
+  renderPager(lastPage: number | null, onLastPage: boolean) {
+    return (
+      <>
+        <div>
+          p. {this.state.pageLoading ? '…' : this.state.page}
+          {lastPage === null ? null : ` of ${lastPage}`}
+          {this.state.total === null || lastPage === 1
+            ? null
+            : ` · ${this.state.total.toLocaleString()} notes`}
+        </div>
+
+        <TopLevelStandardButtonContainer>
+          <TopLevelStandardButton
+            onClick={this.decPage.bind(this)}
+            multiSelect={true}
+            position={this.state.page == 1 ? 'hidden' : onLastPage ? 'left-right' : 'left'}
+            disabled={this.state.pageLoading}
+          >
+            <img src={left} />
+          </TopLevelStandardButton>
+          <TopLevelStandardButton
+            onClick={this.incPage.bind(this)}
+            multiSelect={true}
+            position={onLastPage ? 'hidden' : this.state.page == 1 ? 'left-right' : 'right'}
+            disabled={this.state.pageLoading}
+          >
+            <img src={right} />
+          </TopLevelStandardButton>
+        </TopLevelStandardButtonContainer>
+      </>
+    )
+  }
+
   render() {
     var showMultiselect =
       this.props.viewMode == constants.view_modes.FULL ||
       this.props.viewMode == constants.view_modes.RESULT
     var isTileView = this.props.viewMode == constants.view_modes.TILE
+    const lastPage =
+      this.state.total === null || !this.props.pageSize
+        ? null
+        : Math.max(1, Math.ceil(this.state.total / this.props.pageSize))
+    const onLastPage = lastPage !== null && this.state.page >= lastPage
     return (
       <div className="multi-select">
-        {showMultiselect ? null : this.state.selectedArray.some((x: any) => x) ? (
+        {showMultiselect ? (
+          // Full/Result views have no multi-select bar, but entity pages
+          // with more than one page still need the pager.
+          lastPage !== null && lastPage > 1 ? (
+            <div className="multi-select-top-bar">
+              {this.renderPager(lastPage, onLastPage)}
+            </div>
+          ) : null
+        ) : this.state.selectedArray.some((x: any) => x) ? (
           <div className="multi-select-top-bar">
             {this.state.addSomething ? (
               <Autocomplete
@@ -648,26 +696,7 @@ class NoteList extends React.Component<any, any> {
               />
             </TopLevelStandardButtonContainer>
 
-            <div>p. {this.state.pageLoading ? '…' : this.state.page}</div>
-
-            <TopLevelStandardButtonContainer>
-              <TopLevelStandardButton
-                onClick={this.decPage.bind(this)}
-                multiSelect={true}
-                position={this.state.page == 1 ? 'hidden' : 'left'}
-                disabled={this.state.pageLoading}
-              >
-                <img src={left} />
-              </TopLevelStandardButton>
-              <TopLevelStandardButton
-                onClick={this.incPage.bind(this)}
-                multiSelect={true}
-                position={this.state.page == 1 ? 'left-right' : 'right'}
-                disabled={this.state.pageLoading}
-              >
-                <img src={right} />
-              </TopLevelStandardButton>
-            </TopLevelStandardButtonContainer>
+            {this.renderPager(lastPage, onLastPage)}
           </div>
         )}
         {this.state.notes === undefined ? (

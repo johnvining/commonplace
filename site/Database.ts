@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { showToast } from './Toast'
+import { ENTITY_NOTES_PAGE_SIZE } from './constants'
 
 axios.defaults.withCredentials = true
 // CSRF defence-in-depth: server rejects state-changing requests without
@@ -109,9 +110,42 @@ export async function getRecordsWithFilter(recordType: string, filterType: strin
   )
 }
 
+// One page of an entity's notes. The response's X-Total-Count header holds
+// the full count; see notePageTotal.
+export async function getNotesPageForEntity(
+  filterType: string,
+  filterId: string,
+  page: number = 1,
+  { reverse = false }: { reverse?: boolean } = {}
+) {
+  return axios.get(url_api + filterType + '/' + filterId + '/notes', {
+    params: entityPageParams(page, reverse),
+  })
+}
+
 // All notes for an author, including notes on their works
-export async function getAllNotesForAuthor(authorId: string) {
-  return axios.get(url_api + 'auth/' + authorId + '/all-notes')
+export async function getAllNotesForAuthor(authorId: string, page: number = 1) {
+  return axios.get(url_api + 'auth/' + authorId + '/all-notes', {
+    params: entityPageParams(page),
+  })
+}
+
+function entityPageParams(page: number, reverse = false) {
+  const p = Math.max(1, Number(page) || 1)
+  return {
+    skip: (p - 1) * ENTITY_NOTES_PAGE_SIZE,
+    limit: ENTITY_NOTES_PAGE_SIZE,
+    ...(reverse ? { reverse: 1 } : {}),
+  }
+}
+
+// Total match count from a paged entity-notes response, or null if the
+// endpoint doesn't report one.
+export function notePageTotal(response: any): number | null {
+  const raw = response?.headers?.['x-total-count']
+  if (raw == null) return null
+  const n = Number(raw)
+  return Number.isFinite(n) ? n : null
 }
 
 // Supported combinations:

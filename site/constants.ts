@@ -80,3 +80,7 @@ export const keyboardScopes = {
   ENTITY_PAGE: 'entity_page',
   GLOBAL: 'global',
 }
+
+// Notes per page on entity pages (author, idea, pile, work). Matches the
+// server's per-request cap, so entities under it still show on one page.
+export const ENTITY_NOTES_PAGE_SIZE = 500

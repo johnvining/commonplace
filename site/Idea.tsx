@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import * as constants from './constants'
 import NoteList from './NoteList'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
@@ -47,10 +48,10 @@ function Idea(props: any) {
     fetchIdeaInfo(id)
   }, [id])
 
-  const getListOfNotes = async () => {
+  const getListOfNotes = async (_index: any, page: number) => {
     var notesResponse
     await db
-      .getRecordsWithFilter(db.types.note, db.types.idea, id)
+      .getNotesPageForEntity(db.types.idea, id, page)
       .then((response: any) => {
         notesResponse = response
       })
@@ -194,6 +195,7 @@ function Idea(props: any) {
         key={'idea' + id}
         viewMode={props.viewMode}
         getListOfNotes={getListOfNotes}
+        pageSize={constants.ENTITY_NOTES_PAGE_SIZE}
       />
     </div>
   )

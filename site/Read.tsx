@@ -44,10 +44,10 @@ function Read(props: any) {
     fetchWorkInfo(id)
   }, [id])
 
-  const getListOfNotes = async () => {
+  const getListOfNotes = async (_index: any, page: number) => {
     var notesResponse
     await db
-      .getRecordsWithFilter(db.types.note, db.types.work, id)
+      .getNotesPageForEntity(db.types.work, id, page, { reverse: true })
       .then((response: any) => {
         notesResponse = response
       })
@@ -119,7 +119,7 @@ function Read(props: any) {
         key={'work' + id}
         viewMode={constants.view_modes.RESULT}
         getListOfNotes={getListOfNotes}
-        reverse={true}
+        pageSize={constants.ENTITY_NOTES_PAGE_SIZE}
       />
     </>
   )

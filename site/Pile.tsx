@@ -58,10 +58,10 @@ function Pile(props: any) {
     navigate('/')
   }
 
-  const getListOfNotes = async () => {
+  const getListOfNotes = async (_index: any, page: number) => {
     var notesResponse
     await db
-      .getRecordsWithFilter(db.types.note, db.types.pile, id)
+      .getNotesPageForEntity(db.types.pile, id, page)
       .then((response: any) => {
         notesResponse = response
       })
@@ -230,6 +230,7 @@ function Pile(props: any) {
           key={'noteList' + id}
           viewMode={props.viewMode}
           getListOfNotes={getListOfNotes}
+          pageSize={constants.ENTITY_NOTES_PAGE_SIZE}
         />
       ) : (
         <>
@@ -238,6 +239,7 @@ function Pile(props: any) {
             key={'noteList' + id}
             viewMode={constants.view_modes.RESULT}
             getListOfNotes={getListOfNotes}
+            pageSize={constants.ENTITY_NOTES_PAGE_SIZE}
           />
         </>
       )}

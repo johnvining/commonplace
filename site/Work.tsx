@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import * as constants from './constants'
 import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
 import PileListForItem from './PileListForItem'
@@ -147,10 +148,10 @@ function Work(props: any) {
     }
   }, [edit, pendingSummary])
 
-  const getListOfNotes = async () => {
+  const getListOfNotes = async (_index: any, page: number) => {
     var notesResponse
     await db
-      .getRecordsWithFilter(db.types.note, db.types.work, id)
+      .getNotesPageForEntity(db.types.work, id, page)
       .then((response: any) => {
         notesResponse = response
       })
@@ -509,6 +510,7 @@ function Work(props: any) {
           key={`work-${id}-${notesRefreshKey}`}
           viewMode={props.viewMode}
           getListOfNotes={getListOfNotes}
+          pageSize={constants.ENTITY_NOTES_PAGE_SIZE}
           hideCitation
         />
       )}

@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import * as constants from './constants'
 import NoteList from './NoteList'
 import { useState, useEffect } from 'react'
 import {
@@ -27,7 +28,8 @@ function AuthorNotes(props: any) {
       })
   }
 
-  const getAllNotesForAuthor = () => db.getAllNotesForAuthor(id)
+  const getAllNotesForAuthor = (_index: any, page: number) =>
+    db.getAllNotesForAuthor(id, page)
 
   useEffect(() => {
     fetchAuthorInfo(id)
@@ -54,6 +56,7 @@ function AuthorNotes(props: any) {
         viewMode={props.viewMode}
         useGroupings={true}
         getListOfNotes={getAllNotesForAuthor}
+        pageSize={constants.ENTITY_NOTES_PAGE_SIZE}
       />
     </div>
   )
