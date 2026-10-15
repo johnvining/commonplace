@@ -33,6 +33,18 @@ import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import { togglePinned } from './pinned'
 import PinButton from './PinButton'
 
+// True when the key event came from a text field that isn't part of the
+// note with this id.
+function isFieldOutsideNote(target: any, noteId: string) {
+  if (!target || typeof target.closest !== 'function') return false
+  const isField =
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.isContentEditable
+  if (!isField) return false
+  return !target.closest(`[data-note-id="${noteId}"]`)
+}
+
 class Note extends React.Component<any, any> {
   state: any = {
     largeImage: -1,
@@ -130,6 +142,14 @@ class Note extends React.Component<any, any> {
 
     // Only handle if this note is selected or in edit mode
     if (!selected && !anyEditMode) {
+      return false
+    }
+
+    // Note handlers outrank entity handlers, so without this a key typed
+    // into a field elsewhere on the page (e.g. the idea name on an idea
+    // page) would act on this note: Ctrl+S replaced its title (#316),
+    // Ctrl+A saved it.
+    if (isFieldOutsideNote(event.target, this.props.id)) {
       return false
     }
 
