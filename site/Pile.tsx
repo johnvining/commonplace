@@ -7,7 +7,7 @@ import WorkList from './WorkList'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
-import { saveAndExitEdit } from './saveAndExitEdit'
+import { useEntityEditor } from './useEntityEditor'
 import ClickToCopyNick from './ClickToCopyNick'
 import {
   TopLevelStandardButtonContainer,
@@ -24,10 +24,12 @@ import { togglePinned } from './pinned'
 
 function Pile(props: any) {
   const { id = '' } = useParams()
-  const [edit, setEdit] = useState(false)
-  const [pendingName, setPendingName] = useState('')
-  const [pendingStartYear, setPendingStartYear] = useState('')
-  const [pendingEndYear, setPendingEndYear] = useState('')
+  const editor = useEntityEditor(db.types.pile, id, {
+    name: '',
+    start_year: '' as number | string,
+    end_year: '' as number | string,
+  })
+  const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
@@ -37,9 +39,11 @@ function Pile(props: any) {
       db.getPileNick(pileId),
     ]).then(([infoResponse, nickResponse]) => {
       const pile = infoResponse.data.data
-      setPendingName(pile.name)
-      setPendingStartYear(pile.start_year)
-      setPendingEndYear(pile.end_year)
+      editor.load({
+        name: pile.name,
+        start_year: pile.start_year ?? '',
+        end_year: pile.end_year ?? '',
+      })
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
       console.error(error)
@@ -51,7 +55,7 @@ function Pile(props: any) {
   }, [id])
 
   const handleDeletePile = async () => {
-    if (!confirm(`Do you want to permanently delete '${pendingName}'?`)) {
+    if (!confirm(`Do you want to permanently delete '${pending.name}'?`)) {
       return
     }
 
@@ -87,18 +91,7 @@ function Pile(props: any) {
     return worksResponse
   }
 
-  const handleAcceptUpdates = async () => {
-    var updateObject = {
-      name: pendingName,
-      start_year: pendingStartYear,
-      end_year: pendingEndYear,
-    }
-
-    await saveAndExitEdit(
-      () => db.updateRecord(db.types.pile, id, updateObject),
-      setEdit
-    )
-  }
+  const handleAcceptUpdates = () => editor.save()
 
   const createNoteForPile = async () => {
     try {
@@ -121,7 +114,7 @@ function Pile(props: any) {
     togglePinned({
       type: 'pile',
       id,
-      label: pendingName,
+      label: pending.name,
       href: `/pile/${id}`,
     })
   }
@@ -131,12 +124,12 @@ function Pile(props: any) {
     isEditing: edit,
     onEdit: () => setEdit(true),
     onSave: handleAcceptUpdates,
-    onExitEdit: () => setEdit(false),
+    onExitEdit: editor.cancel,
     onNewNote: createNoteForPile,
     onToggleStar: toggleStar,
   })
 
-  props.setPageTitle(titleWithNick(pendingName, nick))
+  props.setPageTitle(titleWithNick(pending.name, nick))
   return (
     <div>
       {/* Header and Edit */}
@@ -147,25 +140,25 @@ function Pile(props: any) {
               name="Name"
               id="title"
               autoFocus
-              defaultValue={pendingName}
+              defaultValue={pending.name}
               onChange={(e: any) => {
-                setPendingName(e.target.value)
+                editor.set('name', e.target.value)
               }}
             />
             <TopLevelFormInput
               name="Start Year"
               id="startYear"
-              defaultValue={pendingStartYear}
+              defaultValue={pending.start_year}
               onChange={(e: any) => {
-                setPendingStartYear(e.target.value)
+                editor.set('start_year', e.target.value)
               }}
             />
             <TopLevelFormInput
               name="End Year"
               id="endYear"
-              defaultValue={pendingEndYear}
+              defaultValue={pending.end_year}
               onChange={(e: any) => {
-                setPendingEndYear(e.target.value)
+                editor.set('end_year', e.target.value)
               }}
             />
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
@@ -173,12 +166,12 @@ function Pile(props: any) {
         ) : (
           <div className="entity-page-header">
             <div className="entity-page-header-left">
-              <div className="entity-page-title">{pendingName}</div>
-              {(pendingStartYear || pendingEndYear) && (
+              <div className="entity-page-title">{pending.name}</div>
+              {(pending.start_year || pending.end_year) && (
                 <div className="entity-page-byline">
-                  {pendingStartYear ? <YearSpan year={pendingStartYear} /> : null}
-                  {pendingStartYear && pendingEndYear ? ' • ' : null}
-                  {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
+                  {pending.start_year ? <YearSpan year={pending.start_year} /> : null}
+                  {pending.start_year && pending.end_year ? ' • ' : null}
+                  {pending.end_year ? <YearSpan year={pending.end_year} /> : null}
                 </div>
               )}
               {nick && (
@@ -192,7 +185,7 @@ function Pile(props: any) {
                 <TopLevelStarButton
                   type="pile"
                   id={id}
-                  label={pendingName}
+                  label={pending.name}
                   href={`/pile/${id}`}
                 />
                 <TopLevelStandardButton
