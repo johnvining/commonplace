@@ -15,8 +15,8 @@ import { pickAllowed } from '../../utils/pickAllowed.js'
 import type { Request, Response } from 'express'
 
 const WORK_WRITABLE = [
-  'name', 'authors', 'url', 'year', 'citation_information', 'summary', 'piles',
-  'ideas',
+  'name', 'original_name', 'authors', 'url', 'year', 'citation_information', 'summary',
+  'piles', 'ideas',
 ] as const
 
 
@@ -155,7 +155,13 @@ export const reqRemovePileFromWork = async (req: Request, res: Response) => {
 
 export const findWorksByString = async function(string: string, withCounts = false) {
   const works = rankByName(
-    await Work.find({ name: new RegExp(escapeRegexInput(string), 'i') })
+    // Match the original title too, so either name finds the work.
+    await Work.find({
+      $or: [
+        { name: new RegExp(escapeRegexInput(string), 'i') },
+        { original_name: new RegExp(escapeRegexInput(string), 'i') },
+      ],
+    })
       .populate('authors')
       .lean()
       .exec(),

@@ -3,6 +3,7 @@ import mongoose, { Schema, Types } from 'mongoose'
 export interface WorkDoc {
   _id: Types.ObjectId
   name?: string
+  original_name?: string
   authors: Types.ObjectId[]
   url?: string
   year?: number
@@ -17,6 +18,8 @@ export interface WorkDoc {
 const workSchema = new Schema<WorkDoc>(
   {
     name: { type: String, required: true, trim: true },
+    // Title in the original language when `name` is a translation (#221).
+    original_name: { type: String, trim: true },
     authors: [{ type: Schema.Types.ObjectId, ref: 'author' }],
     url: String,
     year: Number,
