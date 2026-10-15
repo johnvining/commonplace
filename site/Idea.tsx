@@ -27,6 +27,7 @@ function Idea(props: any) {
   const [pendingName, setPendingName] = useState('')
   const [pendingStartYear, setPendingStartYear] = useState('')
   const [pendingEndYear, setPendingEndYear] = useState('')
+  const [pendingPerson, setPendingPerson] = useState(false)
   const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
@@ -39,6 +40,7 @@ function Idea(props: any) {
       setPendingName(idea.name)
       setPendingStartYear(idea.start_year)
       setPendingEndYear(idea.end_year)
+      setPendingPerson(Boolean(idea.person))
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
       console.error(error)
@@ -77,6 +79,7 @@ function Idea(props: any) {
       name: pendingName,
       start_year: pendingStartYear,
       end_year: pendingEndYear,
+      person: pendingPerson,
     }
 
     await saveAndExitEdit(
@@ -152,14 +155,25 @@ function Idea(props: any) {
                 setPendingEndYear(e.target.value)
               }}
             />
+            <label htmlFor="person" className="top-level form-label">
+              <input
+                id="person"
+                type="checkbox"
+                checked={pendingPerson}
+                onChange={(e: any) => setPendingPerson(e.target.checked)}
+              />{' '}
+              This idea is a person
+            </label>
             <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
           <div className="entity-page-header">
             <div className="entity-page-header-left">
               <div className="entity-page-title">{pendingName}</div>
-              {(pendingStartYear || pendingEndYear) && (
+              {(pendingPerson || pendingStartYear || pendingEndYear) && (
                 <div className="entity-page-byline">
+                  {pendingPerson ? 'Person' : null}
+                  {pendingPerson && (pendingStartYear || pendingEndYear) ? ' • ' : null}
                   {pendingStartYear ? <YearSpan year={pendingStartYear} /> : null}
                   {pendingStartYear && pendingEndYear ? ' • ' : null}
                   {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}

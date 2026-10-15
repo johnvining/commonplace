@@ -43,3 +43,14 @@ describe('people on notes', () => {
     expect((await getNote(agent, note._id)).people.map(p => p.name)).toEqual(['Kept'])
   })
 })
+
+describe('ideas marked as people', () => {
+  it('defaults to not a person and can be marked as one', async () => {
+    const agent = await authedAgent()
+    const idea = await createIdea(agent, 'Socrates')
+    expect(idea.person).toBe(false)
+    await agent.put(`/api/idea/${idea._id}`).send({ person: true }).expect(200)
+    const res = await agent.get(`/api/idea/${idea._id}`).expect(200)
+    expect(res.body.data.person).toBe(true)
+  })
+})
