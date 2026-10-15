@@ -23,6 +23,8 @@ import { sanitizeSearchInput, escapeRegexInput } from '../../utils/searchInput.j
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
 import type { Request, Response } from 'express'
+import { findEntityNotesPage } from '../../utils/pagination.js'
+import { isValidObjectId } from 'mongoose'
 
 
 const pageSize = 40
@@ -893,3 +895,25 @@ export const findRandomNotesAndPopulate = async function (
 }
 
 export default defaultControllers(Note, { writable: NOTE_WRITABLE })
+
+// GET /note/filter?piles=a,b&ideas=c: notes in every listed pile and
+// with every listed idea (#279). Paged like the entity-notes endpoints.
+export const reqFilterNotes = async (req: Request, res: Response) => {
+  const ids = (param: unknown) =>
+    String(param ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  const piles = ids(req.query.piles)
+  const ideas = ids(req.query.ideas)
+  if (!piles.length && !ideas.length) {
+    return res.status(400).json({ message: 'Give at least one pile or idea' })
+  }
+  if (![...piles, ...ideas].every((id) => isValidObjectId(id))) {
+    return res.status(400).json({ message: 'Invalid id' })
+  }
+  const query: Record<string, unknown> = {}
+  if (piles.length) query.piles = { $all: piles }
+  if (ideas.length) query.ideas = { $all: ideas }
+  return findEntityNotesPage(req, res, query, { updatedAt: -1 })
+}

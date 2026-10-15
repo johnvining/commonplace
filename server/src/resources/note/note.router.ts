@@ -30,6 +30,7 @@ import controllers, {
   reqBulkImportNotesCSV,
   reqBulkEmbedNotes,
   reqUnifiedSearch,
+  reqFilterNotes,
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 import { requireObjectIdParam } from '../../utils/validateObjectId.js'
@@ -96,6 +97,7 @@ router.route('/import/instapaper').put(asyncWrapper(reqBulkImportInstapaper, 200
 router.route('/bulk-embed').post(asyncWrapper(reqBulkEmbedNotes, 200))
 
 router.route('/unified-search').post(asyncWrapper(reqUnifiedSearch, 200))
+router.route('/filter').get(asyncWrapper(reqFilterNotes, 200))
 
 router.route('/:id/opened').post(requireObjectIdParam('id'), asyncWrapper(recordOpened(Note), 200))
 
