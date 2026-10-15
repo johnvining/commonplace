@@ -13,6 +13,7 @@ interface NoteForEmbedding {
   take?: string | null
   ocrText?: string | null
   authors?: Array<{ name?: string | null } | unknown>
+  people?: Array<{ name?: string | null } | unknown>
   work?: { name?: string | null } | unknown
   ideas?: Array<{ name?: string | null } | unknown>
   images?: string[]
@@ -55,6 +56,7 @@ export function buildEmbeddingInput(note: NoteForEmbedding): string {
     note.take,
     note.ocrText,
     note.authors?.map((a) => maybeName(a)).filter(Boolean).join(', '),
+    note.people?.map((p) => maybeName(p)).filter(Boolean).join(', '),
     maybeName(note.work),
     note.ideas?.map((i) => maybeName(i)).filter(Boolean).join(', '),
   ]

@@ -4,6 +4,7 @@ export interface NoteDoc {
   _id: Types.ObjectId
   title?: string
   authors: Types.ObjectId[]
+  people: Types.ObjectId[]
   text?: string
   ideas: Types.ObjectId[]
   work?: Types.ObjectId
@@ -24,6 +25,8 @@ const noteSchema = new Schema<NoteDoc>(
   {
     title: String,
     authors: [{ type: Schema.Types.ObjectId, ref: 'author' }],
+    // People the note is about (#246), as opposed to who wrote it.
+    people: [{ type: Schema.Types.ObjectId, ref: 'author' }],
     text: String,
     ideas: [{ type: Schema.Types.ObjectId, ref: 'idea' }],
     work: {
@@ -42,6 +45,7 @@ const noteSchema = new Schema<NoteDoc>(
   },
   { timestamps: true }
 )
+noteSchema.index({ people: 1 })
 noteSchema.index({ title: 'text', text: 'text', take: 'text', ocrText: 'text' })
 
 noteSchema.index({ authors: 1 })

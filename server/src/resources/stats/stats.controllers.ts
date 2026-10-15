@@ -50,6 +50,7 @@ async function recentNotes() {
     .limit(RECENT_LIMIT)
     .select('-embedding -ocrText -embeddingHash')
     .populate('authors')
+    .populate('people')
     .populate('ideas')
     .populate('piles')
     .populate({ path: 'work', populate: { path: 'authors' } })

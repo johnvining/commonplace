@@ -34,7 +34,7 @@ const LIST_OMIT = '-embedding -ocrText'
 // payload should be able to overwrite them.
 const NOTE_WRITABLE = [
   'title', 'authors', 'text', 'ideas', 'work', 'year', 'url',
-  'images', 'page', 'piles', 'take', 'ocrText',
+  'images', 'page', 'piles', 'take', 'ocrText', 'people',
 ] as const
 
 // Lean note + runtime augmentations added across the request pipeline:
@@ -60,6 +60,7 @@ export const reqFindNotesByString = async (req: Request, res: Response) => {
     .sort({ score: { $meta: 'textScore' } })
     .select(LIST_OMIT)
     .populate('authors')
+    .populate('people')
     .populate('ideas')
     .populate('piles')
     .populate({ path: 'work', populate: { path: 'authors' } })
@@ -417,6 +418,7 @@ export const createNoteObj = async function (obj: object) {
 export const updateNote = async (noteId: unknown, updateObj: Record<string, unknown>) => {
   return await Note.findOneAndUpdate({ _id: noteId }, updateObj, { new: true })
     .populate('authors')
+    .populate('people')
     .populate('ideas')
     .populate('piles')
     .populate({
@@ -643,6 +645,7 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
       .limit(50)
       .select(LIST_OMIT)
       .populate('authors')
+      .populate('people')
       .populate('ideas')
       .populate('piles')
       .populate({ path: 'work', populate: { path: 'authors' } })
@@ -673,6 +676,7 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
     semanticOnlyNotes = (await Note.find({ _id: { $in: semanticOnlyIds } })
       .select(LIST_OMIT)
       .populate('authors')
+      .populate('people')
       .populate('ideas')
       .populate('piles')
       .populate({ path: 'work', populate: { path: 'authors' } })
@@ -764,6 +768,7 @@ export async function embedStaleNotes(filter: Record<string, unknown> = {}) {
       .skip(skip)
       .limit(BATCH)
       .populate('authors')
+      .populate('people')
       .populate('ideas')
       .populate({ path: 'work', populate: { path: 'authors' } })
       .lean()
@@ -824,6 +829,7 @@ export const findNotesAndPopulate = async function (
       .limit(limit)
       .select(projection)
       .populate('authors')
+      .populate('people')
       .populate('ideas')
       .populate('piles')
       .populate({

@@ -12,6 +12,11 @@ export const reqGetNotesForAuthor = async (req: Request, res: Response) => {
   return findEntityNotesPage(req, res, { authors: req.params.id }, { updatedAt: -1 })
 }
 
+// Notes about this person, as opposed to notes they wrote (#246).
+export const reqGetNotesAboutAuthor = async (req: Request, res: Response) => {
+  return findEntityNotesPage(req, res, { people: req.params.id }, { updatedAt: -1 })
+}
+
 export const reqGetAllNotesForAuthor = async (req: Request, res: Response) => {
   const authorId = req.params.id
   const works = await Work.find({ authors: authorId }, { _id: 1 }).lean().exec()
@@ -146,6 +151,7 @@ export const deleteAuthor = async function (id: string) {
   // version needed. Author has no nick, so nothing to drop on that side.
   const steps: Array<() => Promise<unknown>> = [
     () => Note.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
+    () => Note.updateMany({ people: id }, { $pull: { people: id } }).exec(),
     () => Work.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
   ]
   await runCascadeSteps('deleteAuthor', steps)
