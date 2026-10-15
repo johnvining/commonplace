@@ -45,6 +45,10 @@ function Read(props: any) {
     fetchWorkInfo(id)
   }, [id])
 
+  useEffect(() => {
+    if (id) db.recordOpened(db.types.work, id)
+  }, [id])
+
   const getListOfNotes = async (_index: any, page: number) => {
     var notesResponse
     await db

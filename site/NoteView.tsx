@@ -36,6 +36,9 @@ function NoteView(props: any) {
     const note = notesResponse?.data?.data?.[0]
     if (!note) return notesResponse
 
+    // NoteList loads this once per page visit, so this counts one open.
+    db.recordOpened(db.types.note, note._id)
+
     props.setPageTitle(notePageTitle(note))
 
     return notesResponse

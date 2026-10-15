@@ -303,6 +303,12 @@ export async function getMaintenanceJob(jobId: string) {
   return axios.get(url_api + 'maintenance/jobs/' + jobId)
 }
 
+// Count one opening of a note's or work's page (#333). Best effort: a
+// failed count shouldn't get in the way of reading.
+export function recordOpened(type: string, id: string) {
+  return axios.post(url_api + type + '/' + id + '/opened').catch(() => null)
+}
+
 export async function getStats() {
   return axios.get(url_api + 'stats')
 }

@@ -131,6 +131,10 @@ function Work(props: any) {
     fetchWorkInfo(id)
   }, [id])
 
+  useEffect(() => {
+    if (id) db.recordOpened(db.types.work, id)
+  }, [id])
+
   // Handle click events on nick links using event delegation
   useEffect(() => {
     const handleNickLinkClick = (e: any) => {
