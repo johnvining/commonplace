@@ -126,7 +126,9 @@ a {
     align-self: center;
     justify-content: center;
 
-    @include tablet-plus {
+    // Only when there's room: below ~860px the counts squeeze the toolbar
+    // onto a second row (#336). 900px leaves headroom for bigger numbers.
+    @media (min-width: 900px) {
       display: flex;
     }
   }

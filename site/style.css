@@ -826,7 +826,7 @@ div .top-bar {
   align-self: center;
   justify-content: center;
 }
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .top-bar .stats-center {
     display: flex;
   }
