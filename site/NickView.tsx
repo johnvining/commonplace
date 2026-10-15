@@ -34,18 +34,20 @@ function NickView(props: any) {
           }
           return
         }
+        // Replace the nick URL in history, so Back from the page doesn't
+        // land on the nick URL and redirect forward again.
         switch (nickData.key?.charAt(0)) {
           case 'n':
-            navigate('/note/' + nickData.note)
+            navigate('/note/' + nickData.note, { replace: true })
             return
           case 'w':
-            navigate('/work/' + nickData.work)
+            navigate('/work/' + nickData.work, { replace: true })
             return
           case 'i':
-            navigate('/idea/' + nickData.idea)
+            navigate('/idea/' + nickData.idea, { replace: true })
             return
           case 'p':
-            navigate('/pile/' + nickData.pile)
+            navigate('/pile/' + nickData.pile, { replace: true })
             return
           default:
             if (isMounted) {
