@@ -20,15 +20,17 @@ import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { TopLevelStarButton } from './PinButton'
 import ClickToCopyNick from './ClickToCopyNick'
 import { togglePinned } from './pinned'
-import { saveAndExitEdit } from './saveAndExitEdit'
+import { useEntityEditor } from './useEntityEditor'
 
 function Idea(props: any) {
   const { id = '' } = useParams()
-  const [edit, setEdit] = useState(false)
-  const [pendingName, setPendingName] = useState('')
-  const [pendingStartYear, setPendingStartYear] = useState('')
-  const [pendingEndYear, setPendingEndYear] = useState('')
-  const [pendingPerson, setPendingPerson] = useState(false)
+  const editor = useEntityEditor(db.types.idea, id, {
+    name: '',
+    start_year: '' as number | string,
+    end_year: '' as number | string,
+    person: false,
+  })
+  const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
@@ -38,10 +40,12 @@ function Idea(props: any) {
       db.getIdeaNick(ideaId),
     ]).then(([infoResponse, nickResponse]) => {
       const idea = infoResponse.data.data
-      setPendingName(idea.name)
-      setPendingStartYear(idea.start_year)
-      setPendingEndYear(idea.end_year)
-      setPendingPerson(Boolean(idea.person))
+      editor.load({
+        name: idea.name,
+        start_year: idea.start_year ?? '',
+        end_year: idea.end_year ?? '',
+        person: Boolean(idea.person),
+      })
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
       console.error(error)
@@ -67,7 +71,7 @@ function Idea(props: any) {
   }
 
   const deleteIdea = async () => {
-    if (!confirm(`Do you want to permanently delete '${pendingName}'?`)) {
+    if (!confirm(`Do you want to permanently delete '${pending.name}'?`)) {
       return
     }
 
@@ -75,19 +79,7 @@ function Idea(props: any) {
     navigate('/')
   }
 
-  const handleAcceptUpdates = async () => {
-    var updateObject = {
-      name: pendingName,
-      start_year: pendingStartYear,
-      end_year: pendingEndYear,
-      person: pendingPerson,
-    }
-
-    await saveAndExitEdit(
-      () => db.updateRecord(db.types.idea, id, updateObject),
-      setEdit
-    )
-  }
+  const handleAcceptUpdates = () => editor.save()
 
   const createNoteForIdea = async () => {
     try {
@@ -110,7 +102,7 @@ function Idea(props: any) {
     togglePinned({
       type: 'idea',
       id,
-      label: pendingName,
+      label: pending.name,
       href: `/idea/${id}`,
     })
   }
@@ -120,12 +112,12 @@ function Idea(props: any) {
     isEditing: edit,
     onEdit: () => setEdit(true),
     onSave: handleAcceptUpdates,
-    onExitEdit: () => setEdit(false),
+    onExitEdit: editor.cancel,
     onNewNote: createNoteForIdea,
     onToggleStar: toggleStar,
   })
 
-  props.setPageTitle(titleWithNick(pendingName, nick))
+  props.setPageTitle(titleWithNick(pending.name, nick))
 
   return (
     <div>
@@ -136,33 +128,33 @@ function Idea(props: any) {
               name="Name"
               id="title"
               autoFocus
-              defaultValue={pendingName}
+              defaultValue={pending.name}
               onChange={(e: any) => {
-                setPendingName(e.target.value)
+                editor.set('name', e.target.value)
               }}
             />
             <TopLevelFormInput
               name="Start Year"
               id="startYear"
-              defaultValue={pendingStartYear}
+              defaultValue={pending.start_year}
               onChange={(e: any) => {
-                setPendingStartYear(e.target.value)
+                editor.set('start_year', e.target.value)
               }}
             />
             <TopLevelFormInput
               name="End Year"
               id="endYear"
-              defaultValue={pendingEndYear}
+              defaultValue={pending.end_year}
               onChange={(e: any) => {
-                setPendingEndYear(e.target.value)
+                editor.set('end_year', e.target.value)
               }}
             />
             <label htmlFor="person" className="top-level form-label">
               <input
                 id="person"
                 type="checkbox"
-                checked={pendingPerson}
-                onChange={(e: any) => setPendingPerson(e.target.checked)}
+                checked={pending.person}
+                onChange={(e: any) => editor.set('person', e.target.checked)}
               />{' '}
               This idea is a person
             </label>
@@ -171,14 +163,14 @@ function Idea(props: any) {
         ) : (
           <div className="entity-page-header">
             <div className="entity-page-header-left">
-              <div className="entity-page-title">{pendingName}</div>
-              {(pendingPerson || pendingStartYear || pendingEndYear) && (
+              <div className="entity-page-title">{pending.name}</div>
+              {(pending.person || pending.start_year || pending.end_year) && (
                 <div className="entity-page-byline">
-                  {pendingPerson ? 'Person' : null}
-                  {pendingPerson && (pendingStartYear || pendingEndYear) ? ' • ' : null}
-                  {pendingStartYear ? <YearSpan year={pendingStartYear} /> : null}
-                  {pendingStartYear && pendingEndYear ? ' • ' : null}
-                  {pendingEndYear ? <YearSpan year={pendingEndYear} /> : null}
+                  {pending.person ? 'Person' : null}
+                  {pending.person && (pending.start_year || pending.end_year) ? ' • ' : null}
+                  {pending.start_year ? <YearSpan year={pending.start_year} /> : null}
+                  {pending.start_year && pending.end_year ? ' • ' : null}
+                  {pending.end_year ? <YearSpan year={pending.end_year} /> : null}
                 </div>
               )}
               {nick && (
@@ -192,7 +184,7 @@ function Idea(props: any) {
                 <TopLevelStarButton
                   type="idea"
                   id={id}
-                  label={pendingName}
+                  label={pending.name}
                   href={`/idea/${id}`}
                 />
                 <TopLevelStandardButton
