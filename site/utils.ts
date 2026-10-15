@@ -70,3 +70,15 @@ export const NO_AUTOFILL = {
   'data-bwignore': 'true',
   'data-form-type': 'other',
 } as const
+
+// "Well-worn" look for notes and works that get opened a lot (#333): a
+// class for the stripe's strength, and a tooltip with the count.
+export function wornClass(openCount?: number | null): string {
+  const n = openCount ?? 0
+  return n >= 50 ? ' worn-3' : n >= 20 ? ' worn-2' : n >= 5 ? ' worn-1' : ''
+}
+
+export function wornTitle(openCount?: number | null): string | undefined {
+  const n = openCount ?? 0
+  return n > 0 ? `Opened ${n} ${n === 1 ? 'time' : 'times'}` : undefined
+}

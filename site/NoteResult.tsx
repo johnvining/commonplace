@@ -4,6 +4,7 @@ import note_img from 'url:./icons/write.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 import PinButton from './PinButton'
 import { authorsWithWorkFallback } from './authorsDisplay'
+import { wornClass, wornTitle } from './utils'
 
 function snippetAround(text: any, query: any) {
   const idx = text.toLowerCase().indexOf(query.toLowerCase())
@@ -82,7 +83,7 @@ class NoteResult extends React.PureComponent<any> {
 
     return (
       <Link to={`/note/${note._id}`} key={'note-list-' + note._id} data-note-id={note._id}>
-        <div className="result-box">
+        <div className={'result-box' + wornClass(note.openCount)} title={wornTitle(note.openCount)}>
           <div className="result-box header">
             <img src={note_img} />
             <span className="truncate">

@@ -4,6 +4,7 @@ import circle from 'url:./icons/circle.svg'
 import check_circle from 'url:./icons/check_circle.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 import { authorsWithWorkFallback } from './authorsDisplay'
+import { wornClass, wornTitle } from './utils'
 
 class NoteSlim extends React.PureComponent<any> {
   state: any = {}
@@ -50,7 +51,7 @@ class NoteSlim extends React.PureComponent<any> {
             </button>
           )}
         </div>
-        <div className="note-slim">
+        <div className={'note-slim' + wornClass(this.props.note?.openCount)} title={wornTitle(this.props.note?.openCount)}>
           <Link to={'/note/' + this.props.id} className="note-slim" tabIndex={this.props.tabIndex} data-note-id={this.props.id}>
             <div className="note-slim">
               <div className="note-slim inner truncate">

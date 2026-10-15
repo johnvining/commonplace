@@ -5,6 +5,7 @@ import note_img from 'url:./icons/write.svg'
 import PileListForItem from './PileListForItem'
 import PinButton from './PinButton'
 import { joinAuthorNames } from './authorsDisplay'
+import { wornClass, wornTitle } from './utils'
 
 class ResultWork extends React.Component<any, any> {
   state: any = {}
@@ -22,7 +23,7 @@ class ResultWork extends React.Component<any, any> {
 
     return (
       <Link to={`/work/${work._id}`}>
-        <div className="result-box">
+        <div className={'result-box' + wornClass(work.openCount)} title={wornTitle(work.openCount)}>
           <div className="result-box header">
             <img src={work_img} />
             <div>

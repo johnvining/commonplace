@@ -2250,3 +2250,24 @@ mark.search-highlight {
   color: $font_color;
   text-decoration: underline;
 }
+
+// Well-worn notes and works (#333): a warm stripe down the left edge that
+// deepens the more something is opened. Drawn as a background so it
+// doesn't shift the layout or clash with borders and edit-mode rings.
+.worn-1,
+.worn-2,
+.worn-3 {
+  background-image: linear-gradient(to right, var(--worn-color) 4px, transparent 4px);
+}
+
+.worn-1 {
+  --worn-color: rgba(196, 140, 60, 0.3);
+}
+
+.worn-2 {
+  --worn-color: rgba(196, 140, 60, 0.6);
+}
+
+.worn-3 {
+  --worn-color: rgba(196, 140, 60, 0.95);
+}

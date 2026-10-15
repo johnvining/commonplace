@@ -25,6 +25,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
+import { wornClass, wornTitle } from './utils'
 
 function highlight(text: any, query: any) {
   if (!text || !query) return text
@@ -52,7 +53,7 @@ function UnifiedResult({ entry, query }: any) {
   if (type === 'work') {
     return (
       <Link to={`/work/${item._id}`}>
-        <div className="result-box">
+        <div className={'result-box' + wornClass(item.openCount)} title={wornTitle(item.openCount)}>
           <div className="result-box header">
             <img src={work_img} />
             <span className="truncate">
