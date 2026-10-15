@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as db from './Database'
-import { yearsLabel } from './utils'
+import { yearsLabel, NO_AUTOFILL } from './utils'
 import lightbulb from 'url:./icons/lightbulb.svg'
 
 // Pill-input multi-select for ideas on a note. Same shape as
@@ -202,7 +202,7 @@ export default function IdeasPillList(props: Props) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => { if (items.length) setOpen(true) }}
-          autoComplete="off"
+          {...NO_AUTOFILL}
         />
         {props.fetchAiSuggestions && (
           <button

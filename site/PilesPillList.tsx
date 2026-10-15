@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as db from './Database'
+import { NO_AUTOFILL } from './utils'
 
 // Pill-input multi-select for piles on a note. Same shape as
 // IdeasPillList but no AI suggestions, and each pill renders the
@@ -184,7 +185,7 @@ export default function PilesPillList(props: Props) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => { if (suggestions.length) setOpen(true) }}
-          autoComplete="off"
+          {...NO_AUTOFILL}
         />
       </div>
       {open && suggestions.length > 0 && (

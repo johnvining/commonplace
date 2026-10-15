@@ -2,7 +2,7 @@ import React from 'react'
 import lightbulb from 'url:./icons/lightbulb.svg'
 import loader from 'url:./icons/loader.svg'
 import * as constants from './constants'
-import { yearsLabel } from './utils'
+import { yearsLabel, NO_AUTOFILL } from './utils'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 
 class Autocomplete extends React.Component<any, any> {
@@ -293,6 +293,7 @@ class Autocomplete extends React.Component<any, any> {
           value={this.state.currentTypedText || ''}
           onChange={this.handleTypingChange.bind(this)}
           onKeyDown={this.handleInputKeyDown}
+          {...NO_AUTOFILL}
         ></input>
         {this.state.hideResults ? (
           <>

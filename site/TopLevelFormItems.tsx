@@ -1,4 +1,5 @@
 import Autocomplete from './Autocomplete'
+import { NO_AUTOFILL } from './utils'
 
 export function TopLevelFormInput(props: any) {
   return (
@@ -13,6 +14,9 @@ export function TopLevelFormInput(props: any) {
         onChange={props.onChange}
         type={props.type}
         autoFocus={props.autoFocus}
+        // The login form uses this input too: let password managers fill
+        // the password, and keep them out of every other field.
+        {...(props.type === 'password' ? { autoComplete: 'current-password' } : NO_AUTOFILL)}
       />
     </>
   )

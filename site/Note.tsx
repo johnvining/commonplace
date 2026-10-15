@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { guessYearFromURL } from './utils'
+import { guessYearFromURL, NO_AUTOFILL } from './utils'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import AuthorsChipList from './AuthorsChipList'
@@ -1128,6 +1128,7 @@ class Note extends React.Component<any, any> {
                     <input
                       className="note-link-input"
                       autoFocus
+                      {...NO_AUTOFILL}
                       value={this.state.linkToAdd}
                       onChange={(e: any) => {
                         this.setState({

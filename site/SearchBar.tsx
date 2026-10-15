@@ -4,6 +4,7 @@ import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+import { NO_AUTOFILL } from './utils'
 
 // A nick is a type letter (note, work, idea, pile) and six digits.
 const NICK_PATTERN = /^[nwip]\d{6}$/
@@ -339,6 +340,7 @@ function SearchBar(props: any) {
           autoFocus
           value={typedText}
           onChange={(event: any) => handleTextChange(event)}
+          {...NO_AUTOFILL}
         ></input>
       )}
     </div>

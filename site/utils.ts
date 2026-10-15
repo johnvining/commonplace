@@ -58,3 +58,15 @@ export function yearsLabel(record: object): string {
   if (start === end) return formatYear(start!)
   return `${start !== null ? formatYear(start) : ''}–${end !== null ? formatYear(end) : ''}`
 }
+
+// Spread onto text inputs that aren't credentials (pickers, the search
+// bar) so browsers and password managers don't offer to fill or save
+// them (#304). autoComplete="off" covers browsers; the data-* flags are
+// the opt-outs LastPass, 1Password, Bitwarden and Dashlane honor.
+export const NO_AUTOFILL = {
+  autoComplete: 'off',
+  'data-lpignore': 'true',
+  'data-1p-ignore': 'true',
+  'data-bwignore': 'true',
+  'data-form-type': 'other',
+} as const
