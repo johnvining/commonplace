@@ -73,3 +73,19 @@ export const defaultControllers = (model: AnyModel, opts: ControllerOpts = {}) =
 })
 
 export default defaultControllers
+
+// POST /:id/opened: count one opening of the record's page (#333). Uses
+// $inc so concurrent opens don't lose counts, and leaves updatedAt alone
+// so opening something doesn't make it "recently updated".
+export const recordOpened = (model: AnyModel) => async (req: Request, res: Response) => {
+  const doc = await model
+    .findOneAndUpdate(
+      { _id: req.params.id },
+      { $inc: { openCount: 1 }, $set: { lastOpenedAt: new Date() } },
+      { new: true, timestamps: false, projection: { openCount: 1 } }
+    )
+    .lean()
+    .exec()
+  if (!doc) return res.status(404).json({ message: 'Not found' })
+  return { openCount: (doc as { openCount?: number }).openCount ?? 0 }
+}

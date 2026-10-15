@@ -16,6 +16,8 @@ export interface NoteDoc {
   take?: string
   ocrText?: string
   aiTitle?: string
+  openCount?: number
+  lastOpenedAt?: Date
   embedding: number[]
   embeddingHash?: string
   createdAt: Date
@@ -45,6 +47,9 @@ const noteSchema = new Schema<NoteDoc>(
     // equals it, the title is marked as AI-generated (#330); editing the
     // title clears the mark.
     aiTitle: String,
+    // How often its page has been opened, for the well-worn look (#333).
+    openCount: { type: Number, default: 0 },
+    lastOpenedAt: Date,
     embedding: [Number],
     embeddingHash: String,
   },

@@ -11,6 +11,8 @@ export interface WorkDoc {
   summary?: string
   piles: Types.ObjectId[]
   ideas: Types.ObjectId[]
+  openCount?: number
+  lastOpenedAt?: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -27,6 +29,9 @@ const workSchema = new Schema<WorkDoc>(
     summary: String,
     piles: [{ type: Schema.Types.ObjectId, ref: 'pile' }],
     ideas: [{ type: Schema.Types.ObjectId, ref: 'idea' }],
+    // How often its page has been opened, for the well-worn look (#333).
+    openCount: { type: Number, default: 0 },
+    lastOpenedAt: Date,
   },
   { timestamps: true }
 )

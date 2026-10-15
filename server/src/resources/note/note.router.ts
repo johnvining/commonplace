@@ -33,6 +33,8 @@ import controllers, {
 } from './note.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 import { requireObjectIdParam } from '../../utils/validateObjectId.js'
+import { recordOpened } from '../../utils/default.controllers.js'
+import Note from './note.model.js'
 
 const router = Router()
 
@@ -94,6 +96,8 @@ router.route('/import/instapaper').put(asyncWrapper(reqBulkImportInstapaper, 200
 router.route('/bulk-embed').post(asyncWrapper(reqBulkEmbedNotes, 200))
 
 router.route('/unified-search').post(asyncWrapper(reqUnifiedSearch, 200))
+
+router.route('/:id/opened').post(requireObjectIdParam('id'), asyncWrapper(recordOpened(Note), 200))
 
 router
   .route('/:id')

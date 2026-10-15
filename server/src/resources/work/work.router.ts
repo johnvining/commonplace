@@ -16,6 +16,9 @@ import {
   reqUpdateWork
 } from './work.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
+import { recordOpened } from '../../utils/default.controllers.js'
+import { requireObjectIdParam } from '../../utils/validateObjectId.js'
+import Work from './work.model.js'
 
 const router = Router()
 
@@ -39,6 +42,7 @@ router
   .route('/:id/idea/:ideaId')
   .delete(asyncWrapper(reqRemoveIdeaFromWork, 200))
 
+router.route('/:id/opened').post(requireObjectIdParam('id'), asyncWrapper(recordOpened(Work), 200))
 router.route('/:id').get(asyncWrapper(reqGetWorkInfo, 200))
 router.route('/:id').put(asyncWrapper(reqUpdateWork, 200))
 
