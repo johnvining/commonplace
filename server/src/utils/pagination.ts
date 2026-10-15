@@ -35,8 +35,16 @@ export async function findEntityNotesPage(
 ) {
   const { skip, limit } = pageParams(req)
   const tiebreak = sort._id ? {} : { _id: (Object.values(sort)[0] ?? 1) as 1 | -1 }
+  let fullSort: Record<string, 1 | -1> = { ...sort, ...tiebreak }
+  // ?reverse=1 flips the whole order server-side; reversing each page on
+  // the client would scramble the order across pages.
+  if (req.query.reverse === '1') {
+    fullSort = Object.fromEntries(
+      Object.entries(fullSort).map(([k, v]) => [k, v === 1 ? -1 : 1])
+    ) as Record<string, 1 | -1>
+  }
   const [notes, total] = await Promise.all([
-    findNotesAndPopulate(query, { ...sort, ...tiebreak }, false, skip, limit),
+    findNotesAndPopulate(query, fullSort, false, skip, limit),
     Note.countDocuments(query),
   ])
   res.set(TOTAL_COUNT_HEADER, String(total))

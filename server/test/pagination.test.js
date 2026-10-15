@@ -84,4 +84,16 @@ describe('entity-notes paging', () => {
     const { seen } = await pageThrough(agent, `/api/work/${work._id}/notes`)
     expect(seen).toEqual(expected)
   })
+
+  it('reverses the whole order across pages with ?reverse=1', async () => {
+    const agent = await authedAgent()
+    const work = await createWork(agent, { name: 'Ordered' })
+    const expected = await seedNotes({ work: work._id })
+    const seen = []
+    for (let skip = 0; skip < COUNT; skip += 500) {
+      const res = await agent.get(`/api/work/${work._id}/notes?reverse=1&skip=${skip}&limit=500`).expect(200)
+      seen.push(...res.body.data.map(n => String(n._id)))
+    }
+    expect(seen).toEqual([...expected].reverse())
+  })
 })
