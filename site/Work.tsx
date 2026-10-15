@@ -276,8 +276,8 @@ function Work(props: any) {
           if (onProgress) onProgress(completed, images.length)
           continue
         }
+        // The upload reads the image into the note's text (auto OCR).
         await db.addImageToNote(noteId, image)
-        await db.getNoteTextOCR(noteId)
         completed += 1
         if (onProgress) onProgress(completed, images.length)
       } catch (error: any) {
