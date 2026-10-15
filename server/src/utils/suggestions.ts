@@ -27,7 +27,16 @@ export const getSuggestedTitle = async function (
     model: 'gpt-4o-mini',
   })
 
-  return chatCompletion.choices[0].message.content
+  return cleanSuggestedTitle(chatCompletion.choices[0].message.content)
+}
+
+// The model tends to end titles with a space or newline and sometimes
+// wraps them in quotes; strip both (#322).
+export function cleanSuggestedTitle(raw: string | null | undefined): string | null {
+  if (raw == null) return null
+  const title = raw.trim()
+  const wrapped = title.match(/^["“'‘](.*)["”'’]$/s)
+  return (wrapped ? wrapped[1] : title).trim()
 }
 
 export const getSuggestedIdeas = async function (
