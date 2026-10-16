@@ -274,7 +274,7 @@ async function cmdLogin(args, config) {
 async function cmdSearch(args, config) {
   const jsonFlag = args.includes('--json')
   const query = args.filter(a => a !== '--json').join(' ')
-  if (!query) { console.error('Usage: cplace search <query> [--json]'); return }
+  if (!query) { console.error('Usage: cplace search|find <query> [--json]'); return }
 
   if (!jsonFlag) process.stdout.write(`Searching for "${query}"...\r`)
   const res = await api('POST', 'note/unified-search', { query, limit: 20 }, config)
@@ -1500,6 +1500,7 @@ ${BOLD}cplace${RESET} — Commonplace CLI
 
 ${BOLD}Finding & viewing${RESET}
   search <query>     Unified search across notes, authors, works, ideas, piles
+                     (also: find <query>)
   recent [page]      List recent notes (40 per page)
   earliest [page]    List earliest unfiled notes
   flip               Show random notes
@@ -1591,6 +1592,8 @@ const [,, cmd, ...args] = process.argv
 const commands = {
   login:   cmdLogin,
   search:  cmdSearch,
+  // Same thing: the web app's search page is /find, so it's a natural guess.
+  find:    cmdSearch,
   note:    cmdNote,
   recent:  cmdRecent,
   earliest: cmdEarliest,
@@ -1633,6 +1636,7 @@ const commands = {
 }
 
 if (!cmd || !commands[cmd]) {
+  if (cmd) console.error(`\x1b[31mUnknown command:\x1b[0m ${cmd}  (see the list below)`)
   cmdHelp()
   process.exit(cmd ? 1 : 0)
 }
