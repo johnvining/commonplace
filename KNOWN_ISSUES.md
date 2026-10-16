@@ -7,7 +7,7 @@
 Not bug-list material, but worth keeping in mind: #340 (iPad), #329 (AI birth/death + timeline), #187 (timeline view), #162 (responsive note-full), #155 (note view types refactor), #108 (mobile styling), #100 (translate via OpenAI), #64 (kindle import).
 
 - **Upgrade the Pi's MongoDB (on EOL 4.4.8).** Pinned in `docker-compose.yml`. MongoDB 4.4 EOL'd in Feb 2024; no upstream security patches. App works fine (nothing in the code needs a newer server), so not urgent, but worth upgrading in a maintenance window. Why it matters:
-  - **First, close the open port.** `docker-compose.yml` publishes `27017:27017` with no Mongo authentication, so anything on the home network can read or write the database. The server reaches Mongo over the internal Docker network, so the port mapping can simply be removed (or add auth). Do this regardless of the upgrade; it's the bigger risk.
+  - The port was open to the home network with no password; it's now bound to the Pi only (`127.0.0.1:27017`), so that risk is gone. Adding Mongo authentication would still be good practice.
   - **Future dependency bumps will force it.** Mongoose and the MongoDB driver drop old server versions over time; today's support 4.4, a future major may not. Upgrading on our own schedule beats doing it mid-dependency-bump.
   - **Tests run on Mongo 8.2** (mongodb-memory-server), production on 4.4. Nothing used today differs between them, but it's a blind spot until they match.
 

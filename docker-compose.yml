@@ -39,8 +39,11 @@ services:
     image: mongo:4.4.8
     volumes:
       - mongo-data:/data/db
+    # Only reachable from the Pi itself: Mongo has no password, so it must
+    # not be open to the network. The server uses the internal network
+    # (mongo:27017). From another machine, tunnel: ssh -L 27017:localhost:27017
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     networks:
       - app-network
   commonplace-site:
