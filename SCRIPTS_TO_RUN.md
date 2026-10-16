@@ -1,7 +1,5 @@
 # Scripts to run
 
-(Part of [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md), step 3.)
-
 One-off data fixes to run against the real database once the current
 batch of updates is deployed.
 
@@ -25,11 +23,8 @@ On the Pi, run those inside the server container:
 
 ## Pending
 
-| Order | Task | Issue | What it does |
-|---|---|---|---|
-| 1 | `trim-entity-names` | #51 | Trims stray spaces from author, work, idea and pile names, so they can be found again. Lists blank names and names that now clash, to fix by hand. |
-| 2 | `add-work-ideas` | #216 | Optional. Gives every work an empty ideas list. |
-| 3 | `ocr-backlog` | #305 | Fills in the text of old image notes from their images. Uses OpenAI, one call per image not already read; dry run shows the count. `npm run ocr-backlog -- --limit 20` does the newest 20 first. |
+Nothing pending. The batch deployed on 2026-10-16 ran trim-entity-names,
+add-work-ideas and ocr-backlog; the Maintenance page shows their output.
 
 New tasks are added to `server/src/resources/maintenance/tasks.ts` and
 listed here.
