@@ -47,13 +47,7 @@ class ResultWork extends React.Component<any, any> {
               {work.note_count}
             </div>
           ) : null}
-          <PileListForItem
-            remove={false}
-            allowTabbing={false}
-            allowAdd={false}
-            edit={false}
-            piles={pilesToShow}
-          />
+          <PileListForItem allowTabbing={false} piles={pilesToShow} />
           {work.ideas?.length ? (
             <div>
               {work.ideas.map((idea: any) => (

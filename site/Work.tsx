@@ -519,21 +519,7 @@ function Work(props: any) {
                   </TopLevelStandardButtonContainer>
                   {piles && piles.length > 0 && (
                     <div className="entity-page-piles">
-                      <PileListForItem
-                        remove={false}
-                        edit={false}
-                        piles={piles}
-                        onSelect={handleNewPile}
-                        getSuggestions={db.getSuggestions}
-                        handleNewSelect={handleCreatePileAndAssign}
-                        mainClassName="top-level"
-                        onStartPileEdit={() => {
-                          setEditPiles(true)
-                        }}
-                        allowAdd={false}
-                        allowTabbing={true}
-                        onPileRemove={handlePileRemove}
-                      />
+                      <PileListForItem piles={piles} allowTabbing={true} />
                     </div>
                   )}
                   {ideas.length > 0 && (

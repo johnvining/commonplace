@@ -335,10 +335,6 @@ class NoteList extends React.Component<any, any> {
     )
   }
 
-  onStartPileEdit(noteId: any) {
-    this.setNoteMode(noteId, constants.note_modes.EDIT_PILES)
-  }
-
   clearSelection() {
     const tempSelectedArray: boolean[] = []
     for (let i = 0; i < this.state.notes.length; i++) {
@@ -793,7 +789,6 @@ class NoteList extends React.Component<any, any> {
                           : constants.note_modes.NOT_SELECTED
                       }
                       setNoteMode={this.setNoteMode.bind(this)}
-                      onStartPileEdit={this.onStartPileEdit.bind(this)}
                       hideCitation={this.props.hideCitation}
                     />
                   )}

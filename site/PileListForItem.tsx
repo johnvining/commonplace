@@ -1,8 +1,8 @@
-import Autocomplete from './Autocomplete'
 import { useNavigate } from 'react-router-dom'
-import * as db from './Database'
 
-function PileListForItem(props: any) {
+// A record's piles as chips that link to each pile. "Prefix: Name" piles
+// show the prefix small. Editing piles is PilesPillList's job.
+function PileListForItem(props: { piles?: any[]; allowTabbing?: boolean }) {
   const navigate = useNavigate()
   return (
     <>
@@ -17,14 +17,8 @@ function PileListForItem(props: any) {
         return (
           <button
             key={'/pile/' + pile._id}
-            className={props.remove ? 'pile label edit' : 'pile label'}
-            onClick={() => {
-              if (props.remove) {
-                props.onPileRemove(pile._id)
-              } else {
-                navigate('/pile/' + pile._id)
-              }
-            }}
+            className="pile label"
+            onClick={() => navigate('/pile/' + pile._id)}
             tabIndex={!props.allowTabbing ? -1 : undefined}
           >
             <>
@@ -34,23 +28,6 @@ function PileListForItem(props: any) {
           </button>
         )
       })}
-      {props.edit ? (
-        <Autocomplete
-          className={props.mainClassName + ' pile-select'}
-          clearOnSelect={true}
-          defaultValue=""
-          dontAutofocus={false}
-          escape={props.escape}
-          getSuggestions={props.getSuggestions}
-          apiType={db.types.pile}
-          handleNewSelect={props.handleNewSelect}
-          inputName="work-pile"
-          onSelect={props.onSelect}
-          excludeIds={props.piles?.map((pile: any) => pile._id)}
-        />
-      ) : (
-        ''
-      )}
     </>
   )
 }

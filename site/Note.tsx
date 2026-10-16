@@ -1006,22 +1006,7 @@ class Note extends React.Component<any, any> {
                   pills with their own × buttons, so we skip the inline
                   PileListForItem row to avoid duplication. */}
               {!edit_piles && (
-                <PileListForItem
-                  remove={false}
-                  allowTabbing={selected}
-                  allowAdd={false}
-                  edit={false}
-                  piles={note.piles}
-                  onSelect={this.handleNewPile.bind(this)}
-                  getSuggestions={db.getSuggestions}
-                  apiType={db.types.pile}
-                  handleNewSelect={this.handleCreatePileAndAssign.bind(this)}
-                  mainClassName="note"
-                  onPileRemove={this.handlePileRemove.bind(this)}
-                  onStartPileEdit={() => {
-                    this.props.onStartPileEdit(note._id)
-                  }}
-                />
+                <PileListForItem allowTabbing={selected} piles={note.piles} />
               )}
               {/* In edit_ideas mode the IdeasPillList below renders the
                   pills with their own × buttons, so we skip the inline
