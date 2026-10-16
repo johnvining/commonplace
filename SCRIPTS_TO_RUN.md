@@ -1,5 +1,7 @@
 # Scripts to run
 
+(Part of [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md), step 3.)
+
 One-off data fixes to run against the real database once the current
 batch of updates is deployed.
 
