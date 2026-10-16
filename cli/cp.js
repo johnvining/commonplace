@@ -655,7 +655,8 @@ async function cmdWorks(args, config) {
   if (jsonFlag) { console.log(JSON.stringify(works)); return }
   if (!works.length) { console.log('No works found.'); return }
   works.forEach(w => {
-    const auth = w.author?.name ? ` ${DIM}— ${w.author.name}${RESET}` : ''
+    const names = joinAuthorNames(w.authors)
+    const auth = names ? ` ${DIM}— ${names}${RESET}` : ''
     console.log(`${YELLOW}${w.name}${RESET}${auth}  ${DIM}${w._id}${RESET}`)
   })
 }
