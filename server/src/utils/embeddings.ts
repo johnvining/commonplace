@@ -83,12 +83,20 @@ export function cosineSimilarity(a: EmbeddingVector, b: EmbeddingVector): number
 
 const MAX_CHARS = 20000 // conservative limit; dense content (code, CJK) tokenizes at fewer chars/token
 
-export async function generateEmbedding(text: string): Promise<EmbeddingVector> {
-  const response = await openai().embeddings.create({
-    model: 'text-embedding-3-small',
-    input: text.slice(0, MAX_CHARS),
-    dimensions: 256,
-  })
+// `request` overrides the client's timeout/retries for this call, e.g. a
+// search that would rather fall back quickly than wait out an outage.
+export async function generateEmbedding(
+  text: string,
+  request?: { timeout?: number; maxRetries?: number }
+): Promise<EmbeddingVector> {
+  const response = await openai().embeddings.create(
+    {
+      model: 'text-embedding-3-small',
+      input: text.slice(0, MAX_CHARS),
+      dimensions: 256,
+    },
+    request
+  )
   return response.data[0].embedding
 }
 

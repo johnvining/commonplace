@@ -686,14 +686,22 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
 
   const [keywordNotes, queryEmbedding] = await Promise.all([
     keywordSearchNotes(query, Math.max(50, limit)),
-    generateEmbedding(query),
+    // Semantic matching needs OpenAI. If it's down, rate-limited or the
+    // key is revoked, fall back to keyword results instead of failing
+    // the whole search.
+    // A short leash: someone is waiting on these results.
+    generateEmbedding(query, { timeout: 5000, maxRetries: 1 }).catch((err) => {
+      console.error('[search] query embedding failed; keyword results only:', err?.message ?? err)
+      return null
+    }),
   ])
 
-  const embeddingMap = await getEmbeddingCache()
-
   const semanticScores: { id: string; score: number }[] = []
-  for (const [id, embedding] of embeddingMap) {
-    semanticScores.push({ id, score: cosineSimilarity(queryEmbedding, embedding) })
+  if (queryEmbedding) {
+    const embeddingMap = await getEmbeddingCache()
+    for (const [id, embedding] of embeddingMap) {
+      semanticScores.push({ id, score: cosineSimilarity(queryEmbedding, embedding) })
+    }
   }
   semanticScores.sort((a, b) => b.score - a.score)
   const topSemantic = semanticScores.filter((s) => s.score >= 0.38)
