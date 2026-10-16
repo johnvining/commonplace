@@ -20,7 +20,7 @@ export const reqGetNotesForPile = async (req: Request, res: Response) => {
 export const reqGetPileList = async (req: Request, res: Response) => {
   const doc = await findPiles({}, { name: 1 })
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Could not list piles' })
   }
   return doc
 }
@@ -28,7 +28,7 @@ export const reqGetPileList = async (req: Request, res: Response) => {
 export const reqGetWorksForPile = async (req: Request, res: Response) => {
   const doc = await getWorksForPile(req.params.id)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Pile not found' })
   }
   return doc
 }
@@ -40,7 +40,7 @@ export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) 
 export const reqGetAutoComplete = async (req: Request, res: Response, withCounts = false) => {
   const doc = await filePilesByString(req.body.string, withCounts)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Pile search failed' })
   }
   return doc
 }
@@ -48,7 +48,7 @@ export const reqGetAutoComplete = async (req: Request, res: Response, withCounts
 export const reqCreatePile = async (req: Request, res: Response) => {
   const doc = await findOrCreatePile(req.body.name)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Give the pile a name' })
   }
   return doc
 }

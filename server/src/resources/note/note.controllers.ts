@@ -225,7 +225,7 @@ export const reqAddNewPile = async (req: Request, res: Response) => {
 export const reqRemovePileFromNote = async (req: Request, res: Response) => {
   const doc = await updateNote(req.params.id, { $pull: { piles: req.params.pileId } })
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Note not found' })
   }
   await touchPile(req.params.pileId)
   return doc
@@ -320,7 +320,7 @@ export const reqAddImageToNote = async (req: Request, res: Response) => {
       }
       const currentNote = await Note.findOne({ _id: req.params.id })
       if (!currentNote) {
-        res.status(404).end()
+        res.status(404).json({ message: 'Note not found' })
         return
       }
       const numberNotes = currentNote.images.length + 1
@@ -364,7 +364,7 @@ export const reqAddImageToNote = async (req: Request, res: Response) => {
     }
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    res.status(400).json({ message: 'Could not save the image: ' + (e instanceof Error ? e.message : String(e)) })
   }
 }
 
@@ -374,12 +374,12 @@ export const reqRemoveImageFromNote = async function (req: Request, res: Respons
     const noteId = req.params.id
     const note = await Note.findById(noteId)
     if (!note) {
-      res.status(404).end()
+      res.status(404).json({ message: 'Note not found' })
       return
     }
 
     if (!note.images.includes(filename)) {
-      res.status(400).end()
+      res.status(400).json({ message: 'That image is not on this note' })
       return
     }
 
@@ -392,7 +392,7 @@ export const reqRemoveImageFromNote = async function (req: Request, res: Respons
     res.status(200).json({ data: doc })
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    res.status(400).json({ message: 'Could not remove the image: ' + (e instanceof Error ? e.message : String(e)) })
   }
 }
 
@@ -401,7 +401,7 @@ export const reqGetImageForNote = async function (req: Request, res: Response) {
     // Only need the images array, not the full doc (embedding alone is ~2 KB).
     const note = await Note.findOne({ _id: req.params.id }, { images: 1 }).lean()
     if (!note) {
-      res.status(404).end()
+      res.status(404).json({ message: 'Note not found' })
       return
     }
     // Browser-side cache for blob URL fetches — images are immutable per path.
@@ -411,7 +411,7 @@ export const reqGetImageForNote = async function (req: Request, res: Response) {
     )
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    res.status(400).json({ message: 'Could not read the image: ' + (e instanceof Error ? e.message : String(e)) })
   }
 }
 
@@ -419,7 +419,7 @@ export const reqGetSuggestionForNoteTitle = async function (req: Request, res: R
   try {
     const note = await Note.findOne({ _id: req.params.id })
     if (!note) {
-      res.status(404).end()
+      res.status(404).json({ message: 'Note not found' })
       return
     }
     const suggestion = await getSuggestedTitle(note.text ?? '')
@@ -428,7 +428,7 @@ export const reqGetSuggestionForNoteTitle = async function (req: Request, res: R
     res.send({ suggested_title: suggestion })
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    res.status(400).json({ message: 'Could not get a title suggestion: ' + (e instanceof Error ? e.message : String(e)) })
   }
 }
 
@@ -436,14 +436,14 @@ export const reqGetSuggestedIdeasForNote = async function (req: Request, res: Re
   try {
     const note = await Note.findOne({ _id: req.params.id })
     if (!note) {
-      res.status(404).end()
+      res.status(404).json({ message: 'Note not found' })
       return
     }
     const suggestion = await getSuggestedIdeas(note.title ?? '', note.text ?? '')
     res.send({ suggested_ideas: suggestion })
   } catch (e) {
     console.error(e)
-    res.status(400).end()
+    res.status(400).json({ message: 'Could not get idea suggestions: ' + (e instanceof Error ? e.message : String(e)) })
   }
 }
 

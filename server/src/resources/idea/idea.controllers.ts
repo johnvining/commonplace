@@ -36,7 +36,7 @@ export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) 
 export const reqGetAutoComplete = async (req: Request, res: Response, withCounts = false) => {
   const doc = await findIdeasByString(req.body.string, withCounts)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Idea search failed' })
   }
   return doc
 }
@@ -62,7 +62,7 @@ export const findIdeasByString = async function(string: string, withCounts = fal
 export const reqCreateIdea = async (req: Request, res: Response) => {
   const doc = await createIdea(req.body.name)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Could not create the idea' })
   }
   return doc
 }

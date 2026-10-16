@@ -21,7 +21,7 @@ export type ControllerOpts = {
 export const getOne = (model: AnyModel) => async (req: Request, res: Response) => {
   const doc = await model.findOne({ _id: req.params.id }).lean().exec()
   if (!doc) {
-    res.status(400).end()
+    res.status(400).json({ message: `${model.modelName} not found` })
     return
   }
   return doc

@@ -35,7 +35,7 @@ export const getAutoCompleteWithCounts = async (req: Request, res: Response) => 
 export const getAutoComplete = async (req: Request, res: Response, withCounts = false) => {
   const doc = await findAuthorsByString(req.body.string, withCounts)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Author search failed' })
   }
   return doc
 }
@@ -107,7 +107,7 @@ export const findAuthorsByString = async function (str: string, withCounts: bool
 export const reqCreateAuthor = async (req: Request, res: Response) => {
   const doc = await createAuthor(req.body.name)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Could not create the author' })
   }
   return doc
 }

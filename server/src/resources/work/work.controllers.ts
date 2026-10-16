@@ -30,7 +30,7 @@ export const reqGetNotesForWork = async (req: Request, res: Response) => {
 export const reqGetWorkInfo = async (req: Request, res: Response) => {
   const doc = await getWorkInfo(req.params.id)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Work not found' })
   }
   return doc
 }
@@ -38,7 +38,7 @@ export const reqGetWorkInfo = async (req: Request, res: Response) => {
 export const reqCreateWork = async (req: Request, res: Response) => {
   const doc = await createWork(req.body.name)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Could not create the work' })
   }
   return doc
 }
@@ -63,7 +63,7 @@ export const reqUpdateWork = async (req: Request, res: Response) => {
   }
 
   const doc = await updateWorkInfo(req.params.id, updates)
-  if (!doc) return res.status(400).end()
+  if (!doc) return res.status(400).json({ message: 'Work not found' })
   return doc
 }
 
@@ -77,7 +77,7 @@ export const reqCreateAndAddAuth = async (req: Request, res: Response) => {
     { new: true }
   ).lean().exec()
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Work not found' })
   }
   return doc
 }
@@ -105,7 +105,7 @@ export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) 
 export const reqAutocompleteOnName = async (req: Request, res: Response, withCounts = false) => {
   const doc = await findWorksByString(req.body.string, withCounts)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Work search failed' })
   }
   return doc
 }
@@ -128,7 +128,7 @@ export const reqRemoveIdeaFromWork = async (req: Request, res: Response) => {
     .populate('ideas')
     .lean()
     .exec()
-  if (!doc) return res.status(400).end()
+  if (!doc) return res.status(400).json({ message: 'Work not found' })
   await touchIdea(req.params.ideaId)
   return doc
 }
@@ -149,7 +149,7 @@ const addIdeaToWork = async (workId: string, ideaId: unknown) => {
 export const reqRemovePileFromWork = async (req: Request, res: Response) => {
   const doc = await removePileFromWork(req.params.id, req.params.pileId)
   if (!doc) {
-    return res.status(400).end()
+    return res.status(400).json({ message: 'Work not found' })
   }
   return doc
 }
