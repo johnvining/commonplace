@@ -51,8 +51,9 @@ app.use(
     limits: { fileSize: 20 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
-    safeFileNames: true,
-    preserveExtension: true,
+    // No safeFileNames/preserveExtension: together they stripped the dot
+    // and re-split the last 3 letters ("kids.jpeg" -> "kidsj.peg"). The
+    // upload handler makes the stored name safe itself.
   })
 )
 

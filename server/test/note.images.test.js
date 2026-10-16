@@ -41,6 +41,17 @@ describe('note images', () => {
       expect(fs.existsSync(onDisk)).toBe(true)
     })
 
+    it('keeps the file name and extension intact', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'X' })
+      const stored = []
+      for (const name of ['kids.jpeg', 'Free Drivers German.jpeg', 'scan.v2.png']) {
+        const res = await agent.put(`/api/note/${note._id}/image`).attach('image', Buffer.from('x'), name).expect(200)
+        stored.push(res.body.data.newNote.images.at(-1).split('/')[1])
+      }
+      expect(stored).toEqual(['1-kids.jpeg', '2-Free_Drivers_German.jpeg', '3-scan.v2.png'])
+    })
+
     it('returns "No file" message when no upload sent', async () => {
       const agent = await authedAgent()
       const note = await createNote(agent, { title: 'X' })
