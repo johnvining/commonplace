@@ -649,12 +649,28 @@ async function cmdPing(args, config) {
   }
 }
 
+// `--show` on the list commands: print each match's contents (the same
+// view as `cp show`) instead of just its name. Capped so a broad query
+// doesn't flood the terminal. With --json, one JSON object per line.
+const SHOW_LIMIT = 10
+async function showMatches(type, matches, args, config) {
+  const jsonFlag = args.includes('--json')
+  if (!matches.length) { if (!jsonFlag) console.log('No matches.'); return }
+  for (const m of matches.slice(0, SHOW_LIMIT)) {
+    await cmdShow([m._id, `--type=${type}`, ...(jsonFlag ? ['--json'] : [])], config)
+  }
+  if (matches.length > SHOW_LIMIT && !jsonFlag) {
+    console.log(`\n${DIM}…and ${matches.length - SHOW_LIMIT} more matches; narrow the query to see them.${RESET}`)
+  }
+}
+
 async function cmdAuthors(args, config) {
   const jsonFlag = args.includes('--json')
-  const query = args.filter(a => a !== '--json').join(' ')
-  if (!query) { console.error('Usage: cp authors <query> [--json]'); return }
+  const query = args.filter(a => !a.startsWith('--')).join(' ')
+  if (!query) { console.error('Usage: cp authors <query> [--show] [--json]'); return }
   const res = await api('POST', 'auth/autocomplete', { string: query }, config)
   const authors = res?.data || []
+  if (args.includes('--show')) return showMatches('auth', authors, args, config)
   if (jsonFlag) { console.log(JSON.stringify(authors)); return }
   if (!authors.length) { console.log('No authors found.'); return }
   authors.forEach(a => console.log(`${GREEN}${a.name}${RESET}  ${DIM}${a._id}${RESET}`))
@@ -662,10 +678,11 @@ async function cmdAuthors(args, config) {
 
 async function cmdIdeas(args, config) {
   const jsonFlag = args.includes('--json')
-  const query = args.filter(a => a !== '--json').join(' ')
-  if (!query) { console.error('Usage: cp ideas <query> [--json]'); return }
+  const query = args.filter(a => !a.startsWith('--')).join(' ')
+  if (!query) { console.error('Usage: cp ideas <query> [--show] [--json]'); return }
   const res = await api('POST', 'idea/autocomplete', { string: query }, config)
   const ideas = res?.data || []
+  if (args.includes('--show')) return showMatches('idea', ideas, args, config)
   if (jsonFlag) { console.log(JSON.stringify(ideas)); return }
   if (!ideas.length) { console.log('No ideas found.'); return }
   ideas.forEach(i => console.log(`${BLUE}${i.name}${RESET}  ${DIM}${i._id}${RESET}`))
@@ -673,10 +690,11 @@ async function cmdIdeas(args, config) {
 
 async function cmdWorks(args, config) {
   const jsonFlag = args.includes('--json')
-  const query = args.filter(a => a !== '--json').join(' ')
-  if (!query) { console.error('Usage: cp works <query> [--json]'); return }
+  const query = args.filter(a => !a.startsWith('--')).join(' ')
+  if (!query) { console.error('Usage: cp works <query> [--show] [--json]'); return }
   const res = await api('POST', 'work/autocomplete', { string: query }, config)
   const works = res?.data || []
+  if (args.includes('--show')) return showMatches('work', works, args, config)
   if (jsonFlag) { console.log(JSON.stringify(works)); return }
   if (!works.length) { console.log('No works found.'); return }
   works.forEach(w => {
@@ -688,9 +706,9 @@ async function cmdWorks(args, config) {
 
 async function cmdPiles(args, config) {
   const jsonFlag = args.includes('--json')
-  const query = args.filter(a => a !== '--json').join(' ')
+  const query = args.filter(a => !a.startsWith('--')).join(' ')
   if (!query) {
-    console.error('Usage: cp piles <query> [--json]')
+    console.error('Usage: cp piles <query> [--show] [--json]')
     console.error('  Wildcards: `*` and `?` match any chars / one char.')
     console.error('  Range:     `Prefix: YYYY-MM..YYYY-MM` expands to a month range.')
     console.error('  Examples:')
@@ -699,6 +717,7 @@ async function cmdPiles(args, config) {
     return
   }
   const piles = await matchPiles(query, config)
+  if (args.includes('--show')) return showMatches('pile', piles, args, config)
   if (jsonFlag) { console.log(JSON.stringify(piles)); return }
   if (!piles.length) { console.log('No piles found.'); return }
   piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}  ${DIM}${p._id}${RESET}`))
@@ -1561,10 +1580,10 @@ ${BOLD}Finding & viewing${RESET}
   links <id|nick>    Show notes linked to this note
 
 ${BOLD}Lists & searches${RESET}
-  authors <query>    Search authors
-  ideas <query>      Search ideas
-  works <query>      Search works
-  piles <query>      Search piles
+  authors <query>    Search authors (--show: each match's contents)
+  ideas <query>      Search ideas (--show: each match's contents)
+  works <query>      Search works (--show: each match's notes)
+  piles <query>      Search piles (--show: each match's works and notes)
   all-piles          List every pile
   recent-items <type>  Recent items by type (notes|authors|works|ideas|piles)
 
