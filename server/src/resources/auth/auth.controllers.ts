@@ -5,6 +5,7 @@ import { defaultControllers } from '../../utils/default.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
+import { withNoteCounts } from '../../utils/noteCounts.js'
 import type { Request, Response } from 'express'
 
 
@@ -112,14 +113,14 @@ export const reqCreateAuthor = async (req: Request, res: Response) => {
 }
 
 export const reqGetWorksForAuthor = async (req: Request, res: Response) => {
-  const doc = await Work.find({ authors: req.params.id })
+  const works = await Work.find({ authors: req.params.id })
     .populate('authors')
+    .populate('piles')
     .populate('ideas')
     .sort({ year: 1 })
-  if (!doc) {
-    return res.status(400).end()
-  }
-  return doc
+    .lean()
+    .exec()
+  return withNoteCounts(works)
 }
 
 export const reqDeleteAuthor = async (req: Request, res: Response) => {

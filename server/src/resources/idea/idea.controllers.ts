@@ -11,6 +11,7 @@ import { deleteNickFor } from '../nick/nick.controllers.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
+import { withNoteCounts } from '../../utils/noteCounts.js'
 import type { Request, Response } from 'express'
 
 export const reqGetNotesForIdea = async (req: Request, res: Response) => {
@@ -18,13 +19,14 @@ export const reqGetNotesForIdea = async (req: Request, res: Response) => {
 }
 
 export const reqGetWorksForIdea = async (req: Request, res: Response) => {
-  return Work.find({ ideas: req.params.id })
+  const works = await Work.find({ ideas: req.params.id })
     .populate('authors')
     .populate('piles')
     .populate('ideas')
     .sort({ year: 1 })
     .lean()
     .exec()
+  return withNoteCounts(works)
 }
 
 export const reqGetAutoCompleteWithCounts = async (req: Request, res: Response) => {

@@ -12,6 +12,7 @@ import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
+import { withNoteCounts } from '../../utils/noteCounts.js'
 import type { Request, Response } from 'express'
 
 const WORK_WRITABLE = [
@@ -165,14 +166,7 @@ export const findWorksByString = async function(string: string, withCounts = fal
     string
   )
   if (!withCounts || !works.length) return works
-
-  const workIds = works.map(w => w._id)
-  const noteCounts = await Note.aggregate([
-    { $match: { work: { $in: workIds } } },
-    { $group: { _id: '$work', count: { $sum: 1 } } },
-  ])
-  const noteMap = Object.fromEntries(noteCounts.map(x => [String(x._id), x.count]))
-  return works.map(w => ({ ...w, note_count: noteMap[String(w._id)] || 0 }))
+  return withNoteCounts(works)
 }
 
 export const createWork = async function(name: string) {

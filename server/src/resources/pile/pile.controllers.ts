@@ -9,6 +9,7 @@ import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { generateNick } from '../nick/nick.controllers.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
+import { withNoteCounts } from '../../utils/noteCounts.js'
 import type { Request, Response } from 'express'
 
 
@@ -132,12 +133,13 @@ export const findPiles = async function (
 }
 
 export const getWorksForPile = async function (pileId: string) {
-  return Work.find({ piles: pileId })
+  const works = await Work.find({ piles: pileId })
     .populate('authors')
     .populate('piles')
     .populate('ideas')
     .lean()
     .exec()
+  return withNoteCounts(works)
 }
 
 const PILE_WRITABLE = ['name', 'start_year', 'end_year', 'text'] as const
