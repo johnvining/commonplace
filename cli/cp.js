@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync, existsSync } from 'fs'
 import { homedir } from 'os'
-import { join } from 'path'
+import { basename, join } from 'path'
 import { createInterface } from 'readline'
 import { exec } from 'child_process'
 
@@ -50,6 +50,27 @@ async function api(method, path, body, config) {
   const text = await res.text()
   if (!text) return null
   return JSON.parse(text)
+}
+
+// Upload one image file to a note (multipart, field "image"). The server
+// reads it into the note's text when the text is blank (OCR on upload).
+const IMAGE_TYPES = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', heic: 'image/heic', heif: 'image/heif', tif: 'image/tiff', tiff: 'image/tiff' }
+
+async function uploadImage(noteId, filePath, config) {
+  const name = basename(filePath)
+  const ext = name.split('.').pop().toLowerCase()
+  const form = new FormData()
+  form.append('image', new Blob([readFileSync(filePath)], { type: IMAGE_TYPES[ext] || 'application/octet-stream' }), name)
+  const headers = { 'X-Requested-With': 'XMLHttpRequest' }
+  if (config.token) headers['Cookie'] = `jwt=${config.token}`
+  const res = await fetch((config.url || DEFAULT_URL) + `note/${noteId}/image`, { method: 'PUT', headers, body: form })
+  if (res.status === 401) throw new Error('Not authenticated — run: cplace login')
+  const text = await res.text()
+  let body = null
+  try { body = JSON.parse(text) } catch {}
+  if (!res.ok) throw new Error(`HTTP ${res.status}${body?.message ? ': ' + body.message : ''}`)
+  if (body?.status === false) throw new Error(body.message || 'Upload failed')
+  return body?.data?.newNote
 }
 
 // Entity note lists come back 500 per request; fetch every page so big
@@ -1121,6 +1142,35 @@ async function cmdSuggest(args, config) {
   }
 }
 
+async function cmdAttach(args, config) {
+  // `cp attach <note> <file> [file...]` — add images to a note, in order.
+  const jsonFlag = args.includes('--json')
+  const [input, ...files] = args.filter(a => a !== '--json')
+  if (!input || !files.length) {
+    console.error('Usage: cp attach <noteId|nick> <image-file> [more files...] [--json]')
+    return
+  }
+  const missing = files.filter(f => !existsSync(f))
+  if (missing.length) { console.error(`No such file: ${missing.join(', ')}`); process.exitCode = 1; return }
+  const target = await resolveTarget(input, 'note', config)
+  if (!target) { console.error(`Could not resolve note "${input}".`); process.exitCode = 1; return }
+
+  let note = null
+  const results = []
+  // One at a time: each upload's OCR text is appended after the previous.
+  for (const file of files) {
+    const before = note?.text ?? null
+    note = await uploadImage(target.id, file, config)
+    const stored = note?.images?.at(-1)
+    results.push({ file, stored })
+    if (!jsonFlag) {
+      const filled = note?.text && note.text !== before ? `  ${DIM}(text now ${note.text.length} chars)${RESET}` : ''
+      console.log(`${GREEN}Attached${RESET} ${basename(file)} → ${stored}${filled}`)
+    }
+  }
+  if (jsonFlag) console.log(JSON.stringify({ id: target.id, attached: results, text: note?.text ?? null }))
+}
+
 async function cmdLink(args, config) {
   const a = args[0], b = args[1]
   if (!a || !b) { console.error('Usage: cp link <noteId-or-nick> <noteId-or-nick>'); return }
@@ -1557,6 +1607,7 @@ ${BOLD}AI & enrichment${RESET}
 
 ${BOLD}Linking${RESET}
   link <id> <id>     Link two notes
+  attach <note> <file...>  Add image files to a note (text is read from them)
 
 ${BOLD}Import${RESET}
   import csv <file>
@@ -1624,6 +1675,7 @@ const commands = {
   ocr:     cmdOcr,
   suggest: cmdSuggest,
   link:    cmdLink,
+  attach:  cmdAttach,
   links:   cmdLinks,
   import:  cmdImport,
   update:  cmdUpdate,
