@@ -324,7 +324,8 @@ async function cmdNote(args, config) {
     api('GET', `note/${id}`, null, config),
     resolvedNick ? Promise.resolve(null) : ensureNick('note', id, config),
   ])
-  const note = res?.data
+  // GET note/:id returns the note in a one-item list.
+  const note = Array.isArray(res?.data) ? res.data[0] : res?.data
   if (!note) {
     if (jsonFlag) console.log('null')
     else console.log('Not found.')
