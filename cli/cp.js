@@ -35,8 +35,11 @@ async function api(method, path, body, config) {
   const res = await fetch(url, opts)
   if (res.status === 401) throw new Error('Not authenticated — run: cplace login')
   if (!res.ok) {
+    // The server explains refusals as { message }; show that, not raw JSON.
     const errText = await res.text().catch(() => '')
-    throw new Error(`HTTP ${res.status}: ${errText}`)
+    let message = errText
+    try { message = JSON.parse(errText).message || errText } catch {}
+    throw new Error(`HTTP ${res.status}${message ? ': ' + message : ''}`)
   }
   // Capture Set-Cookie on login
   const setCookie = res.headers.get('set-cookie')
