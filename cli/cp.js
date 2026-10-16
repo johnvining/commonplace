@@ -49,6 +49,19 @@ async function api(method, path, body, config) {
   return JSON.parse(text)
 }
 
+// Entity note lists come back 500 per request; fetch every page so big
+// piles and works aren't cut off.
+async function fetchAllNotes(path, config) {
+  const PAGE = 500
+  const all = []
+  for (let skip = 0; ; skip += PAGE) {
+    const res = await api('GET', `${path}?skip=${skip}&limit=${PAGE}`, null, config)
+    const page = res?.data || []
+    all.push(...page)
+    if (page.length < PAGE) return all
+  }
+}
+
 // ── Formatting ────────────────────────────────────────────────────────────────
 
 const RESET = '\x1b[0m'
@@ -858,11 +871,10 @@ async function cmdShow(args, config) {
 
   // Contents by type.
   if (type === 'pile') {
-    const [notesRes, worksRes] = await Promise.all([
-      api('GET', `pile/${id}/notes`, null, config),
+    const [notes, worksRes] = await Promise.all([
+      fetchAllNotes(`pile/${id}/notes`, config),
       api('GET', `pile/${id}/works`, null, config),
     ])
-    const notes = notesRes?.data || []
     const works = worksRes?.data || []
     if (jsonFlag) {
       console.log(JSON.stringify({ type, id, nick: displayNick, info, works, notes }))
@@ -885,16 +897,23 @@ async function cmdShow(args, config) {
   }
 
   if (type === 'idea') {
-    const res = await api('GET', `idea/${id}/notes`, null, config)
-    const notes = res?.data || []
+    const [notes, worksRes] = await Promise.all([
+      fetchAllNotes(`idea/${id}/notes`, config),
+      api('GET', `idea/${id}/works`, null, config),
+    ])
+    const works = worksRes?.data || []
     if (jsonFlag) {
-      console.log(JSON.stringify({ type, id, nick: displayNick, info, notes }))
+      console.log(JSON.stringify({ type, id, nick: displayNick, info, works, notes }))
       return
     }
     const header = info
       ? formatEntity(type, { ...info, nick: displayNick })
       : `${BOLD}${typeColor(type)}[${typeLabel(type)}]${RESET}  ${DIM}${id}${RESET}`
     console.log('\n' + header)
+    if (works.length) {
+      console.log(`\n${BOLD}Works${RESET} (${works.length})`)
+      works.forEach(w => console.log('  ' + formatEntity('work', w).split('\n').join('\n  ')))
+    }
     console.log(`\n${BOLD}Notes${RESET} (${notes.length})`)
     if (!notes.length) { console.log('(none)'); return }
     notes.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
@@ -902,8 +921,7 @@ async function cmdShow(args, config) {
   }
 
   if (type === 'work') {
-    const res = await api('GET', `work/${id}/notes`, null, config)
-    const notes = res?.data || []
+    const notes = await fetchAllNotes(`work/${id}/notes`, config)
     if (jsonFlag) {
       console.log(JSON.stringify({ type, id, nick: displayNick, info, notes }))
       return
@@ -918,7 +936,10 @@ async function cmdShow(args, config) {
     return
   }
 
-  // Auth and any unhandled type: just print the header.
+  // An author: same as `cp author`.
+  if (type === 'auth') return cmdAuthor([id, ...(jsonFlag ? ['--json'] : [])], config)
+
+  // Any other type: just print the header.
   if (jsonFlag) {
     console.log(JSON.stringify({ type, id, nick: displayNick, info }))
     return
@@ -959,17 +980,17 @@ async function cmdAuthor(args, config) {
     else console.log('Not found.')
     return
   }
-  const [worksRes, notesRes] = await Promise.all([
+  const [worksRes, notes, notesAbout] = await Promise.all([
     api('GET', `auth/${id}/works`, null, config),
-    api('GET', `auth/${id}/notes`, null, config),
+    fetchAllNotes(`auth/${id}/notes`, config),
+    fetchAllNotes(`auth/${id}/notes-about`, config),
   ])
   const works = worksRes?.data || []
-  const notes = notesRes?.data || []
   const workIds = new Set(works.map(w => String(w._id)))
   const standalone = notes.filter(n => !n.work?._id || !workIds.has(String(n.work._id)))
 
   if (jsonFlag) {
-    console.log(JSON.stringify({ type: 'auth', id, info, works, notes: standalone }))
+    console.log(JSON.stringify({ type: 'auth', id, info, works, notes: standalone, notesAbout }))
     return
   }
 
@@ -982,7 +1003,11 @@ async function cmdAuthor(args, config) {
     console.log(`\n${BOLD}Notes${RESET} (${standalone.length})`)
     standalone.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
   }
-  if (!works.length && !notes.length) console.log('\n(empty)')
+  if (notesAbout.length) {
+    console.log(`\n${BOLD}Notes about${RESET} (${notesAbout.length})`)
+    notesAbout.forEach(n => console.log('  ' + formatNote(n).split('\n').join('\n  ')))
+  }
+  if (!works.length && !notes.length && !notesAbout.length) console.log('\n(empty)')
 }
 
 async function cmdDelete(args, config) {
