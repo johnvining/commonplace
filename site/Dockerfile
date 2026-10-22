@@ -1,5 +1,5 @@
 # Build react client
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 WORKDIR /app
 
 RUN corepack enable && corepack prepare npm@11 --activate
