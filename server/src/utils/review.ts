@@ -1,17 +1,15 @@
 // Spaced review for /flip: a small Anki-style scheduler.
 //
 // Each note carries
-// - reviewedAt: when it was last reviewed (or edited; an edit counts as
-//   having looked at it),
+// - reviewedAt: when it was last rated,
 // - reviewDueAt: the next review target,
 // - reviewInterval: days between reviewedAt and reviewDueAt,
 // - reviewEase: how fast the interval grows when it's rated "slow",
 // - reviewCount: how many times it has been rated,
-// - touchedAt: the last time it was reviewed or edited,
 // - seenAt / seenCount: the last time, and how often, it was loaded
 //   anywhere (see utils/seen.ts), rated or not.
-// A note with no reviewedAt has never been reviewed. Only a rating (or an
-// edit) moves reviewedAt; just seeing a card doesn't.
+// A note with no reviewedAt has never been reviewed. Only a rating moves
+// reviewedAt: editing a note (updatedAt) or seeing it doesn't.
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -40,7 +38,6 @@ export interface ReviewUpdate {
   reviewInterval: number
   reviewEase: number
   reviewCount: number
-  touchedAt: Date
 }
 
 // The rating is how soon to see the card again:
@@ -79,22 +76,6 @@ export function scheduleReview(
     reviewInterval: next,
     reviewEase: ease,
     reviewCount: (state.reviewCount || 0) + 1,
-    touchedAt: now,
-  }
-}
-
-// An edit counts as a review of the card as it stands: reviewedAt resets
-// to now and the due date moves out by the current interval (a day for a
-// card that has never been rated).
-export function editReviewFields(
-  state: ReviewState,
-  now = new Date()
-): Pick<ReviewUpdate, 'reviewedAt' | 'reviewDueAt' | 'touchedAt'> {
-  const interval = state.reviewInterval || 1
-  return {
-    reviewedAt: now,
-    reviewDueAt: new Date(now.getTime() + interval * DAY),
-    touchedAt: now,
   }
 }
 

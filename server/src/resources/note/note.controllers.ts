@@ -26,7 +26,7 @@ import type { Request, Response } from 'express'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { isValidObjectId } from 'mongoose'
 import { markSeen } from '../../utils/seen.js'
-import { RATINGS, buildDeck, editReviewFields, scheduleReview, type Rating } from '../../utils/review.js'
+import { RATINGS, buildDeck, scheduleReview, type Rating } from '../../utils/review.js'
 
 
 const pageSize = 40
@@ -223,20 +223,20 @@ export const reqReviewNote = async (req: Request, res: Response) => {
 }
 
 export const reqAddIdea = async (req: Request, res: Response) => {
-  const doc = await editNote(req.params.id, { $addToSet: { ideas: req.body.id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { ideas: req.body.id } })
   await touchIdea(req.body.id)
   return doc
 }
 
 export const reqAddNewIdea = async (req: Request, res: Response) => {
   const newIdea = await IdeaControllers.createIdea(req.body.name)
-  const doc = await editNote(req.params.id, { $addToSet: { ideas: newIdea._id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { ideas: newIdea._id } })
   await touchIdea(newIdea._id)
   return doc
 }
 
 export const removeIdeaFromNote = async (noteId: any, ideaId: any) => {
-  const doc = await editNote(noteId, { $pull: { ideas: ideaId } })
+  const doc = await updateNote(noteId, { $pull: { ideas: ideaId } })
   await touchIdea(ideaId)
   return doc
 }
@@ -246,20 +246,20 @@ export const reqRemoveIdeaFromNote = async (req: Request, res: Response) => {
 }
 
 export const reqAddPile = async (req: Request, res: Response) => {
-  const doc = await editNote(req.params.id, { $addToSet: { piles: req.body.id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { piles: req.body.id } })
   await touchPile(req.body.id)
   return doc
 }
 
 export const reqAddNewPile = async (req: Request, res: Response) => {
   const newPile = await Pile.create({ name: req.body.name })
-  const doc = await editNote(req.params.id, { $addToSet: { piles: newPile._id } })
+  const doc = await updateNote(req.params.id, { $addToSet: { piles: newPile._id } })
   await touchPile(newPile._id)
   return doc
 }
 
 export const reqRemovePileFromNote = async (req: Request, res: Response) => {
-  const doc = await editNote(req.params.id, { $pull: { piles: req.params.pileId } })
+  const doc = await updateNote(req.params.id, { $pull: { piles: req.params.pileId } })
   if (!doc) {
     return res.status(400).json({ message: 'Note not found' })
   }
@@ -268,12 +268,12 @@ export const reqRemovePileFromNote = async (req: Request, res: Response) => {
 }
 
 export const reqAddWork = async (req: Request, res: Response) => {
-  return await editNote(req.params.id, { work: req.body.newWork })
+  return await updateNote(req.params.id, { work: req.body.newWork })
 }
 
 export const reqAddNewWork = async (req: Request, res: Response) => {
   const newWork = await WorkControllers.createWork(req.body.newWork)
-  return await editNote(req.params.id, { work: newWork._id })
+  return await updateNote(req.params.id, { work: newWork._id })
 }
 
 const inferWorkUrl = async function (workId: unknown, noteUrl: string) {
@@ -316,7 +316,7 @@ export const reqUpdateNote = async (req: Request, res: Response) => {
     }
   }
 
-  const updated = await editNote(req.params.id, updates)
+  const updated = await updateNote(req.params.id, updates)
 
   if (url && updated?.work) {
     await inferWorkUrl(updated.work, url)
@@ -369,7 +369,7 @@ export const reqAddImageToNote = async (req: Request, res: Response) => {
 
       const newNote = await Note.findOneAndUpdate(
         { _id: req.params.id },
-        await asEdit(req.params.id, { $addToSet: { images: localPath } }),
+        { $addToSet: { images: localPath } },
         { new: true }
       )
         .lean()
@@ -421,7 +421,7 @@ export const reqRemoveImageFromNote = async function (req: Request, res: Respons
 
     const doc = await Note.findOneAndUpdate(
       { _id: noteId },
-      await asEdit(noteId, { $pull: { images: filename } }),
+      { $pull: { images: filename } },
       { new: true }
     )
     await fs.promises.unlink(config.imageStorePath + '/' + filename)
@@ -497,22 +497,6 @@ export const createNoteObj = async function (obj: object) {
   const note = await Note.create(obj)
   generateNick('note', note._id).catch(() => {})
   return note
-}
-
-// An edit made by the user, which also counts as reviewing the note:
-// adds the review reset from editReviewFields to an update.
-const asEdit = async (noteId: unknown, updateObj: Record<string, unknown>) => {
-  const existing = await Note.findById(noteId, { reviewInterval: 1 }).lean().exec()
-  if (!existing) return updateObj
-  const review = editReviewFields(existing)
-  const hasOperators = Object.keys(updateObj).some((key) => key.startsWith('$'))
-  return hasOperators
-    ? { ...updateObj, $set: { ...(updateObj.$set as object), ...review } }
-    : { ...updateObj, ...review }
-}
-
-const editNote = async (noteId: unknown, updateObj: Record<string, unknown>) => {
-  return updateNote(noteId, await asEdit(noteId, updateObj))
 }
 
 export const updateNote = async (noteId: unknown, updateObj: Record<string, unknown>) => {

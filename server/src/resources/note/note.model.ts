@@ -23,7 +23,6 @@ export interface NoteDoc {
   reviewInterval?: number
   reviewEase?: number
   reviewCount?: number
-  touchedAt?: Date
   seenAt?: Date
   seenCount?: number
   embedding: number[]
@@ -59,14 +58,12 @@ const noteSchema = new Schema<NoteDoc>(
     openCount: { type: Number, default: 0 },
     lastOpenedAt: Date,
     // Spaced review in /flip; see utils/review.ts. No reviewedAt means
-    // never reviewed. Editing the note counts as a review.
+    // never reviewed. Only a rating sets these.
     reviewedAt: Date,
     reviewDueAt: Date,
     reviewInterval: Number,
     reviewEase: Number,
     reviewCount: { type: Number, default: 0 },
-    // Last reviewed or edited.
-    touchedAt: Date,
     // Last time, and how often, it was loaded anywhere; see utils/seen.ts.
     seenAt: Date,
     seenCount: { type: Number, default: 0 },

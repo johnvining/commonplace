@@ -23,7 +23,6 @@ describe('scheduleReview', () => {
     expect(slow.reviewInterval).toBe(7)
     expect(slow.reviewDueAt.getTime()).toBe(now.getTime() + 7 * DAY)
     expect(slow.reviewCount).toBe(1)
-    expect(slow.touchedAt).toEqual(now)
   })
 
   it('grows the interval by ease on slow and lowers ease on fast', () => {
@@ -79,7 +78,6 @@ describe('review endpoints', () => {
     const after = await Note.findById(note._id).lean()
     expect(after.reviewedAt).toBeTruthy()
     expect(after.reviewDueAt.getTime()).toBeGreaterThan(Date.now())
-    expect(after.touchedAt).toBeTruthy()
     expect(after.updatedAt.toISOString()).toBe(note.updatedAt)
   })
 
@@ -107,21 +105,22 @@ describe('review endpoints', () => {
     expect(after.updatedAt.toISOString()).toBe(note.updatedAt)
   })
 
-  it('resets reviewedAt when the note is edited', async () => {
+  it('leaves the review schedule alone when the note is edited', async () => {
     const agent = await authedAgent()
-    const note = await createNote(agent, { title: 'card' })
-    await Note.updateOne({ _id: note._id }, { $set: { reviewedAt: ago(30), reviewInterval: 10 } })
-    await agent.put(`/api/note/${note._id}`).send({ text: 'edited' }).expect(200)
-    let after = await Note.findById(note._id).lean()
-    expect(Date.now() - after.reviewedAt.getTime()).toBeLessThan(60 * 1000)
-    expect(after.reviewDueAt.getTime() - after.reviewedAt.getTime()).toBe(10 * DAY)
+    const fresh = await createNote(agent, { title: 'new card' })
+    await agent.put(`/api/note/${fresh._id}`).send({ text: 'edited' }).expect(200)
+    expect((await Note.findById(fresh._id).lean()).reviewedAt).toBeUndefined()
 
+    const note = await createNote(agent, { title: 'card' })
+    const schedule = { reviewedAt: ago(30), reviewDueAt: ago(20), reviewInterval: 10 }
+    await Note.updateOne({ _id: note._id }, { $set: schedule })
+    await agent.put(`/api/note/${note._id}`).send({ text: 'edited' }).expect(200)
     const idea = await createIdea(agent, 'I')
-    await Note.updateOne({ _id: note._id }, { $set: { reviewedAt: ago(30) } })
     await agent.put(`/api/note/${note._id}/idea`).send({ id: idea._id }).expect(200)
-    after = await Note.findById(note._id).lean()
-    expect(Date.now() - after.reviewedAt.getTime()).toBeLessThan(60 * 1000)
-    expect(after.ideas.map(String)).toEqual([String(idea._id)])
+    const after = await Note.findById(note._id).lean()
+    expect(after.reviewedAt).toEqual(schedule.reviewedAt)
+    expect(after.reviewDueAt).toEqual(schedule.reviewDueAt)
+    expect(after.text).toBe('edited')
   })
 
   it('deals a deck of reviewed and never-reviewed notes', async () => {
