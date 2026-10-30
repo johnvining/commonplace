@@ -18,6 +18,14 @@ export interface NoteDoc {
   aiTitle?: string
   openCount?: number
   lastOpenedAt?: Date
+  reviewedAt?: Date
+  reviewDueAt?: Date
+  reviewInterval?: number
+  reviewEase?: number
+  reviewCount?: number
+  touchedAt?: Date
+  seenAt?: Date
+  seenCount?: number
   embedding: number[]
   embeddingHash?: string
   createdAt: Date
@@ -50,6 +58,18 @@ const noteSchema = new Schema<NoteDoc>(
     // How often its page has been opened, for the well-worn look (#333).
     openCount: { type: Number, default: 0 },
     lastOpenedAt: Date,
+    // Spaced review in /flip; see utils/review.ts. No reviewedAt means
+    // never reviewed. Editing the note counts as a review.
+    reviewedAt: Date,
+    reviewDueAt: Date,
+    reviewInterval: Number,
+    reviewEase: Number,
+    reviewCount: { type: Number, default: 0 },
+    // Last reviewed or edited.
+    touchedAt: Date,
+    // Last time, and how often, it was loaded anywhere; see utils/seen.ts.
+    seenAt: Date,
+    seenCount: { type: Number, default: 0 },
     embedding: [Number],
     embeddingHash: String,
   },
@@ -63,5 +83,6 @@ noteSchema.index({ work: 1 })
 noteSchema.index({ piles: 1 })
 noteSchema.index({ ideas: 1 })
 noteSchema.index({ updatedAt: -1 })
+noteSchema.index({ reviewedAt: 1 })
 
 export default mongoose.model<NoteDoc>('note', noteSchema)
