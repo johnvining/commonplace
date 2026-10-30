@@ -25,7 +25,7 @@ import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
 import type { Request, Response } from 'express'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { isValidObjectId } from 'mongoose'
-import { RATINGS, editReviewFields, scheduleReview, type Rating } from '../../utils/review.js'
+import { RATINGS, buildDeck, editReviewFields, scheduleReview, type Rating } from '../../utils/review.js'
 
 
 const pageSize = 40
@@ -183,8 +183,27 @@ export const reqGetEarliestNotesToFile = async (req: Request, res: Response) => 
   )
 }
 
+// GET /note/flip: a review deck. Reviewed notes are ranked by how far
+// through their interval they are (with some randomness), and a share of
+// never-reviewed notes is mixed in; see utils/review.ts.
 export const reqGetRandomNotes = async (req: Request, res: Response) => {
-  return findRandomNotesAndPopulate({}, pageSize)
+  const reviewFields = { reviewedAt: 1, reviewDueAt: 1, seenAt: 1 }
+  const [reviewed, unreviewed] = await Promise.all([
+    Note.find({ reviewedAt: { $ne: null } }, reviewFields).lean().exec(),
+    // Sampled rather than loaded whole: there can be a lot of them. The
+    // pool is bigger than the deck so buildDeck can lean toward ones not
+    // seen lately.
+    Note.aggregate([
+      { $match: { reviewedAt: null } },
+      { $sample: { size: pageSize * 4 } },
+      { $project: reviewFields },
+    ]).exec(),
+  ])
+  const deck = buildDeck(reviewed, unreviewed, pageSize)
+  const ids = deck.map((card) => card._id)
+  const notes = await findNotesAndPopulate({ _id: { $in: ids } })
+  const order = new Map(ids.map((id, i) => [String(id), i]))
+  return notes.sort((a, b) => order.get(String(a._id))! - order.get(String(b._id))!)
 }
 
 // POST /note/:id/review { rating: 'fast' | 'med' | 'slow' }: record a
@@ -931,38 +950,6 @@ export const findNotesAndPopulate = async function (
   })
 
   return notes
-}
-
-export const findRandomNotesAndPopulate = async function (
-  searchObject: Record<string, unknown>,
-  limit = pageSize
-) {
-  const random_notes = await Note.aggregate([
-    { $sample: { size: limit } },
-  ]).exec()
-
-  const populated_notes = await Note.populate(random_notes, [
-    { path: 'authors' },
-    { path: 'ideas' },
-    { path: 'piles' },
-    { path: 'work', populate: { path: 'authors' } },
-  ])
-
-  const noteIds = populated_notes.map((note: any) => note._id)
-  const nicks = await Nick.find({ note: { $in: noteIds } })
-    .lean()
-    .exec()
-
-  const nickMap: Record<string, string> = {}
-  nicks.forEach((nick: any) => {
-    nickMap[String(nick.note)] = nick.key
-  })
-
-  populated_notes.forEach((note: any) => {
-    note.nick = nickMap[String(note._id)] || null
-  })
-
-  return populated_notes
 }
 
 export default defaultControllers(Note, { writable: NOTE_WRITABLE })

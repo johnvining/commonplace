@@ -107,4 +107,13 @@ describe('review endpoints', () => {
     expect(Date.now() - after.reviewedAt.getTime()).toBeLessThan(60 * 1000)
     expect(after.ideas.map(String)).toEqual([String(idea._id)])
   })
+
+  it('deals a deck of reviewed and never-reviewed notes', async () => {
+    const agent = await authedAgent()
+    const a = await createNote(agent, { title: 'A' })
+    await createNote(agent, { title: 'B' })
+    await agent.post(`/api/note/${a._id}/review`).send({ rating: 'fast' }).expect(200)
+    const res = await agent.get('/api/note/flip').expect(200)
+    expect(res.body.data.map((n) => n.title).sort()).toEqual(['A', 'B'])
+  })
 })
