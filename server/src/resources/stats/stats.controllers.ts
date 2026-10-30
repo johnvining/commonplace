@@ -3,6 +3,7 @@ import { Auth } from '../auth/auth.model'
 import Idea from '../idea/idea.model'
 import Work from '../work/work.model'
 import Pile from '../pile/pile.model'
+import { markSeen } from '../../utils/seen'
 import type { Request, Response } from 'express'
 import type { Types } from 'mongoose'
 
@@ -45,7 +46,7 @@ function buildCountMap(
 }
 
 async function recentNotes() {
-  return Note.find({})
+  const notes = await Note.find({})
     .sort({ createdAt: -1 })
     .limit(RECENT_LIMIT)
     .select('-embedding -ocrText -embeddingHash')
@@ -56,6 +57,8 @@ async function recentNotes() {
     .populate({ path: 'work', populate: { path: 'authors' } })
     .lean()
     .exec()
+  await markSeen(notes)
+  return notes
 }
 
 async function recentAuthors() {

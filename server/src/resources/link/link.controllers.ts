@@ -1,6 +1,7 @@
 import Link from '../link/link.model.js'
 import Nick from '../nick/nick.model.js'
 import Note from '../note/note.model.js'
+import { markSeen } from '../../utils/seen.js'
 import { isValidObjectId } from 'mongoose'
 import type { Request, Response } from 'express'
 
@@ -79,5 +80,6 @@ export const reqGetLinksForNote = async (req: Request, res: Response) => {
 
   const nickMap = Object.fromEntries(nicks.map((n: any) => [String(n.note), n.key]))
   notes.forEach((n: any) => { n.nick = nickMap[String(n._id)] || null })
+  await markSeen(notes)
   return notes
 }

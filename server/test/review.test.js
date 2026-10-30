@@ -91,6 +91,22 @@ describe('review endpoints', () => {
     await agent.put(`/api/note/${note._id}`).send({ reviewedAt: new Date() }).expect(400)
   })
 
+  it('counts every load as seen, without reviewing or touching updatedAt', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'card' })
+    const first = (await agent.get(`/api/note/${note._id}`).expect(200)).body.data[0]
+    expect(first.seenAt).toBeUndefined()
+    await agent.get('/api/note/all/1').expect(200)
+    const deck = (await agent.get('/api/note/flip').expect(200)).body.data
+    // The deck carries the seen time from before it was dealt.
+    expect(deck[0].seenCount).toBe(2)
+    const after = await Note.findById(note._id).lean()
+    expect(after.seenCount).toBe(3)
+    expect(after.seenAt).toBeTruthy()
+    expect(after.reviewedAt).toBeUndefined()
+    expect(after.updatedAt.toISOString()).toBe(note.updatedAt)
+  })
+
   it('resets reviewedAt when the note is edited', async () => {
     const agent = await authedAgent()
     const note = await createNote(agent, { title: 'card' })
