@@ -65,6 +65,13 @@ export const keyCodes = {
   nextImage: 75, //k
   prevImage: 74, //j
   help: 191, // / (forward slash) - Ctrl+/ for help
+  // Flip review ratings: 1/2/3 with no modifier
+  reviewFast: 49, // 1
+  reviewMed: 50, // 2
+  reviewSlow: 51, // 3
+  // Flip navigation: n/p with no modifier
+  flipNext: 78, // n
+  flipPrev: 80, // p
 }
 
 // Keyboard scopes - ordered from most specific to least specific
@@ -75,6 +82,7 @@ export const keyboardScopes = {
   NOTE_EDIT_LINKS: 'note_edit_links',
   NOTE_SELECTED: 'note_selected',
   NOTE_LIST: 'note_list',
+  FLIP: 'flip',
   AUTOCOMPLETE: 'autocomplete',
   SEARCH_BAR: 'search_bar',
   ENTITY_EDIT: 'entity_edit',

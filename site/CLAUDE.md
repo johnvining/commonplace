@@ -37,7 +37,7 @@ Most specific (highest priority) to least specific:
 2. `NOTE_SELECTED`
 3. `AUTOCOMPLETE`
 4. `NOTE_LIST`
-5. `SEARCH_BAR`
+5. `FLIP`, `SEARCH_BAR`
 6. `ENTITY_EDIT`
 7. `ENTITY_PAGE`
 8. `GLOBAL` (lowest priority)
@@ -72,6 +72,8 @@ Most specific (highest priority) to least specific:
 | `Enter` | Execute/select/add | Various |
 | `Escape` | Close/exit | Various |
 | `Backspace` | Go back | SEARCH_BAR, AUTOCOMPLETE |
+| `1` / `2` / `3` | Rate card fast / med / slow | FLIP |
+| `n` / `p` | Next / previous card | FLIP |
 
 ### Avoiding Conflicts
 

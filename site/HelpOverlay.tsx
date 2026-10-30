@@ -77,6 +77,19 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
       })
     }
 
+    if (hasScope(constants.keyboardScopes.FLIP)) {
+      sections.push({
+        title: 'Flip',
+        shortcuts: [
+          { key: '1', action: 'See again fast' },
+          { key: '2', action: 'See again medium' },
+          { key: '3', action: 'See again slow' },
+          { key: 'n', action: 'Next card (no rating)' },
+          { key: 'p', action: 'Previous card' },
+        ],
+      })
+    }
+
     // Note editing context
     if (currentContext.noteMode) {
       const noteShortcuts = [

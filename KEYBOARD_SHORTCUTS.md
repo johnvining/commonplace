@@ -174,3 +174,19 @@ When autocomplete dropdown is visible.
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+S` | Fetch AI idea suggestions (when editing note ideas) |
+
+---
+
+## 7. Flip
+
+On the flip (review) page, when not typing in a field.
+
+| Shortcut | Action |
+|----------|--------|
+| `1` | See this card again fast (about a day) |
+| `2` | See it again in a medium while |
+| `3` | See it again slowly (the interval grows) |
+| `n` | Next card, without rating this one |
+| `p` | Previous card |
+
+Each card starts selected, so the note shortcuts (`Ctrl+E` to edit, etc.) work right away. Flip keys are ignored while a note is being edited.

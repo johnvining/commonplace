@@ -21,6 +21,7 @@ const scopePriority = {
   [constants.keyboardScopes.NOTE_EDIT_LINKS]: 1,
   [constants.keyboardScopes.NOTE_SELECTED]: 2,
   [constants.keyboardScopes.NOTE_LIST]: 4,
+  [constants.keyboardScopes.FLIP]: 5,
   [constants.keyboardScopes.ENTITY_EDIT]: 6,
   [constants.keyboardScopes.ENTITY_PAGE]: 7,
   [constants.keyboardScopes.GLOBAL]: 10,
@@ -217,6 +218,15 @@ export const shortcuts = {
     close: (e: KeyboardEvent) => isKey(e, constants.keyCodes.esc),
     back: (e: KeyboardEvent) => isKey(e, constants.keyCodes.delete),
     suggestIdeas: (e: KeyboardEvent) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
+  },
+
+  // 7. Flip
+  flip: {
+    fast: (e: KeyboardEvent) => isKey(e, constants.keyCodes.reviewFast),
+    med: (e: KeyboardEvent) => isKey(e, constants.keyCodes.reviewMed),
+    slow: (e: KeyboardEvent) => isKey(e, constants.keyCodes.reviewSlow),
+    next: (e: KeyboardEvent) => isKey(e, constants.keyCodes.flipNext),
+    prev: (e: KeyboardEvent) => isKey(e, constants.keyCodes.flipPrev),
   },
 }
 
