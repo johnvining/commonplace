@@ -804,6 +804,16 @@ async function cmdFlip(args, config) {
   })
 }
 
+async function cmdReview(args, config) {
+  const [id, rating] = args
+  if (!id || !['fast', 'med', 'slow'].includes(rating)) {
+    console.error('Usage: cplace review <id> fast|med|slow'); return
+  }
+  const res = await api('POST', `note/${id}/review`, { rating }, config)
+  const due = res?.data?.reviewDueAt
+  console.log(`${GREEN}Reviewed.${RESET}${due ? ` Next due ${new Date(due).toLocaleDateString()}.` : ''}`)
+}
+
 async function cmdEdit(args, config) {
   const id = args[0]
   const field = args[1]
@@ -1572,7 +1582,7 @@ ${BOLD}Finding & viewing${RESET}
                      (also: find <query>)
   recent [page]      List recent notes (40 per page)
   earliest [page]    List earliest unfiled notes
-  flip               Show random notes
+  flip               Show a review deck (due notes plus some never reviewed)
   nick <nick>        Look up an entity by its short name
   note <id|nick>     Show a note in full
   show <id|nick>     Show an entity and its contents (pile→notes+works, etc.)
@@ -1612,6 +1622,7 @@ ${BOLD}Creating & editing${RESET}
   set <id> [--title T] [--text T] [--author N[,N]] [--work N] [--idea T] [--pile N]
                      Update metadata on an existing note
   edit <id> <field> <value>  Quick update (field: title or text)
+  review <id> fast|med|slow  Rate a flip card: how soon to see it again
   update <type> <id> --field=value [...]
                      Update any entity's fields (auth/work/idea/pile/note)
   rm <noteId> [--idea N] [--pile N] [--author N] [--work]
@@ -1683,6 +1694,7 @@ const commands = {
   'nick-gen': cmdNickGen,
   show:    cmdShow,
   flip:    cmdFlip,
+  review:  cmdReview,
   edit:    cmdEdit,
   config:  cmdConfig,
   quick:   cmdQuick,
