@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { authedAgent, createIdea, createNote } from './setup.js'
 import Note from '../src/resources/note/note.model.js'
-import { buildDeck, reviewPriority, scheduleReview, staleness } from '../src/utils/review.js'
+import { NEVER_REVIEWED, REVIEWED, buildDeck, reviewPriority, scheduleReview, staleness } from '../src/utils/review.js'
 
 vi.mock('../src/utils/embeddings.js', async (orig) => {
   const actual = await orig()
@@ -42,22 +42,27 @@ describe('scheduleReview', () => {
 
 describe('buildDeck', () => {
   it('ranks overdue reviewed cards first', () => {
-    const due = { id: 'due', reviewedAt: ago(10), reviewDueAt: ago(0) }
-    const overdue = { id: 'overdue', reviewedAt: ago(10), reviewDueAt: ago(5) }
-    const fresh = { id: 'fresh', reviewedAt: ago(1), reviewDueAt: ago(-9) }
+    const due = { id: 'due', reviewedAt: ago(10), reviewDueAt: ago(0), reviewCount: 1 }
+    const overdue = { id: 'overdue', reviewedAt: ago(10), reviewDueAt: ago(5), reviewCount: 1 }
+    const fresh = { id: 'fresh', reviewedAt: ago(1), reviewDueAt: ago(-9), reviewCount: 1 }
     expect(reviewPriority(overdue, now)).toBe(2)
     const deck = buildDeck([fresh, due, overdue], [], 2, now, half)
     expect(deck.map((c) => c.id).sort()).toEqual(['due', 'overdue'])
   })
 
   it('mixes never-reviewed cards in, and fills from either side', () => {
-    const reviewed = Array.from({ length: 50 }, (_, i) => ({ id: `r${i}`, reviewedAt: ago(5), reviewDueAt: ago(1) }))
+    const reviewed = Array.from({ length: 50 }, (_, i) => ({ id: `r${i}`, reviewedAt: ago(5), reviewDueAt: ago(1), reviewCount: 1 }))
     const unreviewed = Array.from({ length: 50 }, (_, i) => ({ id: `u${i}` }))
     const deck = buildDeck(reviewed, unreviewed, 40, now)
     expect(deck).toHaveLength(40)
     expect(deck.filter((c) => c.id.startsWith('u'))).toHaveLength(12)
     expect(buildDeck(reviewed, unreviewed.slice(0, 3), 40, now).filter((c) => c.id.startsWith('u'))).toHaveLength(3)
     expect(buildDeck(reviewed.slice(0, 2), unreviewed, 40, now).filter((c) => c.id.startsWith('u'))).toHaveLength(38)
+  })
+
+  it('treats a reviewedAt without any ratings as never reviewed', () => {
+    expect(reviewPriority({ reviewedAt: ago(1), reviewDueAt: ago(-1) }, now)).toBe(Infinity)
+    expect(reviewPriority({ reviewedAt: ago(1), reviewDueAt: ago(-1), reviewCount: 1 }, now)).toBe(0.5)
   })
 
   it('leans toward cards not seen lately', () => {
@@ -121,6 +126,20 @@ describe('review endpoints', () => {
     expect(after.reviewedAt).toEqual(schedule.reviewedAt)
     expect(after.reviewDueAt).toEqual(schedule.reviewDueAt)
     expect(after.text).toBe('edited')
+  })
+
+  it('sorts notes into reviewed and never reviewed by their ratings', async () => {
+    const agent = await authedAgent()
+    const rated = await createNote(agent, { title: 'rated' })
+    const editedOnly = await createNote(agent, { title: 'edited only' })
+    const untouched = await createNote(agent, { title: 'untouched' })
+    await agent.post(`/api/note/${rated._id}/review`).send({ rating: 'med' }).expect(200)
+    // Left by an earlier version, which set reviewedAt on edits.
+    await Note.collection.updateOne({ _id: editedOnly._id }, { $set: { reviewedAt: ago(1), reviewDueAt: ago(-1) } })
+    const titles = async (filter) => (await Note.find(filter).lean()).map((n) => n.title).sort()
+    expect(await titles(REVIEWED)).toEqual(['rated'])
+    expect(await titles(NEVER_REVIEWED)).toEqual(['edited only', 'untouched'])
+    expect(untouched.reviewCount).toBe(0)
   })
 
   it('deals a deck of reviewed and never-reviewed notes', async () => {

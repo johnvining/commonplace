@@ -58,7 +58,8 @@ function cardStatus(note: any) {
   const parts = []
   if (note.createdAt) parts.push(`Created ${ago(note.createdAt)}`)
   if (note.updatedAt) parts.push(`edited ${ago(note.updatedAt)}`)
-  if (!note.reviewedAt) {
+  // Rated at least once; a reviewedAt alone may be left over from an edit.
+  if (!note.reviewCount) {
     parts.push('never reviewed')
   } else {
     parts.push(`reviewed ${ago(note.reviewedAt)} (${note.reviewCount || 0}×)`)

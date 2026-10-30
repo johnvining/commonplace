@@ -8,8 +8,13 @@
 // - reviewCount: how many times it has been rated,
 // - seenAt / seenCount: the last time, and how often, it was loaded
 //   anywhere (see utils/seen.ts), rated or not.
-// A note with no reviewedAt has never been reviewed. Only a rating moves
-// reviewedAt: editing a note (updatedAt) or seeing it doesn't.
+// Only a rating moves these: editing a note (updatedAt) or seeing it
+// doesn't. A note is reviewed once reviewCount > 0. Don't go by
+// reviewedAt alone: an earlier version set it on edits too, so older
+// notes can have one without ever being rated.
+
+export const REVIEWED = { reviewCount: { $gt: 0 } }
+export const NEVER_REVIEWED = { reviewCount: { $not: { $gt: 0 } } }
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -83,7 +88,7 @@ export function scheduleReview(
 // that has passed. 1 is exactly due, 2 is overdue by a whole interval.
 // Never-reviewed cards don't have a priority; they're drawn separately.
 export function reviewPriority(state: ReviewState, now = new Date()): number {
-  if (!state.reviewedAt) return Infinity
+  if (!state.reviewCount || !state.reviewedAt) return Infinity
   const reviewed = new Date(state.reviewedAt).getTime()
   const due = state.reviewDueAt
     ? new Date(state.reviewDueAt).getTime()

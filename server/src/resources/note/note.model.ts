@@ -57,8 +57,8 @@ const noteSchema = new Schema<NoteDoc>(
     // How often its page has been opened, for the well-worn look (#333).
     openCount: { type: Number, default: 0 },
     lastOpenedAt: Date,
-    // Spaced review in /flip; see utils/review.ts. No reviewedAt means
-    // never reviewed. Only a rating sets these.
+    // Spaced review in /flip; see utils/review.ts. reviewCount > 0 means
+    // reviewed. Only a rating sets these.
     reviewedAt: Date,
     reviewDueAt: Date,
     reviewInterval: Number,
@@ -80,6 +80,6 @@ noteSchema.index({ work: 1 })
 noteSchema.index({ piles: 1 })
 noteSchema.index({ ideas: 1 })
 noteSchema.index({ updatedAt: -1 })
-noteSchema.index({ reviewedAt: 1 })
+noteSchema.index({ reviewCount: 1 })
 
 export default mongoose.model<NoteDoc>('note', noteSchema)

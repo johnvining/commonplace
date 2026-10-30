@@ -26,7 +26,14 @@ import type { Request, Response } from 'express'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { isValidObjectId } from 'mongoose'
 import { markSeen } from '../../utils/seen.js'
-import { RATINGS, buildDeck, scheduleReview, type Rating } from '../../utils/review.js'
+import {
+  NEVER_REVIEWED,
+  RATINGS,
+  REVIEWED,
+  buildDeck,
+  scheduleReview,
+  type Rating,
+} from '../../utils/review.js'
 
 
 const pageSize = 40
@@ -188,14 +195,14 @@ export const reqGetEarliestNotesToFile = async (req: Request, res: Response) => 
 // through their interval they are (with some randomness), and a share of
 // never-reviewed notes is mixed in; see utils/review.ts.
 export const reqGetRandomNotes = async (req: Request, res: Response) => {
-  const reviewFields = { reviewedAt: 1, reviewDueAt: 1, seenAt: 1 }
+  const reviewFields = { reviewedAt: 1, reviewDueAt: 1, reviewCount: 1, seenAt: 1 }
   const [reviewed, unreviewed] = await Promise.all([
-    Note.find({ reviewedAt: { $ne: null } }, reviewFields).lean().exec(),
+    Note.find(REVIEWED, reviewFields).lean().exec(),
     // Sampled rather than loaded whole: there can be a lot of them. The
     // pool is bigger than the deck so buildDeck can lean toward ones not
     // seen lately.
     Note.aggregate([
-      { $match: { reviewedAt: null } },
+      { $match: NEVER_REVIEWED },
       { $sample: { size: pageSize * 4 } },
       { $project: reviewFields },
     ]).exec(),
