@@ -20,6 +20,7 @@ import controllers, {
   reqRemoveIdeaFromNote,
   reqRemoveImageFromNote,
   reqRemovePileFromNote,
+  reqReviewNote,
   reqUpdateNote,
   reqOcrForNote,
   reqBulkOcrForNotes,
@@ -98,6 +99,8 @@ router.route('/bulk-embed').post(asyncWrapper(reqBulkEmbedNotes, 200))
 
 router.route('/unified-search').post(asyncWrapper(reqUnifiedSearch, 200))
 router.route('/filter').get(asyncWrapper(reqFilterNotes, 200))
+
+router.route('/:id/review').post(requireObjectIdParam('id'), asyncWrapper(reqReviewNote, 200))
 
 router.route('/:id/opened').post(requireObjectIdParam('id'), asyncWrapper(recordOpened(Note), 200))
 

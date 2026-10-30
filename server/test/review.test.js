@@ -1,5 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { authedAgent, createIdea, createNote } from './setup.js'
+import Note from '../src/resources/note/note.model.js'
 import { buildDeck, reviewPriority, scheduleReview, staleness } from '../src/utils/review.js'
+
+vi.mock('../src/utils/embeddings.js', async (orig) => {
+  const actual = await orig()
+  return { ...actual, embedNoteIfStale: vi.fn().mockResolvedValue(null) }
+})
 
 const DAY = 24 * 60 * 60 * 1000
 const now = new Date('2026-06-01T00:00:00Z')
@@ -60,5 +67,44 @@ describe('buildDeck', () => {
     const seen = { id: 'seen', seenAt: ago(0) }
     const unseen = { id: 'unseen' }
     expect(buildDeck([], [seen, unseen], 1, now, half)[0].id).toBe('unseen')
+  })
+})
+
+describe('review endpoints', () => {
+  it('records a rating without touching updatedAt', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'card' })
+    const res = await agent.post(`/api/note/${note._id}/review`).send({ rating: 'slow' }).expect(200)
+    expect(res.body.data.reviewCount).toBe(1)
+    const after = await Note.findById(note._id).lean()
+    expect(after.reviewedAt).toBeTruthy()
+    expect(after.reviewDueAt.getTime()).toBeGreaterThan(Date.now())
+    expect(after.touchedAt).toBeTruthy()
+    expect(after.updatedAt.toISOString()).toBe(note.updatedAt)
+  })
+
+  it('rejects bad ratings and unknown notes', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'card' })
+    await agent.post(`/api/note/${note._id}/review`).send({ rating: 'soon' }).expect(400)
+    await agent.post('/api/note/507f1f77bcf86cd799439011/review').send({ rating: 'fast' }).expect(404)
+    await agent.put(`/api/note/${note._id}`).send({ reviewedAt: new Date() }).expect(400)
+  })
+
+  it('resets reviewedAt when the note is edited', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'card' })
+    await Note.updateOne({ _id: note._id }, { $set: { reviewedAt: ago(30), reviewInterval: 10 } })
+    await agent.put(`/api/note/${note._id}`).send({ text: 'edited' }).expect(200)
+    let after = await Note.findById(note._id).lean()
+    expect(Date.now() - after.reviewedAt.getTime()).toBeLessThan(60 * 1000)
+    expect(after.reviewDueAt.getTime() - after.reviewedAt.getTime()).toBe(10 * DAY)
+
+    const idea = await createIdea(agent, 'I')
+    await Note.updateOne({ _id: note._id }, { $set: { reviewedAt: ago(30) } })
+    await agent.put(`/api/note/${note._id}/idea`).send({ id: idea._id }).expect(200)
+    after = await Note.findById(note._id).lean()
+    expect(Date.now() - after.reviewedAt.getTime()).toBeLessThan(60 * 1000)
+    expect(after.ideas.map(String)).toEqual([String(idea._id)])
   })
 })
