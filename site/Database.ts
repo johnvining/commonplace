@@ -276,8 +276,13 @@ export async function getEarliestNotesToFile(page: number | string) {
   return axios.get(url_api + `note/file/` + page)
 }
 
+// A review deck for flip: due cards plus some never reviewed.
 export async function getRandomNotes() {
   return axios.get(url_api + `note/flip`)
+}
+
+export async function reviewNote(id: string, rating: 'fast' | 'med' | 'slow') {
+  return axios.post(url_api + `note/` + id + `/review`, { rating })
 }
 
 export async function getTitleSuggestion(noteID: string) {
