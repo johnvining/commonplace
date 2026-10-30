@@ -1,19 +1,19 @@
 @charset "UTF-8";
 :root {
   --background-color: #F7FCF7;
-  --semantic-idea: rgb(185.3, 221.85, 233.75);
+  --semantic-idea: rgb(72.6666666667%, 87%, 91.6666666667%);
   --semantic-pile: #f3e8f8;
   --semantic-selection: lightgoldenrodyellow;
   --semantic-removal: lightcoral;
-  --button-input-background-selected: rgb(185.3, 221.85, 233.75);
-  --button-selected: rgb(177.1, 217.95, 231.25);
+  --button-input-background-selected: rgb(72.6666666667%, 87%, 91.6666666667%);
+  --button-selected: rgb(69.4509803922%, 85.4705882353%, 90.6862745098%);
   --input-background: #efefef;
   --note-background-edit: white;
   --note-background-not-selected: white;
   --note-background: white;
   --font-color: black;
   --link-color: black;
-  --inverse-background-color: rgb(6.8045454545, 18.1454545455, 6.8045454545);
+  --inverse-background-color: rgb(2.6684491979%, 7.1158645276%, 2.6684491979%);
   --inverse-font-color: white;
   --low-intensity-border: white;
   --high-intensity-border: black;
@@ -28,27 +28,27 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #010d12;
-    --semantic-idea: rgb(14.1238317757, 38.4168224299, 46.3261682243);
-    --semantic-pile: rgb(43.2, 16.8, 55.2);
-    --semantic-selection: rgb(41.4, 41.4, 4.6);
-    --semantic-removal: rgb(49.3690140845, 5.8309859155, 5.8309859155);
-    --button-input-background-selected: rgb(2.2921052632, 29.7973684211, 41.2578947368);
-    --button-selected: rgb(8.7526315789, 113.7842105263, 157.5473684211);
-    --input-background: rgb(1.5168421053, 19.7189473684, 27.3031578947);
-    --note-background-edit: rgb(0.07, 0.91, 1.26);
-    --note-background-not-selected: rgb(2.5505263158, 33.1568421053, 45.9094736842);
-    --note-background: rgb(0.03, 0.39, 0.54);
+    --semantic-idea: rgb(5.5387575591%, 15.0654205607%, 18.1671247938%);
+    --semantic-pile: rgb(16.9411764706%, 6.5882352941%, 21.6470588235%);
+    --semantic-selection: rgb(16.2352941176%, 16.2352941176%, 1.8039215686%);
+    --semantic-removal: rgb(19.3603976802%, 2.2866611433%, 2.2866611433%);
+    --button-input-background-selected: rgb(0.8988648091%, 11.6852425181%, 16.1795665635%);
+    --button-selected: rgb(3.4324045408%, 44.6212590299%, 61.7832817337%);
+    --input-background: rgb(0.5948400413%, 7.7329205366%, 10.707120743%);
+    --note-background-edit: rgb(0.0274509804%, 0.3568627451%, 0.4941176471%);
+    --note-background-not-selected: rgb(1.0002063983%, 13.0026831785%, 18.0037151703%);
+    --note-background: rgb(0.0117647059%, 0.1529411765%, 0.2117647059%);
     --link-color: #cccccc;
     --font-color: #cccccc;
     --inverse-background-color: #F7FCF7;
     --inverse-font-color: black;
-    --low-intensity-border: rgb(3.5842105263, 46.5947368421, 64.5157894737);
+    --low-intensity-border: rgb(1.4055727554%, 18.2724458204%, 25.3003095975%);
     --high-intensity-border: #cccccc;
-    --note-border-edit: rgb(0.07, 0.91, 1.26);
+    --note-border-edit: rgb(0.0274509804%, 0.3568627451%, 0.4941176471%);
     --note-border-focused: darkgray;
     --note-border-selected: #efefef;
-    --note-border: rgb(3.5842105263, 46.5947368421, 64.5157894737);
-    --button-border: rgb(3.5842105263, 46.5947368421, 64.5157894737);
+    --note-border: rgb(1.4055727554%, 18.2724458204%, 25.3003095975%);
+    --button-border: rgb(1.4055727554%, 18.2724458204%, 25.3003095975%);
     --button-background: black;
     --button-shadow-color: darkgray;
   }
@@ -2447,13 +2447,13 @@ mark.search-highlight {
   text-align: center;
   font-size: var(--font-size-sm);
   color: black;
-  background-color: rgb(228.8545454545, 245.1954545455, 228.8545454545);
+  background-color: rgb(89.7468805704%, 96.1550802139%, 89.7468805704%);
   border-radius: 6px;
   padding: 6px 10px;
 }
 @media (prefers-color-scheme: dark) {
   .help-overlay-hint {
-    background-color: rgb(6.1684210526, 80.1894736842, 111.0315789474);
+    background-color: rgb(2.4189886481%, 31.4468524252%, 43.5417956656%);
     color: white;
   }
 }
@@ -2511,7 +2511,7 @@ mark.search-highlight {
 }
 @media (prefers-color-scheme: dark) {
   .help-section kbd {
-    background-color: rgb(5.6515789474, 73.4705263158, 101.7284210526);
+    background-color: rgb(2.2163054696%, 28.8119711042%, 39.893498452%);
     border-color: var(--high-intensity-border);
   }
 }
