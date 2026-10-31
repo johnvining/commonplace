@@ -4069,4 +4069,30 @@ a.grid-link > a {
   color: var(--muted);
 }
 
+.search-bar.container {
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  align-items: center;
+  gap: 8px;
+}
+.search-bar.current-modifier {
+  margin: 0;
+  padding: 2px 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 2px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+.search-bar.search-box {
+  margin: 0;
+  padding: 8px 2px;
+  font-size: var(--font-size-xl);
+}
+
 /*# sourceMappingURL=style.css.map */

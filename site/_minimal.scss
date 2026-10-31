@@ -1406,3 +1406,38 @@ a.grid-link {
   width: auto;
   color: var(--muted);
 }
+
+// ---- Search box -----------------------------------------------------------------------
+
+// The overlay is the frame; the box inside is borderless, and the active
+// mode ("work", "idea"…) is a quiet label, not a black block.
+.search-bar {
+  &.container {
+    border: none;
+    border-bottom: 1px solid var(--hairline);
+    border-radius: 0;
+    background: transparent;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &.current-modifier {
+    margin: 0;
+    padding: 2px 6px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 2px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+
+  &.search-box {
+    margin: 0;
+    padding: 8px 2px;
+    font-size: var(--font-size-xl);
+  }
+}
+
