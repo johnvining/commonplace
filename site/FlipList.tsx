@@ -11,10 +11,12 @@ import {
 
 type Rating = 'fast' | 'med' | 'slow'
 
-const RATING_BUTTONS: { rating: Rating; name: string; key: string }[] = [
-  { rating: 'fast', name: 'Fast', key: '1' },
-  { rating: 'med', name: 'Med', key: '2' },
-  { rating: 'slow', name: 'Slow', key: '3' },
+// `hint` is the hover text: the key, and roughly when the card comes back
+// (see scheduleReview in server/src/utils/review.ts).
+const RATING_BUTTONS: { rating: Rating; name: string; hint: string }[] = [
+  { rating: 'fast', name: 'Fast', hint: 'Fast · key 1: back in about a day' },
+  { rating: 'med', name: 'Med', hint: 'Med · key 2: back in a few days, a little later than last time' },
+  { rating: 'slow', name: 'Slow', hint: 'Slow · key 3: back in a week or more, and the gap keeps growing' },
 ]
 
 // Scopes active while a note is being edited; flip keys stay out of the
@@ -194,7 +196,7 @@ function FlipList(props: any) {
             <TopLevelStandardButton
               key={button.rating}
               name={button.name}
-              label={`See again ${button.name.toLowerCase()} (${button.key})`}
+              label={button.hint}
               position={i === 0 ? 'left' : i === RATING_BUTTONS.length - 1 ? 'right' : 'middle'}
               onClick={() => rate(button.rating)}
             />
