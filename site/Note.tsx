@@ -1,4 +1,5 @@
 import React from 'react'
+import { showToast } from './Toast'
 import { Link } from 'react-router-dom'
 import { guessYearFromURL, NO_AUTOFILL, wornClass } from './utils'
 import * as db from './Database'
@@ -222,6 +223,41 @@ class Note extends React.Component<any, any> {
     if (shortcuts.note.addLink(event) && editLinks) {
       this.handleNewNoteLink()
       return true
+    }
+
+    // Single keys on a selected note: copy its nick, show the rest of a
+    // long text, zoom the open image, delete (asks first).
+    if (selected && !anyEditMode) {
+      if (shortcuts.note.copyNick(event) && this.state.nick) {
+        navigator.clipboard?.writeText(this.state.nick)
+        showToast({ kind: 'success', message: `Copied ${this.state.nick}`, ttl: 1500 })
+        return true
+      }
+      if (shortcuts.note.more(event) && this.state.textOverflows && this.clampText()) {
+        this.setState({ textExpanded: true })
+        return true
+      }
+      if (shortcuts.note.zoom(event) && this.state.overlayMode && this.state.largeImage >= 0) {
+        this.setState((state: any) => ({ lightboxOpen: !state.lightboxOpen }))
+        return true
+      }
+      if (shortcuts.note.delete(event)) {
+        this.handleDelete()
+        return true
+      }
+    }
+
+    // Edit mode: Ctrl+U picks images to upload, Ctrl+M shows fewer/all fields.
+    if (editMode) {
+      if (shortcuts.note.upload(event)) {
+        const input = document.getElementById(this.props.id)?.querySelector('input[type=file]') as HTMLInputElement | null
+        input?.click()
+        return true
+      }
+      if (shortcuts.note.toggleFields(event)) {
+        this.toggleCompact()
+        return true
+      }
     }
 
     // Section 5.3: Image Navigation (works in selected or edit modes)
@@ -860,7 +896,7 @@ class Note extends React.Component<any, any> {
                 <img
                   src={this.props.note.imageUrls[this.state.largeImage]}
                   onClick={() => this.setState({ lightboxOpen: true })}
-                  title="Click to zoom"
+                  title="Zoom (z)"
                   alt=""
                 />
                 {this.props.note.imageUrls.length > 1 ? (
@@ -986,6 +1022,7 @@ class Note extends React.Component<any, any> {
                   className="note-more"
                   tabIndex={selected ? undefined : -1}
                   onClick={() => this.setState({ textExpanded: true })}
+                  title="Show more (m)"
                 >
                   Show more
                 </button>
@@ -1208,6 +1245,7 @@ class Note extends React.Component<any, any> {
                       allowMultiple={true}
                       buttonClassName="action-button"
                       iconOnly={true}
+                      shortcut="Ctrl+U"
                     />
                   </div>
 
@@ -1221,6 +1259,7 @@ class Note extends React.Component<any, any> {
                     <NoteButton
                       icon={this.state.compactEdit ? eye : eye_closed}
                       label={this.state.compactEdit ? 'Show all fields' : 'Show fewer fields'}
+                      shortcut="Ctrl+M"
                       onClick={this.toggleCompact.bind(this)}
                     />
                     <NoteButton
@@ -1365,6 +1404,7 @@ class Note extends React.Component<any, any> {
                   <NoteButton
                     icon={trash}
                     label="Delete"
+                    shortcut="#"
                     tabbable={selected}
                     onClick={this.handleDelete.bind(this)}
                   />

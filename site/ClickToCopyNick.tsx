@@ -35,7 +35,7 @@ function ClickToCopyNick({
         ...style,
       }}
       onClick={handleCopy}
-      title={disableClick ? undefined : 'Click to copy nick'}
+      title={disableClick ? undefined : 'Copy nick (y)'}
     >
       {!disableClick && (
         <img

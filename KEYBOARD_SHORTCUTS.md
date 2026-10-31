@@ -131,6 +131,9 @@ Shortcuts for navigating and selecting notes. **Only works in Full view mode.**
 | `Ctrl+P` | Edit piles |
 | `Ctrl+L` | Add links |
 | `Ctrl+S` | Star/unstar selected note |
+| `y` | Copy the note's nick |
+| `m` | Show more of a long note |
+| `#` | Delete the note (asks first) |
 
 ---
 
@@ -147,6 +150,8 @@ Shortcuts when editing a note in Full view.
 ### 5.2 Text Tools (Edit Mode Only)
 | Shortcut | Action |
 |----------|--------|
+| `Ctrl+U` | Upload images |
+| `Ctrl+M` | Show fewer / all fields |
 | `Ctrl+F` | Format text (remove extra whitespace) |
 | `Ctrl+S` | Generate AI title suggestion |
 | `Ctrl+R` | Run OCR on images |
@@ -154,6 +159,7 @@ Shortcuts when editing a note in Full view.
 ### 5.3 Image Navigation
 | Shortcut | Action |
 |----------|--------|
+| `z` | Zoom the image open in the reader |
 | `Ctrl+I` | Open/close the image reader: the image beside the note's text (Esc closes; click the image to zoom) |
 | `←` / `Ctrl+J` | Previous image (opens the last one if none is open) |
 | `→` / `Ctrl+K` | Next image (opens the first one if none is open) |

@@ -109,7 +109,9 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
         noteShortcuts.push(
           { key: 'Ctrl+F', action: 'Format text' },
           { key: 'Ctrl+S', action: 'Suggest title (AI)' },
-          { key: 'Ctrl+R', action: 'Run OCR' }
+          { key: 'Ctrl+R', action: 'Run OCR' },
+          { key: 'Ctrl+U', action: 'Upload images' },
+          { key: 'Ctrl+M', action: 'Fewer / all fields' }
         )
       }
 
@@ -131,6 +133,10 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
 
       if (currentContext.noteMode === constants.note_modes.SELECTED) {
         noteShortcuts.push({ key: 'Ctrl+S', action: 'Star / unstar note' })
+        noteShortcuts.push({ key: 'y', action: 'Copy nick' })
+        noteShortcuts.push({ key: 'm', action: 'Show more' })
+        noteShortcuts.push({ key: 'z', action: 'Zoom open image' })
+        noteShortcuts.push({ key: '#', action: 'Delete note' })
         noteShortcuts.push({ key: 'Ctrl+L', action: 'Add link' })
       }
 

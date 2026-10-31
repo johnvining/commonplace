@@ -61,6 +61,8 @@ Most specific (highest priority) to least specific:
 | `/` | Open search bar | GLOBAL |
 | `h` / `c` / `d` | Home / create note / day-night | GLOBAL |
 | `[` / `]` | Previous / next page | NOTE_LIST |
+| `y` / `m` / `z` / `#` | Copy nick / show more / zoom image / delete | NOTE_SELECTED |
+| `Ctrl+U` / `Ctrl+M` | Upload images / fewer-all fields | NOTE_EDIT |
 | `j` / `k` | Next / previous note | NOTE_LIST |
 | `e` / `o` | Edit / open selected note (Enter on a selected note opens it too) | NOTE_LIST |
 | `Ctrl+Shift+1-4` | View modes | GLOBAL |

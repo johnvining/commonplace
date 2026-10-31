@@ -77,6 +77,12 @@ export const keyCodes = {
   home: 72, // h
   create: 67, // c
   theme: 68, // d
+  // On a selected note: copy nick, show more, zoom (delete is Shift+3, #)
+  copyNick: 89, // y
+  more: 77, // m (Ctrl+M in edit mode: fewer/more fields)
+  zoom: 90, // z
+  deleteKey: 51, // 3, with Shift: #
+  upload: 85, // u (Ctrl+U in edit mode)
   // List paging
   prevPage: 219, // [
   nextPage: 221, // ]
