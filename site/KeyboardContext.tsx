@@ -143,13 +143,15 @@ export function useKeyboardScopes() {
   return context?.activeScopes || new Set<string>()
 }
 
-// Helper to check key combinations
+// Helper to check key combinations. No shortcut uses Cmd, so Cmd+key is
+// left to the browser (Cmd+C was creating a note as plain c).
 function isKey(event: KeyboardEvent, keyCode: number, { ctrl = false, shift = false, alt = false }: { ctrl?: boolean; shift?: boolean; alt?: boolean } = {}) {
   return (
     event.keyCode === keyCode &&
     event.ctrlKey === ctrl &&
     event.shiftKey === shift &&
-    event.altKey === alt
+    event.altKey === alt &&
+    !event.metaKey
   )
 }
 
