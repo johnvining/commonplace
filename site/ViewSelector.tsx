@@ -10,20 +10,21 @@ import { TopLevelStandardButton } from './TopLevelStandardButton'
 // This component only renders the view mode buttons
 
 const VIEWS = [
-  { mode: constants.view_modes.FULL, icon: full, label: 'Full view (Ctrl-Shift-1)', position: 'left' },
-  { mode: constants.view_modes.SLIM, icon: slim, label: 'Slim view (Ctrl-Shift-2)', position: 'middle' },
-  { mode: constants.view_modes.GRID, icon: grid, label: 'Grid view (Ctrl-Shift-3)', position: 'middle' },
-  { mode: constants.view_modes.TILE, icon: gridSmall, label: 'Tile view (Ctrl-Shift-4)', position: 'right' },
+  { mode: constants.view_modes.FULL, icon: full, label: 'Full view', shortcut: 'Ctrl+Shift+1', position: 'left' },
+  { mode: constants.view_modes.SLIM, icon: slim, label: 'Slim view', shortcut: 'Ctrl+Shift+2', position: 'middle' },
+  { mode: constants.view_modes.GRID, icon: grid, label: 'Grid view', shortcut: 'Ctrl+Shift+3', position: 'middle' },
+  { mode: constants.view_modes.TILE, icon: gridSmall, label: 'Tile view', shortcut: 'Ctrl+Shift+4', position: 'right' },
 ]
 
 class ViewSelector extends React.Component<any> {
   render() {
     return (
       <>
-        {VIEWS.map(({ mode, icon, label, position }) => (
+        {VIEWS.map(({ mode, icon, label, shortcut, position }) => (
           <TopLevelStandardButton
             key={mode}
             label={label}
+            shortcut={shortcut}
             position={position}
             className={this.props.viewMode == mode ? 'button-selected' : undefined}
             onClick={() => this.props.setView(mode)}

@@ -169,7 +169,7 @@ function Author(props: any) {
                 editor.set('usernames', e.target.value)
               }}
             />
-            <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
+            <TopLevelStandardButton name="Done" shortcut="Ctrl+A" onClick={handleAcceptUpdates} />
           </TopLevelFormContainer>
         ) : (
           <div className="entity-page-header">
@@ -202,6 +202,7 @@ function Author(props: any) {
                 />
                 <TopLevelStandardButton
                   name="Edit"
+                  shortcut="Ctrl+E"
                   onClick={() => {
                     setEdit(true)
                   }}

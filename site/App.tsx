@@ -152,7 +152,8 @@ class App extends React.Component<any, any> {
           <div className="top-action-bar">
             <div className="tool-bar div">
               <TopLevelStandardButton
-                label="Search (Ctrl-O)"
+                label="Search"
+                shortcut="/ or Ctrl+O"
                 onClick={() => {
                   this.setState({ barOpen: true })
                 }}

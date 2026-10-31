@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { withShortcut } from './TopLevelStandardButton'
 import { isPinned, togglePinned } from './pinned'
 import { TopLevelStandardButton } from './TopLevelStandardButton'
 import star from 'url:./icons/star.svg'
@@ -14,6 +15,7 @@ function PinButton({
   showLabel,
   stopPropagation = true,
   tabIndex,
+  shortcut,
 }: any) {
   const [pinned, setPinned] = useState(isPinned(type, id))
   const shouldShowLabel = showLabel ?? !compact
@@ -49,7 +51,7 @@ function PinButton({
       onClick={handleClick}
       aria-pressed={pinned}
       aria-label={pinned ? 'Starred' : 'Star'}
-      title={pinned ? 'Starred' : 'Star'}
+      title={withShortcut(pinned ? 'Starred' : 'Star', shortcut)}
       tabIndex={tabIndex}
     >
       <img

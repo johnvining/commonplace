@@ -435,7 +435,7 @@ function Work(props: any) {
                       compact
                     />
                   </div>
-                  <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
+                  <TopLevelStandardButton name="Done" shortcut="Esc" onClick={handleFinishEditing} />
                 </div>
               ) : editIdeas ? (
                 <div
@@ -457,7 +457,7 @@ function Work(props: any) {
                       inputId="work-idea"
                     />
                   </div>
-                  <TopLevelStandardButton name="Done" onClick={handleFinishEditing} />
+                  <TopLevelStandardButton name="Done" shortcut="Esc" onClick={handleFinishEditing} />
                 </div>
               ) : (
                 <>
@@ -470,6 +470,7 @@ function Work(props: any) {
                     />
                     <TopLevelStandardButton
                       name="Edit"
+                      shortcut="Ctrl+E"
                       onClick={() => {
                         setEdit(true)
                         setEditPiles(false)
@@ -478,6 +479,7 @@ function Work(props: any) {
                     />
                     <TopLevelStandardButton
                       name="Piles"
+                      shortcut="Ctrl+P"
                       onClick={() => {
                         setEdit(false)
                         setEditIdeas(false)
@@ -503,6 +505,7 @@ function Work(props: any) {
                     />
                     <TopLevelStandardButton
                       name="Add Note"
+                      shortcut="Ctrl+N"
                       onClick={createNoteForWork}
                     />
                     <ImageUploader
@@ -555,7 +558,7 @@ function Work(props: any) {
       )}
       {edit && (
         <div style={{ marginBottom: '4px' }}>
-          <TopLevelStandardButton name="Done" onClick={handleAcceptUpdates} />
+          <TopLevelStandardButton name="Done" shortcut="Ctrl+A" onClick={handleAcceptUpdates} />
         </div>
       )}
       {importMode ? (

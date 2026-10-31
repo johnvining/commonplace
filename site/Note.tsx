@@ -694,6 +694,7 @@ class Note extends React.Component<any, any> {
               {this.props.note.imageUrls.length > 1 && (
                 <button
                   className="lightbox-nav lightbox-prev"
+                  title="Previous image (←)"
                   onClick={() => this.moveFocusedImage(-1)}
                   disabled={this.state.largeImage === 0}
                 >‹</button>
@@ -705,11 +706,12 @@ class Note extends React.Component<any, any> {
               {this.props.note.imageUrls.length > 1 && (
                 <button
                   className="lightbox-nav lightbox-next"
+                  title="Next image (→)"
                   onClick={() => this.moveFocusedImage(1)}
                   disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
                 >›</button>
               )}
-              <button className="lightbox-close" onClick={() => this.setState({ lightboxOpen: false })}>×</button>
+              <button className="lightbox-close" title="Close (Esc)" onClick={() => this.setState({ lightboxOpen: false })}>×</button>
               {this.props.note.imageUrls.length > 1 && (
                 <div className="lightbox-counter">
                   {this.state.largeImage + 1} / {this.props.note.imageUrls.length}
@@ -726,6 +728,7 @@ class Note extends React.Component<any, any> {
                 {this.props.note.imageUrls.length > 1 && (
                   <button
                     className="lightbox-nav lightbox-prev"
+                    title="Previous image (←)"
                     onClick={() => this.moveFocusedImage(-1)}
                     disabled={this.state.largeImage === 0}
                   >‹</button>
@@ -737,19 +740,20 @@ class Note extends React.Component<any, any> {
                 {this.props.note.imageUrls.length > 1 && (
                   <button
                     className="lightbox-nav lightbox-next"
+                    title="Next image (→)"
                     onClick={() => this.moveFocusedImage(1)}
                     disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
                   >›</button>
                 )}
               </div>
               <div className="focus-edit-text-side">
-                <button className="focus-edit-close" onClick={() => this.setState({ focusEdit: false })}>×</button>
+                <button className="focus-edit-close" title="Close (Esc)" onClick={() => this.setState({ focusEdit: false })}>×</button>
                 <label className="note-full form-label">
                   Text
-                  <ClickableLabelButton onClick={() => this.runOCROnText()}>
+                  <ClickableLabelButton shortcut="Ctrl+R" onClick={() => this.runOCROnText()}>
                     {this.state.fetchingOcr ? 'Fetching' : 'OCR'}
                   </ClickableLabelButton>
-                  <ClickableLabelButton onClick={() => this.formatMainText()}>Format</ClickableLabelButton>
+                  <ClickableLabelButton shortcut="Ctrl+F" onClick={() => this.formatMainText()}>Format</ClickableLabelButton>
                 </label>
                 <textarea
                   className="focus-edit-textarea"
@@ -765,6 +769,7 @@ class Note extends React.Component<any, any> {
                 />
                 <button
                   className="button focus-edit-save"
+                  title="Save (Ctrl+A)"
                   onClick={() => { this.handleAccept(); this.setState({ focusEdit: false }) }}
                 >
                   <img src={check_circle} /> Save
@@ -782,6 +787,7 @@ class Note extends React.Component<any, any> {
                 <label htmlFor="title" className="note-full form-label">
                   Title
                   <ClickableLabelButton
+                    shortcut="Ctrl+S"
                     onClick={() => {
                       this.generateTitleSuggestion()
                     }}
@@ -934,6 +940,7 @@ class Note extends React.Component<any, any> {
               <label htmlFor="text" className="note-full form-label">
                 Text
                 <ClickableLabelButton
+                  shortcut="Ctrl+R"
                   onClick={() => {
                     this.runOCROnText()
                   }}
@@ -941,6 +948,7 @@ class Note extends React.Component<any, any> {
                   {this.state.fetchingOcr ? 'Fetching' : 'OCR'}
                 </ClickableLabelButton>
                 <ClickableLabelButton
+                  shortcut="Ctrl+F"
                   onClick={() => {
                     this.formatMainText()
                   }}
@@ -1206,7 +1214,8 @@ class Note extends React.Component<any, any> {
                   <div className="right-div">
                     <NoteButton
                       icon={check_circle}
-                      label="Save (Ctrl-A)"
+                      label="Save"
+                      shortcut="Ctrl+A"
                       onClick={this.handleAccept.bind(this)}
                     />
                     <NoteButton
@@ -1217,6 +1226,7 @@ class Note extends React.Component<any, any> {
                     <NoteButton
                       icon={cross_circle}
                       label="Cancel"
+                      shortcut="Esc"
                       onClick={() => {
                         this.props.setNoteMode(this.props.id, '')
                       }}
@@ -1294,6 +1304,7 @@ class Note extends React.Component<any, any> {
                     compact={true}
                     showLabel={false}
                     stopPropagation={false}
+                    shortcut="Ctrl+S"
                     tabIndex={
                       selected || edit || edit_ideas || edit_piles || edit_links
                         ? this.props.tabIndex
@@ -1302,7 +1313,8 @@ class Note extends React.Component<any, any> {
                   />
                   <NoteButton
                     icon={pile_img}
-                    label="Piles (Ctrl-P)"
+                    label="Piles"
+                    shortcut="Ctrl+P"
                     tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(
@@ -1313,7 +1325,8 @@ class Note extends React.Component<any, any> {
                   />
                   <NoteButton
                     icon={tags}
-                    label="Ideas (Ctrl-T)"
+                    label="Ideas"
+                    shortcut="Ctrl+T"
                     tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(
@@ -1323,11 +1336,12 @@ class Note extends React.Component<any, any> {
                     }}
                   />
                   <Link to={'/note/' + this.props.id} tabIndex={-1}>
-                    <NoteButton icon={document_image} label="Open note" tabbable={selected} />
+                    <NoteButton icon={document_image} label="Open note" shortcut="o or Enter" tabbable={selected} />
                   </Link>
                   <NoteButton
                     icon={link}
-                    label="Links (Ctrl-L)"
+                    label="Links"
+                    shortcut="Ctrl+L"
                     tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(
@@ -1338,7 +1352,8 @@ class Note extends React.Component<any, any> {
                   />
                   <NoteButton
                     icon={write}
-                    label="Edit (Ctrl-E)"
+                    label="Edit"
+                    shortcut="e or Ctrl+E"
                     tabbable={selected}
                     onClick={() => {
                       this.props.setNoteMode(

@@ -201,13 +201,15 @@ function FlipList(props: any) {
           ))}
           <TopLevelStandardButton
             name="‹"
-            label="Previous card (p)"
+            label="Previous card"
+            shortcut="p"
             position="left"
             onClick={() => move(-1)}
           />
           <TopLevelStandardButton
             name="›"
-            label="Next card without rating (n)"
+            label="Next card without rating"
+            shortcut="n"
             position="right"
             onClick={() => move(1)}
           />

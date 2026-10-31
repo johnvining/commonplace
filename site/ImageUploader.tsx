@@ -1,4 +1,5 @@
 import React from 'react'
+import { withShortcut } from './TopLevelStandardButton'
 import upload from 'url:./icons/upload.svg'
 
 class ImageUploader extends React.Component<any, any> {
@@ -117,7 +118,6 @@ class ImageUploader extends React.Component<any, any> {
           ref={this.inputRef}
           multiple={this.props.allowMultiple}
           onChange={this.onFileSelect.bind(this)}
-          title="asdfsdf"
         />
         <label
           htmlFor="fileUploadInput"
@@ -125,6 +125,7 @@ class ImageUploader extends React.Component<any, any> {
           onBlur={this.onFileSelect.bind(this)}
         >
           <div
+            title={withShortcut('Upload images', this.props.shortcut)}
             className={
               buttonClassName +
               (uploading ? ' uploading' : '') +

@@ -122,7 +122,7 @@ function Read(props: any) {
         </TopLevelTitle>
       </TopLevelTitleContainer>
       <TopLevelStandardButtonContainer nick={nick}>
-        <TopLevelStandardButton name="Add Note" onClick={createNoteForWork} />
+        <TopLevelStandardButton name="Add Note" shortcut="Ctrl+N" onClick={createNoteForWork} />
         <ImageUploader
           onImagesUpload={createNotesWithImagesForWork}
           allowMultiple={true}
