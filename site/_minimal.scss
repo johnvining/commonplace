@@ -539,16 +539,14 @@ div .top-bar {
   }
 }
 
-// "Status: To read" and friends: a key, a hairline, then the value.
+// "Status: To read" and friends: a small key, then the value.
 .pile-pre {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   opacity: 0.7;
-  padding-right: 6px;
   margin-right: 6px;
-  border-right: 1px solid currentColor;
   line-height: 1;
 }
 
@@ -558,7 +556,6 @@ div .top-bar {
 .pile-list .pile-pre {
   color: var(--faint);
   opacity: 1;
-  border-right-color: var(--hairline);
 }
 
 .entity-page-title .pile-pre {
