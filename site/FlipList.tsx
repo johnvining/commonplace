@@ -75,7 +75,8 @@ function cardStatus(note: any) {
 
 // Flip: review notes one at a time, Anki-style. Each card is rated by
 // how soon to see it again (fast / med / slow); the server schedules it
-// and deals the next deck. Only a rating counts as a review, and only
+// and deals the next deck, up to 100 cards a day (the count isn't shown).
+// Only a rating counts as a review, and only
 // opening a note's own page counts as opening it. n and p step
 // through the deck without rating. Each card starts selected, so Ctrl+E
 // edits it right away.
@@ -83,7 +84,6 @@ function FlipList(props: any) {
   const [deck, setDeck] = React.useState<any[] | null>(null)
   const [index, setIndex] = React.useState(0)
   const [rating, setRating] = React.useState(false)
-  const [ratedCount, setRatedCount] = React.useState(0)
   // Cards already shown in this deck. Going back to one fetches it again,
   // since it may have been edited or rated since the deck was dealt.
   const shown = React.useRef(new Set<string>())
@@ -97,7 +97,6 @@ function FlipList(props: any) {
   const deal = React.useCallback(async () => {
     setDeck(null)
     setIndex(0)
-    setRatedCount(0)
     shown.current = new Set()
     try {
       const response = await db.getRandomNotes()
@@ -119,7 +118,6 @@ function FlipList(props: any) {
     setRating(true)
     try {
       await db.reviewNote(current._id, value)
-      setRatedCount((n) => n + 1)
       setIndex((i) => i + 1)
     } catch (error) {
       console.error(error)
@@ -176,9 +174,7 @@ function FlipList(props: any) {
     return (
       <div className="flip">
         <p className="flip-status">
-          {deck.length
-            ? `Done: ${ratedCount} of ${deck.length} rated.`
-            : 'No notes to review.'}
+          {deck.length ? 'Done.' : 'Nothing left to review today.'}
         </p>
         <TopLevelStandardButtonContainer>
           <TopLevelStandardButton name="Deal again" shortcut="Enter" onClick={deal} />
@@ -191,7 +187,7 @@ function FlipList(props: any) {
     <div className="flip">
       <div className="flip-header">
         <span className="flip-status">
-          {index + 1} / {deck.length} · {cardStatus(current)}
+          {cardStatus(current)}
         </span>
         <TopLevelStandardButtonContainer className="flip-ratings">
           <span className="flip-prompt">See again:</span>

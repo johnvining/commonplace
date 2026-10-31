@@ -26,6 +26,7 @@ import type { Request, Response } from 'express'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { isValidObjectId } from 'mongoose'
 import {
+  FLIP_PER_DAY,
   NEVER_REVIEWED,
   RATINGS,
   REVIEWED,
@@ -190,10 +191,21 @@ export const reqGetEarliestNotesToFile = async (req: Request, res: Response) => 
   )
 }
 
-// GET /note/flip: a review deck. Reviewed notes are ranked by how far
-// through their interval they are (with some randomness), and a share of
-// never-reviewed notes is mixed in; see utils/review.ts.
+// GET /note/flip?since=<ISO date>: a review deck. Reviewed notes are
+// ranked by how far through their interval they are (with some
+// randomness), and a share of never-reviewed notes is mixed in; see
+// utils/review.ts. The deck holds what's left of FLIP_PER_DAY after the
+// notes rated since `since` (the start of the reader's day; the server's
+// midnight if missing or invalid).
 export const reqGetRandomNotes = async (req: Request, res: Response) => {
+  let since = new Date(String(req.query.since))
+  if (isNaN(since.getTime())) {
+    since = new Date()
+    since.setHours(0, 0, 0, 0)
+  }
+  const ratedToday = await Note.countDocuments({ ...REVIEWED, reviewedAt: { $gte: since } }).exec()
+  const size = Math.max(0, FLIP_PER_DAY - ratedToday)
+  if (!size) return []
   const reviewFields = { reviewedAt: 1, reviewDueAt: 1, reviewCount: 1, lastOpenedAt: 1 }
   const [reviewed, unreviewed] = await Promise.all([
     Note.find(REVIEWED, reviewFields).lean().exec(),
@@ -202,11 +214,11 @@ export const reqGetRandomNotes = async (req: Request, res: Response) => {
     // seen lately.
     Note.aggregate([
       { $match: NEVER_REVIEWED },
-      { $sample: { size: pageSize * 4 } },
+      { $sample: { size: size * 4 } },
       { $project: reviewFields },
     ]).exec(),
   ])
-  const deck = buildDeck(reviewed, unreviewed, pageSize)
+  const deck = buildDeck(reviewed, unreviewed, size)
   const ids = deck.map((card) => card._id)
   const notes = await findNotesAndPopulate({ _id: { $in: ids } })
   const order = new Map(ids.map((id, i) => [String(id), i]))

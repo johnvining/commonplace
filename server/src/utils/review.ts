@@ -18,6 +18,9 @@ export const NEVER_REVIEWED = { reviewCount: { $not: { $gt: 0 } } }
 
 const DAY = 24 * 60 * 60 * 1000
 
+// Cards to rate per day; each deck holds what's left of it.
+export const FLIP_PER_DAY = 100
+
 export const RATINGS = ['fast', 'med', 'slow'] as const
 export type Rating = (typeof RATINGS)[number]
 

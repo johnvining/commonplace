@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { authedAgent, createIdea, createNote } from './setup.js'
 import Note from '../src/resources/note/note.model.js'
-import { NEVER_REVIEWED, REVIEWED, buildDeck, reviewPriority, scheduleReview, staleness } from '../src/utils/review.js'
+import { FLIP_PER_DAY, NEVER_REVIEWED, REVIEWED, buildDeck, reviewPriority, scheduleReview, staleness } from '../src/utils/review.js'
 
 vi.mock('../src/utils/embeddings.js', async (orig) => {
   const actual = await orig()
@@ -147,5 +147,28 @@ describe('review endpoints', () => {
     await Note.updateOne({ _id: a._id }, { $set: { reviewDueAt: ago(1) } })
     res = await agent.get('/api/note/flip').expect(200)
     expect(res.body.data.map((n) => n.title).sort()).toEqual(['A', 'B'])
+  })
+
+  it(`deals up to ${FLIP_PER_DAY} a day, less what was rated since the start of the day`, async () => {
+    const agent = await authedAgent()
+    const docs = Array.from({ length: FLIP_PER_DAY + 10 }, (_, i) => ({ title: `n${i}` }))
+    const [first, second] = await Note.insertMany(docs)
+    let res = await agent.get('/api/note/flip').expect(200)
+    expect(res.body.data).toHaveLength(FLIP_PER_DAY)
+
+    await agent.post(`/api/note/${first._id}/review`).send({ rating: 'med' }).expect(200)
+    await agent.post(`/api/note/${second._id}/review`).send({ rating: 'med' }).expect(200)
+    const startOfDay = new Date(Date.now() - 60 * 1000).toISOString()
+    res = await agent.get('/api/note/flip').query({ since: startOfDay }).expect(200)
+    expect(res.body.data).toHaveLength(FLIP_PER_DAY - 2)
+
+    // Ratings from before the day started don't count against it.
+    const later = new Date(Date.now() + 60 * 1000).toISOString()
+    res = await agent.get('/api/note/flip').query({ since: later }).expect(200)
+    expect(res.body.data).toHaveLength(FLIP_PER_DAY)
+
+    await Note.updateMany({}, { $set: { reviewCount: 1, reviewedAt: new Date(), reviewDueAt: ago(-30) } })
+    res = await agent.get('/api/note/flip').query({ since: startOfDay }).expect(200)
+    expect(res.body.data).toEqual([])
   })
 })

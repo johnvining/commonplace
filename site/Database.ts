@@ -277,8 +277,11 @@ export async function getEarliestNotesToFile(page: number | string) {
 }
 
 // A review deck for flip: due cards plus some never reviewed.
+// The deck is what's left of the day's quota, counted from local midnight.
 export async function getRandomNotes() {
-  return axios.get(url_api + `note/flip`)
+  const since = new Date()
+  since.setHours(0, 0, 0, 0)
+  return axios.get(url_api + `note/flip`, { params: { since: since.toISOString() } })
 }
 
 export async function reviewNote(id: string, rating: 'fast' | 'med' | 'slow') {
