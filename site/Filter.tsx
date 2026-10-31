@@ -84,7 +84,6 @@ function Filter(props: any) {
           viewMode={props.viewMode}
           getListOfNotes={(_index: any, page: number) => db.getFilteredNotes(pileIds, ideaIds, page)}
           pageSize={constants.ENTITY_NOTES_PAGE_SIZE}
-          selectFirst
         />
       ) : (
         <div className="search-empty-state">

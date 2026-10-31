@@ -75,14 +75,9 @@ class NoteList extends React.Component<any, any> {
           return
         }
 
-        // A note on its own page, the only note in a list, or the first
-        // note of a list that asks for it (selectFirst) starts selected,
-        // so j/k, Enter and note shortcuts work right away (#310).
-        const full = this.props.viewMode == constants.view_modes.FULL
-        const onlyNote = this.state.notes.length === 1 && full
-        if (this.props.fromNoteView || onlyNote || (this.props.selectFirst && full)) {
-          this.setNoteMode(firstNoteId, constants.note_modes.SELECTED)
-        }
+        // Every list starts with a note selected, so j/k, Enter and note
+        // shortcuts work right away (#310).
+        this.selectFirstNote()
       }
     )
   }
@@ -287,7 +282,7 @@ class NoteList extends React.Component<any, any> {
   }
 
   // Load `page`; then select its first or last note if asked (j/k paging),
-  // or else the first note of a selectFirst list. Returns false, staying
+  // or else its first note. Returns false, staying
   // put, when an open-ended list has no further page.
   async goToPage(page: number, selectAt: 'first' | 'last' | null = null) {
     this.setState({ pageLoading: true })
@@ -313,17 +308,17 @@ class NoteList extends React.Component<any, any> {
         this.setupImageObserver()
         const target = selectAt === 'last' ? notes[notes.length - 1] : selectAt === 'first' ? notes[0] : null
         if (target) this.setNoteMode(target._id, constants.note_modes.SELECTED)
-        else this.selectFirstIfWanted()
+        else this.selectFirstNote()
       }
     )
     this.focusFirstNote()
     return true
   }
 
-  // On a new page of a selectFirst list, select its first note again.
-  selectFirstIfWanted() {
+  // Select the first note (only Full view has a selected note).
+  selectFirstNote() {
     const firstNoteId = this.state.notes?.[0]?._id
-    if (!firstNoteId || !this.props.selectFirst) return
+    if (!firstNoteId) return
     if (this.props.viewMode != constants.view_modes.FULL) return
     this.setNoteMode(firstNoteId, constants.note_modes.SELECTED)
   }

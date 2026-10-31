@@ -47,7 +47,6 @@ function RecentItems(props: any) {
             key={'recent-notes'}
             viewMode={props.viewMode}
             getListOfNotes={getListOfNotes}
-            selectFirst
           />
         </div>
       )

@@ -25,7 +25,6 @@ class FileList extends React.Component<any, any> {
           key={'recent'}
           viewMode={this.props.viewMode}
           getListOfNotes={this.getListOfNotes.bind(this)}
-          selectFirst
         />
       </div>
     )
