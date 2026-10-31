@@ -354,8 +354,18 @@ export async function getPileNick(pileID: string) {
   return axios.put(url_api + `nick/pile/` + pileID)
 }
 
+// Nick lookups are cached for the session: a nick always names the same
+// record, and caching lets a hover prefetch make the click instant. Failed
+// lookups aren't kept.
+const nickCache = new Map<string, Promise<any>>()
 export async function getNick(nick: string) {
-  return axios.get(url_api + `nick/` + nick)
+  let lookup = nickCache.get(nick)
+  if (!lookup) {
+    lookup = axios.get(url_api + `nick/` + nick)
+    lookup.catch(() => nickCache.delete(nick))
+    nickCache.set(nick, lookup)
+  }
+  return lookup
 }
 
 export async function getAuthentication(password: string) {

@@ -7,7 +7,7 @@ import Autocomplete from './Autocomplete'
 import NoteList from './NoteList'
 import PileListForItem from './PileListForItem'
 import YearUrlComboSpan from './YearUrlComboSpan'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import autosize from 'autosize'
 import WorkCitationSpan from './WorkCitationSpan'
 import { renderMarkdown } from './safeMarkdown'
@@ -60,36 +60,6 @@ function Work(props: any) {
   const navigate = useNavigate()
 
   // Function to handle nick navigation
-  const handleNickClick = useCallback(
-    async (nickValue: any, e: any) => {
-      e.preventDefault()
-      try {
-        const nickResponse = await db.getNick(nickValue)
-        if (nickResponse?.data?.data) {
-          const nickData = nickResponse.data.data
-          switch (nickData.key?.charAt(0)) {
-            case 'n':
-              navigate('/note/' + nickData.note)
-              break
-            case 'w':
-              navigate('/work/' + nickData.work)
-              break
-            case 'i':
-              navigate('/idea/' + nickData.idea)
-              break
-            case 'p':
-              navigate('/pile/' + nickData.pile)
-              break
-            default:
-              break
-          }
-        }
-      } catch (error: any) {
-        console.error('Error fetching nick:', error)
-      }
-    },
-    [navigate],
-  )
 
   // Function to process HTML string and convert nicks to links (including in code blocks)
   const processHtmlForNicks = (html: any) => {
@@ -101,7 +71,7 @@ function Work(props: any) {
     // We need to handle both regular text and text inside code/pre tags
     return html.replace(nickPattern, (match: any) => {
       // Create an anchor tag with a special data attribute
-      return `<a href="#" data-nick="${match}" class="nick-link">${match}</a>`
+      return `<a href="/${match}" data-nick="${match}" class="nick-link">${match}</a>`
     })
   }
 
@@ -136,22 +106,28 @@ function Work(props: any) {
     if (id) db.recordOpened(db.types.work, id)
   }, [id])
 
-  // Handle click events on nick links using event delegation
+  // Nick links in the summary are real links to /<nick>, which NickView
+  // resolves. A plain click navigates in-app at once (modified clicks open
+  // a tab), and hovering starts the lookup so it's usually done by then.
   useEffect(() => {
+    const nickOf = (e: any) => e.target?.closest?.('.nick-link')?.dataset?.nick
     const handleNickLinkClick = (e: any) => {
-      const target = e.target.closest('.nick-link')
-      if (target && target.dataset.nick) {
-        e.preventDefault()
-        handleNickClick(target.dataset.nick, e)
-      }
+      const nick = nickOf(e)
+      if (!nick || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+      e.preventDefault()
+      navigate('/' + nick)
     }
-
-    // Use event delegation on the document, but check for nick-link class
+    const prefetchNick = (e: any) => {
+      const nick = nickOf(e)
+      if (nick) db.getNick(nick).catch(() => {})
+    }
     document.addEventListener('click', handleNickLinkClick)
+    document.addEventListener('mouseover', prefetchNick)
     return () => {
       document.removeEventListener('click', handleNickLinkClick)
+      document.removeEventListener('mouseover', prefetchNick)
     }
-  }, [handleNickClick])
+  }, [navigate])
 
   useEffect(() => {
     if (edit) {
