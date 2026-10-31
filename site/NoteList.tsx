@@ -33,6 +33,8 @@ class NoteList extends React.Component<any, any> {
     useGridView: 1,
     page: 1,
     pageLoading: false,
+    // Set when an open-ended list turned out to have no next page.
+    atEnd: false,
     // Full match count when the list endpoint reports one (entity pages);
     // null for lists that don't, which keep open-ended paging.
     total: null,
@@ -183,56 +185,67 @@ class NoteList extends React.Component<any, any> {
   }
 
   // Select the note `step` away from the current one (or the first note,
-  // if none is current). Returns false at either end so the key falls
-  // through.
+  // if none is current). Past either end of the page, move to the next or
+  // previous page; at the very ends, return false so the key falls through.
   moveSelection(step: number, event: any) {
     const notes = this.state.notes ?? []
     if (!notes.length) return false
     const currentId = this.getActiveNoteId(event) || this.state.selectedNote
     const index = notes.findIndex((note: any) => note._id == currentId)
     const next = index === -1 ? 0 : index + step
-    if (next < 0 || next >= notes.length) return false
+    if (next >= notes.length) {
+      const last = this.lastPage()
+      if (!this.pages() || this.state.pageLoading || this.state.atEnd || (last !== null && this.state.page >= last)) return false
+      this.goToPage(this.state.page + 1, 'first')
+      return true
+    }
+    if (next < 0) {
+      if (!this.pages() || this.state.pageLoading || this.state.page <= 1) return false
+      this.goToPage(this.state.page - 1, 'last')
+      return true
+    }
     this.setNoteMode(notes[next]._id, constants.note_modes.SELECTED)
     return true
   }
 
-  async incPage() {
-    this.setState({ pageLoading: true })
-    const response = await this.props.getListOfNotes(
-      this.props.index,
-      this.state.page + 1
-    )
-    window.scrollTo({ top: 0, behavior: 'instant' })
-    this.setState(
-      {
-        notes: response.data.data,
-        total: db.notePageTotal(response),
-        page: this.state.page + 1,
-        selectedArray: [],
-        selectedNote: '',
-        focusType: constants.note_modes.NO_SELECTION,
-        pageLoading: false,
-      },
-      () => {
-        this.setupImageObserver()
-        this.selectFirstIfWanted()
-      }
-    )
-    this.focusFirstNote()
+  // Lists that only ever have one page of their own: flip, a note's page.
+  pages() {
+    return !this.props.noPaging && !this.props.fromNoteView
   }
 
-  async decPage() {
+  // The last page when the list reports a total; null when open-ended.
+  lastPage(): number | null {
+    return this.state.total === null || !this.props.pageSize
+      ? null
+      : Math.max(1, Math.ceil(this.state.total / this.props.pageSize))
+  }
+
+  incPage() {
+    return this.goToPage(this.state.page + 1)
+  }
+
+  decPage() {
+    return this.goToPage(this.state.page - 1)
+  }
+
+  // Load `page`; then select its first or last note if asked (j/k paging),
+  // or else the first note of a selectFirst list. Returns false, staying
+  // put, when an open-ended list has no further page.
+  async goToPage(page: number, selectAt: 'first' | 'last' | null = null) {
     this.setState({ pageLoading: true })
-    const response = await this.props.getListOfNotes(
-      this.props.index,
-      this.state.page - 1
-    )
+    const response = await this.props.getListOfNotes(this.props.index, page)
+    const notes = response.data.data ?? []
+    if (!notes.length && page > this.state.page) {
+      this.setState({ pageLoading: false, atEnd: true })
+      return false
+    }
     window.scrollTo({ top: 0, behavior: 'instant' })
     this.setState(
       {
-        notes: response.data.data,
+        notes,
         total: db.notePageTotal(response),
-        page: this.state.page - 1,
+        page,
+        atEnd: false,
         selectedArray: [],
         selectedNote: '',
         focusType: constants.note_modes.NO_SELECTION,
@@ -240,10 +253,13 @@ class NoteList extends React.Component<any, any> {
       },
       () => {
         this.setupImageObserver()
-        this.selectFirstIfWanted()
+        const target = selectAt === 'last' ? notes[notes.length - 1] : selectAt === 'first' ? notes[0] : null
+        if (target) this.setNoteMode(target._id, constants.note_modes.SELECTED)
+        else this.selectFirstIfWanted()
       }
     )
     this.focusFirstNote()
+    return true
   }
 
   // On a new page of a selectFirst list, select its first note again.
@@ -658,17 +674,20 @@ class NoteList extends React.Component<any, any> {
       this.props.viewMode == constants.view_modes.FULL ||
       this.props.viewMode == constants.view_modes.RESULT
     var isTileView = this.props.viewMode == constants.view_modes.TILE
-    const lastPage =
-      this.state.total === null || !this.props.pageSize
-        ? null
-        : Math.max(1, Math.ceil(this.state.total / this.props.pageSize))
-    const onLastPage = lastPage !== null && this.state.page >= lastPage
+    const lastPage = this.lastPage()
+    const onLastPage = (lastPage !== null && this.state.page >= lastPage) || this.state.atEnd
+    // Full view shows the pager whenever there may be more than one page:
+    // entity pages know their count; open-ended lists (home, recent) don't.
+    const fullPager =
+      this.props.viewMode == constants.view_modes.FULL &&
+      this.pages() &&
+      (lastPage === null ? this.state.page > 1 || (this.state.notes?.length ?? 0) > 1 : lastPage > 1)
     return (
       <div className="multi-select">
         {showMultiselect ? (
-          // Full/Result views have no multi-select bar, but entity pages
-          // with more than one page still need the pager.
-          lastPage !== null && lastPage > 1 ? (
+          // Full/Result views have no multi-select bar, but still need the
+          // pager when there's more than one page.
+          fullPager || (lastPage !== null && lastPage > 1) ? (
             <div className="multi-select-top-bar">
               {this.renderPager(lastPage, onLastPage)}
             </div>
@@ -852,6 +871,13 @@ class NoteList extends React.Component<any, any> {
             })}
           </div>
         )}
+        {fullPager && this.state.notes?.length ? (
+          // Again at the bottom, so the next page is reachable without
+          // scrolling back up.
+          <div className="multi-select-top-bar note-list-bottom-pager">
+            {this.renderPager(lastPage, onLastPage)}
+          </div>
+        ) : null}
       </div>
     )
   }

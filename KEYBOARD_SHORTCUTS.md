@@ -112,8 +112,8 @@ Shortcuts for navigating and selecting notes. **Only works in Full view mode.**
 ### 4.1 Selection
 | Shortcut | Action |
 |----------|--------|
-| `j` | Select next note |
-| `k` | Select previous note |
+| `j` | Select next note (past the last one: next page) |
+| `k` | Select previous note (before the first one: previous page) |
 | `Enter` | Select focused note; on the selected note, open it |
 | `Escape` | Deselect note |
 | `e` | Edit selected note |

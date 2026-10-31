@@ -3913,5 +3913,19 @@ mark.search-highlight {
     z-index: 1;
   }
 }
+.multi-select-top-bar {
+  top: 44px;
+  min-height: 36px;
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.note-list-bottom-pager {
+  position: static;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
 
 /*# sourceMappingURL=style.css.map */

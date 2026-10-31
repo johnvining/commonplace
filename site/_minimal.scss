@@ -1226,3 +1226,20 @@ mark.search-highlight {
     z-index: 1;
   }
 }
+
+// The list pager: compact, sticking under the 44px top bar; repeated,
+// unstuck, under the list.
+.multi-select-top-bar {
+  top: 44px;
+  min-height: 36px;
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.note-list-bottom-pager {
+  position: static;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}

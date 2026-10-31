@@ -217,6 +217,7 @@ function FlipList(props: any) {
         key={current._id}
         viewMode={constants.view_modes.FULL}
         getListOfNotes={loadCurrent}
+        noPaging
       />
     </div>
   )

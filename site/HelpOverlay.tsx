@@ -68,7 +68,7 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
       sections.push({
         title: 'Note List (Full View)',
         shortcuts: [
-          { key: 'j / k', action: 'Next / previous note' },
+          { key: 'j / k', action: 'Next / previous note (and page)' },
           { key: 'Enter', action: 'Select note (again: open it)' },
           { key: 'Escape', action: 'Deselect note' },
           { key: 'e', action: 'Edit note' },
