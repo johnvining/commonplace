@@ -69,6 +69,26 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
       })
     }
 
+    // Selecting notes (slim, grid, tile)
+    if (
+      currentContext.viewMode !== constants.view_modes.FULL &&
+      !currentContext.searchBarOpen &&
+      hasScope(constants.keyboardScopes.NOTE_LIST)
+    ) {
+      sections.push({
+        title: 'Selecting Notes',
+        shortcuts: [
+          { key: 'x', action: 'Select focused note' },
+          { key: '*', action: 'Select all / none' },
+          { key: '#', action: 'Delete selected' },
+          { key: 'Ctrl+T / w / @ / Ctrl+P', action: 'Add idea / work / author / pile' },
+          { key: 'Ctrl+R / Ctrl+S', action: 'OCR / suggest titles' },
+          { key: 'y', action: 'Copy as list' },
+          { key: '[ / ]', action: 'Previous / next page' },
+        ],
+      })
+    }
+
     // Note list context (Full view only)
     if (
       currentContext.viewMode === constants.view_modes.FULL &&

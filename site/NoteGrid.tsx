@@ -38,6 +38,7 @@ class NoteGrid extends React.Component<any, any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              title="Select (x)"
               tabIndex={-1}
             >
               <img src={check_circle} />
@@ -46,6 +47,7 @@ class NoteGrid extends React.Component<any, any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              title="Select (x)"
               tabIndex={-1}
             >
               <img src={circle} />

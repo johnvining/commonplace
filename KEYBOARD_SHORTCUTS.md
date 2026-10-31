@@ -149,6 +149,20 @@ Shortcuts for navigating and selecting notes. **Only works in Full view mode.**
 
 ---
 
+### 4.3 Selecting Notes (Slim, Grid and Tile Views)
+| Shortcut | Action |
+|----------|--------|
+| `x` | Select / unselect the focused note |
+| `*` | Select all / none |
+| `#` | Delete the selected notes |
+| `Ctrl+T` / `w` / `@` / `Ctrl+P` | Add an idea / work / author / pile to them |
+| `Ctrl+R` | OCR them |
+| `Ctrl+S` | Suggest titles for them |
+| `y` | Copy them as a list |
+| `Escape` | Unselect all |
+
+---
+
 ## 5. Note Editing
 
 Shortcuts when editing a note in Full view.

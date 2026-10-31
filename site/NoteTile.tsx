@@ -41,6 +41,7 @@ class NoteTile extends React.PureComponent<any> {
             <button
               onClick={this.markChecked.bind(this)}
               className="button grid-button"
+              title="Select (x)"
               tabIndex={-1}
             >
               <img src={this.props.selected ? check_circle : circle} />

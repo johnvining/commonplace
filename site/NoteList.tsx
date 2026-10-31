@@ -99,6 +99,15 @@ class NoteList extends React.Component<any, any> {
       return true
     }
 
+    // Slim, grid and tile views: select notes and act on the selection,
+    // matching the buttons in the bar above the list.
+    if (
+      this.props.viewMode !== constants.view_modes.FULL &&
+      this.props.viewMode !== constants.view_modes.RESULT
+    ) {
+      return this.handleSelectionShortcut(event)
+    }
+
     // Only handle shortcuts in Full view mode
     if (this.props.viewMode !== constants.view_modes.FULL) {
       return false
@@ -191,6 +200,45 @@ class NoteList extends React.Component<any, any> {
       return true
     }
 
+    return false
+  }
+
+  // x toggles the focused note, * selects all or none; with notes
+  // selected, the bar's actions: # delete, Ctrl+T idea, w work, @ author,
+  // Ctrl+P pile, Ctrl+R OCR, Ctrl+S suggest titles, y copy list, Esc clear.
+  handleSelectionShortcut(event: any) {
+    if (this.state.addSomething) return false
+    const anySelected = this.state.selectedArray.some((x: any) => x)
+    if (shortcuts.noteList.toggleSelect(event)) {
+      const id = this.getActiveNoteId(event)
+      const index = (this.state.notes ?? []).findIndex((note: any) => note._id == id)
+      if (index === -1) return false
+      this.markChecked(index)
+      return true
+    }
+    if (shortcuts.noteList.selectAll(event)) {
+      anySelected ? this.clearSelection() : this.selectAll()
+      return true
+    }
+    if (!anySelected) return false
+    const add = (toAdd: string) => this.setState({ addSomething: true, toAdd })
+    const actions: [(e: KeyboardEvent) => boolean, () => unknown][] = [
+      [shortcuts.noteList.deleteSelected, () => this.delete()],
+      [shortcuts.noteList.addIdea, () => add(db.types.idea)],
+      [shortcuts.noteList.addWork, () => add(db.types.work)],
+      [shortcuts.noteList.addAuthor, () => add(db.types.auth)],
+      [shortcuts.noteList.addPile, () => add(db.types.pile)],
+      [shortcuts.noteList.ocrSelected, () => this.bulkOcr()],
+      [shortcuts.noteList.suggestSelected, () => this.bulkSuggestTitles()],
+      [shortcuts.noteList.copySelected, () => this.bulkExportToMarkdown()],
+      [shortcuts.noteList.deselect, () => this.clearSelection()],
+    ]
+    for (const [matches, run] of actions) {
+      if (matches(event)) {
+        run()
+        return true
+      }
+    }
     return false
   }
 
@@ -725,11 +773,13 @@ class NoteList extends React.Component<any, any> {
               <TopLevelStandardButtonContainer>
                 <TopLevelStandardButton
                   name="Delete"
+                  shortcut="#"
                   onClick={this.delete.bind(this)}
                   multiSelect={true}
                 />
                 <TopLevelStandardButton
                   name="Idea"
+                  shortcut="Ctrl+T"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.idea })
                   }}
@@ -738,6 +788,7 @@ class NoteList extends React.Component<any, any> {
                 />
                 <TopLevelStandardButton
                   name="Work"
+                  shortcut="w"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.work })
                   }}
@@ -746,6 +797,7 @@ class NoteList extends React.Component<any, any> {
                 />
                 <TopLevelStandardButton
                   name="Author"
+                  shortcut="@"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.auth })
                   }}
@@ -754,6 +806,7 @@ class NoteList extends React.Component<any, any> {
                 />
                 <TopLevelStandardButton
                   name="Pile"
+                  shortcut="Ctrl+P"
                   onClick={() => {
                     this.setState({ addSomething: true, toAdd: db.types.pile })
                   }}
@@ -762,21 +815,25 @@ class NoteList extends React.Component<any, any> {
                 />
                 <TopLevelStandardButton
                   name="OCR"
+                  shortcut="Ctrl+R"
                   onClick={this.bulkOcr.bind(this)}
                   multiSelect={true}
                 />
                 <TopLevelStandardButton
                   name="Suggest Title"
+                  shortcut="Ctrl+S"
                   onClick={this.bulkSuggestTitles.bind(this)}
                   multiSelect={true}
                 />
                 <TopLevelStandardButton
                   name="List to Clipboard"
+                  shortcut="y"
                   onClick={this.bulkExportToMarkdown.bind(this)}
                   multiSelect={true}
                 />
                 <TopLevelStandardButton
                   name="Unselect All"
+                  shortcut="Esc or *"
                   onClick={this.clearSelection.bind(this)}
                   multiSelect={true}
                 />
@@ -788,6 +845,7 @@ class NoteList extends React.Component<any, any> {
             <TopLevelStandardButtonContainer>
               <TopLevelStandardButton
                 name="Select All"
+                shortcut="*"
                 onClick={this.selectAll.bind(this)}
                 multiSelect={true}
               />

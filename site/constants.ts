@@ -89,6 +89,11 @@ export const keyCodes = {
   read: 82, // r
   importNotes: 73, // i
   back: 66, // b
+  // Selecting notes in slim/grid/tile views
+  toggleSelect: 88, // x
+  selectAll: 56, // 8, with Shift: *
+  addWork: 87, // w
+  addAuthor: 50, // 2, with Shift: @
   // List paging
   prevPage: 219, // [
   nextPage: 221, // ]
