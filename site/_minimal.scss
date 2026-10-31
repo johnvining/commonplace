@@ -1307,3 +1307,102 @@ mark.search-highlight {
     transform: translate(-50%, -100%);
   }
 }
+
+// ---- Grid (table) and tile checkboxes -----------------------------------------------
+
+// Row checkboxes in every view: just the circle, no button outline.
+.button.grid-button {
+  height: 20px;
+  width: 20px;
+  min-width: 0;
+  margin: 0;
+  padding: 2px;
+  border: none;
+  background: transparent;
+
+  img {
+    width: 14px;
+    height: 14px;
+    opacity: 0.55;
+  }
+
+  &:hover {
+    background: transparent;
+
+    img {
+      opacity: 1;
+    }
+  }
+}
+
+// Grid view: one flex row per note, checkbox centred, the text columns on
+// a shared baseline (they mix mono and sans at different sizes).
+.grid,
+.grid-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--hairline);
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.grid-selected {
+  background: var(--accent-soft);
+}
+
+.grid-div-button {
+  flex: 0 0 20px;
+  height: auto;
+  display: flex;
+  align-items: center;
+}
+
+.grid-link,
+a.grid-link {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  height: auto;
+
+  > a {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    min-width: 0;
+  }
+}
+
+.grid-nick,
+.grid-author,
+.grid-title,
+.grid-text {
+  padding: 0;
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+}
+
+.grid-nick {
+  flex: 0 0 64px;
+  font-family: $monospace;
+  font-size: var(--font-size-xs);
+  color: var(--faint);
+}
+
+.grid-author {
+  flex: 0 0 14%;
+}
+
+.grid-title {
+  flex: 0 0 22%;
+  font-weight: 500;
+}
+
+.grid-text {
+  flex: 1;
+  width: auto;
+  color: var(--muted);
+}
