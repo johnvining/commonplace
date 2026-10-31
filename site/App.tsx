@@ -161,9 +161,7 @@ class App extends React.Component<any, any> {
             <div className="tool-bar div">
               <TopLevelStandardButton
                 label="Home"
-                onClick={() => {
-                  window.location.href = '/'
-                }}
+                onClick={() => this.props.navigate('/')}
               >
                 <img src={home_door} alt="" />
               </TopLevelStandardButton>
@@ -173,8 +171,7 @@ class App extends React.Component<any, any> {
                 label="New note"
                 onClick={async () => {
                   const response = await createNewNoteFromTitle('')
-                  window.location.href =
-                    '/note/' + response.data._id + '/edit'
+                  this.props.navigate('/note/' + response.data._id + '/edit')
                 }}
               >
                 <img src={plus} alt="" />
