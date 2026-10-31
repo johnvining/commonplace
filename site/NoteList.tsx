@@ -73,12 +73,12 @@ class NoteList extends React.Component<any, any> {
           return
         }
 
-        // A note on its own page, or the only note in a list, starts
-        // selected so note shortcuts (Ctrl-E, ...) work right away (#310).
-        const onlyNote =
-          this.state.notes.length === 1 &&
-          this.props.viewMode == constants.view_modes.FULL
-        if (this.props.fromNoteView || onlyNote) {
+        // A note on its own page, the only note in a list, or the first
+        // note of a list that asks for it (selectFirst) starts selected,
+        // so j/k, Enter and note shortcuts work right away (#310).
+        const full = this.props.viewMode == constants.view_modes.FULL
+        const onlyNote = this.state.notes.length === 1 && full
+        if (this.props.fromNoteView || onlyNote || (this.props.selectFirst && full)) {
           this.setNoteMode(firstNoteId, constants.note_modes.SELECTED)
         }
       }
@@ -213,7 +213,10 @@ class NoteList extends React.Component<any, any> {
         focusType: constants.note_modes.NO_SELECTION,
         pageLoading: false,
       },
-      () => this.setupImageObserver()
+      () => {
+        this.setupImageObserver()
+        this.selectFirstIfWanted()
+      }
     )
     this.focusFirstNote()
   }
@@ -235,9 +238,20 @@ class NoteList extends React.Component<any, any> {
         focusType: constants.note_modes.NO_SELECTION,
         pageLoading: false,
       },
-      () => this.setupImageObserver()
+      () => {
+        this.setupImageObserver()
+        this.selectFirstIfWanted()
+      }
     )
     this.focusFirstNote()
+  }
+
+  // On a new page of a selectFirst list, select its first note again.
+  selectFirstIfWanted() {
+    const firstNoteId = this.state.notes?.[0]?._id
+    if (!firstNoteId || !this.props.selectFirst) return
+    if (this.props.viewMode != constants.view_modes.FULL) return
+    this.setNoteMode(firstNoteId, constants.note_modes.SELECTED)
   }
 
   focusFirstNote() {
