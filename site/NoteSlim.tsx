@@ -1,4 +1,5 @@
 import React from 'react'
+import PileName from './PileName'
 import { Link } from 'react-router-dom'
 import circle from 'url:./icons/circle.svg'
 import check_circle from 'url:./icons/check_circle.svg'
@@ -87,7 +88,7 @@ class NoteSlim extends React.PureComponent<any> {
               <div className="note-slim inner">
                 {this.props.note.piles?.map((pile: any, idx: any) => (
                   <span className="pile" key={'pile-' + this.props.id + idx}>
-                    {pile.name}
+                    <PileName name={pile.name} />
                   </span>
                 ))}
                 {this.props.note.ideas?.map((idea: any, idx: any) => (

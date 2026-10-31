@@ -1,4 +1,5 @@
 import React from 'react'
+import PileName from './PileName'
 import { Link } from 'react-router-dom'
 import pile_img from 'url:./icons/stack.svg'
 import work_img from 'url:./icons/work.svg'
@@ -26,7 +27,7 @@ class PileList extends React.Component<any, any> {
                   <div className="result-box">
                     <div className="result-box header">
                       <img src={pile_img} />
-                      <div>{pile.name}</div>
+                      <div><PileName name={pile.name} /></div>
                       <PinButton
                         type="pile"
                         id={pile._id}

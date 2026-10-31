@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import PileName from './PileName'
 import { Link } from 'react-router-dom'
 import * as db from './Database'
 import { getPinnedItems, unpinItem } from './pinned'
@@ -181,7 +182,7 @@ function Sidebar() {
                   to={`/pile/${pile._id}`}
                   className="sidebar-link sidebar-link-compact"
                 >
-                  <span className="sidebar-item">{pile.name}</span>
+                  <span className="sidebar-item"><PileName name={pile.name} /></span>
                   <span className="sidebar-count">
                     {getPileItemCount(pile).toLocaleString()}
                   </span>

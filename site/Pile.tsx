@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
+import PileName from './PileName'
 import * as constants from './constants'
 import * as db from './Database'
 import { titleWithNick } from './utils'
@@ -179,7 +180,7 @@ function Pile(props: any) {
         ) : (
           <div className="entity-page-header">
             <div className="entity-page-header-left">
-              <div className="entity-page-title">{pending.name}</div>
+              <div className="entity-page-title"><PileName name={pending.name} /></div>
               {(pending.start_year || pending.end_year) && (
                 <div className="entity-page-byline">
                   {pending.start_year ? <YearSpan year={pending.start_year} /> : null}
