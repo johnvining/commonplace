@@ -358,6 +358,13 @@ class NoteList extends React.Component<any, any> {
     }
   }
 
+  componentDidUpdate(prevProps: any) {
+    // A different view renders different elements; watch the new ones.
+    if (prevProps.viewMode !== this.props.viewMode && this.state.notes) {
+      this.setupImageObserver()
+    }
+  }
+
   setupImageObserver() {
     if (this._imageObserver) {
       this._imageObserver.disconnect()
@@ -376,8 +383,12 @@ class NoteList extends React.Component<any, any> {
       },
       { rootMargin: '200px' }
     )
+    // Full notes carry their id; every view (tile, grid, slim) marks its
+    // note with data-note-id, so fall back to that.
     this.state.notes.forEach((note: any, index: number) => {
-      const el = document.getElementById(note._id)
+      const el =
+        document.getElementById(note._id) ??
+        (document.querySelector(`[data-note-id="${note._id}"]`) as HTMLElement | null)
       if (el) {
         el.dataset.noteIndex = String(index)
         this._imageObserver?.observe(el)
