@@ -1,0 +1,996 @@
+// Minimal, dense layer over the base styles. Loaded last, so it wins.
+//
+// - One sans for the interface, a reading serif for note text, mono for nicks.
+// - Hairlines instead of boxes; notes are rows in a list, not cards.
+// - One accent colour, used for focus, selection and links to ideas.
+// - Controls are small and quiet until hovered, focused or selected.
+
+:root {
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-md: 13px;
+  --font-size-lg: 14px;
+  --font-size-xl: 16px;
+  --font-size-xxl: 20px;
+
+  --ink: #1b1b1a;
+  --muted: #6e6e6b;
+  --faint: #a3a39f;
+  --hairline: #e7e7e3;
+  --surface: #ffffff;
+  --hover: #f2f2ef;
+  --accent: #2557c9;
+  --accent-soft: #eef3fd;
+  --idea: #2557c9;
+  --pile: #7b3fa3;
+
+  // Re-map the base palette onto the new tokens so existing rules follow.
+  --background-color: #fbfbfa;
+  --font-color: var(--ink);
+  --link-color: var(--ink);
+  // Opaque: dropdowns, the login box and search boxes paint with these.
+  // Note rows set their own transparent background below.
+  --note-background: var(--surface);
+  --note-background-not-selected: var(--surface);
+  --note-background-edit: var(--surface);
+  --note-border: var(--hairline);
+  --note-border-focused: var(--hairline);
+  --note-border-selected: var(--accent);
+  --note-border-edit: var(--hairline);
+  --low-intensity-border: var(--hairline);
+  --high-intensity-border: var(--ink);
+  --button-background: transparent;
+  --button-border: var(--accent);
+  --button-selected: var(--hover);
+  --button-input-background-selected: var(--hover);
+  --button-shadow-color: var(--accent-soft);
+  --input-background: var(--hover);
+  --semantic-idea: var(--accent-soft);
+  --semantic-pile: #f5eef9;
+  --semantic-selection: var(--hover);
+  --semantic-removal: #fbe9e7;
+  --inverse-background-color: var(--ink);
+  --inverse-font-color: var(--background-color);
+  --icon-filter: none;
+  color-scheme: light;
+}
+
+@mixin dark-tokens {
+  --ink: #e4e4e0;
+  --muted: #9b9b96;
+  --faint: #6b6b67;
+  --hairline: #26272a;
+  --surface: #17181b;
+  --hover: #1d1f23;
+  --accent: #7ea4ff;
+  --accent-soft: #1a2338;
+  --idea: #7ea4ff;
+  --pile: #c69ae6;
+
+  --background-color: #111214;
+  --semantic-pile: #241a2c;
+  --semantic-removal: #3a1d1b;
+  --icon-filter: invert(1);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    @include dark-tokens;
+  }
+}
+
+// The icons are black SVGs. The base styles invert them in scattered
+// prefers-color-scheme rules (and un-invert on hover, which no longer
+// suits the dark hover colour); one token here covers them all.
+button img,
+.button img,
+.action-button img,
+.pin-button-icon,
+.click-to-copy-nick img,
+.result-box img {
+  filter: var(--icon-filter) !important;
+  -webkit-filter: var(--icon-filter) !important;
+}
+
+// ---- Base -----------------------------------------------------------------
+
+body {
+  font-family: $main_font;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.main {
+  max-width: 1180px;
+  padding: 0 16px;
+}
+
+// ---- Top bar --------------------------------------------------------------
+
+div .top-bar {
+  height: 44px;
+  flex-wrap: nowrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.top-bar {
+  .title-bar {
+    align-self: center;
+    flex: 0 0 auto;
+
+    .title,
+    .title-link .title {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      padding: 0;
+
+      @include tablet-plus {
+        font-size: 15px;
+      }
+    }
+  }
+
+  .stats-center {
+    flex: 1;
+    justify-content: flex-start;
+  }
+
+  .top-action-bar {
+    min-height: 0;
+    flex: 0 0 auto;
+    width: auto;
+    gap: 2px;
+    align-items: center;
+  }
+
+  .tool-bar.div {
+    margin: 0;
+  }
+
+  .button {
+    height: 28px;
+    min-width: 28px;
+    padding: 0 6px;
+    margin: 0;
+    border: none;
+    border-radius: 4px;
+
+    img {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.stats-display {
+  font-size: var(--font-size-xs);
+  color: var(--faint);
+  opacity: 1;
+}
+
+// ---- Shell & sidebar ------------------------------------------------------
+
+.app-shell {
+  margin-top: 12px;
+}
+
+@media (min-width: 1100px) {
+  .app-shell {
+    gap: 28px;
+  }
+}
+
+.sidebar {
+  width: 190px;
+  top: 56px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--font-size-md);
+}
+
+.sidebar-section + .sidebar-section {
+  margin-top: 18px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.sidebar-title {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  margin-bottom: 4px;
+}
+
+.sidebar-list,
+.sidebar-list-compact {
+  gap: 0;
+  font-size: var(--font-size-md);
+}
+
+.sidebar-link,
+.sidebar-pin-row {
+  border-bottom: none;
+  padding: 2px 6px;
+  margin: 0 -6px;
+  border-radius: 4px;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.sidebar-pin-row .sidebar-link {
+  margin: 0;
+  padding: 0;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+.sidebar-count {
+  font-size: var(--font-size-xs);
+  color: var(--faint);
+  opacity: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.sidebar-muted {
+  font-size: var(--font-size-sm);
+  color: var(--faint);
+  opacity: 1;
+}
+
+.sidebar-maintenance {
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+}
+
+// ---- Buttons --------------------------------------------------------------
+
+.button {
+  height: 28px;
+  padding: 0 10px;
+  font-family: $main_font;
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  border: 1px solid var(--hairline);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ink);
+
+  &:hover {
+    background: var(--hover);
+    border-color: var(--hairline);
+  }
+
+  &:focus {
+    border-color: var(--hairline);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  &.button-selected {
+    background: var(--hover);
+    color: var(--ink);
+  }
+
+  &.left,
+  &.middle,
+  &.right {
+    border: 1px solid var(--hairline);
+  }
+
+  &.left { border-right: none; }
+  &.middle { border-right: none; }
+}
+
+.top-level-button-container .button {
+  font-size: var(--font-size-md);
+  height: 28px;
+  padding: 0 10px;
+}
+
+.clickable-label-button {
+  font-size: var(--font-size-xs);
+  padding: 1px 6px;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+// ---- Notes (full view) ----------------------------------------------------
+
+.note-full {
+  &.outer {
+    position: relative;
+    margin: 0;
+    padding: 12px 12px 12px 14px;
+    border: none;
+    border-bottom: 1px solid var(--hairline);
+    border-radius: 0;
+    background: transparent;
+
+    &:hover,
+    &:focus {
+      outline: none;
+      background: var(--hover);
+    }
+
+    // Selected: a 2px accent bar down the left edge.
+    &.selected {
+      box-shadow: inset 2px 0 0 var(--accent);
+      background: var(--hover);
+      border-bottom-color: var(--hairline);
+    }
+
+    // Square corners: a rounded box behind the accent bar bends it.
+    &.edit-note {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: 0;
+      box-shadow: inset 2px 0 0 var(--accent);
+      margin: 6px 0;
+    }
+
+    &.edit-ideas,
+    &.edit-piles {
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+  }
+
+  .width-100 {
+    margin-bottom: 4px;
+    padding: 0;
+  }
+
+  .title {
+    font-family: $main_font;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+    margin: 0 0 2px;
+    // Leave room for the corner actions.
+    padding: 0 150px 0 0;
+  }
+
+  .note-text {
+    font-family: $reading_font;
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 0;
+    color: var(--ink);
+  }
+
+  .note-take {
+    &.note-take {
+      font-family: $reading_font;
+      font-size: 14px;
+      font-style: italic;
+      background: transparent;
+      color: var(--muted);
+      padding: 0 0 0 10px;
+      border-left: 2px solid var(--hairline);
+      border-radius: 0;
+    }
+  }
+
+  .citation {
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+    opacity: 1;
+    padding: 0;
+
+    a {
+      color: inherit;
+
+      &:hover {
+        color: var(--ink);
+      }
+    }
+  }
+
+  // Inputs while editing
+  .title,
+  .url,
+  .year,
+  .page,
+  .note-text,
+  .note-take {
+    &.edit {
+      background: var(--background-color);
+      border: 1px solid var(--hairline);
+      border-radius: 3px;
+      padding: 6px 8px;
+      font-size: 14px;
+
+      &:focus {
+        background: var(--surface);
+        border-color: var(--accent);
+        outline: none;
+      }
+    }
+  }
+
+  .title.edit {
+    padding-right: 8px;
+  }
+
+  .edit-author,
+  .edit-work {
+    &.search-box {
+      font-family: $main_font;
+      font-size: 14px;
+      padding: 6px 8px;
+      background: var(--background-color);
+      border: 1px solid var(--hairline);
+      border-radius: 3px;
+
+      &:focus {
+        background: var(--surface);
+        border-color: var(--accent);
+      }
+    }
+
+    &.option {
+      font-family: $main_font;
+      font-size: 14px;
+      padding: 4px 8px;
+    }
+  }
+
+  &.form-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+    padding: 6px 0 2px;
+  }
+
+  &.container {
+    width: 100%;
+  }
+}
+
+// Ideas, piles and people on a note: small square tags, coloured by kind.
+// Links to other notes stay plain mono text.
+.idea,
+.pile,
+.person {
+  &.label {
+    display: inline-flex;
+    align-items: center;
+    height: 19px;
+    margin: 0 4px 2px 0;
+    padding: 0 6px;
+    font-family: $main_font;
+    font-size: var(--font-size-sm);
+    line-height: 1;
+    border: 1px solid transparent;
+    border-radius: 0;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: none;
+      border-color: currentColor;
+    }
+
+    &.idea {
+      color: var(--idea);
+      background: var(--accent-soft);
+    }
+
+    &.pile {
+      color: var(--pile);
+      background: var(--semantic-pile);
+    }
+
+    &.person {
+      color: var(--muted);
+      background: transparent;
+      border-color: var(--hairline);
+    }
+  }
+}
+
+.link.label {
+  background: transparent;
+  border: none;
+  margin: 0 8px 0 0;
+  padding: 0;
+  font-family: $monospace;
+  font-size: var(--font-size-xs);
+  color: var(--muted);
+  cursor: pointer;
+
+  &:hover {
+    background: transparent;
+    text-decoration: underline;
+  }
+}
+
+// ---- Note actions ---------------------------------------------------------
+
+.action-bar {
+  margin-top: 6px;
+  gap: 2px;
+}
+
+// Outside editing, the actions sit in the top-right corner and only show
+// on hover, focus or selection, so each note is one block of text.
+.note-full.outer:not(.edit-note) .action-bar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: auto;
+  margin: 0;
+  padding-left: 8px;
+  // Opaque, so it sits cleanly over text in notes without a title.
+  background: var(--hover);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 80ms;
+}
+
+.note-full.outer:not(.edit-note):hover .action-bar,
+.note-full.outer:not(.edit-note):focus-within .action-bar,
+.note-full.outer.selected .action-bar {
+  opacity: 1;
+}
+
+// Except a list being edited (ideas, piles, links), which needs the room.
+.note-full.outer.edit-ideas .action-bar,
+.note-full.outer.edit-piles .action-bar {
+  position: static;
+  opacity: 1;
+}
+
+.action-button,
+.button.action-button,
+.action-button.pin-button {
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  padding: 5px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  img,
+  .pin-button-icon {
+    width: 15px;
+    height: 15px;
+    opacity: 0.7;
+  }
+
+  &:hover {
+    background: var(--hover);
+
+    img,
+    .pin-button-icon {
+      opacity: 1;
+    }
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+  }
+}
+
+.action-button.pin-button:hover,
+.action-button.pin-button:focus {
+  background: var(--hover);
+}
+
+.click-to-copy-nick {
+  font-family: $monospace;
+  font-size: var(--font-size-xs);
+  color: var(--faint);
+}
+
+// ---- Pages ----------------------------------------------------------------
+
+.entity-page-title {
+  font-size: var(--font-size-xxl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.entity-page-section-heading {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+// ---- Flip -----------------------------------------------------------------
+
+.flip-header {
+  position: sticky;
+  top: 44px;
+  z-index: 5;
+  background: var(--background-color);
+  padding: 6px 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.flip-status,
+.flip-prompt {
+  font-family: $main_font;
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+  opacity: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.flip-ratings .button {
+  font-size: var(--font-size-md);
+}
+
+// ---- Overlays -------------------------------------------------------------
+
+.search-overlay-content,
+.help-overlay-content {
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+// ---- Inputs ----------------------------------------------------------------
+
+// One look for every field: page-coloured, hairline border, accent on focus.
+.pill-input .pill-input-control {
+  background: var(--background-color);
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+  min-height: 32px;
+  padding: 3px 6px;
+
+  &:focus-within {
+    background: var(--surface);
+    border-color: var(--accent);
+    box-shadow: none;
+  }
+}
+
+.pill-input .pill {
+  border-radius: 2px;
+  font-size: var(--font-size-sm);
+}
+
+textarea,
+input {
+  font-family: inherit;
+}
+
+.focus-edit-textarea {
+  font-family: $reading_font;
+}
+
+// ---- Slim view ----------------------------------------------------------------
+
+// One dense row per note, like the full view: hairlines, no boxes.
+.note-slim {
+  &.outer:not(.tile) {
+    margin: 0;
+    padding: 8px 4px;
+    border: none;
+    border-bottom: 1px solid var(--hairline);
+    border-radius: 0;
+    color: var(--ink);
+    align-items: flex-start;
+
+    &:hover {
+      background: var(--hover);
+    }
+
+    &.selected {
+      background: var(--accent-soft);
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+  }
+
+  &.outer.tile {
+    border: 1px solid var(--hairline);
+    border-radius: 0;
+    background: var(--surface);
+  }
+
+  &.inner {
+    margin: 0 4px;
+    font-size: var(--font-size-md);
+    line-height: 1.45;
+
+    .pile,
+    .idea {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      margin: 2px 4px 0 0;
+      padding: 0 5px;
+      font-family: $main_font;
+      font-size: var(--font-size-xs);
+      border-radius: 0;
+    }
+
+    .idea {
+      color: var(--idea);
+      background: var(--accent-soft);
+    }
+
+    .pile {
+      color: var(--pile);
+      background: var(--semantic-pile);
+    }
+
+    .idea::before,
+    .pile::before {
+      display: none;
+    }
+  }
+}
+
+.note-slim.button .grid-button {
+  height: 20px;
+  width: 20px;
+  min-width: 0;
+  margin: 1px 4px 0 0;
+  padding: 2px;
+  border: none;
+
+  img {
+    width: 14px;
+    height: 14px;
+    opacity: 0.55;
+  }
+
+  &:hover img {
+    opacity: 1;
+  }
+}
+
+// ---- Overlays: plain dim, no blur -------------------------------------------
+
+.help-overlay,
+.search-overlay {
+  background-color: rgba(0, 0, 0, 0.35);
+  backdrop-filter: none;
+}
+
+.search-overlay-content,
+.help-overlay-content {
+  background-color: var(--background-color);
+  border-radius: 6px;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: var(--background-color);
+  }
+}
+
+.search-overlay-content {
+  padding: 10px;
+}
+
+.help-overlay-hint {
+  background: transparent;
+  color: var(--faint);
+  padding: 0;
+  font-size: var(--font-size-sm);
+
+  @media (prefers-color-scheme: dark) {
+    background: transparent;
+  }
+}
+
+.help-overlay-content kbd {
+  font-family: $monospace;
+  font-size: var(--font-size-xs);
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+  padding: 1px 5px;
+  background: var(--surface);
+}
+
+// ---- Entity pages -------------------------------------------------------------
+
+.entity-page-header {
+  margin: 0 0 4px;
+  padding: 4px 0 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+}
+
+// The slim checkbox's wrapper carries the generic .button class.
+div.note-slim.button {
+  border: none;
+  background: transparent;
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+}
+
+// Phones: no room for corner actions over the title. Show them under the
+// selected note only.
+@media (max-width: 600px) {
+  .note-full .title {
+    padding-right: 0;
+  }
+
+  .note-full.outer:not(.edit-note) .action-bar {
+    position: static;
+    display: none;
+    background: transparent;
+    padding: 0;
+    margin-top: 6px;
+  }
+
+  .note-full.outer.selected:not(.edit-note) .action-bar {
+    display: flex;
+    opacity: 1;
+  }
+}
+
+// ---- Suggestion dropdowns ---------------------------------------------------------
+
+// Piles/ideas/authors pickers: an opaque panel above everything, a clear
+// highlight on the active option.
+.pill-input .pill-input-suggestions {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  padding: 2px 0;
+  z-index: 1000;
+}
+
+.pill-input .pill-input-option {
+  padding: 5px 10px;
+  font-size: var(--font-size-md);
+  color: var(--ink);
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  &.highlighted {
+    background: var(--accent-soft);
+    color: var(--ink);
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+}
+
+.pill-input.piles .pill-input-option.highlighted {
+  background: var(--semantic-pile);
+  box-shadow: inset 2px 0 0 var(--pile);
+}
+
+// Selected/hovered rows tint the row; keep the dropdown's own panel solid.
+.note-full.outer .pill-input-suggestions,
+.note-full.outer .edit-work.ul,
+.note-full.outer .edit-author.ul {
+  background: var(--surface);
+}
+
+// ---- Result rows (search, piles list, works on a pile) -----------------------------
+
+.result-box {
+  margin: 0;
+  padding: 7px 8px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--font-size-lg);
+
+  &:hover {
+    background: var(--hover);
+  }
+
+  &.header,
+  &.content {
+    border-bottom: none;
+    padding: 0;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  &.header {
+    gap: 10px;
+
+    img {
+      width: 15px;
+      height: 15px;
+      opacity: 0.6;
+    }
+  }
+
+  .result-box-snippet {
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+    opacity: 1;
+    padding-left: 25px;
+  }
+
+  .result-box-ideas {
+    padding-left: 25px;
+    gap: 4px;
+
+    .idea {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      padding: 0 5px;
+      font-size: var(--font-size-xs);
+      color: var(--idea);
+      background: var(--accent-soft);
+    }
+  }
+}
+
+mark.search-highlight {
+  background: var(--accent-soft);
+  color: inherit;
+  border-radius: 0;
+  padding: 0 1px;
+}
+
+// ---- Page titles and panels ---------------------------------------------------------
+
+// Left-aligned like everything else, sized like an entity page title.
+.top-level {
+  &.title {
+    font-size: var(--font-size-xxl);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: left;
+    margin: 4px 0 8px;
+  }
+
+  &.sub-title {
+    font-size: var(--font-size-xl);
+    font-weight: 500;
+  }
+}
+
+.maintenance-task {
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  padding: 10px 0;
+  margin: 0;
+}

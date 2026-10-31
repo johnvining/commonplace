@@ -1,9 +1,11 @@
 @use 'sass:color';
 
 // Fonts
-$monospace: 'Courier New', Courier, monospace;
-$main_font: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-$sans_font: 'Avenir', 'Candara', 'Arial', sans-serif;
+$monospace: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+// Interface text. Note text is set in $reading_font (see _minimal.scss).
+$main_font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+$sans_font: $main_font;
+$reading_font: 'Iowan Old Style', Charter, 'Source Serif Pro', Georgia, serif;
 
 // Images
 $image_add_background: '/icons/plus.svg';
