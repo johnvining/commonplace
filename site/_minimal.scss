@@ -1247,3 +1247,40 @@ mark.search-highlight {
   margin-left: auto;
   justify-content: flex-end;
 }
+
+// ---- Slim rows and list bars ----------------------------------------------------------
+
+// A fixed checkbox column, so every row's text starts at the same place,
+// and a text column that can shrink (so long rows clamp, not overflow).
+.note-slim.outer:not(.tile) {
+  gap: 8px;
+
+  > .note-slim.button {
+    flex: 0 0 20px;
+  }
+
+  > .note-slim:not(.button) {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// Page number sits beside the arrows, not floating mid-bar.
+.multi-select-top-bar > div:not(.top-level-button-container) {
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+// Category pages ("essay" / Notes): the subtitle is a quiet label.
+.top-level.sub-title {
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--muted);
+  margin: -4px 0 8px;
+}
+
+.search-tag-hint {
+  font-size: var(--font-size-sm);
+  color: var(--faint);
+  margin-bottom: 4px;
+}

@@ -3929,4 +3929,33 @@ mark.search-highlight {
   justify-content: flex-end;
 }
 
+.note-slim.outer:not(.tile) {
+  gap: 8px;
+}
+.note-slim.outer:not(.tile) > .note-slim.button {
+  flex: 0 0 20px;
+}
+.note-slim.outer:not(.tile) > .note-slim:not(.button) {
+  flex: 1;
+  min-width: 0;
+}
+
+.multi-select-top-bar > div:not(.top-level-button-container) {
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.top-level.sub-title {
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  color: var(--muted);
+  margin: -4px 0 8px;
+}
+
+.search-tag-hint {
+  font-size: var(--font-size-sm);
+  color: var(--faint);
+  margin-bottom: 4px;
+}
+
 /*# sourceMappingURL=style.css.map */
