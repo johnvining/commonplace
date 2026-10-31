@@ -357,6 +357,8 @@ class NoteList extends React.Component<any, any> {
     // A different view renders different elements; watch the new ones.
     if (prevProps.viewMode !== this.props.viewMode && this.state.notes) {
       this.setupImageObserver()
+      // Switching into Full keeps a selected note, or else selects the first.
+      if (!this.state.selectedNote) this.selectFirstNote()
     }
   }
 

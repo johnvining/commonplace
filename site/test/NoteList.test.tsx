@@ -28,15 +28,20 @@ const notes = [
   { _id: 'c', text: 'third' },
 ]
 
-function renderList(props: any = {}) {
-  const getListOfNotes = vi.fn(async () => ({ data: { data: notes } }))
-  render(
+const getListOfNotes = async () => ({ data: { data: notes } })
+
+function list(props: any = {}) {
+  return (
     <MemoryRouter>
       <KeyboardProvider>
         <NoteList viewMode={constants.view_modes.FULL} getListOfNotes={getListOfNotes} {...props} />
       </KeyboardProvider>
     </MemoryRouter>
   )
+}
+
+function renderList(props: any = {}) {
+  return render(list(props))
 }
 
 function selectedIds() {
@@ -66,5 +71,12 @@ describe('NoteList selection', () => {
 
     fireEvent.keyDown(document.getElementById('c')!, { keyCode: constants.keyCodes.listPrev })
     await waitFor(() => expect(selectedIds()).toEqual(['b']))
+  })
+
+  it('selects the first note when switching into Full view', async () => {
+    const { rerender } = renderList({ viewMode: constants.view_modes.RESULT })
+    await screen.findByText('first')
+    rerender(list({ viewMode: constants.view_modes.FULL }))
+    await waitFor(() => expect(selectedIds()).toEqual(['a']))
   })
 })
