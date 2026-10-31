@@ -4095,4 +4095,16 @@ a.grid-link > a {
   font-size: var(--font-size-xl);
 }
 
+.sidebar-pin-row .sidebar-item {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: unset;
+}
+
+.sidebar-pin-row .sidebar-link {
+  min-width: 0;
+}
+
 /*# sourceMappingURL=style.css.map */

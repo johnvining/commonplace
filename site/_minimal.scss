@@ -1441,3 +1441,17 @@ a.grid-link {
   }
 }
 
+// ---- Sidebar starred items --------------------------------------------------------------
+
+// One line each, cut with an ellipsis.
+.sidebar-pin-row .sidebar-item {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: unset;
+}
+
+.sidebar-pin-row .sidebar-link {
+  min-width: 0;
+}
