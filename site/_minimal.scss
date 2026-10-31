@@ -74,15 +74,19 @@
   color-scheme: dark;
 }
 
+// Night follows the system unless the theme toggle forces day or night.
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     @include dark-tokens;
   }
 }
 
+:root[data-theme='dark'] {
+  @include dark-tokens;
+}
+
 // The icons are black SVGs. The base styles invert them in scattered
-// prefers-color-scheme rules (and un-invert on hover, which no longer
-// suits the dark hover colour); one token here covers them all.
+// prefers-color-scheme rules; one token here covers forced themes too.
 button img,
 .button img,
 .action-button img,

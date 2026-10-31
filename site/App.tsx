@@ -1,5 +1,7 @@
 import { createNewNoteFromTitle, getAuthStatus, logout } from './Database'
 import { createRoot } from 'react-dom/client'
+import { applyTheme, getTheme } from './theme'
+import ThemeToggle from './ThemeToggle'
 import { Routes, Route, Link, BrowserRouter, useNavigate } from 'react-router-dom'
 import plus from 'url:./icons/plus.svg'
 import React, { Suspense } from 'react'
@@ -176,6 +178,9 @@ class App extends React.Component<any, any> {
               >
                 <img src={plus} alt="" />
               </TopLevelStandardButton>
+            </div>
+            <div className="tool-bar div">
+              <ThemeToggle />
             </div>
             <div className="tool-bar div">
               <ViewSelector
@@ -516,6 +521,7 @@ function AppWithKeyboard() {
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('#root not found')
+applyTheme(getTheme())
 const root = createRoot(rootEl)
 root.render(
   <BrowserRouter>

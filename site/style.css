@@ -2964,7 +2964,7 @@ mark.search-highlight {
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme=light]) {
     --ink: #e4e4e0;
     --muted: #9b9b96;
     --faint: #6b6b67;
@@ -2982,6 +2982,24 @@ mark.search-highlight {
     color-scheme: dark;
   }
 }
+:root[data-theme=dark] {
+  --ink: #e4e4e0;
+  --muted: #9b9b96;
+  --faint: #6b6b67;
+  --hairline: #26272a;
+  --surface: #17181b;
+  --hover: #1d1f23;
+  --accent: #7ea4ff;
+  --accent-soft: #1a2338;
+  --idea: #7ea4ff;
+  --pile: #c69ae6;
+  --background-color: #111214;
+  --semantic-pile: #241a2c;
+  --semantic-removal: #3a1d1b;
+  --icon-filter: invert(1);
+  color-scheme: dark;
+}
+
 button img,
 .button img,
 .action-button img,
