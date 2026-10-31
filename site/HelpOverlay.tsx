@@ -118,7 +118,7 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
         currentContext.noteMode === constants.note_modes.EDIT
       ) {
         noteShortcuts.push(
-          { key: 'Ctrl+I', action: 'Toggle image zoom' },
+          { key: 'Ctrl+I', action: 'Image beside text (Esc closes)' },
           { key: '← or Ctrl+J', action: 'Previous image' },
           { key: '→ or Ctrl+K', action: 'Next image' }
         )

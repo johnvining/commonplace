@@ -295,7 +295,7 @@ class Note extends React.Component<any, any> {
     const url = '/note/' + this.props.id
     if (window.location.pathname === url) return
     const interactive =
-      'a, button, input, textarea, select, img, label, .action-bar, .click-to-copy-nick'
+      'a, button, input, textarea, select, img, label, .action-bar, .click-to-copy-nick, .image-reader, .lightbox-backdrop'
     if ((event.target as HTMLElement).closest(interactive)) return
     if (!window.getSelection()?.isCollapsed) return
     if (event.metaKey || event.ctrlKey) {
@@ -550,6 +550,9 @@ class Note extends React.Component<any, any> {
       this.setState({ largeImage: index, focusEdit: true, lightboxOpen: false, overlayMode: false })
     } else {
       this.setState({ largeImage: index, lightboxOpen: false, overlayMode: true })
+      if (this.props.mode !== constants.note_modes.SELECTED) {
+        this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
+      }
     }
   }
 
@@ -842,45 +845,86 @@ class Note extends React.Component<any, any> {
           {/* Overlay mode — show the focused image at full natural size.
               Images here are usually text scans, so nothing covers them:
               navigation lives below the image, not on top of it. */}
+          {/* Image reader: a large image beside the note's text, over the
+              page. ← / → switch images, Esc or × closes, clicking the image
+              opens the full-screen lightbox. */}
           {this.state.overlayMode && !edit && this.props.note.imageUrls?.length > 0 && this.state.largeImage >= 0 ? (
-            <div className="note-overlay-wrapper width-100">
-              <button
-                className="overlay-close-btn"
-                onClick={() => this.setState({ overlayMode: false, largeImage: -1 })}
-                title="Close"
-              >×</button>
-              <img
-                className="note-overlay-image"
-                src={this.props.note.imageUrls[this.state.largeImage]}
-                onClick={() => this.setState({ lightboxOpen: true })}
-              />
-              {this.props.note.imageUrls.length > 1 ? (
-                <div className="note-overlay-nav">
-                  <button
-                    className="overlay-nav-btn overlay-nav-prev"
-                    onClick={() => this.moveFocusedImage(-1)}
-                    disabled={this.state.largeImage === 0}
-                  >
-                    <img src={left_arrow} />
-                  </button>
-                  <div className="overlay-nav-dots">
-                    {this.props.note.imageUrls.map((_: any, i: any) => (
-                      <button
-                        key={i}
-                        className={`overlay-dot${i === this.state.largeImage ? ' active' : ''}`}
-                        onClick={() => this.setState({ largeImage: i })}
-                      />
-                    ))}
+            <div className="image-reader" role="dialog" aria-label="Image and text">
+              <div className="image-reader-image">
+                <img
+                  src={this.props.note.imageUrls[this.state.largeImage]}
+                  onClick={() => this.setState({ lightboxOpen: true })}
+                  title="Click to zoom"
+                  alt=""
+                />
+                {this.props.note.imageUrls.length > 1 ? (
+                  <div className="image-reader-nav">
+                    <button
+                      className="button"
+                      onClick={() => this.moveFocusedImage(-1)}
+                      disabled={this.state.largeImage === 0}
+                      aria-label="Previous image (←)"
+                      title="Previous image (←)"
+                    >
+                      <img src={left_arrow} alt="" />
+                    </button>
+                    <span className="image-reader-count">
+                      {this.state.largeImage + 1} / {this.props.note.imageUrls.length}
+                    </span>
+                    <button
+                      className="button"
+                      onClick={() => this.moveFocusedImage(1)}
+                      disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
+                      aria-label="Next image (→)"
+                      title="Next image (→)"
+                    >
+                      <img src={right_arrow} alt="" />
+                    </button>
                   </div>
-                  <button
-                    className="overlay-nav-btn overlay-nav-next"
-                    onClick={() => this.moveFocusedImage(1)}
-                    disabled={this.state.largeImage === this.props.note.imageUrls.length - 1}
-                  >
-                    <img src={right_arrow} />
-                  </button>
+                ) : null}
+              </div>
+              <div className="image-reader-text">
+                <button
+                  className="image-reader-close"
+                  onClick={() => this.setState({ overlayMode: false, largeImage: -1 })}
+                  aria-label="Close (Esc)"
+                  title="Close (Esc)"
+                >
+                  ×
+                </button>
+                {this.state.pendingTitle ? (
+                  <div className="image-reader-title">{this.state.pendingTitle}</div>
+                ) : null}
+                <div className="citation">
+                  <WorkCitationSpan
+                    authors={
+                      this.state.pendingAuthors.length
+                        ? this.state.pendingAuthors
+                        : this.props.note?.work?.authors
+                    }
+                    workTitle={this.state.pendingWorkName}
+                    workID={this.state.pendingWorkId}
+                    spaceAfter={false}
+                  />
+                  <YearUrlComboSpan
+                    year={this.state.pendingYear ?? this.props.note.work?.year}
+                    url={this.state.pendingUrl ?? this.props.note.work?.url}
+                  />
+                  {this.state.pendingPage ? <>, {this.state.pendingPage}</> : null}
                 </div>
-              ) : null}
+                {this.state.pendingText ? (
+                  <div
+                    className="note-full note-text markdown"
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(this.state.pendingText) }}
+                  />
+                ) : null}
+                {this.state.pendingTake ? (
+                  <div
+                    className="note-full note-take markdown"
+                    dangerouslySetInnerHTML={{ __html: renderMarkdown(this.state.pendingTake) }}
+                  />
+                ) : null}
+              </div>
             </div>
           ) : null}
 
@@ -912,7 +956,7 @@ class Note extends React.Component<any, any> {
                 value={this.state.pendingText}
               ></textarea>
             </div>
-          ) : !this.state.overlayMode && this.state.pendingText ? (
+          ) : this.state.pendingText ? (
             <div data-name="text" className="width-100">
               <div
                 ref={this._textRef}
@@ -942,7 +986,7 @@ class Note extends React.Component<any, any> {
           ) : null}
 
           {/* Take */}
-          {!this.state.overlayMode && edit && !this.state.compactEdit ? (
+          {edit && !this.state.compactEdit ? (
             <div data-name="take" className="width-100">
               <label htmlFor="take" className="note-full form-label">
                 Take
@@ -954,7 +998,7 @@ class Note extends React.Component<any, any> {
                 value={this.state.pendingTake}
               ></textarea>
             </div>
-          ) : !this.state.overlayMode && this.state.pendingTake ? (
+          ) : this.state.pendingTake ? (
             <div data-name="take" className="width-100">
               <div
                 className="note-full note-take markdown"
@@ -1015,7 +1059,7 @@ class Note extends React.Component<any, any> {
                 />
               </div>
             </>
-          ) : !this.state.overlayMode && !this.props.hideCitation && (this.state.pendingAuthors.length ||
+          ) : !this.props.hideCitation && (this.state.pendingAuthors.length ||
             this.props.note?.work?.authors?.length ||
             this.state.pendingWorkId ||
             this.state.pendingYear ||

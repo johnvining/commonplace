@@ -150,7 +150,7 @@ Shortcuts when editing a note in Full view.
 ### 5.3 Image Navigation
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+I` | Toggle image focus/zoom |
+| `Ctrl+I` | Open/close the image reader: the image beside the note's text (Esc closes; click the image to zoom) |
 | `←` / `Ctrl+J` | Previous image (opens the last one if none is open) |
 | `→` / `Ctrl+K` | Next image (opens the first one if none is open) |
 
