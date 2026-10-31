@@ -820,6 +820,7 @@ class NoteList extends React.Component<any, any> {
                       }
                       setNoteMode={this.setNoteMode.bind(this)}
                       hideCitation={this.props.hideCitation}
+                      openNote={this.props.navigate && ((id: string) => this.props.navigate('/note/' + id))}
                     />
                   )}
                 </div>

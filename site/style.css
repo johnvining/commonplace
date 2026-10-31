@@ -3541,6 +3541,19 @@ input {
   font-family: "Iowan Old Style", Charter, "Source Serif Pro", Georgia, serif;
 }
 
+.note-full.outer:not(.edit-note) {
+  cursor: pointer;
+}
+
+.note-full .title .title-link {
+  color: inherit;
+}
+.note-full .title .title-link:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--faint);
+  text-underline-offset: 2px;
+}
+
 .note-slim.outer:not(.tile) {
   margin: 0;
   padding: 8px 4px;

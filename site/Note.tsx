@@ -259,6 +259,28 @@ class Note extends React.Component<any, any> {
     })
   }
 
+  // Clicking a note (anywhere but its controls) opens it on its own page;
+  // Cmd/Ctrl-click opens it in a new tab. Not while editing, not after
+  // selecting text, and not on the note's own page.
+  handleCardClick = (event: any) => {
+    const viewing =
+      this.props.mode === constants.note_modes.NO_SELECTION ||
+      this.props.mode === constants.note_modes.NOT_SELECTED ||
+      this.props.mode === constants.note_modes.SELECTED
+    if (!viewing || !this.props.openNote) return
+    const url = '/note/' + this.props.id
+    if (window.location.pathname === url) return
+    const interactive =
+      'a, button, input, textarea, select, img, label, .action-bar, .click-to-copy-nick'
+    if ((event.target as HTMLElement).closest(interactive)) return
+    if (!window.getSelection()?.isCollapsed) return
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, '_blank')
+      return
+    }
+    this.props.openNote(this.props.id)
+  }
+
   handleSelectKeyDown = (event: any) => {
     if (event.keyCode !== constants.keyCodes.enter) {
       return
@@ -630,6 +652,7 @@ class Note extends React.Component<any, any> {
         data-note-id={this.props.id}
         tabIndex={no_selection || not_selected ? this.props.tabIndex : '-1'}
         onKeyDown={this.handleSelectKeyDown}
+        onClick={this.handleCardClick}
       >
 
         {this.state.lightboxOpen && this.state.largeImage >= 0 ? (
@@ -749,7 +772,9 @@ class Note extends React.Component<any, any> {
           ) : this.state.pendingTitle ? (
             <div className="width-100">
               <div className="note-full title">
-                {this.state.pendingTitle}
+                <Link to={'/note/' + this.props.id} className="title-link" tabIndex={-1}>
+                  {this.state.pendingTitle}
+                </Link>
                 {this.isAiTitle() ? <AiTitleTag /> : null}
               </div>
             </div>

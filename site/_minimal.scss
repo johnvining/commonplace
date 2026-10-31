@@ -700,6 +700,24 @@ input {
   font-family: $reading_font;
 }
 
+// ---- Opening notes ----------------------------------------------------------
+
+// The whole note opens on click (see Note.handleCardClick); the title is a
+// real link, so it can be middle-clicked or copied.
+.note-full.outer:not(.edit-note) {
+  cursor: pointer;
+}
+
+.note-full .title .title-link {
+  color: inherit;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--faint);
+    text-underline-offset: 2px;
+  }
+}
+
 // ---- Slim view ----------------------------------------------------------------
 
 // One dense row per note, like the full view: hairlines, no boxes.
