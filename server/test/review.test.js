@@ -14,29 +14,22 @@ const ago = (days) => new Date(now.getTime() - days * DAY)
 const half = () => 0.5 // no fuzz, no jitter
 
 describe('scheduleReview', () => {
-  it('sends a fast card back in a day and a slow one out further', () => {
-    const fast = scheduleReview({}, 'fast', now, half)
-    const med = scheduleReview({}, 'med', now, half)
-    const slow = scheduleReview({}, 'slow', now, half)
-    expect(fast.reviewInterval).toBe(1)
-    expect(med.reviewInterval).toBe(3)
-    expect(slow.reviewInterval).toBe(7)
-    expect(slow.reviewDueAt.getTime()).toBe(now.getTime() + 7 * DAY)
-    expect(slow.reviewCount).toBe(1)
+  const day = (update) => (update.reviewDueAt.getTime() - now.getTime()) / DAY
+
+  it('sends cards back within a week, six months or 18 months', () => {
+    expect(day(scheduleReview({}, 'fast', now, () => 0))).toBe(1)
+    expect(day(scheduleReview({}, 'fast', now, () => 0.9999))).toBeCloseTo(7, 1)
+    expect(day(scheduleReview({}, 'med', now, () => 0))).toBe(30)
+    expect(day(scheduleReview({}, 'med', now, () => 0.9999))).toBeCloseTo(182, 0)
+    expect(day(scheduleReview({}, 'slow', now, () => 0))).toBe(182)
+    expect(day(scheduleReview({}, 'slow', now, () => 0.9999))).toBeCloseTo(548, 0)
   })
 
-  it('grows the interval by ease on slow and lowers ease on fast', () => {
-    const slow = scheduleReview({ reviewInterval: 10, reviewEase: 2, reviewCount: 4 }, 'slow', now, half)
-    expect(slow.reviewInterval).toBe(20)
-    expect(slow.reviewEase).toBeCloseTo(2.15)
-    expect(slow.reviewCount).toBe(5)
-    const fast = scheduleReview({ reviewInterval: 10, reviewEase: 1.4 }, 'fast', now, half)
-    expect(fast.reviewEase).toBe(1.3)
-  })
-
-  it('fuzzes intervals', () => {
-    expect(scheduleReview({}, 'slow', now, () => 0).reviewInterval).toBeCloseTo(7 * 0.85)
-    expect(scheduleReview({}, 'slow', now, () => 0.9999).reviewInterval).toBeCloseTo(7 * 1.15)
+  it('records the review', () => {
+    const update = scheduleReview({ reviewCount: 4 }, 'med', now, half)
+    expect(update.reviewedAt).toEqual(now)
+    expect(update.reviewInterval).toBe(106)
+    expect(update.reviewCount).toBe(5)
   })
 })
 
@@ -48,6 +41,8 @@ describe('buildDeck', () => {
     expect(reviewPriority(overdue, now)).toBe(2)
     const deck = buildDeck([fresh, due, overdue], [], 2, now, half)
     expect(deck.map((c) => c.id).sort()).toEqual(['due', 'overdue'])
+    // Not-yet-due cards stay out, even when the deck has room.
+    expect(buildDeck([fresh, due], [], 5, now, half).map((c) => c.id)).toEqual(['due'])
   })
 
   it('mixes never-reviewed cards in, and fills from either side', () => {
@@ -142,12 +137,15 @@ describe('review endpoints', () => {
     expect(untouched.reviewCount).toBe(0)
   })
 
-  it('deals a deck of reviewed and never-reviewed notes', async () => {
+  it('deals never-reviewed notes, and reviewed ones only once due', async () => {
     const agent = await authedAgent()
     const a = await createNote(agent, { title: 'A' })
     await createNote(agent, { title: 'B' })
     await agent.post(`/api/note/${a._id}/review`).send({ rating: 'fast' }).expect(200)
-    const res = await agent.get('/api/note/flip').expect(200)
+    let res = await agent.get('/api/note/flip').expect(200)
+    expect(res.body.data.map((n) => n.title)).toEqual(['B'])
+    await Note.updateOne({ _id: a._id }, { $set: { reviewDueAt: ago(1) } })
+    res = await agent.get('/api/note/flip').expect(200)
     expect(res.body.data.map((n) => n.title).sort()).toEqual(['A', 'B'])
   })
 })

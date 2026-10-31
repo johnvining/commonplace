@@ -229,9 +229,9 @@ On the flip (review) page, when not typing in a field.
 
 | Shortcut | Action |
 |----------|--------|
-| `1` | See this card again fast (about a day) |
-| `2` | See it again in a medium while |
-| `3` | See it again slowly (the interval grows) |
+| `1` | Fast: see this card again within a week |
+| `2` | Med: see it again in 1 to 6 months |
+| `3` | Slow: see it again in 6 to 18 months |
 | `n` | Next card, without rating this one |
 | `Enter` | Deal again (when the deck is done) |
 | `p` | Previous card |

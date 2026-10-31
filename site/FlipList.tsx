@@ -11,12 +11,12 @@ import {
 
 type Rating = 'fast' | 'med' | 'slow'
 
-// `hint` is the hover text: the key, and roughly when the card comes back
-// (see scheduleReview in server/src/utils/review.ts).
+// `hint` is the hover text: the key, and when the card comes back (see
+// WINDOWS in server/src/utils/review.ts).
 const RATING_BUTTONS: { rating: Rating; name: string; hint: string }[] = [
-  { rating: 'fast', name: 'Fast', hint: 'Fast · key 1: back in about a day' },
-  { rating: 'med', name: 'Med', hint: 'Med · key 2: back in a few days, a little later than last time' },
-  { rating: 'slow', name: 'Slow', hint: 'Slow · key 3: back in a week or more, and the gap keeps growing' },
+  { rating: 'fast', name: 'Fast', hint: 'Fast · key 1: back within a week' },
+  { rating: 'med', name: 'Med', hint: 'Med · key 2: back in 1 to 6 months' },
+  { rating: 'slow', name: 'Slow', hint: 'Slow · key 3: back in 6 to 18 months' },
 ]
 
 // Scopes active while a note is being edited; flip keys stay out of the

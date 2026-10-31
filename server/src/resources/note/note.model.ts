@@ -21,7 +21,6 @@ export interface NoteDoc {
   reviewedAt?: Date
   reviewDueAt?: Date
   reviewInterval?: number
-  reviewEase?: number
   reviewCount?: number
   embedding: number[]
   embeddingHash?: string
@@ -60,7 +59,6 @@ const noteSchema = new Schema<NoteDoc>(
     reviewedAt: Date,
     reviewDueAt: Date,
     reviewInterval: Number,
-    reviewEase: Number,
     reviewCount: { type: Number, default: 0 },
     embedding: [Number],
     embeddingHash: String,

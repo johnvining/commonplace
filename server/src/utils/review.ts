@@ -4,7 +4,6 @@
 // - reviewedAt: when it was last rated,
 // - reviewDueAt: the next review target,
 // - reviewInterval: days between reviewedAt and reviewDueAt,
-// - reviewEase: how fast the interval grows when it's rated "slow",
 // - reviewCount: how many times it has been rated,
 // - lastOpenedAt: when its own page was last opened (with openCount; see
 //   recordOpened), which the deck uses to lean toward notes not looked at
@@ -22,18 +21,19 @@ const DAY = 24 * 60 * 60 * 1000
 export const RATINGS = ['fast', 'med', 'slow'] as const
 export type Rating = (typeof RATINGS)[number]
 
-export const DEFAULT_EASE = 2.5
-const MIN_EASE = 1.3
-const MAX_EASE = 3.5
-// Intervals are randomized by up to this fraction either way, so cards
-// rated together don't keep coming back together.
-const FUZZ = 0.15
+// Each rating sends the card back at a random point in a fixed window
+// (in days), so cards rated together don't come back together.
+// fast: within a week; med: within six months; slow: within 18 months.
+export const WINDOWS: Record<Rating, [number, number]> = {
+  fast: [1, 7],
+  med: [30, 182],
+  slow: [182, 548],
+}
 
 export interface ReviewState {
   reviewedAt?: Date | null
   reviewDueAt?: Date | null
   reviewInterval?: number | null
-  reviewEase?: number | null
   reviewCount?: number | null
   lastOpenedAt?: Date | null
 }
@@ -42,45 +42,21 @@ export interface ReviewUpdate {
   reviewedAt: Date
   reviewDueAt: Date
   reviewInterval: number
-  reviewEase: number
   reviewCount: number
 }
 
-// The rating is how soon to see the card again:
-// - fast: back to a day, and grow more slowly from now on.
-// - med: a modest step up.
-// - slow: a full step up, and grow faster from now on.
 export function scheduleReview(
   state: ReviewState,
   rating: Rating,
   now = new Date(),
   rand: () => number = Math.random
 ): ReviewUpdate {
-  const interval = state.reviewInterval || 0
-  let ease = state.reviewEase || DEFAULT_EASE
-  let next: number
-  switch (rating) {
-    case 'fast':
-      next = 1
-      ease -= 0.2
-      break
-    case 'med':
-      next = Math.max(3, interval * 1.2)
-      break
-    case 'slow':
-      next = Math.max(7, interval * ease)
-      ease += 0.15
-      break
-  }
-  ease = Math.min(MAX_EASE, Math.max(MIN_EASE, ease))
-  next = next * (1 + FUZZ * (2 * rand() - 1))
-  next = Math.round(next * 100) / 100
-
+  const [min, max] = WINDOWS[rating]
+  const next = Math.round((min + rand() * (max - min)) * 100) / 100
   return {
     reviewedAt: now,
     reviewDueAt: new Date(now.getTime() + next * DAY),
     reviewInterval: next,
-    reviewEase: ease,
     reviewCount: (state.reviewCount || 0) + 1,
   }
 }
@@ -95,7 +71,9 @@ export function reviewPriority(state: ReviewState, now = new Date()): number {
     ? new Date(state.reviewDueAt).getTime()
     : reviewed + DAY
   const span = Math.max(due - reviewed, 60 * 1000)
-  return (now.getTime() - reviewed) / span
+  const ratio = (now.getTime() - reviewed) / span
+  // Past its due date is due, however the dates got there.
+  return now.getTime() >= due ? Math.max(1, ratio) : ratio
 }
 
 // How long since the note was last opened, as 0 (just now) to 1 (never,
@@ -115,14 +93,15 @@ const SEEN_BOOST = 0.3
 // available. Whatever one side can't fill goes to the other.
 export const NEW_SHARE = 0.3
 // Each reviewed card's priority is scaled by a random factor in
-// [1 - JITTER, 1 + JITTER] before ranking, so the deck isn't the same
-// strict order every time and near-due cards sometimes get in ahead of
-// barely-overdue ones.
+// [1 - JITTER, 1 + JITTER] before ranking, so when more cards are due
+// than fit, the deck isn't the same strict order every time.
 const JITTER = 0.35
 
-// Picks a deck of `size` from the reviewed cards (ranked by jittered
-// priority, highest first) and the never-reviewed cards (random, leaning
-// toward ones not opened lately), then shuffles the two together.
+// Picks a deck of `size` from the reviewed cards that are due (ranked by
+// jittered priority, highest first) and the never-reviewed cards (random,
+// leaning toward ones not opened lately), then shuffles the two together.
+// A reviewed card never comes back before its due date; when too few are
+// due, never-reviewed cards fill the deck.
 export function buildDeck<T extends ReviewState>(
   reviewed: T[],
   unreviewed: T[],
@@ -131,6 +110,7 @@ export function buildDeck<T extends ReviewState>(
   rand: () => number = Math.random
 ): T[] {
   const ranked = reviewed
+    .filter((card) => reviewPriority(card, now) >= 1)
     .map((card) => ({
       card,
       score:
