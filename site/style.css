@@ -3924,4 +3924,9 @@ mark.search-highlight {
   margin-top: 8px;
 }
 
+.flip-header .flip-ratings {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
 /*# sourceMappingURL=style.css.map */

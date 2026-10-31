@@ -1240,3 +1240,10 @@ mark.search-highlight {
   gap: 10px;
   margin-top: 8px;
 }
+
+// Flip's rating buttons stay at the right, even when the status line is
+// long enough to push them onto their own line.
+.flip-header .flip-ratings {
+  margin-left: auto;
+  justify-content: flex-end;
+}
