@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import work_img from 'url:./icons/work.svg'
-import note_img from 'url:./icons/write.svg'
 import PileListForItem from './PileListForItem'
 import PinButton from './PinButton'
 import { joinAuthorNames } from './authorsDisplay'
@@ -19,6 +18,8 @@ class ResultWork extends React.Component<any, any> {
           pile.name?.includes('Status: ') ||
           pile.name?.includes('Reading: '),
       )
+      // On a pile's own page its tag would only repeat the page title.
+      .filter((pile: any) => pile._id !== this.props.hidePileId)
       .sort((a: any, b: any) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
 
     return (
@@ -30,7 +31,7 @@ class ResultWork extends React.Component<any, any> {
               {work.authors?.length ? <>{joinAuthorNames(work.authors)},&nbsp;</> : null}
               <em>{work.name}</em>
               {work.original_name ? <span className="work-original-name"> ({work.original_name})</span> : null}
-              {work.year ? <span className="date">{work.year}</span> : null}
+              {work.year ? <span className="result-year">{work.year}</span> : null}
             </div>
               <PinButton
                 type="work"
@@ -41,16 +42,16 @@ class ResultWork extends React.Component<any, any> {
                 className="pin-button-inline"
               />
           </div>
-          {work.note_count ? (
-            <div className="result-box content">
-              <img src={note_img} />
-              {work.note_count}
-            </div>
-          ) : null}
-          <PileListForItem allowTabbing={false} piles={pilesToShow} />
-          {work.ideas?.length ? (
-            <div>
-              {work.ideas.map((idea: any) => (
+          {work.note_count || pilesToShow?.length || work.ideas?.length ? (
+            // One wrapping line under the title: note count, then tags.
+            <div className="result-meta">
+              {work.note_count ? (
+                <span className="result-count">
+                  {work.note_count} {work.note_count === 1 ? 'note' : 'notes'}
+                </span>
+              ) : null}
+              <PileListForItem allowTabbing={false} piles={pilesToShow} />
+              {work.ideas?.map((idea: any) => (
                 <span className="idea label" key={idea._id}>
                   {idea.name}
                 </span>

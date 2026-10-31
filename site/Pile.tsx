@@ -248,7 +248,7 @@ function Pile(props: any) {
         />
       ) : (
         <>
-          <WorkList key={'workList' + id} getListOfWorks={getListOfWorks} />
+          <WorkList key={'workList' + id} getListOfWorks={getListOfWorks} hidePileId={id} />
           <NoteList
             key={'noteList' + id}
             viewMode={constants.view_modes.RESULT}

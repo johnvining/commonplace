@@ -23,7 +23,7 @@ class WorkList extends React.Component<any, any> {
             <div className="search-empty-state">No works found.</div>
           )
         ) : display.map((work: any) => (
-          <ResultWork work={work} key={'work-list-' + work._id} />
+          <ResultWork work={work} key={'work-list-' + work._id} hidePileId={this.props.hidePileId} />
         ))}
       </div>
     )

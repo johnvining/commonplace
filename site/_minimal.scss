@@ -1070,3 +1070,30 @@ mark.search-highlight {
   padding: 10px 0;
   margin: 0;
 }
+
+// Second line of a result row (works on pile/author/idea pages): note
+// count and tags, indented to line up with the title text.
+.result-box .result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 4px;
+  padding: 3px 0 0 25px;
+
+  .label {
+    margin: 0;
+  }
+}
+
+.result-box .result-count {
+  font-size: var(--font-size-sm);
+  color: var(--muted);
+  margin-right: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-box .result-year {
+  color: var(--faint);
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+}
