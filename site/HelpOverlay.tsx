@@ -69,10 +69,10 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
         title: 'Note List (Full View)',
         shortcuts: [
           { key: 'j / k', action: 'Next / previous note' },
-          { key: 'Enter', action: 'Select focused note' },
+          { key: 'Enter', action: 'Select note (again: open it)' },
           { key: 'Escape', action: 'Deselect note' },
           { key: 'e', action: 'Edit note' },
-          { key: 'o', action: 'Open note' },
+          { key: 'o', action: 'Open selected note' },
           { key: 'Ctrl+E', action: 'Edit note' },
           { key: 'Ctrl+T', action: 'Edit tags/ideas' },
           { key: 'Ctrl+P', action: 'Edit piles' },

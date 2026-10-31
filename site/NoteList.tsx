@@ -143,11 +143,21 @@ class NoteList extends React.Component<any, any> {
       return true
     }
 
-    // Section 4.1: Selection shortcuts
+    // Section 4.1: Selection shortcuts. Enter selects the focused note;
+    // Enter on the note that's already selected opens it (like o). Links
+    // and buttons inside a note keep their own Enter.
     if (shortcuts.noteList.select(event)) {
+      if ((event.target as HTMLElement)?.closest?.('a, button')) return false
       let activeNoteId = this.getActiveNoteId(event) || this.state.selectedNote
       if (!activeNoteId && this.state.notes?.length) {
         activeNoteId = this.state.notes[0]._id
+      }
+      const alreadySelected =
+        activeNoteId === this.state.selectedNote &&
+        this.state.focusType === constants.note_modes.SELECTED
+      if (alreadySelected && this.props.navigate && !this.props.fromNoteView) {
+        this.props.navigate('/note/' + activeNoteId)
+        return true
       }
       if (activeNoteId) {
         this.setNoteMode(activeNoteId, constants.note_modes.SELECTED)
