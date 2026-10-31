@@ -326,6 +326,8 @@ div .top-bar {
 .note-full {
   &.outer {
     position: relative;
+    // Keep a note selected with j/k clear of the sticky top bar.
+    scroll-margin: 56px 0 16px;
     margin: 0;
     padding: 12px 12px 12px 14px;
     border: none;

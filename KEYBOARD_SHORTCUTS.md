@@ -8,7 +8,11 @@ Always available throughout the application.
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+O` | Toggle search bar open/closed |
+| `/` | Open search bar |
 | `Ctrl+/` | Toggle keyboard shortcuts help |
+| `?` | Toggle keyboard shortcuts help |
+
+Single-key shortcuts (`/`, `?`, `j`, `k`, `e`, `o`, …) are ignored while typing in a field.
 
 ### 1.2 View Mode Switching
 | Shortcut | Action |
@@ -108,8 +112,12 @@ Shortcuts for navigating and selecting notes. **Only works in Full view mode.**
 ### 4.1 Selection
 | Shortcut | Action |
 |----------|--------|
+| `j` | Select next note |
+| `k` | Select previous note |
 | `Enter` | Select focused note |
 | `Escape` | Deselect note |
+| `e` | Edit selected note |
+| `o` | Open selected note on its own page |
 
 ### 4.2 Quick Edit (With Note Selected)
 | Shortcut | Action |

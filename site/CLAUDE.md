@@ -56,8 +56,11 @@ Most specific (highest priority) to least specific:
 
 | Shortcut | Action | Scope |
 |----------|--------|-------|
-| `Ctrl+/` | Toggle help overlay | GLOBAL |
+| `Ctrl+/`, `?` | Toggle help overlay | GLOBAL |
 | `Ctrl+O` | Toggle search bar | GLOBAL |
+| `/` | Open search bar | GLOBAL |
+| `j` / `k` | Next / previous note | NOTE_LIST |
+| `e` / `o` | Edit / open selected note | NOTE_LIST |
 | `Ctrl+Shift+1-4` | View modes | GLOBAL |
 | `Ctrl+E` | Edit | ENTITY_PAGE, NOTE_LIST |
 | `Ctrl+A` | Save | ENTITY_EDIT, NOTE_EDIT |

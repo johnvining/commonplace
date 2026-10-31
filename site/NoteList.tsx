@@ -17,6 +17,7 @@ import {
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+import { useNavigate } from 'react-router-dom'
 
 class NoteList extends React.Component<any, any> {
   _imageObserver: IntersectionObserver | null = null
@@ -127,6 +128,21 @@ class NoteList extends React.Component<any, any> {
       }
     }
 
+    // Section 4.1: Moving through the list (j/k), opening (o), editing (e)
+    if (shortcuts.noteList.next(event) || shortcuts.noteList.prev(event)) {
+      return this.moveSelection(shortcuts.noteList.next(event) ? 1 : -1, event)
+    }
+
+    const currentId = this.getActiveNoteId(event) || this.state.selectedNote
+    if (shortcuts.noteList.open(event) && currentId && this.props.navigate) {
+      this.props.navigate('/note/' + currentId)
+      return true
+    }
+    if (shortcuts.noteList.editKey(event) && currentId) {
+      this.setNoteMode(currentId, constants.note_modes.EDIT)
+      return true
+    }
+
     // Section 4.1: Selection shortcuts
     if (shortcuts.noteList.select(event)) {
       let activeNoteId = this.getActiveNoteId(event) || this.state.selectedNote
@@ -154,6 +170,20 @@ class NoteList extends React.Component<any, any> {
     }
 
     return false
+  }
+
+  // Select the note `step` away from the current one (or the first note,
+  // if none is current). Returns false at either end so the key falls
+  // through.
+  moveSelection(step: number, event: any) {
+    const notes = this.state.notes ?? []
+    if (!notes.length) return false
+    const currentId = this.getActiveNoteId(event) || this.state.selectedNote
+    const index = notes.findIndex((note: any) => note._id == currentId)
+    const next = index === -1 ? 0 : index + step
+    if (next < 0 || next >= notes.length) return false
+    this.setNoteMode(notes[next]._id, constants.note_modes.SELECTED)
+    return true
   }
 
   async incPage() {
@@ -805,6 +835,7 @@ class NoteList extends React.Component<any, any> {
 // Wrapper component that provides keyboard shortcuts
 function NoteListWithKeyboard(props: any) {
   const noteListRef = React.useRef<NoteList | null>(null)
+  const navigate = useNavigate()
 
   // Section 4: Note List keyboard shortcuts
   useKeyboardShortcuts(
@@ -816,7 +847,7 @@ function NoteListWithKeyboard(props: any) {
     [props.viewMode]
   )
 
-  return <NoteList ref={noteListRef} {...props} />
+  return <NoteList ref={noteListRef} navigate={navigate} {...props} />
 }
 
 export default NoteListWithKeyboard

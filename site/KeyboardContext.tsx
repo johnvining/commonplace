@@ -170,6 +170,9 @@ export const shortcuts = {
     viewSlim: (e: KeyboardEvent) => isKey(e, constants.keyCodes.slim, { ctrl: true, shift: true }),
     viewGrid: (e: KeyboardEvent) => isKey(e, constants.keyCodes.grid, { ctrl: true, shift: true }),
     viewTile: (e: KeyboardEvent) => isKey(e, constants.keyCodes.tile, { ctrl: true, shift: true }),
+    // Plain-key aliases; inputs never see these (see handleKeyDown).
+    search: (e: KeyboardEvent) => isKey(e, constants.keyCodes.help),
+    help: (e: KeyboardEvent) => isKey(e, constants.keyCodes.help, { shift: true }),
   },
 
   // 2. Search Bar
@@ -196,6 +199,10 @@ export const shortcuts = {
     edit: (e: KeyboardEvent) => isKey(e, constants.keyCodes.edit, { ctrl: true }),
     editIdeas: (e: KeyboardEvent) => isKey(e, constants.keyCodes.ideas, { ctrl: true }),
     editPiles: (e: KeyboardEvent) => isKey(e, constants.keyCodes.piles, { ctrl: true }),
+    next: (e: KeyboardEvent) => isKey(e, constants.keyCodes.listNext),
+    prev: (e: KeyboardEvent) => isKey(e, constants.keyCodes.listPrev),
+    open: (e: KeyboardEvent) => isKey(e, constants.keyCodes.listOpen),
+    editKey: (e: KeyboardEvent) => isKey(e, constants.keyCodes.edit),
   },
 
   // 5. Note Editing

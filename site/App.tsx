@@ -432,6 +432,18 @@ function AppWithKeyboard() {
         return true
       }
 
+      // ? also toggles help
+      if (shortcuts.global.help(event)) {
+        setHelpOpen((prev: any) => !prev)
+        return true
+      }
+
+      // / opens search
+      if (shortcuts.global.search(event)) {
+        appRef.current.setState({ barOpen: true })
+        return true
+      }
+
       // 1.1 Search Bar Toggle (Ctrl+O)
       if (shortcuts.global.toggleSearchBar(event)) {
         appRef.current.setState((state: any) => ({ barOpen: !state.barOpen }))

@@ -69,6 +69,10 @@ export const keyCodes = {
   reviewFast: 49, // 1
   reviewMed: 50, // 2
   reviewSlow: 51, // 3
+  // Note list navigation: j/k/o with no modifier (e reuses `edit`)
+  listNext: 74, // j
+  listPrev: 75, // k
+  listOpen: 79, // o
   // Flip navigation: n/p with no modifier
   flipNext: 78, // n
   flipPrev: 80, // p

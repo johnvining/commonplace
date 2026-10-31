@@ -23,8 +23,8 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
     sections.push({
       title: 'Global',
       shortcuts: [
-        { key: 'Ctrl+O', action: 'Toggle search bar' },
-        { key: 'Ctrl+/', action: 'Toggle this help' },
+        { key: '/ or Ctrl+O', action: 'Search' },
+        { key: '? or Ctrl+/', action: 'Toggle this help' },
         { key: 'Ctrl+Shift+1', action: 'Full view' },
         { key: 'Ctrl+Shift+2', action: 'Slim view' },
         { key: 'Ctrl+Shift+3', action: 'Grid view' },
@@ -68,8 +68,11 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
       sections.push({
         title: 'Note List (Full View)',
         shortcuts: [
+          { key: 'j / k', action: 'Next / previous note' },
           { key: 'Enter', action: 'Select focused note' },
           { key: 'Escape', action: 'Deselect note' },
+          { key: 'e', action: 'Edit note' },
+          { key: 'o', action: 'Open note' },
           { key: 'Ctrl+E', action: 'Edit note' },
           { key: 'Ctrl+T', action: 'Edit tags/ideas' },
           { key: 'Ctrl+P', action: 'Edit piles' },
@@ -142,7 +145,7 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
       <div className="help-overlay-content" onClick={(e: any) => e.stopPropagation()}>
         <div className="help-overlay-header">
           <h2>Keyboard Shortcuts</h2>
-          <span className="help-overlay-hint">Press Ctrl+/ or Escape or click outside to close</span>
+          <span className="help-overlay-hint">? or Esc to close</span>
         </div>
         <div className="help-overlay-sections">
           {sections.map((section: any) => (

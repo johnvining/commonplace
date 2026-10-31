@@ -3201,6 +3201,7 @@ div .top-bar {
 
 .note-full.outer {
   position: relative;
+  scroll-margin: 56px 0 16px;
   margin: 0;
   padding: 12px 12px 12px 14px;
   border: none;
