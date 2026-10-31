@@ -28,10 +28,11 @@
   --background-color: #fbfbfa;
   --font-color: var(--ink);
   --link-color: var(--ink);
-  // Opaque: dropdowns, the login box and search boxes paint with these.
+  // Opaque: dropdowns, the login box and search boxes paint with this.
   // Note rows set their own transparent background below.
   --note-background: var(--surface);
-  --note-background-not-selected: var(--surface);
+  // Only note rows use this (the others while one is selected): flat.
+  --note-background-not-selected: transparent;
   --note-background-edit: var(--surface);
   --note-border: var(--hairline);
   --note-border-focused: var(--hairline);

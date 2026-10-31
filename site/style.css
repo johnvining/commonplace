@@ -2939,7 +2939,7 @@ mark.search-highlight {
   --font-color: var(--ink);
   --link-color: var(--ink);
   --note-background: var(--surface);
-  --note-background-not-selected: var(--surface);
+  --note-background-not-selected: transparent;
   --note-background-edit: var(--surface);
   --note-border: var(--hairline);
   --note-border-focused: var(--hairline);
