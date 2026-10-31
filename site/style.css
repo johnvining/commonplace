@@ -3958,4 +3958,24 @@ mark.search-highlight {
   margin-bottom: 4px;
 }
 
+.instant-tip {
+  position: fixed;
+  z-index: 10000;
+  transform: translateX(-50%);
+  max-width: 320px;
+  padding: 3px 7px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+  color: var(--background-color);
+  background: var(--ink);
+  border-radius: 3px;
+  pointer-events: none;
+  white-space: normal;
+  text-align: center;
+}
+.instant-tip.above {
+  transform: translate(-50%, -100%);
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -1284,3 +1284,26 @@ mark.search-highlight {
   color: var(--faint);
   margin-bottom: 4px;
 }
+
+// ---- Instant tooltips (InstantTooltip.tsx) -------------------------------------------
+
+.instant-tip {
+  position: fixed;
+  z-index: 10000; // over the lightbox
+  transform: translateX(-50%);
+  max-width: 320px;
+  padding: 3px 7px;
+  font-family: $main_font;
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+  color: var(--background-color);
+  background: var(--ink);
+  border-radius: 3px;
+  pointer-events: none;
+  white-space: normal;
+  text-align: center;
+
+  &.above {
+    transform: translate(-50%, -100%);
+  }
+}

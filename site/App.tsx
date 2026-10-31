@@ -2,6 +2,7 @@ import { createNewNoteFromTitle, getAuthStatus, logout } from './Database'
 import { createRoot } from 'react-dom/client'
 import { applyTheme, getTheme } from './theme'
 import ThemeToggle from './ThemeToggle'
+import InstantTooltip from './InstantTooltip'
 import { Routes, Route, Link, BrowserRouter, useNavigate } from 'react-router-dom'
 import plus from 'url:./icons/plus.svg'
 import React, { Suspense } from 'react'
@@ -141,6 +142,7 @@ class App extends React.Component<any, any> {
     let environment = process.env.NODE_ENV
     return (
       <ErrorBoundary>
+      <InstantTooltip />
       <div className="main">
         <div className="top-bar">
           <div className="title-bar">
