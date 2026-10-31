@@ -76,15 +76,26 @@ export const unpinItem = (type: EntityType, id: EntityId): void => {
   db.deletePin(type, String(id)).catch(syncPinned)
 }
 
-// Replace this browser's copy with the server's list. The first time, if
-// the server has none but this browser does (stars from before they were
-// stored on the server), upload them.
+// Set once this browser's pre-server stars have been merged in.
+const IMPORTED_KEY = 'pinned-items-imported'
+
+// Replace this browser's copy with the server's list. The first sync in
+// each browser first merges in the stars it kept from before they were
+// stored on the server, so stars from several browsers all carry over;
+// after that the server's list wins, so an unstar on one device sticks.
 export async function syncPinned(): Promise<void> {
   const startedAt = localVersion
   try {
-    let items: PinnedItem[] = await db.getPins()
+    let imported = false
+    try {
+      imported = localStorage.getItem(IMPORTED_KEY) === '1'
+    } catch {}
     const local = getPinnedItems()
-    if (!items.length && local.length) items = await db.importPins(local)
+    const items: PinnedItem[] =
+      !imported && local.length ? await db.importPins(local) : await db.getPins()
+    try {
+      localStorage.setItem(IMPORTED_KEY, '1')
+    } catch {}
     // Starred or unstarred something meanwhile: the local copy is newer.
     if (localVersion !== startedAt) return
     writeStorage(items)
