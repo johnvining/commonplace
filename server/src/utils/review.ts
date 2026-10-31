@@ -6,10 +6,11 @@
 // - reviewInterval: days between reviewedAt and reviewDueAt,
 // - reviewEase: how fast the interval grows when it's rated "slow",
 // - reviewCount: how many times it has been rated,
-// - seenAt / seenCount: the last time, and how often, it was loaded
-//   anywhere (see utils/seen.ts), rated or not.
-// Only a rating moves these: editing a note (updatedAt) or seeing it
-// doesn't. A note is reviewed once reviewCount > 0. Don't go by
+// - lastOpenedAt: when its own page was last opened (with openCount; see
+//   recordOpened), which the deck uses to lean toward notes not looked at
+//   lately.
+// Only a rating moves the review fields: editing a note (updatedAt) or
+// opening it doesn't. A note is reviewed once reviewCount > 0. Don't go by
 // reviewedAt alone: an earlier version set it on edits too, so older
 // notes can have one without ever being rated.
 
@@ -34,7 +35,7 @@ export interface ReviewState {
   reviewInterval?: number | null
   reviewEase?: number | null
   reviewCount?: number | null
-  seenAt?: Date | null
+  lastOpenedAt?: Date | null
 }
 
 export interface ReviewUpdate {
@@ -97,15 +98,15 @@ export function reviewPriority(state: ReviewState, now = new Date()): number {
   return (now.getTime() - reviewed) / span
 }
 
-// How long since the card was last seen, as 0 (just now) to 1 (never, or
-// at least STALE_DAYS ago).
+// How long since the note was last opened, as 0 (just now) to 1 (never,
+// or at least STALE_DAYS ago).
 const STALE_DAYS = 30
 export function staleness(state: ReviewState, now = new Date()): number {
-  if (!state.seenAt) return 1
-  const days = (now.getTime() - new Date(state.seenAt).getTime()) / DAY
+  if (!state.lastOpenedAt) return 1
+  const days = (now.getTime() - new Date(state.lastOpenedAt).getTime()) / DAY
   return Math.min(1, Math.max(0, days / STALE_DAYS))
 }
-// How much an unseen (or long-unseen) card is preferred: a reviewed
+// How much a never (or long-ago) opened card is preferred: a reviewed
 // card's priority is scaled by up to 1 + SEEN_BOOST, and a never-reviewed
 // card gets up to SEEN_BOOST added to its random draw in [0, 1).
 const SEEN_BOOST = 0.3
@@ -121,7 +122,7 @@ const JITTER = 0.35
 
 // Picks a deck of `size` from the reviewed cards (ranked by jittered
 // priority, highest first) and the never-reviewed cards (random, leaning
-// toward ones not seen lately), then shuffles the two together.
+// toward ones not opened lately), then shuffles the two together.
 export function buildDeck<T extends ReviewState>(
   reviewed: T[],
   unreviewed: T[],

@@ -23,8 +23,6 @@ export interface NoteDoc {
   reviewInterval?: number
   reviewEase?: number
   reviewCount?: number
-  seenAt?: Date
-  seenCount?: number
   embedding: number[]
   embeddingHash?: string
   createdAt: Date
@@ -64,9 +62,6 @@ const noteSchema = new Schema<NoteDoc>(
     reviewInterval: Number,
     reviewEase: Number,
     reviewCount: { type: Number, default: 0 },
-    // Last time, and how often, it was loaded anywhere; see utils/seen.ts.
-    seenAt: Date,
-    seenCount: { type: Number, default: 0 },
     embedding: [Number],
     embeddingHash: String,
   },

@@ -51,9 +51,7 @@ function dateLabel(date: string, now: number) {
 }
 
 // Where the card stands, shown above it: when it was created and last
-// edited, last reviewed and due, and last seen before now. The deck
-// carries the seen time from before it was dealt, so dealing it doesn't
-// count.
+// edited, last reviewed and due, and last opened on its own page.
 function cardStatus(note: any) {
   const now = Date.now()
   const ago = (date: string) => dateLabel(date, now)
@@ -68,17 +66,17 @@ function cardStatus(note: any) {
     if (note.reviewDueAt) parts.push(`due ${ago(note.reviewDueAt)}`)
   }
   parts.push(
-    note.seenAt
-      ? `seen ${ago(note.seenAt)} (${note.seenCount || 0}×)`
-      : 'never seen'
+    note.lastOpenedAt
+      ? `opened ${ago(note.lastOpenedAt)} (${note.openCount || 0}×)`
+      : 'never opened'
   )
   return parts.join(' · ')
 }
 
 // Flip: review notes one at a time, Anki-style. Each card is rated by
 // how soon to see it again (fast / med / slow); the server schedules it
-// and deals the next deck. Only a rating counts as a review; the server
-// counts every note it loads, decks included, as seen. n and p step
+// and deals the next deck. Only a rating counts as a review, and only
+// opening a note's own page counts as opening it. n and p step
 // through the deck without rating. Each card starts selected, so Ctrl+E
 // edits it right away.
 function FlipList(props: any) {

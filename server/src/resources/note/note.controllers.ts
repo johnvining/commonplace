@@ -25,7 +25,6 @@ import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
 import type { Request, Response } from 'express'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { isValidObjectId } from 'mongoose'
-import { markSeen } from '../../utils/seen.js'
 import {
   NEVER_REVIEWED,
   RATINGS,
@@ -128,7 +127,7 @@ async function attachNicks(notes: PopulatedNote[]) {
 
 export const reqFindNotesByString = async (req: Request, res: Response) => {
   const notes = await keywordSearchNotes(req.body.searchString, 200)
-  await Promise.all([attachNicks(notes), markSeen(notes)])
+  await attachNicks(notes)
   return notes
 }
 
@@ -195,7 +194,7 @@ export const reqGetEarliestNotesToFile = async (req: Request, res: Response) => 
 // through their interval they are (with some randomness), and a share of
 // never-reviewed notes is mixed in; see utils/review.ts.
 export const reqGetRandomNotes = async (req: Request, res: Response) => {
-  const reviewFields = { reviewedAt: 1, reviewDueAt: 1, reviewCount: 1, seenAt: 1 }
+  const reviewFields = { reviewedAt: 1, reviewDueAt: 1, reviewCount: 1, lastOpenedAt: 1 }
   const [reviewed, unreviewed] = await Promise.all([
     Note.find(REVIEWED, reviewFields).lean().exec(),
     // Sampled rather than loaded whole: there can be a lot of them. The
@@ -824,7 +823,6 @@ export const reqUnifiedSearch = async (req: Request, res: Response) => {
     Idea.find(byName).lean().exec(),
     Pile.find(byName).lean().exec(),
   ])
-  await markSeen(notes)
 
   interface SearchResult {
     type: 'note' | 'auth' | 'work' | 'idea' | 'pile'
@@ -941,9 +939,6 @@ export const findNotesAndPopulate = async function (
   notes.forEach((note) => {
     note.nick = nickMap[String(note._id)] || null
   })
-
-  // Slim lookups are internal (cascade deletes and the like), not loads.
-  if (!slim) await markSeen(notes)
 
   return notes
 }

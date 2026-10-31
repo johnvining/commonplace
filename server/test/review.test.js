@@ -67,8 +67,8 @@ describe('buildDeck', () => {
 
   it('leans toward cards not seen lately', () => {
     expect(staleness({}, now)).toBe(1)
-    expect(staleness({ seenAt: ago(15) }, now)).toBe(0.5)
-    const seen = { id: 'seen', seenAt: ago(0) }
+    expect(staleness({ lastOpenedAt: ago(15) }, now)).toBe(0.5)
+    const seen = { id: 'seen', lastOpenedAt: ago(0) }
     const unseen = { id: 'unseen' }
     expect(buildDeck([], [seen, unseen], 1, now, half)[0].id).toBe('unseen')
   })
@@ -94,20 +94,20 @@ describe('review endpoints', () => {
     await agent.put(`/api/note/${note._id}`).send({ reviewedAt: new Date() }).expect(400)
   })
 
-  it('counts every load as seen, without reviewing or touching updatedAt', async () => {
+  it('counts only opening a note, not loading it in lists or decks', async () => {
     const agent = await authedAgent()
     const note = await createNote(agent, { title: 'card' })
-    const first = (await agent.get(`/api/note/${note._id}`).expect(200)).body.data[0]
-    expect(first.seenAt).toBeUndefined()
+    await agent.get(`/api/note/${note._id}`).expect(200)
     await agent.get('/api/note/all/1').expect(200)
-    const deck = (await agent.get('/api/note/flip').expect(200)).body.data
-    // The deck carries the seen time from before it was dealt.
-    expect(deck[0].seenCount).toBe(2)
-    const after = await Note.findById(note._id).lean()
-    expect(after.seenCount).toBe(3)
-    expect(after.seenAt).toBeTruthy()
+    await agent.get('/api/note/flip').expect(200)
+    let after = await Note.findById(note._id).lean()
+    expect(after.openCount ?? 0).toBe(0)
+    expect(after.lastOpenedAt).toBeUndefined()
+    await agent.post(`/api/note/${note._id}/opened`).expect(200)
+    after = await Note.findById(note._id).lean()
+    expect(after.openCount).toBe(1)
+    expect(after.lastOpenedAt).toBeTruthy()
     expect(after.reviewedAt).toBeUndefined()
-    expect(after.updatedAt.toISOString()).toBe(note.updatedAt)
   })
 
   it('leaves the review schedule alone when the note is edited', async () => {
