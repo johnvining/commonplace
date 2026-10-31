@@ -3,6 +3,8 @@ import Work from '../work/work.model.js'
 import Idea from '../idea/idea.model.js'
 import Pile from '../pile/pile.model.js'
 import { runOcrBacklog } from '../../utils/ocrBacklog.js'
+import Note from '../note/note.model.js'
+import { cleanOcrText } from '../../utils/ocrText.js'
 
 export interface TaskContext {
   dryRun: boolean
@@ -91,7 +93,34 @@ const ocrBacklog: MaintenanceTask = {
   },
 }
 
+const clearOcrRefusals: MaintenanceTask = {
+  id: 'clear-ocr-refusals',
+  title: 'Clear "can\'t transcribe" text from image notes',
+  issue: 0,
+  description:
+    'Reading an image with no text (a photo, a painting) used to save the ' +
+    'apology as the note\'s text: "Sorry, I can\'t transcribe the text from ' +
+    'this image." Clears that text (and its OCR copy) on image notes. Only ' +
+    'text that is nothing but such an apology is touched. Dry run lists them.',
+  async run({ dryRun, log }) {
+    const candidates = await Note.find(
+      { 'images.0': { $exists: true }, text: { $regex: /transcri|text|NO_TEXT/i } },
+      { text: 1, title: 1 }
+    ).lean()
+    const refusals = candidates.filter((n) => n.text?.trim() && cleanOcrText(n.text) === '')
+    for (const n of refusals) log(`  ${n._id} ${n.title ?? '(no title)'}: "${n.text?.trim().slice(0, 70)}"`)
+    if (!dryRun && refusals.length) {
+      await Note.updateMany(
+        { _id: { $in: refusals.map((n) => n._id) } },
+        { $set: { text: '', ocrText: '' } },
+        { timestamps: false }
+      )
+    }
+    log(`${dryRun ? 'would clear' : 'cleared'} ${refusals.length} of ${candidates.length} image notes checked`)
+  },
+}
+
 // In the order they should be run.
-export const TASKS: MaintenanceTask[] = [trimEntityNames, addWorkIdeas, ocrBacklog]
+export const TASKS: MaintenanceTask[] = [trimEntityNames, addWorkIdeas, ocrBacklog, clearOcrRefusals]
 
 export const findTask = (id: string) => TASKS.find((t) => t.id === id)

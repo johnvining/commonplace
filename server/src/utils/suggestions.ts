@@ -1,4 +1,5 @@
 import config from '../config'
+import { NO_TEXT, cleanOcrText } from './ocrText.js'
 import fs from 'fs'
 
 import OpenAI from 'openai'
@@ -87,7 +88,10 @@ export const getOpenAiOCR = async function (
         content: [
           {
             type: 'text',
-            text: 'Transcribe the text in this image and only include semantically important line breaks. Return just the text without any additional punctuation or markdown.',
+            text:
+              'Transcribe the text in this image and only include semantically important line breaks. ' +
+              'Return just the text without any additional punctuation or markdown. ' +
+              `If the image has no text to transcribe (a photo, a painting), reply with exactly ${NO_TEXT}.`,
           },
           {
             type: 'image_url',
@@ -102,5 +106,6 @@ export const getOpenAiOCR = async function (
     max_tokens: 1200,
   })
 
-  return chatCompletion.choices[0].message.content
+  // '' when the image has no text (see ocrText.ts).
+  return cleanOcrText(chatCompletion.choices[0].message.content)
 }

@@ -23,8 +23,13 @@ On the Pi, run those inside the server container:
 
 ## Pending
 
-Nothing pending. The batch deployed on 2026-10-16 ran trim-entity-names,
-add-work-ideas and ocr-backlog; the Maintenance page shows their output.
+- **clear-ocr-refusals**: clears "Sorry, I can't transcribe the text from
+  this image"-style text that OCR saved on image notes with no text (photos,
+  paintings). Only text that is nothing but such an apology is touched; dry
+  run lists the notes first.
+
+The batch deployed on 2026-10-16 ran trim-entity-names, add-work-ideas and
+ocr-backlog; the Maintenance page shows their output.
 
 New tasks are added to `server/src/resources/maintenance/tasks.ts` and
 listed here.

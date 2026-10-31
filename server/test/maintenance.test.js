@@ -36,7 +36,7 @@ describe('maintenance tasks', () => {
   it('lists tasks in run order, all pending at first', async () => {
     const agent = await authedAgent()
     const res = await agent.get('/api/maintenance/').expect(200)
-    expect(res.body.data.map((t) => t.id)).toEqual(['trim-entity-names', 'add-work-ideas', 'ocr-backlog'])
+    expect(res.body.data.map((t) => t.id)).toEqual(['trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals'])
     expect(res.body.data.every((t) => t.pending && t.lastRun === null)).toBe(true)
   })
 
@@ -85,6 +85,24 @@ describe('maintenance tasks', () => {
     expect(real.status).toBe('done')
     expect((await models.Note.collection.findOne({ title: 'blank' })).text).toBe('read from image')
     expect((await models.Note.collection.findOne({ title: 'typed' })).text).toBe('mine')
+  })
+
+  it('clears OCR apologies from image notes, and nothing else', async () => {
+    const agent = await authedAgent()
+    await models.Note.collection.insertMany([
+      { title: 'painting', text: "Sorry, I can't transcribe the text from this image.", images: ['x/1-a.jpg'] },
+      { title: 'photo', text: 'I cannot transcribe the text from the image you provided.', images: ['x/1-b.jpg'] },
+      { title: 'real', text: 'Sorry for the delay, the text of the letter follows.\n\n' + 'Dear sir. '.repeat(40), images: ['x/1-c.jpg'] },
+      { title: 'typed', text: 'no visible text here, said nobody', images: [] },
+    ])
+    const dry = await runJob(agent, 'clear-ocr-refusals', true)
+    expect(dry.output.at(-1)).toMatch(/^would clear 2 of/)
+    expect((await models.Note.collection.findOne({ title: 'painting' })).text).toMatch(/^Sorry/)
+    await runJob(agent, 'clear-ocr-refusals', false)
+    expect((await models.Note.collection.findOne({ title: 'painting' })).text).toBe('')
+    expect((await models.Note.collection.findOne({ title: 'photo' })).text).toBe('')
+    expect((await models.Note.collection.findOne({ title: 'real' })).text).toMatch(/^Sorry for the delay/)
+    expect((await models.Note.collection.findOne({ title: 'typed' })).text).toMatch(/^no visible/)
   })
 
   it('404s for unknown tasks and jobs', async () => {

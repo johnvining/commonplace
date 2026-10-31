@@ -535,15 +535,14 @@ export const reqOcrForNote = async (req: Request, res: Response) => {
   const note = await Note.findOne({ _id: req.params.id })
   if (!note) return ''
 
-  let result = ''
+  // '' when none of the images has text.
+  const texts: string[] = []
   // TODO: Serial await
   for (let i = 0; i < note.images.length; i++) {
-    result +=
-      (await getOpenAiOCR(config.imageStorePath + '/' + note.images[i])) +
-      '\n\n'
+    texts.push((await getOpenAiOCR(config.imageStorePath + '/' + note.images[i])) ?? '')
   }
 
-  return result
+  return texts.filter((t) => t.trim()).join('\n\n')
 }
 
 // Cap on bulk operations — prevents a runaway request from creating a million
@@ -602,7 +601,10 @@ export const reqBulkOcrForNotes = async (req: Request, res: Response) => {
         )
 
         const imageResults = await Promise.all(imagePromises)
-        const ocrText = imageResults.join('\n\n').trim()
+        const ocrText = imageResults.filter((t) => t?.trim()).join('\n\n').trim()
+        if (!ocrText) {
+          return { noteId, success: true, textUpdated: false, reason: 'No text in the images' }
+        }
 
         await Note.updateOne({ _id: noteId }, { $set: { text: ocrText } })
 

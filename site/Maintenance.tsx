@@ -114,7 +114,7 @@ function Maintenance(props: any) {
               <div>
                 <div className="maintenance-task-title">{task.title}</div>
                 <div className="maintenance-task-status">
-                  #{task.issue} ·{' '}
+                  {task.issue ? `#${task.issue} · ` : null}
                   {task.lastRun
                     ? `${task.lastRun.ok ? 'Ran' : 'Failed'} ${new Date(task.lastRun.finishedAt).toLocaleString()}`
                     : 'Not run yet'}

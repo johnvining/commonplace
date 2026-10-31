@@ -538,6 +538,12 @@ class Note extends React.Component<any, any> {
     this.setState({ fetchingOcr: true })
     db.getNoteTextOCR(this.props.id).then((response: any) => {
       const newText = response.data.data
+      // Images with no text (photos, paintings) leave the text alone.
+      if (!newText?.trim()) {
+        this.setState({ fetchingOcr: false })
+        showToast({ kind: 'info', message: 'No text found in the images' })
+        return
+      }
       this.setState({
         pendingText: newText,
         fetchingOcr: false,
