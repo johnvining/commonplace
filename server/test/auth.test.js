@@ -48,6 +48,14 @@ describe('auth (authors)', () => {
       await agent.delete(`/api/auth/${author._id}/delete`).expect(204)
       await agent.get(`/api/auth/${author._id}`).expect(400)
     })
+
+    // The site deletes with DELETE /:id, like works and piles.
+    it('deletes the author at DELETE /api/auth/:id', async () => {
+      const agent = await authedAgent()
+      const author = await createAuthor(agent, 'Doomed')
+      await agent.delete(`/api/auth/${author._id}`).expect(204)
+      await agent.get(`/api/auth/${author._id}`).expect(400)
+    })
   })
 
   describe('POST /api/auth/autocomplete', () => {

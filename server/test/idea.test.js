@@ -48,6 +48,14 @@ describe('idea', () => {
       await agent.delete(`/api/idea/${idea._id}/delete`).expect(204)
       await agent.get(`/api/idea/${idea._id}`).expect(400)
     })
+
+    // The site deletes with DELETE /:id, like works and piles.
+    it('deletes the idea at DELETE /api/idea/:id', async () => {
+      const agent = await authedAgent()
+      const idea = await createIdea(agent, 'Doomed')
+      await agent.delete(`/api/idea/${idea._id}`).expect(204)
+      await agent.get(`/api/idea/${idea._id}`).expect(400)
+    })
   })
 
   describe('POST /api/idea/autocomplete', () => {
