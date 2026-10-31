@@ -1,4 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useKeyboardShortcuts } from './KeyboardContext'
 import * as db from './Database'
 import { titleWithNick } from './utils'
 import * as constants from './constants'
@@ -317,6 +318,23 @@ function Work(props: any) {
       setEditPiles(true)
     },
     onToggleStar: toggleStar,
+    onEditIdeas: () => {
+      setEdit(false)
+      setEditPiles(false)
+      setEditIdeas(true)
+    },
+    onDelete: deleteWork,
+    onRead: () => navigate('/read/' + id),
+    onImport: () => setImportMode(!importMode),
+    onUploadImages: () =>
+      (document.querySelector('.top-level-toolbar input[type=file]') as HTMLInputElement | null)?.click(),
+  })
+
+  // Ctrl+Enter finishes an import, even while typing in its text box.
+  useKeyboardShortcuts(constants.keyboardScopes.ENTITY_EDIT, (event: any) => {
+    if (!importMode || !(event.ctrlKey && event.keyCode === constants.keyCodes.enter)) return false
+    handleImport()
+    return true
   })
 
   props.setPageTitle(titleWithNick(pending.name, nick))
@@ -488,17 +506,19 @@ function Work(props: any) {
                     />
                     <TopLevelStandardButton
                       name="Ideas"
+                      shortcut="Ctrl+T"
                       onClick={() => {
                         setEdit(false)
                         setEditPiles(false)
                         setEditIdeas(true)
                       }}
                     />
-                    <TopLevelStandardButton name="Delete" onClick={deleteWork} />
+                    <TopLevelStandardButton name="Delete" shortcut="#" onClick={deleteWork} />
                   </TopLevelStandardButtonContainer>
                   <TopLevelStandardButtonContainer className="top-level-toolbar">
                     <TopLevelStandardButton
                       name="Read"
+                      shortcut="r"
                       onClick={() => {
                         navigate('/read/' + id)
                       }}
@@ -512,9 +532,11 @@ function Work(props: any) {
                       onImagesUpload={createNotesForWorkFromImages}
                       allowMultiple={true}
                       buttonClassName="button left-right"
+                      shortcut="Ctrl+U"
                     />
                     <TopLevelStandardButton
                       name="Import"
+                      shortcut="i"
                       onClick={() => {
                         setImportMode(!importMode)
                       }}
@@ -573,7 +595,7 @@ function Work(props: any) {
             }}
           />
           <TopLevelStandardButtonContainer>
-            <TopLevelStandardButton name="Done" onClick={handleImport} />
+            <TopLevelStandardButton name="Done" shortcut="Ctrl+Enter" onClick={handleImport} />
           </TopLevelStandardButtonContainer>
         </TopLevelFormContainer>
       ) : (

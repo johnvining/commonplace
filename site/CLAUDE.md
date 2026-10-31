@@ -63,6 +63,7 @@ Most specific (highest priority) to least specific:
 | `[` / `]` | Previous / next page | NOTE_LIST |
 | `y` / `m` / `z` / `#` | Copy nick / show more / zoom image / delete | NOTE_SELECTED |
 | `Ctrl+U` / `Ctrl+M` | Upload images / fewer-all fields | NOTE_EDIT |
+| `v` `f` `r` `i` `b` `#`, `Ctrl+T` `Ctrl+U` | Entity page buttons (view notes, narrow, read, import, back, delete, ideas, upload) | ENTITY_PAGE |
 | `j` / `k` | Next / previous note | NOTE_LIST |
 | `e` / `o` | Edit / open selected note (Enter on a selected note opens it too) | NOTE_LIST |
 | `Ctrl+Shift+1-4` | View modes | GLOBAL |

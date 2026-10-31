@@ -9,6 +9,15 @@ interface EntityKeyboardShortcutsOptions {
   onNewNote?: () => unknown
   onEditPiles?: () => void
   onToggleStar?: () => void
+  // Single keys for the rest of an entity page's buttons (Section 3.1)
+  onEditIdeas?: () => void
+  onDelete?: () => unknown
+  onViewNotes?: () => void
+  onNarrow?: () => void
+  onRead?: () => void
+  onImport?: () => void
+  onUploadImages?: () => void
+  onBack?: () => void
 }
 
 // Shared keyboard shortcuts for entity pages (Work, Pile, Idea, Read)
@@ -21,6 +30,7 @@ export function useEntityKeyboardShortcuts({
   onNewNote,
   onEditPiles,
   onToggleStar,
+  ...more
 }: EntityKeyboardShortcutsOptions) {
   // Entity edit mode shortcuts (Section 3.1)
   useKeyboardShortcuts(
@@ -76,6 +86,25 @@ export function useEntityKeyboardShortcuts({
         return true
       }
 
+      // The other buttons: # delete, Ctrl+T ideas, v notes, f narrow,
+      // r read, i import, Ctrl+U upload images, b back.
+      const extra: [(e: KeyboardEvent) => boolean, (() => unknown) | undefined][] = [
+        [shortcuts.entity.delete, more.onDelete],
+        [shortcuts.entity.editIdeas, more.onEditIdeas],
+        [shortcuts.entity.viewNotes, more.onViewNotes],
+        [shortcuts.entity.narrow, more.onNarrow],
+        [shortcuts.entity.read, more.onRead],
+        [shortcuts.entity.importNotes, more.onImport],
+        [shortcuts.entity.uploadImages, more.onUploadImages],
+        [shortcuts.entity.back, more.onBack],
+      ]
+      for (const [matches, run] of extra) {
+        if (run && matches(event)) {
+          run()
+          return true
+        }
+      }
+
       // Escape: Exit any mode (piles edit, etc.)
       if (shortcuts.entity.exitEdit(event) && onExitEdit) {
         onExitEdit()
@@ -84,6 +113,6 @@ export function useEntityKeyboardShortcuts({
 
       return false
     },
-    [isEditing, onEdit, onNewNote, onEditPiles, onToggleStar, onExitEdit]
+    [isEditing, onEdit, onNewNote, onEditPiles, onToggleStar, onExitEdit, more]
   )
 }

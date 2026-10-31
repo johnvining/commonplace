@@ -132,6 +132,9 @@ function Pile(props: any) {
     onExitEdit: editor.cancel,
     onNewNote: createNoteForPile,
     onToggleStar: toggleStar,
+    onDelete: handleDeletePile,
+    onViewNotes: () => navigate(props.showNotes ? '/pile/' + id : '/pile/' + id + '/notes'),
+    onNarrow: () => navigate('/filter?piles=' + id),
   })
 
   props.setPageTitle(titleWithNick(pending.name, nick))
@@ -212,6 +215,7 @@ function Pile(props: any) {
                 {!props.showNotes ? (
                   <TopLevelStandardButton
                     name="View notes"
+                    shortcut="v"
                     onClick={() => {
                       navigate('/pile/' + id + '/notes')
                     }}
@@ -219,6 +223,7 @@ function Pile(props: any) {
                 ) : (
                   <TopLevelStandardButton
                     name="View all"
+                    shortcut="v"
                     onClick={() => {
                       navigate('/pile/' + id)
                     }}
@@ -226,10 +231,12 @@ function Pile(props: any) {
                 )}
                 <TopLevelStandardButton
                   name="Narrow"
+                  shortcut="f"
                   onClick={() => navigate('/filter?piles=' + id)}
                 />
                 <TopLevelStandardButton
                   name="Delete"
+                  shortcut="#"
                   onClick={handleDeletePile}
                 />
               </TopLevelStandardButtonContainer>

@@ -57,6 +57,13 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
           { key: 'Ctrl+S', action: 'Star / unstar' },
           { key: 'Ctrl+N', action: 'Create new note' },
           { key: 'Ctrl+P', action: 'Edit piles' },
+          { key: 'Ctrl+T', action: 'Edit ideas (work)' },
+          { key: 'v', action: 'View notes / all' },
+          { key: 'f', action: 'Narrow (filter)' },
+          { key: 'r / i', action: 'Read / import (work)' },
+          { key: 'Ctrl+U', action: 'Upload images (work)' },
+          { key: 'b', action: 'Back to author' },
+          { key: '#', action: 'Delete (asks first)' },
           { key: 'Escape', action: 'Exit edit mode' },
         ],
       })

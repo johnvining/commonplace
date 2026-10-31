@@ -118,6 +118,8 @@ function Author(props: any) {
     onSave: handleAcceptUpdates,
     onExitEdit: editor.cancel,
     onToggleStar: () => id && togglePinned({ type: 'auth', id, label: pending.name, href: `/auth/${id}` }),
+    onDelete: () => deleteAuthor(),
+    onViewNotes: () => navigate(`/auth/${id}/notes`),
   })
 
   const deleteAuthor = async () => {
@@ -209,9 +211,10 @@ function Author(props: any) {
                 />
                 <TopLevelStandardButton
                   name="Show Notes"
+                  shortcut="v"
                   onClick={() => navigate(`/auth/${id}/notes`)}
                 />
-                <TopLevelStandardButton name="Delete" onClick={deleteAuthor} />
+                <TopLevelStandardButton name="Delete" shortcut="#" onClick={deleteAuthor} />
               </TopLevelStandardButtonContainer>
             </div>
           </div>

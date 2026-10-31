@@ -12,6 +12,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
+import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 
 function AuthorNotes(props: any) {
   const { id = '' } = useParams()
@@ -35,6 +36,8 @@ function AuthorNotes(props: any) {
     fetchAuthorInfo(id)
   }, [id])
 
+  useEntityKeyboardShortcuts({ onBack: () => navigate(`/auth/${id}`) })
+
   props.setPageTitle(`${authorName} - Notes`)
 
   return (
@@ -47,6 +50,7 @@ function AuthorNotes(props: any) {
       <TopLevelStandardButtonContainer>
         <TopLevelStandardButton
           name="Back to Author"
+          shortcut="b"
           onClick={() => navigate(`/auth/${id}`)}
         />
       </TopLevelStandardButtonContainer>

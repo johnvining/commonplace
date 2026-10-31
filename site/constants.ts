@@ -83,6 +83,12 @@ export const keyCodes = {
   zoom: 90, // z
   deleteKey: 51, // 3, with Shift: #
   upload: 85, // u (Ctrl+U in edit mode)
+  // Entity pages (single keys, not while editing)
+  viewNotes: 86, // v
+  narrow: 70, // f (filter)
+  read: 82, // r
+  importNotes: 73, // i
+  back: 66, // b
   // List paging
   prevPage: 219, // [
   nextPage: 221, // ]

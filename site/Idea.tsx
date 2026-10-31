@@ -119,6 +119,8 @@ function Idea(props: any) {
     onExitEdit: editor.cancel,
     onNewNote: createNoteForIdea,
     onToggleStar: toggleStar,
+    onDelete: deleteIdea,
+    onNarrow: () => navigate('/filter?ideas=' + id),
   })
 
   props.setPageTitle(titleWithNick(pending.name, nick))
@@ -209,9 +211,10 @@ function Idea(props: any) {
                 />
                 <TopLevelStandardButton
                   name="Narrow"
+                  shortcut="f"
                   onClick={() => navigate('/filter?ideas=' + id)}
                 />
-                <TopLevelStandardButton name="Delete" onClick={deleteIdea} />
+                <TopLevelStandardButton name="Delete" shortcut="#" onClick={deleteIdea} />
               </TopLevelStandardButtonContainer>
             </div>
           </div>

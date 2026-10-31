@@ -64,6 +64,8 @@ Active when the search bar is open.
 | `file` | Go to file list |
 | `slim` / `full` / `grid` / `tile` | Switch view mode |
 
+On the search results page, `[` / `]` page through results and `v` opens the notes among them for tagging.
+
 ---
 
 ## 3. Entity Pages
@@ -78,18 +80,25 @@ Available on all entity pages (Author, Work, Pile, Idea, Read).
 | `Ctrl+E` | Edit entity details |
 | `Ctrl+A` | Save changes (when editing) |
 | `Ctrl+S` | Star/unstar entity (when not editing) |
+| `#` | Delete the entity (asks first) |
 | `Escape` | Exit edit mode |
 
 ### 3.2 Author Page
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+S` | Star / unstar author |
+| `v` | Show the author's notes |
+| `b` | Back to the author (from their notes) |
 
 ### 3.3 Work Page
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+N` | Create new note for this work |
 | `Ctrl+P` | Edit piles |
+| `Ctrl+T` | Edit ideas |
+| `r` | Read |
+| `i` | Import notes (`Ctrl+Enter` finishes) |
+| `Ctrl+U` | Upload images as notes |
 
 ### 3.4 Read Page
 | Shortcut | Action |
@@ -100,10 +109,13 @@ Available on all entity pages (Author, Work, Pile, Idea, Read).
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+N` | Create new note in this pile |
+| `v` | View notes / view all |
+| `f` | Narrow (filter by this pile) |
 
 ### 3.6 Idea Page
 | Shortcut | Action |
 |----------|--------|
+| `f` | Narrow (filter by this idea) |
 | `Ctrl+N` | Create new note with this idea |
 
 ---

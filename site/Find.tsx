@@ -8,6 +8,7 @@ import AuthorList from './AuthorList'
 import PileList from './PileList'
 import React from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import { joinAuthorNames } from './authorsDisplay'
 import work_img from 'url:./icons/work.svg'
 import author_img from 'url:./icons/author.svg'
@@ -119,6 +120,26 @@ function Find(props: any) {
   const [page, setPage] = React.useState(1)
   const navigate = useNavigate()
   const resultsRef = React.useRef<HTMLDivElement>(null)
+
+  // Results page keys: [ / ] page through results, v opens the notes
+  // among them for tagging.
+  useKeyboardShortcuts(constants.keyboardScopes.ENTITY_PAGE, (event: any) => {
+    if (category || !results) return false
+    const totalPages = Math.ceil(results.length / PAGE_SIZE)
+    if (shortcuts.noteList.prevPage(event)) {
+      setPage((p) => Math.max(1, p - 1))
+      return true
+    }
+    if (shortcuts.noteList.nextPage(event)) {
+      setPage((p) => Math.min(totalPages, p + 1))
+      return true
+    }
+    if (shortcuts.entity.viewNotes(event) && results.some((r: any) => r.type === 'note')) {
+      navigate('/find/' + encodeURIComponent(search) + '/notes')
+      return true
+    }
+    return false
+  })
 
   // Start keyboard work on the first result when results arrive or the
   // page changes (#310).
@@ -244,6 +265,7 @@ function Find(props: any) {
             <TopLevelStandardButtonContainer>
               <TopLevelStandardButton
                 name="Tag notes in these results"
+                shortcut="v"
                 onClick={() => navigate('/find/' + encodeURIComponent(search) + '/notes')}
               />
             </TopLevelStandardButtonContainer>
@@ -258,6 +280,8 @@ function Find(props: any) {
             <TopLevelStandardButtonContainer>
               <TopLevelStandardButton
                 position={page === 1 ? 'hidden' : 'left'}
+                label="Previous page"
+                shortcut="["
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
@@ -265,6 +289,8 @@ function Find(props: any) {
               </TopLevelStandardButton>
               <TopLevelStandardButton
                 position={page === totalPages ? 'right' : 'left-right'}
+                label="Next page"
+                shortcut="]"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >

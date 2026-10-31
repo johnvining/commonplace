@@ -193,6 +193,14 @@ export const shortcuts = {
     newNote: (e: KeyboardEvent) => isKey(e, constants.keyCodes.new, { ctrl: true }),
     editPiles: (e: KeyboardEvent) => isKey(e, constants.keyCodes.piles, { ctrl: true }),
     star: (e: KeyboardEvent) => isKey(e, constants.keyCodes.suggest, { ctrl: true }),
+    editIdeas: (e: KeyboardEvent) => isKey(e, constants.keyCodes.ideas, { ctrl: true }),
+    delete: (e: KeyboardEvent) => isKey(e, constants.keyCodes.deleteKey, { shift: true }),
+    viewNotes: (e: KeyboardEvent) => isKey(e, constants.keyCodes.viewNotes),
+    narrow: (e: KeyboardEvent) => isKey(e, constants.keyCodes.narrow),
+    read: (e: KeyboardEvent) => isKey(e, constants.keyCodes.read),
+    importNotes: (e: KeyboardEvent) => isKey(e, constants.keyCodes.importNotes),
+    uploadImages: (e: KeyboardEvent) => isKey(e, constants.keyCodes.upload, { ctrl: true }),
+    back: (e: KeyboardEvent) => isKey(e, constants.keyCodes.back),
   },
 
   // 4. Note List
