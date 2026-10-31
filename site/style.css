@@ -3351,8 +3351,7 @@ div .top-bar {
 }
 
 .note-full.outer:not(.edit-note):hover .action-bar,
-.note-full.outer:not(.edit-note):focus-within .action-bar,
-.note-full.outer.selected .action-bar {
+.note-full.outer:not(.edit-note) .action-bar:focus-within {
   opacity: 1;
 }
 

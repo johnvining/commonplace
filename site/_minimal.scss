@@ -571,7 +571,8 @@ div .top-bar {
 }
 
 // Outside editing, the actions sit in the top-right corner and only show
-// on hover, focus or selection, so each note is one block of text.
+// on hover (or while one of them has keyboard focus), so they never sit
+// over the text of the note being read.
 .note-full.outer:not(.edit-note) .action-bar {
   position: absolute;
   top: 8px;
@@ -587,8 +588,7 @@ div .top-bar {
 }
 
 .note-full.outer:not(.edit-note):hover .action-bar,
-.note-full.outer:not(.edit-note):focus-within .action-bar,
-.note-full.outer.selected .action-bar {
+.note-full.outer:not(.edit-note) .action-bar:focus-within {
   opacity: 1;
 }
 
