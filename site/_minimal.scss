@@ -915,6 +915,31 @@ div.note-slim.button {
   }
 }
 
+// ---- Long notes -----------------------------------------------------------------
+
+// Clamp long text to ~20 lines outside the note's own page (Note.clampText).
+.note-full .note-text.clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 20;
+  line-clamp: 20;
+  overflow: hidden;
+}
+
+.note-more {
+  background: none;
+  border: none;
+  padding: 2px 0 0;
+  font-family: $main_font;
+  font-size: var(--font-size-sm);
+  color: var(--accent);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 // ---- Suggestion dropdowns ---------------------------------------------------------
 
 // Piles/ideas/authors pickers: an opaque panel above everything, a clear

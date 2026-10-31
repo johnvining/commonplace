@@ -3741,6 +3741,27 @@ div.note-slim.button {
     opacity: 1;
   }
 }
+.note-full .note-text.clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 20;
+  line-clamp: 20;
+  overflow: hidden;
+}
+
+.note-more {
+  background: none;
+  border: none;
+  padding: 2px 0 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-size: var(--font-size-sm);
+  color: var(--accent);
+  cursor: pointer;
+}
+.note-more:hover {
+  text-decoration: underline;
+}
+
 .pill-input .pill-input-suggestions {
   background: var(--surface);
   border: 1px solid var(--hairline);

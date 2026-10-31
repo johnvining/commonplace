@@ -56,6 +56,10 @@ function AiTitleTag() {
 
 class Note extends React.Component<any, any> {
   state: any = {
+    // Long text is clamped in lists (see clampText); these track whether
+    // it actually overflows and whether the reader asked for all of it.
+    textOverflows: false,
+    textExpanded: false,
     largeImage: -1,
     lightboxOpen: false,
     overlayMode: false,
@@ -98,8 +102,21 @@ class Note extends React.Component<any, any> {
   // props catch up (see onImageUpload). A refetch from an earlier upload
   // can land with older text, so only let go once the props match.
   _serverText: string | null = null
+  _textRef = React.createRef<HTMLDivElement>()
+
+  // Clamp long text everywhere but the note's own page.
+  clampText() {
+    return !this.state.textExpanded && window.location.pathname !== '/note/' + this.props.id
+  }
+
+  measureTextOverflow() {
+    const el = this._textRef.current
+    const overflows = !!el && this.clampText() && el.scrollHeight > el.clientHeight + 1
+    if (overflows !== this.state.textOverflows) this.setState({ textOverflows: overflows })
+  }
 
   componentDidUpdate(prevProps: any) {
+    this.measureTextOverflow()
     if (this._serverText !== null && this.props.note?.text === this._serverText) {
       this._serverText = null
     }
@@ -122,6 +139,7 @@ class Note extends React.Component<any, any> {
   }
 
   componentDidMount() {
+    this.measureTextOverflow()
     if (this.props.note.nick) {
       this.setState({ nick: this.props.note.nick })
     } else {
@@ -885,16 +903,29 @@ class Note extends React.Component<any, any> {
           ) : !this.state.overlayMode && this.state.pendingText ? (
             <div data-name="text" className="width-100">
               <div
+                ref={this._textRef}
                 className={
                   'note-full note-text markdown' +
                   (this.state.largeImage >= 0 && (edit_ideas || edit_piles)
                     ? ' abbreviate'
+                    : this.clampText()
+                    ? ' clamped'
                     : '')
                 }
                 dangerouslySetInnerHTML={{
                   __html: renderMarkdown(this.state.pendingText, { tabbableLinks: selected }),
                 }}
               />
+              {this.state.textOverflows && this.clampText() ? (
+                <button
+                  type="button"
+                  className="note-more"
+                  tabIndex={selected ? undefined : -1}
+                  onClick={() => this.setState({ textExpanded: true })}
+                >
+                  Show more
+                </button>
+              ) : null}
             </div>
           ) : null}
 
