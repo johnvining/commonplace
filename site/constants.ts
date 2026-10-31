@@ -73,6 +73,13 @@ export const keyCodes = {
   listNext: 74, // j
   listPrev: 75, // k
   listOpen: 79, // o
+  // Global single keys: home, create a note, day/night
+  home: 72, // h
+  create: 67, // c
+  theme: 68, // d
+  // List paging
+  prevPage: 219, // [
+  nextPage: 221, // ]
   // Image navigation on a selected note: arrow keys with no modifier
   arrowLeft: 37,
   arrowRight: 39,

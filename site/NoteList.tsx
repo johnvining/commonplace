@@ -89,6 +89,16 @@ class NoteList extends React.Component<any, any> {
 
   // Section 4: Note List keyboard shortcuts - called from wrapper
   handleKeyboardShortcut(event: any) {
+    // [ and ] page in any view that shows the pager.
+    if ((shortcuts.noteList.prevPage(event) || shortcuts.noteList.nextPage(event)) && this.pages()) {
+      const forward = shortcuts.noteList.nextPage(event)
+      const last = this.lastPage()
+      if (this.state.pageLoading) return true
+      if (forward && !this.state.atEnd && (last === null || this.state.page < last)) this.incPage()
+      if (!forward && this.state.page > 1) this.decPage()
+      return true
+    }
+
     // Only handle shortcuts in Full view mode
     if (this.props.viewMode !== constants.view_modes.FULL) {
       return false
@@ -650,6 +660,8 @@ class NoteList extends React.Component<any, any> {
         <TopLevelStandardButtonContainer>
           <TopLevelStandardButton
             onClick={this.decPage.bind(this)}
+            label="Previous page"
+            shortcut="["
             multiSelect={true}
             position={this.state.page == 1 ? 'hidden' : onLastPage ? 'left-right' : 'left'}
             disabled={this.state.pageLoading}
@@ -658,6 +670,8 @@ class NoteList extends React.Component<any, any> {
           </TopLevelStandardButton>
           <TopLevelStandardButton
             onClick={this.incPage.bind(this)}
+            label="Next page"
+            shortcut="]"
             multiSelect={true}
             position={onLastPage ? 'hidden' : this.state.page == 1 ? 'left-right' : 'right'}
             disabled={this.state.pageLoading}

@@ -25,6 +25,9 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
       shortcuts: [
         { key: '/ or Ctrl+O', action: 'Search' },
         { key: '? or Ctrl+/', action: 'Toggle this help' },
+        { key: 'h', action: 'Home' },
+        { key: 'c', action: 'Create a note' },
+        { key: 'd', action: 'Day / night / system' },
         { key: 'Ctrl+Shift+1', action: 'Full view' },
         { key: 'Ctrl+Shift+2', action: 'Slim view' },
         { key: 'Ctrl+Shift+3', action: 'Grid view' },
@@ -73,6 +76,7 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
           { key: 'Escape', action: 'Deselect note' },
           { key: 'e', action: 'Edit note' },
           { key: 'o', action: 'Open selected note' },
+          { key: '[ / ]', action: 'Previous / next page' },
           { key: 'Ctrl+E', action: 'Edit note' },
           { key: 'Ctrl+T', action: 'Edit tags/ideas' },
           { key: 'Ctrl+P', action: 'Edit piles' },
@@ -89,6 +93,7 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
           { key: '3', action: 'See again slow' },
           { key: 'n', action: 'Next card (no rating)' },
           { key: 'p', action: 'Previous card' },
+          { key: 'Enter', action: 'Deal again (deck done)' },
         ],
       })
     }

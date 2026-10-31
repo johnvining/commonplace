@@ -145,6 +145,11 @@ function FlipList(props: any) {
 
   useKeyboardShortcuts(constants.keyboardScopes.FLIP, (event: any) => {
     if (editing) return false
+    // Deck finished (or empty): Enter deals another.
+    if (deck && !current && event.keyCode === constants.keyCodes.enter) {
+      deal()
+      return true
+    }
     if (shortcuts.flip.next(event)) {
       move(1)
       return true
@@ -176,7 +181,7 @@ function FlipList(props: any) {
             : 'No notes to review.'}
         </p>
         <TopLevelStandardButtonContainer>
-          <TopLevelStandardButton name="Deal again" onClick={deal} />
+          <TopLevelStandardButton name="Deal again" shortcut="Enter" onClick={deal} />
         </TopLevelStandardButtonContainer>
       </div>
     )

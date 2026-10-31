@@ -92,6 +92,7 @@ export function TopLevelStarButton({ type, id, label, href }: any) {
       position="left-right"
       onClick={handleClick}
       className="has-icon"
+      shortcut="Ctrl+S"
     >
       <img
         className="pin-button-icon"

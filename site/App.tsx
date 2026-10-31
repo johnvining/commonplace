@@ -127,6 +127,12 @@ class App extends React.Component<any, any> {
     this.setState({ authorized: false })
   }
 
+  // New empty note, opened for editing (the + button, or c).
+  async createNote() {
+    const response = await createNewNoteFromTitle('')
+    this.props.navigate('/note/' + response.data._id + '/edit')
+  }
+
   render() {
     if (!this.state.authorized) {
       return <Login onTokenReceived={this.setNewToken.bind(this)} />
@@ -164,6 +170,7 @@ class App extends React.Component<any, any> {
             <div className="tool-bar div">
               <TopLevelStandardButton
                 label="Home"
+                shortcut="h"
                 onClick={() => this.props.navigate('/')}
               >
                 <img src={home_door} alt="" />
@@ -172,10 +179,8 @@ class App extends React.Component<any, any> {
             <div className="tool-bar div">
               <TopLevelStandardButton
                 label="New note"
-                onClick={async () => {
-                  const response = await createNewNoteFromTitle('')
-                  this.props.navigate('/note/' + response.data._id + '/edit')
-                }}
+                shortcut="c"
+                onClick={() => this.createNote()}
               >
                 <img src={plus} alt="" />
               </TopLevelStandardButton>
@@ -447,6 +452,16 @@ function AppWithKeyboard() {
       // / opens search
       if (shortcuts.global.search(event)) {
         appRef.current.setState({ barOpen: true })
+        return true
+      }
+
+      // h goes home, c creates a note (d, day/night, is ThemeToggle's)
+      if (shortcuts.global.home(event)) {
+        navigate('/')
+        return true
+      }
+      if (shortcuts.global.newNote(event)) {
+        appRef.current.createNote()
         return true
       }
 

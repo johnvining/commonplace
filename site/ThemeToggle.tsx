@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { TopLevelStandardButton } from './TopLevelStandardButton'
+import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
+import * as constants from './constants'
 import { NEXT_THEME, getTheme, setTheme, type Theme } from './theme'
 
 const LABELS: Record<Theme, string> = {
@@ -37,16 +39,18 @@ function ThemeIcon({ theme }: { theme: Theme }) {
 // Cycles follow-system → day → night.
 export default function ThemeToggle() {
   const [theme, setThemeState] = useState<Theme>(getTheme)
-  const label = `${LABELS[theme]} (click to change)`
+  const cycle = () => {
+    const next = NEXT_THEME[theme]
+    setTheme(next)
+    setThemeState(next)
+  }
+  useKeyboardShortcuts(constants.keyboardScopes.GLOBAL, (event: any) => {
+    if (!shortcuts.global.theme(event)) return false
+    cycle()
+    return true
+  })
   return (
-    <TopLevelStandardButton
-      label={label}
-      onClick={() => {
-        const next = NEXT_THEME[theme]
-        setTheme(next)
-        setThemeState(next)
-      }}
-    >
+    <TopLevelStandardButton label={LABELS[theme]} shortcut="d" onClick={cycle}>
       <ThemeIcon theme={theme} />
     </TopLevelStandardButton>
   )

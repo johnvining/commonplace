@@ -173,6 +173,9 @@ export const shortcuts = {
     // Plain-key aliases; inputs never see these (see handleKeyDown).
     search: (e: KeyboardEvent) => isKey(e, constants.keyCodes.help),
     help: (e: KeyboardEvent) => isKey(e, constants.keyCodes.help, { shift: true }),
+    home: (e: KeyboardEvent) => isKey(e, constants.keyCodes.home),
+    newNote: (e: KeyboardEvent) => isKey(e, constants.keyCodes.create),
+    theme: (e: KeyboardEvent) => isKey(e, constants.keyCodes.theme),
   },
 
   // 2. Search Bar
@@ -203,6 +206,8 @@ export const shortcuts = {
     prev: (e: KeyboardEvent) => isKey(e, constants.keyCodes.listPrev),
     open: (e: KeyboardEvent) => isKey(e, constants.keyCodes.listOpen),
     editKey: (e: KeyboardEvent) => isKey(e, constants.keyCodes.edit),
+    prevPage: (e: KeyboardEvent) => isKey(e, constants.keyCodes.prevPage),
+    nextPage: (e: KeyboardEvent) => isKey(e, constants.keyCodes.nextPage),
   },
 
   // 5. Note Editing

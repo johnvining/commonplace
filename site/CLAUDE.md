@@ -59,6 +59,8 @@ Most specific (highest priority) to least specific:
 | `Ctrl+/`, `?` | Toggle help overlay | GLOBAL |
 | `Ctrl+O` | Toggle search bar | GLOBAL |
 | `/` | Open search bar | GLOBAL |
+| `h` / `c` / `d` | Home / create note / day-night | GLOBAL |
+| `[` / `]` | Previous / next page | NOTE_LIST |
 | `j` / `k` | Next / previous note | NOTE_LIST |
 | `e` / `o` | Edit / open selected note (Enter on a selected note opens it too) | NOTE_LIST |
 | `Ctrl+Shift+1-4` | View modes | GLOBAL |

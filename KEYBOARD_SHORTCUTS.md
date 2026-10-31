@@ -11,6 +11,9 @@ Always available throughout the application.
 | `/` | Open search bar |
 | `Ctrl+/` | Toggle keyboard shortcuts help |
 | `?` | Toggle keyboard shortcuts help |
+| `h` | Go home |
+| `c` | Create a note |
+| `d` | Cycle day / night / follow system |
 
 Single-key shortcuts (`/`, `?`, `j`, `k`, `e`, `o`, …) are ignored while typing in a field.
 
@@ -118,6 +121,7 @@ Shortcuts for navigating and selecting notes. **Only works in Full view mode.**
 | `Escape` | Deselect note |
 | `e` | Edit selected note |
 | `o` | Open selected note on its own page |
+| `[` / `]` | Previous / next page (any view) |
 
 ### 4.2 Quick Edit (With Note Selected)
 | Shortcut | Action |
@@ -197,6 +201,7 @@ On the flip (review) page, when not typing in a field.
 | `2` | See it again in a medium while |
 | `3` | See it again slowly (the interval grows) |
 | `n` | Next card, without rating this one |
+| `Enter` | Deal again (when the deck is done) |
 | `p` | Previous card |
 
 Each card starts selected, so the note shortcuts (`Ctrl+E` to edit, etc.) work right away. Flip keys are ignored while a note is being edited.
