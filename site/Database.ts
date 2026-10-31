@@ -354,6 +354,23 @@ export async function getPileNick(pileID: string) {
   return axios.put(url_api + `nick/pile/` + pileID)
 }
 
+// Starred items (pins), stored on the server so they sync (see pinned.ts).
+export async function getPins() {
+  return (await axios.get(url_api + 'pin/')).data.data
+}
+
+export async function putPin(item: { type: string; id: string; label?: string; href?: string }) {
+  return axios.put(url_api + 'pin/', item)
+}
+
+export async function deletePin(type: string, id: string) {
+  return axios.delete(url_api + 'pin/' + type + '/' + id)
+}
+
+export async function importPins(items: unknown[]) {
+  return (await axios.post(url_api + 'pin/import', { items })).data.data
+}
+
 // Nick lookups are cached for the session: a nick always names the same
 // record, and caching lets a hover prefetch make the click instant. Failed
 // lookups aren't kept.

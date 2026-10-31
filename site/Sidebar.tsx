@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import PileName from './PileName'
 import { Link } from 'react-router-dom'
 import * as db from './Database'
-import { getPinnedItems, unpinItem } from './pinned'
+import { getPinnedItems, syncPinned, unpinItem } from './pinned'
 import starSmall from 'url:./icons/star-small.svg'
 
 const RECENT_LIMIT = 15
@@ -33,6 +33,13 @@ function Sidebar() {
   const [loading, setLoading] = useState(!cached)
   // Maintenance tasks still to run after an update.
   const [pendingTasks, setPendingTasks] = useState(0)
+  // Stars are stored on the server: refresh them now and whenever the
+  // window comes back into focus (e.g. after starring on another device).
+  useEffect(() => {
+    syncPinned()
+    window.addEventListener('focus', syncPinned)
+    return () => window.removeEventListener('focus', syncPinned)
+  }, [])
   useEffect(() => {
     db.getMaintenanceTasks()
       .then((res: any) => setPendingTasks(res.data.data.filter((t: any) => t.pending).length))

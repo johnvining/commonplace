@@ -14,6 +14,7 @@ import ideaRouter from './resources/idea/idea.router'
 import workRouter from './resources/work/work.router'
 import pileRouter from './resources/pile/pile.router'
 import nickRouter from './resources/nick/nick.router'
+import pinRouter from './resources/pin/pin.router'
 import linkRouter from './resources/link/link.router'
 import maintenanceRouter from './resources/maintenance/maintenance.router'
 import userRouter from './resources/user/user.router'
@@ -80,6 +81,7 @@ app.use('/api/idea', ideaRouter)
 app.use('/api/work', workRouter)
 app.use('/api/pile', pileRouter)
 app.use('/api/nick', nickRouter)
+app.use('/api/pin', pinRouter)
 app.use('/api/link', linkRouter)
 app.use('/api/stats', statsRouter)
 app.use('/api/maintenance', maintenanceRouter)
