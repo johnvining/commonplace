@@ -151,8 +151,10 @@ Shortcuts when editing a note in Full view.
 | Shortcut | Action |
 |----------|--------|
 | `Ctrl+I` | Toggle image focus/zoom |
-| `Ctrl+J` | Previous image |
-| `Ctrl+K` | Next image |
+| `←` / `Ctrl+J` | Previous image (opens the last one if none is open) |
+| `→` / `Ctrl+K` | Next image (opens the first one if none is open) |
+
+The arrow keys only act on a note that has images.
 
 ### 5.4 Note Links Mode
 | Shortcut | Action |

@@ -119,8 +119,8 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
       ) {
         noteShortcuts.push(
           { key: 'Ctrl+I', action: 'Toggle image zoom' },
-          { key: 'Ctrl+J', action: 'Previous image' },
-          { key: 'Ctrl+K', action: 'Next image' }
+          { key: '← or Ctrl+J', action: 'Previous image' },
+          { key: '→ or Ctrl+K', action: 'Next image' }
         )
       }
 

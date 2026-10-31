@@ -71,7 +71,7 @@ Most specific (highest priority) to least specific:
 | `Ctrl+F` | Format text | NOTE_EDIT |
 | `Ctrl+S` | Suggest title/ideas | NOTE_EDIT, AUTOCOMPLETE |
 | `Ctrl+R` | OCR | NOTE_EDIT |
-| `Ctrl+I/J/K` | Image navigation | NOTE_EDIT, NOTE_SELECTED |
+| `Ctrl+I/J/K`, `←` / `→` | Image navigation | NOTE_EDIT, NOTE_SELECTED |
 | `Enter` | Execute/select/add | Various |
 | `Escape` | Close/exit | Various |
 | `Backspace` | Go back | SEARCH_BAR, AUTOCOMPLETE |

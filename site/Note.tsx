@@ -237,6 +237,12 @@ class Note extends React.Component<any, any> {
       this.moveFocusedImage(1)
       return true
     }
+    // ← / → do the same, but only claim the keys when there are images.
+    const step = shortcuts.note.prevImageKey(event) ? -1 : shortcuts.note.nextImageKey(event) ? 1 : 0
+    if (step && this.props.note.imageUrls?.length) {
+      this.moveFocusedImage(step)
+      return true
+    }
 
     // Section 5.2: Text Tools (Edit mode only)
     if (editMode) {
@@ -565,9 +571,15 @@ class Note extends React.Component<any, any> {
     }
   }
 
+  // Step to the next/previous image; with none open, open the first (or,
+  // going back, the last).
   moveFocusedImage(val: any) {
     const urls = this.props.note.imageUrls
-    if (this.state.largeImage < 0 || !urls?.length) return
+    if (!urls?.length) return
+    if (this.state.largeImage < 0) {
+      this.handleFocusImage(val > 0 ? 0 : urls.length - 1)
+      return
+    }
     const newVal = this.state.largeImage + val
     if (newVal < 0 || newVal >= urls.length) return
     this.setState({ largeImage: newVal })

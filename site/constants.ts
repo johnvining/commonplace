@@ -73,6 +73,9 @@ export const keyCodes = {
   listNext: 74, // j
   listPrev: 75, // k
   listOpen: 79, // o
+  // Image navigation on a selected note: arrow keys with no modifier
+  arrowLeft: 37,
+  arrowRight: 39,
   // Flip navigation: n/p with no modifier
   flipNext: 78, // n
   flipPrev: 80, // p
