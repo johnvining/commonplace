@@ -41,7 +41,7 @@ function Login(props: any) {
           />
           {error && <p className="login-error">{error}</p>}
           <TopLevelStandardButtonContainer>
-            <TopLevelStandardButton name="Submit" type="submit" />
+            <TopLevelStandardButton name="Submit" shortcut="Enter" type="submit" />
           </TopLevelStandardButtonContainer>
         </TopLevelFormContainer>
       </form>

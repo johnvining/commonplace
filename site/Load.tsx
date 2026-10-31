@@ -8,6 +8,8 @@ import {
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
 import { TopLevelFormTextArea } from './TopLevelFormItems'
+import { useKeyboardShortcuts } from './KeyboardContext'
+import * as constants from './constants'
 
 function Load(props: any) {
   const [pendingImportText, setPendingImportText] = useState('')
@@ -123,6 +125,19 @@ function Load(props: any) {
     cancelRef.current = true
   }
 
+  // Ctrl+Enter submits (even from the text box); Esc cancels a running import.
+  useKeyboardShortcuts(constants.keyboardScopes.ENTITY_EDIT, (event: any) => {
+    if (event.ctrlKey && event.keyCode === constants.keyCodes.enter && !importing) {
+      handleImport()
+      return true
+    }
+    if (event.keyCode === constants.keyCodes.esc && importing) {
+      handleCancel()
+      return true
+    }
+    return false
+  })
+
   props.setPageTitle('Import Notes')
 
   return (
@@ -187,9 +202,9 @@ function Load(props: any) {
           }}
         />
         <TopLevelStandardButtonContainer>
-          <TopLevelStandardButton name="Submit" onClick={handleImport} disabled={importing} />
+          <TopLevelStandardButton name="Submit" shortcut="Ctrl+Enter" onClick={handleImport} disabled={importing} />
           {importing && (
-            <TopLevelStandardButton name="Cancel" onClick={handleCancel} />
+            <TopLevelStandardButton name="Cancel" shortcut="Esc" onClick={handleCancel} />
           )}
         </TopLevelStandardButtonContainer>
         <span>

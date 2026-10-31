@@ -237,3 +237,16 @@ On the flip (review) page, when not typing in a field.
 | `p` | Previous card |
 
 Each card starts selected, so the note shortcuts (`Ctrl+E` to edit, etc.) work right away. Flip keys are ignored while a note is being edited.
+
+---
+
+## 8. Other Pages
+
+| Page | Shortcut | Action |
+|------|----------|--------|
+| Load | `Ctrl+Enter` | Submit the import |
+| Load | `Escape` | Cancel a running import |
+| Maintenance | `Shift+D` / `Shift+R` | Dry run / run the next task (Enter confirms, Escape cancels) |
+| Login | `Enter` | Log in |
+
+In idea and pile pickers, `Backspace` in an empty field removes the last one and `Ctrl+S` asks for AI idea suggestions.

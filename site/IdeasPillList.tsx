@@ -79,7 +79,7 @@ export default function IdeasPillList(props: Props) {
             onClick={handleFetchAi}
             disabled={aiLoading}
             tabIndex={-1}
-            title="Suggest ideas"
+            title="Suggest ideas (Ctrl+S)"
             aria-label="Suggest ideas with AI"
           >
             <img src={lightbulb} alt="" />

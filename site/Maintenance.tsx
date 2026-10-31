@@ -9,6 +9,8 @@ import {
   TopLevelTitle,
   TopLevelSubTitle,
 } from './TopLevelHeadings'
+import { useKeyboardShortcuts } from './KeyboardContext'
+import * as constants from './constants'
 
 // One-off data fixes to run after deploying an update (listed in
 // SCRIPTS_TO_RUN.md). Each task has a dry run that changes nothing; a
@@ -63,6 +65,32 @@ function Maintenance(props: any) {
   props.setPageTitle('Maintenance')
 
   const pendingCount = tasks?.filter((t) => t.pending).length ?? 0
+  // Tasks run in order, so the keys act on the next one to run:
+  // Shift+D dry run, Shift+R run (then Enter confirms, Esc cancels).
+  const nextTask = tasks?.find((t) => t.pending) ?? null
+  useKeyboardShortcuts(constants.keyboardScopes.ENTITY_PAGE, (event: any) => {
+    if (confirming) {
+      if (event.keyCode === constants.keyCodes.enter) {
+        start(confirming, false)
+        return true
+      }
+      if (event.keyCode === constants.keyCodes.esc) {
+        setConfirming(null)
+        return true
+      }
+      return false
+    }
+    if (!nextTask || jobs[nextTask.id]?.status === 'running' || !event.shiftKey || event.ctrlKey) return false
+    if (event.keyCode === constants.keyCodes.theme) {
+      start(nextTask.id, true)
+      return true
+    }
+    if (event.keyCode === constants.keyCodes.read) {
+      setConfirming(nextTask.id)
+      return true
+    }
+    return false
+  })
 
   return (
     <div>
@@ -98,11 +126,13 @@ function Maintenance(props: any) {
                   <>
                     <TopLevelStandardButton
                       name="Confirm run"
+                      shortcut="Enter"
                       position="left"
                       onClick={() => start(task.id, false)}
                     />
                     <TopLevelStandardButton
                       name="Cancel"
+                      shortcut="Esc"
                       position="right"
                       onClick={() => setConfirming(null)}
                     />
@@ -111,11 +141,13 @@ function Maintenance(props: any) {
                   <>
                     <TopLevelStandardButton
                       name="Dry run"
+                      shortcut={task === nextTask ? 'Shift+D' : undefined}
                       position="left"
                       onClick={() => !running && start(task.id, true)}
                     />
                     <TopLevelStandardButton
                       name="Run"
+                      shortcut={task === nextTask ? 'Shift+R' : undefined}
                       position="right"
                       onClick={() => !running && setConfirming(task.id)}
                     />

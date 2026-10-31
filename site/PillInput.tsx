@@ -194,6 +194,7 @@ export default function PillInput(props: Props) {
               tabIndex={-1}
               onClick={(e) => { e.stopPropagation(); remove(index) }}
               aria-label={`Remove ${item.name ?? ''}`}
+              title="Remove (Backspace removes the last one)"
             >×</button>
           </span>
         ))}
