@@ -1642,7 +1642,8 @@ mark.search-highlight {
 }
 
 .flip-status,
-.flip-prompt {
+.flip-prompt,
+.note-status {
   font-family: $sans_font;
   font-size: var(--font-size-sm);
   opacity: 0.7;

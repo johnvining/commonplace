@@ -3,6 +3,7 @@ import NoteList from './NoteList'
 import * as db from './Database'
 import * as constants from './constants'
 import { showToast } from './Toast'
+import { noteStatus } from './noteStatus'
 import { useKeyboardShortcuts, useKeyboardScopes, shortcuts } from './KeyboardContext'
 import {
   TopLevelStandardButtonContainer,
@@ -27,51 +28,6 @@ const EDIT_SCOPES = [
   constants.keyboardScopes.NOTE_EDIT_PILES,
   constants.keyboardScopes.NOTE_EDIT_LINKS,
 ]
-
-const DAY = 24 * 60 * 60 * 1000
-
-const relative = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
-const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
-  ['year', 365 * DAY],
-  ['month', 30 * DAY],
-  ['week', 7 * DAY],
-  ['day', DAY],
-  ['hour', DAY / 24],
-  ['minute', DAY / 24 / 60],
-]
-
-// Fuzzy relative time in the largest unit that fits: "just now",
-// "3 hours ago", "yesterday", "2 weeks ago", "in 5 days".
-function dateLabel(date: string, now: number) {
-  const ms = new Date(date).getTime() - now
-  for (const [unit, size] of UNITS) {
-    if (Math.abs(ms) >= size) return relative.format(Math.round(ms / size), unit)
-  }
-  return 'just now'
-}
-
-// Where the card stands, shown above it: when it was created and last
-// edited, last reviewed and due, and last opened on its own page.
-function cardStatus(note: any) {
-  const now = Date.now()
-  const ago = (date: string) => dateLabel(date, now)
-  const parts = []
-  if (note.createdAt) parts.push(`Created ${ago(note.createdAt)}`)
-  if (note.updatedAt) parts.push(`edited ${ago(note.updatedAt)}`)
-  // Rated at least once; a reviewedAt alone may be left over from an edit.
-  if (!note.reviewCount) {
-    parts.push('never reviewed')
-  } else {
-    parts.push(`reviewed ${ago(note.reviewedAt)} (${note.reviewCount || 0}×)`)
-    if (note.reviewDueAt) parts.push(`due ${ago(note.reviewDueAt)}`)
-  }
-  parts.push(
-    note.lastOpenedAt
-      ? `opened ${ago(note.lastOpenedAt)} (${note.openCount || 0}×)`
-      : 'never opened'
-  )
-  return parts.join(' · ')
-}
 
 // Flip: review notes one at a time, Anki-style. Each card is rated by
 // how soon to see it again (fast / med / slow); the server schedules it
@@ -187,7 +143,7 @@ function FlipList(props: any) {
     <div className="flip">
       <div className="flip-header">
         <span className="flip-status">
-          {cardStatus(current)}
+          {noteStatus(current)}
         </span>
         <TopLevelStandardButtonContainer className="flip-ratings">
           <span className="flip-prompt">See again:</span>

@@ -2,10 +2,14 @@ import * as constants from './constants'
 import * as db from './Database'
 import { notePageTitle } from './utils'
 import NoteList from './NoteList'
+import { noteStatus } from './noteStatus'
+import React from 'react'
 import { useParams } from 'react-router-dom'
 
 function NoteView(props: any) {
   const { id = '', nick } = useParams()
+  // As loaded, so "opened" is the visit before this one.
+  const [note, setNote] = React.useState<any>(null)
 
   const getListOfOneNote = async () => {
     let notesResponse: any
@@ -35,6 +39,7 @@ function NoteView(props: any) {
 
     const note = notesResponse?.data?.data?.[0]
     if (!note) return notesResponse
+    setNote(note)
 
     // NoteList loads this once per page visit, so this counts one open.
     db.recordOpened(db.types.note, note._id)
@@ -45,14 +50,17 @@ function NoteView(props: any) {
   }
 
   return (
-    <NoteList
-      key={'note' + (id ?? nick)}
-      viewMode={constants.view_modes.FULL}
-      editFirst={props.edit}
-      getListOfNotes={getListOfOneNote}
-      fromNoteView={true}
-      setPageTitle={props.setPageTitle}
-    />
+    <>
+      {note && <p className="note-status">{noteStatus(note)}</p>}
+      <NoteList
+        key={'note' + (id ?? nick)}
+        viewMode={constants.view_modes.FULL}
+        editFirst={props.edit}
+        getListOfNotes={getListOfOneNote}
+        fromNoteView={true}
+        setPageTitle={props.setPageTitle}
+      />
+    </>
   )
 }
 
