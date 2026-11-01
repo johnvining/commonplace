@@ -1421,8 +1421,11 @@ async function cmdWork(args, config) {
   const rest = args.slice(1)
   if (!sub) {
     console.error('Usage: cp work <add-author|rm-author> <workTarget> <authorTarget>')
+    console.error('       cp work merge <fromWork> <intoWork> [--yes]')
     return
   }
+
+  if (sub === 'merge') return mergeCommand('work', rest, config)
 
   if (sub === 'add-author' || sub === 'rm-author') {
     const [workInput, authorInput] = rest
@@ -1463,6 +1466,50 @@ async function cmdWork(args, config) {
   }
 
   console.error(`Unknown work subcommand: ${sub}`)
+}
+
+// `cp work merge` / `cp auth merge <from> <into> [--yes]` (#360). Shows
+// what will move (a dry run on the server), asks, then merges.
+async function mergeCommand(type, args, config) {
+  const flagYes = args.includes('--yes') || args.includes('-y')
+  const [fromInput, intoInput] = args.filter(a => a !== '--yes' && a !== '-y')
+  const label = type === 'auth' ? 'author' : 'work'
+  if (!fromInput || !intoInput) {
+    console.error(`Usage: cp ${type} merge <from${label}> <into${label}> [--yes]`)
+    return
+  }
+  const from = await resolveTarget(fromInput, type, config)
+  if (!from) { console.error(`Could not resolve ${label} "${fromInput}".`); return }
+  const into = await resolveTarget(intoInput, type, config)
+  if (!into) { console.error(`Could not resolve ${label} "${intoInput}".`); return }
+  if (String(from.id) === String(into.id)) { console.error(`Both are the same ${label}.`); return }
+
+  const plan = (await api('POST', `${type}/${from.id}/merge`, { into: into.id, dryRun: true }, config))?.data
+  if (!plan) { console.error('Merge preview failed.'); return }
+  console.log(`Merge ${label} ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET}`)
+  console.log(`   into ${BOLD}${plan.into.name}${RESET} ${DIM}${plan.into._id}${RESET}`)
+  const moves = type === 'auth'
+    ? [['notes by', plan.notes], ['notes about', plan.notesAbout], ['works', plan.works]]
+    : [['notes', plan.notes], ['piles', plan.piles], ['ideas', plan.ideas], ['authors', plan.authors]]
+  console.log('  ' + moves.map(([what, n]) => `${n} ${what}`).join(', '))
+  if (plan.fields.length) console.log(`  fills in: ${plan.fields.join(', ')}`)
+  console.log(`  then deletes ${plan.from.name}`)
+
+  if (!flagYes) {
+    const ok = await confirm('Merge? [y/N] ')
+    if (!ok) { console.log('Cancelled.'); return }
+  }
+  await api('POST', `${type}/${from.id}/merge`, { into: into.id }, config)
+  console.log(`${GREEN}Merged${RESET} into ${plan.into.name}`)
+}
+
+async function cmdAuth(args, config) {
+  // `cp auth merge ...` — author maintenance (#360). Showing an author is
+  // `cp author`.
+  const sub = args[0]
+  const rest = args.slice(1)
+  if (sub === 'merge') return mergeCommand('auth', rest, config)
+  console.error('Usage: cp auth merge <fromAuthor> <intoAuthor> [--yes]')
 }
 
 async function cmdAllPiles(args, config) {
@@ -1649,6 +1696,13 @@ ${BOLD}Piles${RESET}
 ${BOLD}Works${RESET}
   work add-author <work> <author>  Attach an existing author to a work
   work rm-author  <work> <author>  Detach an author from a work
+  work merge <from> <into> [--yes] Move a duplicate work's notes, piles,
+                                   ideas and authors to another, then
+                                   delete it
+
+${BOLD}Authors${RESET}
+  auth merge <from> <into> [--yes] Move a duplicate author's works and notes
+                                   to another, then delete it
 
 ${BOLD}Standalone create${RESET}
   new <work|idea|auth|pile> "<name>"   Create an empty entity of any type
@@ -1727,6 +1781,7 @@ const commands = {
   ping:    cmdPing,
   authors: cmdAuthors,
   author:  cmdAuthor,
+  auth:    cmdAuth,
   ideas:   cmdIdeas,
   works:   cmdWorks,
   piles:   cmdPiles,
