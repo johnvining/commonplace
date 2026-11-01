@@ -1386,15 +1386,29 @@ async function cmdNew(args, config) {
   // the server has POST endpoints for each. Piles have `cp pile new` too,
   // which this command accepts as an alias.
   const jsonFlag = args.includes('--json')
-  const positional = args.filter(a => a !== '--json')
+  const positional = args.filter(a => a !== '--json' && a !== '--force')
   const type = positional[0]
   const name = positional.slice(1).join(' ').trim()
   const valid = new Set(['work', 'idea', 'auth', 'pile'])
   if (!type || !name) {
-    console.error('Usage: cp new <work|idea|auth|pile> "<name>" [--json]')
+    console.error('Usage: cp new <work|idea|auth|pile> "<name>" [--json] [--force]')
     return
   }
   if (!valid.has(type)) { console.error(`Unknown type: ${type}`); return }
+
+  // Authors are matched by name nowhere else, so a second `new auth` used
+  // to make a silent duplicate (#359).
+  if (type === 'auth' && !args.includes('--force')) {
+    const ac = await api('POST', 'auth/autocomplete', { string: name }, config)
+    const same = (ac?.data || []).filter(a => (a.name || '').trim().toLowerCase() === name.toLowerCase())
+    if (same.length) {
+      if (jsonFlag) { console.log(JSON.stringify({ exists: true, matches: same })); return }
+      console.error(`An author named "${name}" already exists:`)
+      same.forEach(a => console.error(`  ${a.name}  ${DIM}${a._id}${RESET}`))
+      console.error('Pass --force to create another anyway.')
+      return
+    }
+  }
 
   const res = await api('POST', type, { name }, config)
   const entity = res?.data || res
@@ -1504,12 +1518,43 @@ async function mergeCommand(type, args, config) {
 }
 
 async function cmdAuth(args, config) {
-  // `cp auth merge ...` — author maintenance (#360). Showing an author is
-  // `cp author`.
+  // `cp auth <rm|merge> ...` — author maintenance (#359, #360). Showing an
+  // author is `cp author`.
   const sub = args[0]
   const rest = args.slice(1)
   if (sub === 'merge') return mergeCommand('auth', rest, config)
-  console.error('Usage: cp auth merge <fromAuthor> <intoAuthor> [--yes]')
+  if (sub === 'rm') {
+    const flagYes = rest.includes('--yes') || rest.includes('-y')
+    const input = rest.filter(a => a !== '--yes' && a !== '-y').join(' ').trim()
+    if (!input) { console.error('Usage: cp auth rm <author> [--yes]'); return }
+    const target = await resolveTarget(input, 'auth', config)
+    if (!target) { console.error(`Could not resolve author "${input}".`); return }
+    const info = (await api('GET', `auth/${target.id}`, null, config))?.data
+    if (!info) { console.error('Not found.'); return }
+    const [worksRes, notes, notesAbout] = await Promise.all([
+      api('GET', `auth/${target.id}/works`, null, config),
+      fetchAllNotes(`auth/${target.id}/notes`, config),
+      fetchAllNotes(`auth/${target.id}/notes-about`, config),
+    ])
+    const works = worksRes?.data || []
+    const used = works.length + notes.length + notesAbout.length
+    console.log(`Author ${BOLD}${info.name}${RESET} ${DIM}${target.id}${RESET}`)
+    if (used) {
+      console.log(`  still on ${works.length} works, ${notes.length} notes by, ${notesAbout.length} notes about;`)
+      console.log('  deleting removes it from all of them (use `cp auth merge` to move them instead)')
+    } else {
+      console.log('  not used by any work or note')
+    }
+    if (!flagYes) {
+      const ok = await confirm('Delete? [y/N] ')
+      if (!ok) { console.log('Cancelled.'); return }
+    }
+    await api('DELETE', `auth/${target.id}`, null, config)
+    console.log(`${GREEN}Deleted${RESET} author ${info.name}`)
+    return
+  }
+  console.error('Usage: cp auth rm <author> [--yes]')
+  console.error('       cp auth merge <fromAuthor> <intoAuthor> [--yes]')
 }
 
 async function cmdAllPiles(args, config) {
@@ -1701,12 +1746,15 @@ ${BOLD}Works${RESET}
                                    delete it
 
 ${BOLD}Authors${RESET}
+  auth rm <author> [--yes]         Delete an author (says what still uses it)
   auth merge <from> <into> [--yes] Move a duplicate author's works and notes
                                    to another, then delete it
 
 ${BOLD}Standalone create${RESET}
   new <work|idea|auth|pile> "<name>"   Create an empty entity of any type
-                                       (alias for \`pile new\` when type=pile)
+                                       (alias for \`pile new\` when type=pile;
+                                       auth warns on an existing name unless
+                                       --force)
 
 ${BOLD}Bulk export${RESET}
   export --piles "<query>"   Dump matching piles with works+notes as JSON
