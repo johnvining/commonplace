@@ -1,103 +1,45 @@
 import React from 'react'
-import PileName from './PileName'
 import { Link } from 'react-router-dom'
-import circle from 'url:./icons/circle.svg'
-import check_circle from 'url:./icons/check_circle.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 import { authorsWithWorkFallback } from './authorsDisplay'
 import { wornClass, wornTitle } from './utils'
+import { CompactNoteProps, NoteTags, SelectToggle, imageCountLabel } from './NoteCompactParts'
 
-class NoteSlim extends React.PureComponent<any> {
-  state: any = {}
-
-  markChecked(e: any) {
-    if (e.shiftKey) {
-      this.props.markShiftChecked(this.props.index)
-    } else {
-      this.props.markChecked(this.props.index)
-    }
-  }
-
+class NoteSlim extends React.PureComponent<CompactNoteProps> {
   render() {
     if (this.props.deleted) {
       return <div> </div>
     }
 
+    const { note, id } = this.props
     const outerClassName = this.props.selected
       ? 'note-slim outer selected'
       : 'note-slim outer'
 
     return (
-      <div
-        className={
-          this.props.tile ? outerClassName + ' tile' : outerClassName
-        }
-      >
+      <div className={outerClassName}>
         <div className="note-slim button">
-          {this.props.selected ? (
-            <button
-              onClick={this.markChecked.bind(this)}
-              className="button grid-button"
-              title="Select (x)"
-              tabIndex={-1}
-            >
-              <img src={check_circle} />
-            </button>
-          ) : (
-            <button
-              onClick={this.markChecked.bind(this)}
-              className="button grid-button"
-              title="Select (x)"
-              tabIndex={-1}
-            >
-              <img src={circle} />
-            </button>
-          )}
+          <SelectToggle {...this.props} />
         </div>
-        <div className={'note-slim' + wornClass(this.props.note?.openCount)} title={wornTitle(this.props.note?.openCount)}>
-          <Link to={'/note/' + this.props.id} className="note-slim" tabIndex={this.props.tabIndex} data-note-id={this.props.id}>
+        <div className={'note-slim' + wornClass(note?.openCount)} title={wornTitle(note?.openCount)}>
+          <Link to={'/note/' + id} className="note-slim" tabIndex={this.props.tabIndex} data-note-id={id}>
             <div className="note-slim">
               <div className="note-slim inner truncate">
                 <WorkCitationSpan
-                  authors={authorsWithWorkFallback(this.props.note.authors, this.props.note.work?.authors)}
-                  workTitle={this.props.note.work?.name}
+                  authors={authorsWithWorkFallback(note.authors, note.work?.authors)}
+                  workTitle={note.work?.name}
                   workID={null}
                   spaceAfter={false}
                   plain={true}
                 />
-                {(this.props.note.authors?.length ||
-                  this.props.note.work?.authors?.length ||
-                  this.props.note.work?.name) &&
-                  ': '}
-                <b>
-                  {this.props.note.title?.length
-                    ? this.props.note.title + '. '
-                    : 'no title. '}
-                </b>
-
-                {this.props.note.images?.length > 0
-                  ? '[' +
-                    this.props.note.images?.length +
-                    ' image' +
-                    (this.props.note.images?.length == 1 ? '' : 's') +
-                    '] '
-                  : null}
-                {this.props.note.text?.length ? (
-                  <>{this.props.note.text}</>
-                ) : null}
+                {(note.authors?.length || note.work?.authors?.length || note.work?.name) && ': '}
+                <b>{note.title?.length ? note.title + '. ' : 'no title. '}</b>
+                {imageCountLabel(note.images?.length)}
+                {note.text?.length ? <>{note.text}</> : null}
               </div>
 
               <div className="note-slim inner">
-                {this.props.note.piles?.map((pile: any, idx: any) => (
-                  <span className="pile" key={'pile-' + this.props.id + idx}>
-                    <PileName name={pile.name} />
-                  </span>
-                ))}
-                {this.props.note.ideas?.map((idea: any, idx: any) => (
-                  <span className="idea" key={'idea-' + this.props.id + idx}>
-                    {idea.name}
-                  </span>
-                ))}
+                <NoteTags note={note} id={id} />
               </div>
               <div></div>
             </div>

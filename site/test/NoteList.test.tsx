@@ -22,10 +22,11 @@ globalThis.IntersectionObserver = class {
   disconnect() {}
 } as any
 
+// nick set so the grid view doesn't fetch one
 const notes = [
-  { _id: 'a', text: 'first' },
-  { _id: 'b', text: 'second' },
-  { _id: 'c', text: 'third' },
+  { _id: 'a', text: 'first', nick: 'n1' },
+  { _id: 'b', text: 'second', nick: 'n2' },
+  { _id: 'c', text: 'third', nick: 'n3' },
 ]
 
 const getListOfNotes = async () => ({ data: { data: notes } })
@@ -92,5 +93,30 @@ describe('NoteList loading', () => {
     renderList({ getListOfNotes: flaky })
     fireEvent.click(await screen.findByText('Retry'))
     await screen.findByText('first')
+  })
+})
+
+describe('NoteList compact views (#155)', () => {
+  const circles = () => Array.from(document.querySelectorAll('button[title="Select (x)"]')) as HTMLElement[]
+
+  it.each([
+    ['slim', constants.view_modes.SLIM],
+    ['grid', constants.view_modes.GRID],
+    ['tile', constants.view_modes.TILE],
+  ])('%s view selects a note with its circle and shows the multi-select bar', async (_, viewMode) => {
+    renderList({ viewMode })
+    await screen.findByText('first')
+    expect(circles()).toHaveLength(3)
+    expect(screen.queryByText('Delete')).toBeNull()
+    fireEvent.click(circles()[1])
+    await screen.findByText('Delete')
+  })
+
+  it('Shift selects the range from the last note clicked', async () => {
+    renderList({ viewMode: constants.view_modes.SLIM })
+    await screen.findByText('first')
+    fireEvent.click(circles()[0])
+    fireEvent.click(circles()[2], { shiftKey: true })
+    await waitFor(() => expect(document.querySelectorAll('.note-slim.outer.selected')).toHaveLength(3))
   })
 })

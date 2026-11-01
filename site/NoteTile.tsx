@@ -1,19 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import circle from 'url:./icons/circle.svg'
-import check_circle from 'url:./icons/check_circle.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 import { authorsWithWorkFallback } from './authorsDisplay'
+import { CompactNoteProps, NoteTags, SelectToggle } from './NoteCompactParts'
 
-class NoteTile extends React.PureComponent<any> {
-  markChecked(e: any) {
-    if (e.shiftKey) {
-      this.props.markShiftChecked(this.props.index)
-    } else {
-      this.props.markChecked(this.props.index)
-    }
-  }
-
+class NoteTile extends React.PureComponent<CompactNoteProps> {
   render() {
     if (this.props.deleted) {
       return <div> </div>
@@ -38,14 +29,7 @@ class NoteTile extends React.PureComponent<any> {
           }
         >
           <div className="note-slim tile-header">
-            <button
-              onClick={this.markChecked.bind(this)}
-              className="button grid-button"
-              title="Select (x)"
-              tabIndex={-1}
-            >
-              <img src={this.props.selected ? check_circle : circle} />
-            </button>
+            <SelectToggle {...this.props} />
             <Link
               to={'/note/' + this.props.id}
               className="note-slim tile-title-link"
@@ -84,16 +68,7 @@ class NoteTile extends React.PureComponent<any> {
             </div>
           </Link>
           <div className="note-slim tile-tags">
-            {this.props.note.piles?.map((pile: any, idx: any) => (
-              <span className="pile" key={'pile-' + this.props.id + idx}>
-                {pile.name}
-              </span>
-            ))}
-            {this.props.note.ideas?.map((idea: any, idx: any) => (
-              <span className="idea" key={'idea-' + this.props.id + idx}>
-                {idea.name}
-              </span>
-            ))}
+            <NoteTags note={this.props.note} id={this.props.id} />
           </div>
         </div>
         <div className="note-slim tile-footer">

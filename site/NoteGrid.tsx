@@ -1,11 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import circle from 'url:./icons/circle.svg'
-import check_circle from 'url:./icons/check_circle.svg'
 import * as db from './Database'
 import ClickToCopyNick from './ClickToCopyNick'
+import { authorsWithWorkFallback, joinAuthorNames } from './authorsDisplay'
+import { CompactNoteProps, SelectToggle, imageCountLabel } from './NoteCompactParts'
 
-class NoteGrid extends React.Component<any, any> {
+class NoteGrid extends React.Component<CompactNoteProps, any> {
   state: any = {}
 
   componentDidMount() {
@@ -18,66 +18,35 @@ class NoteGrid extends React.Component<any, any> {
     }
   }
 
-  markChecked(e: any) {
-    if (e.shiftKey) {
-      this.props.markShiftChecked(this.props.index)
-    } else {
-      this.props.markChecked(this.props.index)
-    }
-  }
-
   render() {
     if (this.props.deleted) {
       return <div> </div>
     }
 
+    const { note, id } = this.props
     return (
       <div className={this.props.selected ? 'grid-selected' : 'grid'}>
         <div className="grid-div-button">
-          {this.props.selected ? (
-            <button
-              onClick={this.markChecked.bind(this)}
-              className="button grid-button"
-              title="Select (x)"
-              tabIndex={-1}
-            >
-              <img src={check_circle} />
-            </button>
-          ) : (
-            <button
-              onClick={this.markChecked.bind(this)}
-              className="button grid-button"
-              title="Select (x)"
-              tabIndex={-1}
-            >
-              <img src={circle} />
-            </button>
-          )}
+          <SelectToggle {...this.props} />
         </div>
 
         <div className="grid-link">
-          <Link to={'/note/' + this.props.id} tabIndex={this.props.tabIndex} data-note-id={this.props.id}>
+          <Link to={'/note/' + id} tabIndex={this.props.tabIndex} data-note-id={id}>
             <div className="grid-nick">
               <ClickToCopyNick nick={this.state.nick} disableClick={true} />
               <span className="grid-unprintable">|</span>
             </div>
             <div className="grid-author">
-              {this.props.author}
+              {joinAuthorNames(authorsWithWorkFallback(note.authors, note.work?.authors))}
               <span className="grid-unprintable">|</span>
             </div>
             <div className="grid-title">
-              {this.props.title}
+              {note.title}
               <span className="grid-unprintable">|</span>
             </div>
             <div className="grid-text">
-              {this.props.imageCount > 0
-                ? '[' +
-                  this.props.imageCount +
-                  ' image' +
-                  (this.props.imageCount == 1 ? '' : 's') +
-                  '] '
-                : null}
-              {this.props.text}
+              {imageCountLabel(note.images?.length)}
+              {note.text}
             </div>
           </Link>
         </div>

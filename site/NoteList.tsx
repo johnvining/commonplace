@@ -8,7 +8,6 @@ import * as db from './Database'
 import { notePageTitle } from './utils'
 import Autocomplete from './Autocomplete'
 import * as constants from './constants'
-import { joinAuthorNames, authorsWithWorkFallback } from './authorsDisplay'
 import left from 'url:./icons/left.svg'
 import right from 'url:./icons/right.svg'
 import autosize from 'autosize'
@@ -19,10 +18,17 @@ import {
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import { useNavigate } from 'react-router-dom'
 
+// The views that select notes with circles and share one set of props
+// (see NoteCompactParts); the others are full (Note) and result.
+const COMPACT_VIEWS: Record<number, React.ComponentType<any>> = {
+  [constants.view_modes.SLIM]: NoteSlim,
+  [constants.view_modes.GRID]: NoteGrid,
+  [constants.view_modes.TILE]: NoteTile,
+}
+
 class NoteList extends React.Component<any, any> {
   _imageObserver: IntersectionObserver | null = null
   state: any = {
-    inFocus: null,
     focusType: constants.note_modes.NO_SELECTION,
     selectedNote: '',
     notes: undefined,
@@ -506,13 +512,15 @@ class NoteList extends React.Component<any, any> {
     this.setState({ selectedArray: tempSelectedArray, anchorIndex: 0 })
   }
 
-  markChecked(noteIndex: any) {
+  // Arrow functions so the compact views get the same function each
+  // render and can skip re-rendering.
+  markChecked = (noteIndex: any) => {
     const tempSelectedArray = [...this.state.selectedArray]
     tempSelectedArray[noteIndex] = !tempSelectedArray[noteIndex]
     this.setState({ selectedArray: tempSelectedArray, anchorIndex: noteIndex })
   }
 
-  markShiftChecked(noteIndex: any) {
+  markShiftChecked = (noteIndex: any) => {
     const tempSelectedArray = [...this.state.selectedArray]
     if (noteIndex > this.state.anchorIndex) {
       if (noteIndex > this.state.lastTouchedIndex) {
@@ -767,9 +775,9 @@ class NoteList extends React.Component<any, any> {
   }
 
   render() {
-    var showMultiselect =
-      this.props.viewMode == constants.view_modes.FULL ||
-      this.props.viewMode == constants.view_modes.RESULT
+    // Slim, grid and tile select notes with circles and act on them from
+    // the multi-select bar; full and result views don't.
+    const CompactView = COMPACT_VIEWS[this.props.viewMode] ?? null
     var isTileView = this.props.viewMode == constants.view_modes.TILE
     const lastPage = this.lastPage()
     const onLastPage = (lastPage !== null && this.state.page >= lastPage) || this.state.atEnd
@@ -781,7 +789,7 @@ class NoteList extends React.Component<any, any> {
       (lastPage === null ? this.state.page > 1 || (this.state.notes?.length ?? 0) > 1 : lastPage > 1)
     return (
       <div className="multi-select">
-        {showMultiselect ? (
+        {!CompactView ? (
           // Full/Result views have no multi-select bar, but still need the
           // pager when there's more than one page.
           fullPager || (lastPage !== null && lastPage > 1) ? (
@@ -916,51 +924,16 @@ class NoteList extends React.Component<any, any> {
                   key={'note-view-' + note._id}
                   className={isTileView ? 'note-tile-grid-item' : ''}
                 >
-                  {this.props.viewMode == constants.view_modes.GRID ? (
-                    <NoteGrid
-                      author={joinAuthorNames(authorsWithWorkFallback(note.authors, note.work?.authors))}
+                  {CompactView ? (
+                    <CompactView
+                      note={note}
+                      id={note._id}
                       index={index}
                       selected={this.state.selectedArray[index]}
                       deleted={this.state.deleted.includes(index)}
-                      authorId={note.authors?.[0]?._id}
-                      id={note._id}
-                      inFocus={this.state.inFocus}
-                      key={note._id}
                       tabIndex={0}
-                      text={note.text}
-                      title={note.title}
-                      work={note.work?.name}
-                      workId={note.work?._id}
-                      markChecked={this.markChecked.bind(this)}
-                      markShiftChecked={this.markShiftChecked.bind(this)}
-                      imageCount={note.images?.length ?? 0}
-                      note={note}
-                    />
-                  ) : this.props.viewMode == constants.view_modes.TILE ? (
-                    <NoteTile
-                      deleted={this.state.deleted.includes(index)}
-                      id={note._id}
-                      index={index}
-                      inFocus={this.state.inFocus}
-                      key={note._id}
-                      markChecked={this.markChecked.bind(this)}
-                      markShiftChecked={this.markShiftChecked.bind(this)}
-                      note={note}
-                      selected={this.state.selectedArray[index]}
-                      tabIndex={0}
-                    />
-                  ) : this.props.viewMode == constants.view_modes.SLIM ? (
-                    <NoteSlim
-                      deleted={this.state.deleted.includes(index)}
-                      id={note._id}
-                      index={index}
-                      inFocus={this.state.inFocus}
-                      key={note._id}
-                      markChecked={this.markChecked.bind(this)}
-                      markShiftChecked={this.markShiftChecked.bind(this)}
-                      note={note}
-                      selected={this.state.selectedArray[index]}
-                      tabIndex={0}
+                      markChecked={this.markChecked}
+                      markShiftChecked={this.markShiftChecked}
                     />
                   ) : this.props.viewMode == constants.view_modes.RESULT ? (
                     <NoteResult note={note} id={note._id} key={note._id} />
