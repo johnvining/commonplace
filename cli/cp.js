@@ -737,8 +737,18 @@ async function showMatches(type, matches, args, config) {
 
 async function cmdAuthors(args, config) {
   const jsonFlag = args.includes('--json')
+  if (args.includes('--duplicates') || args.includes('--combined')) {
+    const path = args.includes('--duplicates') ? 'auth/duplicates' : 'auth/combined'
+    const data = (await api('GET', path, null, config))?.data || []
+    if (jsonFlag) { console.log(JSON.stringify(data)); return }
+    if (path === 'auth/duplicates') return printDuplicateGroups(data, GREEN)
+    if (!data.length) { console.log('No combined-looking authors.'); return }
+    data.forEach(a => console.log(`${GREEN}${a.name}${RESET}  ${DIM}${a._id}${RESET}`))
+    console.log(`\n${DIM}Split one with: cp auth split <author> --into "A" --into "B"${RESET}`)
+    return
+  }
   const query = args.filter(a => !a.startsWith('--')).join(' ')
-  if (!query) { console.error('Usage: cp authors <query> [--show] [--json]'); return }
+  if (!query) { console.error('Usage: cp authors <query> [--show] [--json]  |  cp authors --duplicates | --combined'); return }
   const res = await api('POST', 'auth/autocomplete', { string: query }, config)
   const authors = res?.data || []
   if (args.includes('--show')) return showMatches('auth', authors, args, config)
@@ -762,8 +772,27 @@ async function cmdIdeas(args, config) {
 
 async function cmdWorks(args, config) {
   const jsonFlag = args.includes('--json')
+  const byline = (w) => {
+    const names = joinAuthorNames(w.authors)
+    return names ? ` ${DIM}— ${names}${RESET}` : ''
+  }
+  if (args.includes('--duplicates')) {
+    const groups = (await api('GET', 'work/duplicates', null, config))?.data || []
+    if (jsonFlag) { console.log(JSON.stringify(groups)); return }
+    printDuplicateGroups(groups, YELLOW, byline)
+    if (groups.length) console.log(`${DIM}Merge with: cp work merge <from...> <into>${RESET}`)
+    return
+  }
+  if (args.includes('--no-notes')) {
+    const works = (await api('GET', 'work/no-notes', null, config))?.data || []
+    if (jsonFlag) { console.log(JSON.stringify(works)); return }
+    if (!works.length) { console.log('Every work has notes.'); return }
+    works.forEach(w => console.log(`${YELLOW}${w.name}${RESET}${byline(w)}  ${DIM}${w._id}${RESET}`))
+    console.log(`\n${works.length} works without notes`)
+    return
+  }
   const query = args.filter(a => !a.startsWith('--')).join(' ')
-  if (!query) { console.error('Usage: cp works <query> [--show] [--json]'); return }
+  if (!query) { console.error('Usage: cp works <query> [--show] [--json]  |  cp works --duplicates | --no-notes'); return }
   const res = await api('POST', 'work/autocomplete', { string: query }, config)
   const works = res?.data || []
   if (args.includes('--show')) return showMatches('work', works, args, config)
@@ -1662,7 +1691,68 @@ async function cmdNotes(args, config) {
     console.log(`${GREEN}Linked${RESET} ${plan.matched} notes`)
     return
   }
-  console.error('Usage: cp notes link-by-title --work <work> [--title "T"] [--all] [--yes]')
+  return notesQuery(args, config)
+}
+
+// `cp notes --group-by title | --no-work | --title-is-work` (#357).
+// --ids prints only note ids, one per line, to pipe into `cp set -`.
+async function notesQuery(args, config) {
+  const jsonFlag = args.includes('--json')
+  const idsFlag = args.includes('--ids')
+  const { flags } = parseFlags(args.filter(a => !['--json', '--ids', '--no-work', '--title-is-work'].includes(a)))
+  const printIds = (ids) => ids.forEach(id => console.log(id))
+
+  if (flags['group-by']) {
+    if (flags['group-by'] !== 'title') { console.error('Only --group-by title is supported.'); return }
+    const min = Number(flags['min-count']) || 2
+    const groups = (await api('GET', `note/title-groups?min=${min}`, null, config))?.data || []
+    if (jsonFlag) { console.log(JSON.stringify(groups)); return }
+    if (idsFlag) { printIds(groups.flatMap(g => g.ids)); return }
+    if (!groups.length) { console.log('No titles shared by that many notes.'); return }
+    groups.forEach(g => console.log(`${String(g.count).padStart(5)}  ${CYAN}${g.title}${RESET}` +
+      (g.unlinked ? `  ${DIM}${g.unlinked} without a work${RESET}` : '')))
+    return
+  }
+
+  if (args.includes('--no-work')) {
+    const notes = await fetchAllNotes('note/no-work', config)
+    if (jsonFlag) { console.log(JSON.stringify(notes)); return }
+    if (idsFlag) { printIds(notes.map(n => n._id)); return }
+    if (!notes.length) { console.log('Every note has a work.'); return }
+    notes.forEach(n => console.log(formatNote(n)))
+    console.log(`\n${notes.length} notes without a work`)
+    return
+  }
+
+  if (args.includes('--title-is-work')) {
+    const rows = (await api('GET', 'note/titled-like-work', null, config))?.data || []
+    if (jsonFlag) { console.log(JSON.stringify(rows)); return }
+    if (idsFlag) { printIds(rows.flatMap(r => r.notes.map(n => n._id))); return }
+    if (!rows.length) { console.log('No notes titled like a work they are not on.'); return }
+    rows.forEach(r => {
+      const loose = r.notes.filter(n => !n.work).length
+      console.log(`${String(r.notes.length).padStart(5)}  ${YELLOW}${r.work.name}${RESET}  ${DIM}${r.work._id}` +
+        (loose < r.notes.length ? `  (${r.notes.length - loose} on another work)` : '') + RESET)
+    })
+    console.log(`\n${DIM}Link them with: cp notes link-by-title --work <work>${RESET}`)
+    return
+  }
+
+  console.error('Usage: cp notes --group-by title [--min-count N]')
+  console.error('       cp notes --no-work')
+  console.error('       cp notes --title-is-work')
+  console.error('       cp notes link-by-title --work <work> [--title "T"] [--all] [--yes]')
+  console.error('  --json for JSON, --ids for note ids only (pipe into `cp set -`).')
+}
+
+// Groups of near-duplicate names from work/duplicates or auth/duplicates
+function printDuplicateGroups(groups, color, describe = () => '') {
+  if (!groups.length) { console.log('No near-duplicates.'); return }
+  groups.forEach((group, i) => {
+    if (i) console.log('')
+    group.forEach(item => console.log(`${color}${item.name}${RESET}${describe(item)}  ${DIM}${item._id}${RESET}`))
+  })
+  console.log(`\n${groups.length} groups`)
 }
 
 async function cmdAuth(args, config) {
@@ -1912,6 +2002,15 @@ ${BOLD}Authors${RESET}
   auth split <author> --into "A" --into "B" [--keep] [--yes]
                                    Replace a combined author with one per
                                    name everywhere it's used
+
+${BOLD}Cleanup queries${RESET} (--json for JSON; notes queries take --ids)
+  notes --group-by title [--min-count N]  Titles shared by several notes
+  notes --no-work                         Notes without a work
+  notes --title-is-work                   Notes titled like a work they're not on
+  works --no-notes                        Works without notes
+  works --duplicates                      Near-duplicate work names
+  authors --duplicates                    Near-duplicate author names
+  authors --combined                      Authors that look like several people
 
 ${BOLD}Many notes at once${RESET}
   notes link-by-title --work <work> [--title "T"] [--all] [--yes]
