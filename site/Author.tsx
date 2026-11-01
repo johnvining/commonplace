@@ -37,6 +37,8 @@ function Author(props: any) {
   // Notes about this person, as opposed to by them (#246).
   const [notesAbout, setNotesAbout] = useState<any[]>([])
   const [notesAboutTotal, setNotesAboutTotal] = useState(0)
+  // Works they edited or translated, listed apart from their own (#358).
+  const [credits, setCredits] = useState<{ edited: any[]; translated: any[] }>({ edited: [], translated: [] })
   const navigate = useNavigate()
 
   const fetchAuthorInfo = (id: any) => {
@@ -91,6 +93,18 @@ function Author(props: any) {
   useEffect(() => {
     fetchAuthorInfo(id)
     fetchAuthorWorks(id)
+  }, [id])
+
+  useEffect(() => {
+    let cancelled = false
+    db.getAuthorCredits(id)
+      .then((response: any) => {
+        if (cancelled) return
+        const data = response?.data?.data
+        setCredits({ edited: data?.edited ?? [], translated: data?.translated ?? [] })
+      })
+      .catch((err: any) => console.error(err))
+    return () => { cancelled = true }
   }, [id])
 
   useEffect(() => {
@@ -227,6 +241,23 @@ function Author(props: any) {
           <ResultWork work={work} key={'work-' + work._id} />
         </div>
       ))}
+
+      {credits.edited.length > 0 ? (
+        <>
+          <div className="entity-page-section-heading">Edited</div>
+          {credits.edited.map((work: any) => (
+            <ResultWork work={work} key={'edited-' + work._id} />
+          ))}
+        </>
+      ) : null}
+      {credits.translated.length > 0 ? (
+        <>
+          <div className="entity-page-section-heading">Translated</div>
+          {credits.translated.map((work: any) => (
+            <ResultWork work={work} key={'translated-' + work._id} />
+          ))}
+        </>
+      ) : null}
 
       {/* Notes attributed to this author (excluding those from works above) */}
       {authorOnlyNotes.map((note: any) => (

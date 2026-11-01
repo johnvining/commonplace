@@ -2685,6 +2685,11 @@ mark.search-highlight {
   opacity: 0.7;
 }
 
+.work-credit {
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+}
+
 .result-box-placeholder {
   font-style: italic;
   opacity: 0.6;

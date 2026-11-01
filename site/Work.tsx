@@ -49,6 +49,9 @@ function Work(props: any) {
     year: '' as number | string,
     // Edited as author records; sent as ids.
     authors: [] as import('./authorsDisplay').AuthorLike[],
+    // Credited apart from the authors (#358)
+    editors: [] as import('./authorsDisplay').AuthorLike[],
+    translators: [] as import('./authorsDisplay').AuthorLike[],
     summary: '',
     citation_information: '',
   })
@@ -87,6 +90,8 @@ function Work(props: any) {
         url: work.url ?? '',
         year: work.year ?? '',
         authors: Array.isArray(work.authors) ? work.authors : [],
+        editors: Array.isArray(work.editors) ? work.editors : [],
+        translators: Array.isArray(work.translators) ? work.translators : [],
         summary: work.summary ?? '',
         citation_information: work.citation_information ?? '',
       })
@@ -165,7 +170,12 @@ function Work(props: any) {
   }
 
   const handleAcceptUpdates = () =>
-    editor.save((v) => ({ ...v, authors: v.authors.map((a) => a._id).filter(Boolean) }))
+    editor.save((v) => ({
+      ...v,
+      authors: v.authors.map((a) => a._id).filter(Boolean),
+      editors: v.editors.map((a) => a._id).filter(Boolean),
+      translators: v.translators.map((a) => a._id).filter(Boolean),
+    }))
 
   const handleImport = async () => {
     let importText = pendingImportText
@@ -344,6 +354,22 @@ function Work(props: any) {
             inputId="add-author"
             dontAutofocus
           />
+          <label htmlFor="add-editor" className="top-level form-label">Editors</label>
+          <AuthorsChipList
+            value={pending.editors}
+            onChange={(editors) => editor.set('editors', editors)}
+            onExit={handleFinishEditing}
+            inputId="add-editor"
+            dontAutofocus
+          />
+          <label htmlFor="add-translator" className="top-level form-label">Translators</label>
+          <AuthorsChipList
+            value={pending.translators}
+            onChange={(translators) => editor.set('translators', translators)}
+            onExit={handleFinishEditing}
+            inputId="add-translator"
+            dontAutofocus
+          />
           <TopLevelFormInput
             name="Citation Information"
             id="citation-info"
@@ -399,6 +425,16 @@ function Work(props: any) {
               {pending.authors.length > 0 && (
                 <div className="entity-page-byline">
                   <WorkCitationSpan authors={pending.authors} />
+                </div>
+              )}
+              {pending.editors.length > 0 && (
+                <div className="entity-page-byline work-credit">
+                  Edited by <WorkCitationSpan authors={pending.editors} />
+                </div>
+              )}
+              {pending.translators.length > 0 && (
+                <div className="entity-page-byline work-credit">
+                  Translated by <WorkCitationSpan authors={pending.translators} />
                 </div>
               )}
               {nick && (
