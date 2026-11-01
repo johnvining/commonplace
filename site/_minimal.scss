@@ -915,12 +915,12 @@ div.note-slim.button {
 
 // ---- Long notes -----------------------------------------------------------------
 
-// Clamp long text to ~20 lines outside the note's own page (Note.clampText).
+// Clamp long text to ~10 lines outside the note's own page (Note.clampText).
 .note-full .note-text.clamped {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 20;
-  line-clamp: 20;
+  -webkit-line-clamp: 10;
+  line-clamp: 10;
   overflow: hidden;
 }
 
