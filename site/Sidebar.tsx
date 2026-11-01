@@ -89,12 +89,13 @@ function Sidebar() {
     return () => window.removeEventListener('pinned-items-updated', refreshPinned)
   }, [])
 
-  const typeLabels: Record<string, string> = {
-    note: 'Note',
-    work: 'Work',
-    idea: 'Idea',
-    pile: 'Pile',
-    auth: 'Author',
+  // A starred item's name, styled as in the rest of the sidebar and site:
+  // a pile's "Prefix:" as a small key before its name, a work in italics.
+  const pinLabel = (item: any) => {
+    const label = item.label || 'Untitled'
+    if (item.type === 'pile') return <PileName name={label} />
+    if (item.type === 'work') return <em>{label}</em>
+    return label
   }
 
   const getPileItemCount = (pile: any) => {
@@ -122,12 +123,7 @@ function Sidebar() {
                   to={item.href ?? '#'}
                   className="sidebar-link sidebar-link-compact"
                 >
-                  <span className="sidebar-item">
-                    {item.label || 'Untitled'}
-                  </span>
-                  <span className="sidebar-count">
-                    {typeLabels[item.type] || 'Item'}
-                  </span>
+                  <span className="sidebar-item">{pinLabel(item)}</span>
                 </Link>
                 <button
                   className="button pin-button pin-button-compact pin-button-inline pin-button-icon-only starred"
