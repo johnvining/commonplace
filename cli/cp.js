@@ -1291,10 +1291,11 @@ async function cmdPile(args, config) {
   const sub = args[0]
   const rest = args.slice(1)
   if (!sub) {
-    console.error('Usage: cp pile <new|add-work|rm-work> ...')
+    console.error('Usage: cp pile <new|add-work|rm-work|swap-work> ...')
     console.error('  cp pile new "<name>"')
     console.error('  cp pile add-work <pileTarget> <workTarget>')
     console.error('  cp pile rm-work <pileTarget> <workTarget>')
+    console.error('  cp pile swap-work <fromPile> <toPile> <workTarget>')
     return
   }
 
@@ -1332,6 +1333,31 @@ async function cmdPile(args, config) {
       await api('DELETE', `work/${workTarget.id}/pile/${pileTarget.id}`, null, config)
       console.log(`${GREEN}Removed${RESET} work ${workTarget.id} from pile ${pileTarget.id}`)
     }
+    return
+  }
+
+  if (sub === 'swap-work' || sub === 'move-work') {
+    // Adds to the new pile before removing from the old, so a failure
+    // midway leaves the work in both piles rather than neither (#355).
+    const [fromInput, toInput, workInput] = rest
+    if (!fromInput || !toInput || !workInput) {
+      console.error(`Usage: cp pile ${sub} <fromPile> <toPile> <workTarget>`)
+      return
+    }
+    const fromTarget = await resolveTarget(fromInput, 'pile', config)
+    if (!fromTarget) { console.error(`Could not resolve pile "${fromInput}".`); return }
+    const toTarget = await resolveTarget(toInput, 'pile', config)
+    if (!toTarget) { console.error(`Could not resolve pile "${toInput}".`); return }
+    const workTarget = await resolveTarget(workInput, 'work', config)
+    if (!workTarget) { console.error(`Could not resolve work "${workInput}".`); return }
+    if (String(fromTarget.id) === String(toTarget.id)) {
+      console.error('The two piles are the same.')
+      return
+    }
+
+    await api('PUT', `work/${workTarget.id}/pile`, { id: toTarget.id }, config)
+    await api('DELETE', `work/${workTarget.id}/pile/${fromTarget.id}`, null, config)
+    console.log(`${GREEN}Moved${RESET} work ${workTarget.id} from pile ${fromTarget.id} to pile ${toTarget.id}`)
     return
   }
 
@@ -1601,6 +1627,9 @@ ${BOLD}Piles${RESET}
   pile new "<name>"           Create an empty pile
   pile add-work <pile> <work> Add a work to a pile (each accepts nick/ObjectId/name)
   pile rm-work  <pile> <work> Remove a work from a pile
+  pile swap-work <from> <to> <work>
+                              Move a work from one pile to another
+                              (also: move-work)
 
 ${BOLD}Works${RESET}
   work add-author <work> <author>  Attach an existing author to a work
