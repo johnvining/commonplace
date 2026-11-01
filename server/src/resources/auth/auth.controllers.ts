@@ -6,6 +6,7 @@ import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
+import { mergeAuthors } from '../../utils/merge.js'
 import type { Request, Response } from 'express'
 
 
@@ -121,6 +122,11 @@ export const reqGetWorksForAuthor = async (req: Request, res: Response) => {
     .lean()
     .exec()
   return withNoteCounts(works)
+}
+
+// POST /auth/:id/merge { into, dryRun }: fold this author into `into` (#360)
+export const reqMergeAuthor = async (req: Request, res: Response) => {
+  return mergeAuthors(String(req.params.id), String(req.body.into), Boolean(req.body.dryRun))
 }
 
 export const reqDeleteAuthor = async (req: Request, res: Response) => {

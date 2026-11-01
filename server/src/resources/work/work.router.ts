@@ -11,6 +11,7 @@ import {
   reqGetAutoCompleteWithCounts,
   reqGetNotesForWork,
   reqGetWorkInfo,
+  reqMergeWork,
   reqRemoveIdeaFromWork,
   reqRemovePileFromWork,
   reqUpdateWork
@@ -29,6 +30,7 @@ router.route('/autocomplete').post(asyncWrapper(reqAutocompleteOnName, 200))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForWork, 200))
 router.route('/:id/auth/create').put(asyncWrapper(reqCreateAndAddAuth, 201))
 router.route('/:id').delete(asyncWrapper(reqDeleteWork, 204))
+router.route('/:id/merge').post(asyncWrapper(reqMergeWork, 200))
 
 router.route('/:id/pile').put(asyncWrapper(reqAddPile, 200))
 router.route('/:id/pile/create').put(asyncWrapper(reqAddNewPile, 201))

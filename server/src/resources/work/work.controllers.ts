@@ -13,6 +13,7 @@ import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
+import { mergeWorks } from '../../utils/merge.js'
 import type { Request, Response } from 'express'
 
 const WORK_WRITABLE = [
@@ -80,6 +81,11 @@ export const reqCreateAndAddAuth = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Work not found' })
   }
   return doc
+}
+
+// POST /work/:id/merge { into, dryRun }: fold this work into `into` (#360)
+export const reqMergeWork = async (req: Request, res: Response) => {
+  return mergeWorks(String(req.params.id), String(req.body.into), Boolean(req.body.dryRun))
 }
 
 export const reqDeleteWork = async (req: Request, res: Response) => {

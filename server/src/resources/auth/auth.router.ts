@@ -4,6 +4,7 @@ import defaultControllers, {
   getAutoCompleteWithCounts,
   reqCreateAuthor,
   reqDeleteAuthor,
+  reqMergeAuthor,
   reqGetNotesForAuthor,
   reqGetAllNotesForAuthor,
   reqGetNotesAboutAuthor,
@@ -19,6 +20,7 @@ router
   .post(asyncWrapper(getAutoCompleteWithCounts, 200))
 router.route('/autocomplete').post(asyncWrapper(getAutoComplete, 200))
 router.route('/:id/delete').delete(asyncWrapper(reqDeleteAuthor, 204))
+router.route('/:id/merge').post(asyncWrapper(reqMergeAuthor, 200))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForAuthor, 200))
 router.route('/:id/all-notes').get(asyncWrapper(reqGetAllNotesForAuthor, 200))
 router.route('/:id/notes-about').get(asyncWrapper(reqGetNotesAboutAuthor, 200))
