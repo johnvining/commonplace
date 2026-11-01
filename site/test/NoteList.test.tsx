@@ -80,3 +80,17 @@ describe('NoteList selection', () => {
     await waitFor(() => expect(selectedIds()).toEqual(['a']))
   })
 })
+
+describe('NoteList loading', () => {
+  it('shows a retry instead of hanging when the first load fails (#353)', async () => {
+    let calls = 0
+    const flaky = async () => {
+      calls++
+      // Failing loaders log and resolve undefined, like RecentList
+      return calls <= 2 ? undefined : { data: { data: notes } }
+    }
+    renderList({ getListOfNotes: flaky })
+    fireEvent.click(await screen.findByText('Retry'))
+    await screen.findByText('first')
+  })
+})

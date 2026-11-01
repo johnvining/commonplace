@@ -33,6 +33,8 @@ class NoteList extends React.Component<any, any> {
     useGridView: 1,
     page: 1,
     pageLoading: false,
+    // Set when the first page couldn't be fetched
+    loadFailed: false,
     // Set when an open-ended list turned out to have no next page.
     atEnd: false,
     // Full match count when the list endpoint reports one (entity pages);
@@ -47,15 +49,36 @@ class NoteList extends React.Component<any, any> {
     return noteElement?.dataset?.noteId || null
   }
 
-  async componentDidMount() {
-    const response = await this.props.getListOfNotes(
-      this.props.index,
-      this.state.page
-    )
+  // Most getListOfNotes implementations log a failed request and resolve
+  // undefined. Try twice, then show an error with a retry button rather
+  // than "Loading..." forever (#353).
+  async fetchPage(page: number) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await this.props.getListOfNotes(this.props.index, page)
+        if (response?.data) return response
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    return null
+  }
+
+  componentDidMount() {
+    this.loadFirstPage()
+  }
+
+  async loadFirstPage() {
+    this.setState({ loadFailed: false })
+    const response = await this.fetchPage(this.state.page)
+    if (!response) {
+      this.setState({ loadFailed: true })
+      return
+    }
 
     this.setState(
       {
-        notes: response.data.data,
+        notes: response.data.data ?? [],
         total: db.notePageTotal(response),
       },
       () => {
@@ -286,7 +309,11 @@ class NoteList extends React.Component<any, any> {
   // put, when an open-ended list has no further page.
   async goToPage(page: number, selectAt: 'first' | 'last' | null = null) {
     this.setState({ pageLoading: true })
-    const response = await this.props.getListOfNotes(this.props.index, page)
+    const response = await this.fetchPage(page)
+    if (!response) {
+      this.setState({ pageLoading: false })
+      return false
+    }
     const notes = response.data.data ?? []
     if (!notes.length && page > this.state.page) {
       this.setState({ pageLoading: false, atEnd: true })
@@ -862,7 +889,14 @@ class NoteList extends React.Component<any, any> {
             {this.renderPager(lastPage, onLastPage)}
           </div>
         )}
-        {this.state.notes === undefined ? (
+        {this.state.notes === undefined && this.state.loadFailed ? (
+          <div className="search-loading-state">
+            Couldn't load notes.{' '}
+            <button className="load-retry" onClick={() => this.loadFirstPage()}>
+              Retry
+            </button>
+          </div>
+        ) : this.state.notes === undefined ? (
           <div className="search-loading-state">Loading...</div>
         ) : this.state.notes.length === 0 ? (
           <div className="search-empty-state">No notes found.</div>

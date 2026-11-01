@@ -1340,6 +1340,17 @@ mark.search-highlight {
   font-style: italic;
 }
 
+.load-retry {
+  font: inherit;
+  font-style: normal;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .result-box {
   padding: 8px;
   margin: 8px;
