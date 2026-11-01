@@ -38,10 +38,17 @@ import { requireObjectIdParam } from '../../utils/validateObjectId.js'
 import { recordOpened } from '../../utils/default.controllers.js'
 import Note from './note.model.js'
 import { bulkUpdateNotes, linkNotesByTitle } from '../../utils/bulkNotes.js'
+import { noteTitleGroups, notesTitledLikeAWork } from '../../utils/cleanupQueries.js'
+import { findEntityNotesPage } from '../../utils/pagination.js'
 
 const router = Router()
 
 router.route('/find').put(asyncWrapper(reqFindNotesByString, 200))
+
+// Cleanup queries (#357)
+router.route('/title-groups').get(asyncWrapper(async (req) => noteTitleGroups(Number(req.query.min) || 2), 200))
+router.route('/titled-like-work').get(asyncWrapper(async () => notesTitledLikeAWork(), 200))
+router.route('/no-work').get(asyncWrapper((req, res) => findEntityNotesPage(req, res, { work: null }, { updatedAt: -1 }), 200))
 
 router.route('/').post(controllers.createOne)
 

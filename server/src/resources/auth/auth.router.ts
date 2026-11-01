@@ -13,6 +13,7 @@ import defaultControllers, {
   reqGetCreditsForAuthor
 } from './auth.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
+import { combinedAuthors, duplicateAuthors } from '../../utils/cleanupQueries.js'
 
 const router = Router()
 
@@ -21,6 +22,9 @@ router
   .route('/autocomplete/with-counts')
   .post(asyncWrapper(getAutoCompleteWithCounts, 200))
 router.route('/autocomplete').post(asyncWrapper(getAutoComplete, 200))
+// Cleanup queries (#357)
+router.route('/duplicates').get(asyncWrapper(async () => duplicateAuthors(), 200))
+router.route('/combined').get(asyncWrapper(async () => combinedAuthors(), 200))
 router.route('/:id/delete').delete(asyncWrapper(reqDeleteAuthor, 204))
 router.route('/:id/merge').post(asyncWrapper(reqMergeAuthor, 200))
 router.route('/:id/split').post(asyncWrapper(reqSplitAuthor, 200))

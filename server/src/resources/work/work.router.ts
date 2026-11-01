@@ -20,6 +20,7 @@ import { asyncWrapper } from '../../utils/requests.js'
 import { recordOpened } from '../../utils/default.controllers.js'
 import { requireObjectIdParam } from '../../utils/validateObjectId.js'
 import Work from './work.model.js'
+import { duplicateWorks, worksWithoutNotes } from '../../utils/cleanupQueries.js'
 
 const router = Router()
 
@@ -27,6 +28,9 @@ router
   .route('/autocomplete/with-counts')
   .post(asyncWrapper(reqGetAutoCompleteWithCounts, 200))
 router.route('/autocomplete').post(asyncWrapper(reqAutocompleteOnName, 200))
+// Cleanup queries (#357)
+router.route('/no-notes').get(asyncWrapper(async () => worksWithoutNotes(), 200))
+router.route('/duplicates').get(asyncWrapper(async () => duplicateWorks(), 200))
 router.route('/:id/notes').get(asyncWrapper(reqGetNotesForWork, 200))
 router.route('/:id/auth/create').put(asyncWrapper(reqCreateAndAddAuth, 201))
 router.route('/:id').delete(asyncWrapper(reqDeleteWork, 204))
