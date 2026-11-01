@@ -804,6 +804,13 @@ class NoteList extends React.Component<any, any> {
                 getSuggestions={db.getSuggestions}
                 apiType={this.state.toAdd}
               />
+            ) : null}
+            {this.state.addSomething ? (
+              <TopLevelStandardButton
+                name="Cancel"
+                shortcut="Esc"
+                onClick={() => this.setState({ addSomething: false, toAdd: '' })}
+              />
             ) : (
               <TopLevelStandardButtonContainer>
                 <TopLevelStandardButton

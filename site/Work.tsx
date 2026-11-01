@@ -592,7 +592,10 @@ function Work(props: any) {
       )}
       {edit && (
         <div style={{ marginBottom: '4px' }}>
-          <TopLevelStandardButton name="Done" shortcut="Ctrl+A" onClick={handleAcceptUpdates} />
+          <TopLevelStandardButtonContainer>
+            <TopLevelStandardButton name="Done" shortcut="Ctrl+A" position="left" onClick={handleAcceptUpdates} />
+            <TopLevelStandardButton name="Cancel" shortcut="Esc" position="right" onClick={handleFinishEditing} />
+          </TopLevelStandardButtonContainer>
         </div>
       )}
       {importMode ? (

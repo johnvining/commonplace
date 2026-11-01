@@ -783,6 +783,36 @@ a {
   align-self: center;
 }
 
+// Closes the search bar without Esc (#340)
+.search-bar-close {
+  flex: none;
+  align-self: center;
+  background: none;
+  border: none;
+  color: $font_color;
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  padding: 4px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// A note's ideas, piles or links input with its Done button (#340)
+.note-mode-edit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  > :first-child {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
 .search-bar {
   &.container {
     border-width: 1px;

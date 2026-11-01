@@ -1497,6 +1497,32 @@ div .top-bar {
   align-self: center;
 }
 
+.search-bar-close {
+  flex: none;
+  align-self: center;
+  background: none;
+  border: none;
+  color: var(--font-color);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  padding: 4px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.search-bar-close:hover {
+  opacity: 1;
+}
+
+.note-mode-edit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.note-mode-edit > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
 .search-bar.container {
   border-width: 1px;
   border-style: solid;

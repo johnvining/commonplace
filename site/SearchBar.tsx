@@ -343,6 +343,15 @@ function SearchBar(props: any) {
           {...NO_AUTOFILL}
         ></input>
       )}
+      {props.onClose ? (
+        <button
+          type="button"
+          className="search-bar-close"
+          title="Close search (Esc)"
+          aria-label="Close search"
+          onClick={props.onClose}
+        >×</button>
+      ) : null}
     </div>
   )
 }

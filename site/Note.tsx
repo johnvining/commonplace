@@ -665,6 +665,19 @@ class Note extends React.Component<any, any> {
     this.setState({ pendingWorkId: null, pendingWorkName: '' })
   }
 
+  // Way out of editing ideas, piles or links without Esc, which iPad
+  // keyboards lack (#340).
+  renderModeDone() {
+    return (
+      <NoteButton
+        icon={check_circle}
+        label="Done"
+        shortcut="Esc"
+        onClick={() => this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)}
+      />
+    )
+  }
+
   render() {
     const { deleted } = this.state
     const { note } = this.props
@@ -1279,6 +1292,7 @@ class Note extends React.Component<any, any> {
                   </div>
                 </>
               ) : edit_ideas ? (
+                <span className="note-mode-edit">
                 <IdeasPillList
                   value={note.ideas ?? []}
                   onAddExisting={(idea) => this.handleNewIdea(idea._id)}
@@ -1297,7 +1311,10 @@ class Note extends React.Component<any, any> {
                   }}
                   inputId={this.props.id + 'idea'}
                 />
+                {this.renderModeDone()}
+                </span>
               ) : edit_piles ? (
+                <span className="note-mode-edit">
                 <PilesPillList
                   value={note.piles ?? []}
                   onAddExisting={(pile) => this.handleNewPile(pile._id)}
@@ -1311,9 +1328,11 @@ class Note extends React.Component<any, any> {
                   }
                   inputId={this.props.id + 'pile'}
                 />
+                {this.renderModeDone()}
+                </span>
               ) : edit_links ? (
                 <>
-                  <div className="right-div">
+                  <div className="right-div note-mode-edit">
                     <input
                       className="note-link-input"
                       autoFocus
@@ -1325,6 +1344,7 @@ class Note extends React.Component<any, any> {
                         })
                       }}
                     ></input>
+                    {this.renderModeDone()}
                   </div>
                 </>
               ) : (

@@ -185,7 +185,10 @@ function Author(props: any) {
                 editor.set('usernames', e.target.value)
               }}
             />
-            <TopLevelStandardButton name="Done" shortcut="Ctrl+A" onClick={handleAcceptUpdates} />
+            <TopLevelStandardButtonContainer>
+              <TopLevelStandardButton name="Done" shortcut="Ctrl+A" position="left" onClick={handleAcceptUpdates} />
+              <TopLevelStandardButton name="Cancel" shortcut="Esc" position="right" onClick={editor.cancel} />
+            </TopLevelStandardButtonContainer>
           </TopLevelFormContainer>
         ) : (
           <div className="entity-page-header">
