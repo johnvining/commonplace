@@ -51,12 +51,11 @@ export async function importCsvFromString(string: string, recordType: number) {
   const stream = Readable.from(string)
   const entries: any[] = []
   const delimiter = recordType === 3 ? '\t' : ','
-  const quote = recordType === 3 ? false : '"'
-  const parser = parse({ delimiter, relax_column_count: true, quote })
+  // Quoted fields can hold newlines in both formats (#362). relax_quotes
+  // keeps a bare " inside an unquoted field from failing the whole import.
+  const parser = parse({ delimiter, relax_column_count: true, quote: '"', relax_quotes: true })
   stream.pipe(parser).on('data', async (data: any) => {
     entries.push(data)
-  }).on('error', (err: unknown) => {
-    console.error('Import parse error:', err)
   })
   await streamComplete(parser)
 
@@ -72,10 +71,15 @@ export async function importCsvFromString(string: string, recordType: number) {
   return totalImports
 }
 
+// Rejects on a parse error, which ends the stream without an 'end' event
 function streamComplete(stream: any) {
-  return new Promise<void>(function c(res) {
+  return new Promise<void>(function c(res, rej) {
     stream.on('end', function () {
       res()
+    })
+    stream.on('error', function (err: unknown) {
+      console.error('Import parse error:', err)
+      rej(err)
     })
   })
 }

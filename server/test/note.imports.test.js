@@ -78,5 +78,27 @@ describe('note imports', () => {
         .expect(200)
       expect(res.body.data).toBe(2)
     })
+
+    it('keeps a quoted multi-line field in one note (#362)', async () => {
+      const agent = await authedAgent()
+      const tsv = 'Article\t"line one\nline two"\thttps://x.com/1\t\tTitle\n'
+      const res = await agent
+        .put('/api/note/import/instapaper')
+        .send({ importList: tsv })
+        .expect(200)
+      expect(res.body.data).toBe(1)
+      const notes = await agent.get('/api/note/all/1').expect(200)
+      expect(notes.body.data.map(n => n.text)).toEqual(['line one\nline two'])
+    })
+
+    it('keeps a bare quote inside an unquoted field', async () => {
+      const agent = await authedAgent()
+      const tsv = 'Article\tHe said "hi" twice\thttps://x.com/1\t\tTitle\n'
+      const res = await agent
+        .put('/api/note/import/instapaper')
+        .send({ importList: tsv })
+        .expect(200)
+      expect(res.body.data).toBe(1)
+    })
   })
 })
