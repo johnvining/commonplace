@@ -77,6 +77,22 @@ export const getSuggestedIdeas = async function (
   }
 }
 
+// Photos of book pages usually mark the passages that matter, and often
+// carry pencil notes in the margins (#354). Marked passages win over the
+// full page; margin notes come last, each on a "Margin:" line.
+export const OCR_PROMPT = [
+  'Transcribe the text in this image.',
+  'If some passages are marked (highlighted, underlined, bracketed, or flagged with a line or mark in the margin), ' +
+    'transcribe only the marked passages, in reading order, with a blank line between separate passages. ' +
+    'Otherwise transcribe all of the printed text.',
+  'Then, if there are handwritten notes (often faint pencil in the margins or between lines), transcribe each one ' +
+    'on its own line at the end, starting with "Margin: ". Skip marks that are not words, such as lines, ticks and stars. ' +
+    'Write [illegible] for a handwritten word you cannot read.',
+  'Only include semantically important line breaks; join lines broken by the page width and rejoin hyphenated words.',
+  'Return just the text without any additional punctuation or markdown.',
+  `If the image has no text to transcribe (a photo, a painting), reply with exactly ${NO_TEXT}.`,
+].join(' ')
+
 export const getOpenAiOCR = async function (
   image_location: string
 ): Promise<string | null> {
@@ -88,10 +104,7 @@ export const getOpenAiOCR = async function (
         content: [
           {
             type: 'text',
-            text:
-              'Transcribe the text in this image and only include semantically important line breaks. ' +
-              'Return just the text without any additional punctuation or markdown. ' +
-              `If the image has no text to transcribe (a photo, a painting), reply with exactly ${NO_TEXT}.`,
+            text: OCR_PROMPT,
           },
           {
             type: 'image_url',
