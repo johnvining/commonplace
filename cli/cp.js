@@ -147,7 +147,7 @@ function formatEntity(type, item) {
   if (type === 'work') {
     const authorStr = joinAuthorNames(item.authors)
     if (authorStr) meta = ` ${DIM}— ${authorStr}${RESET}`
-    if (item.year) meta += ` ${DIM}(${item.year})${RESET}`
+    if (item.year) meta += ` ${DIM}(${item.year < 0 ? `${-item.year} BC` : item.year})${RESET}`
   }
   return `${BOLD}${color}[${label}]${RESET} ${name}${meta}${nick ? '  ' + nick : ''}\n  ${DIM}${item._id}${RESET}`
 }

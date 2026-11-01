@@ -4,7 +4,7 @@ import work_img from 'url:./icons/work.svg'
 import PileListForItem from './PileListForItem'
 import PinButton from './PinButton'
 import { joinAuthorNames } from './authorsDisplay'
-import { wornClass, wornTitle } from './utils'
+import { formatYear, wornClass, wornTitle } from './utils'
 
 class ResultWork extends React.Component<any, any> {
   state: any = {}
@@ -31,7 +31,7 @@ class ResultWork extends React.Component<any, any> {
               {work.authors?.length ? <>{joinAuthorNames(work.authors)},&nbsp;</> : null}
               <em>{work.name}</em>
               {work.original_name ? <span className="work-original-name"> ({work.original_name})</span> : null}
-              {work.year ? <span className="result-year">{work.year}</span> : null}
+              {work.year ? <span className="result-year">{formatYear(work.year)}</span> : null}
             </div>
               <PinButton
                 type="work"

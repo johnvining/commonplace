@@ -29,9 +29,11 @@ export function notePageTitle(note: { title?: string; text?: string; nick?: stri
   return titleWithNick(label, note.nick)
 }
 
-// Year as YearSpan shows it: negative years are BC.
-function formatYear(year: number): string {
-  return year < 0 ? `${-year} BC` : String(year)
+// Years before 1 show as BC (#361). The stored value stays numeric.
+export function formatYear(year: number | string | null | undefined): string {
+  if (year === null || year === undefined) return ''
+  const n = Number(year)
+  return n < 0 ? `${-n} BC` : String(year)
 }
 
 const asYear = (v: unknown): number | null => {

@@ -1,4 +1,5 @@
 import React from 'react'
+import { formatYear } from './utils'
 
 interface YearSpanProps {
   year?: number | string
@@ -8,9 +9,7 @@ interface YearSpanProps {
 
 class YearSpan extends React.Component<YearSpanProps> {
   formatYear(year: any) {
-    if (year < 0) {
-      year = year * -1 + ' BC'
-    }
+    year = formatYear(year)
 
     if (this.props.parens) {
       return '(' + year + ')'

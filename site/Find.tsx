@@ -26,7 +26,7 @@ import {
   TopLevelTitle,
   TopLevelTitleContainer,
 } from './TopLevelHeadings'
-import { wornClass, wornTitle } from './utils'
+import { formatYear, wornClass, wornTitle } from './utils'
 
 function highlight(text: any, query: any) {
   if (!text || !query) return text
@@ -60,7 +60,7 @@ function UnifiedResult({ entry, query }: any) {
             <span className="truncate">
               {item.authors?.length ? <>{highlight(joinAuthorNames(item.authors), query)},&nbsp;</> : null}
               <em>{highlight(item.name, query)}</em>
-              {item.year ? <span className="date">&nbsp;{item.year}</span> : null}
+              {item.year ? <span className="date">&nbsp;{formatYear(item.year)}</span> : null}
             </span>
             <PinButton type="work" id={item._id} label={item.name} href={`/work/${item._id}`} compact={true} className="pin-button-inline" />
           </div>
