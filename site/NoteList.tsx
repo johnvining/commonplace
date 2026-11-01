@@ -19,7 +19,8 @@ import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import { useNavigate } from 'react-router-dom'
 
 // The views that select notes with circles and share one set of props
-// (see NoteCompactParts); the others are full (Note) and result.
+// (see NoteCompactParts; constants.compact_view_modes lists the same
+// modes); the others are full (Note) and result.
 const COMPACT_VIEWS: Record<number, React.ComponentType<any>> = {
   [constants.view_modes.SLIM]: NoteSlim,
   [constants.view_modes.GRID]: NoteGrid,

@@ -182,6 +182,11 @@ function Find(props: any) {
 
   // Category-specific full views
   if (category === 'notes') {
+    // Tagging needs the select circles, so keep the chosen view when it
+    // has them and use slim otherwise (#155).
+    const tagViewMode = constants.compact_view_modes.includes(props.viewMode)
+      ? props.viewMode
+      : constants.view_modes.SLIM
     return (
       <div>
         <TopLevelTitleContainer>
@@ -194,7 +199,7 @@ function Find(props: any) {
         </div>
         <NoteList
           key={'notes-all-' + search}
-          viewMode={constants.view_modes.SLIM}
+          viewMode={tagViewMode}
           getListOfNotes={getListOfNotes}
         />
       </div>

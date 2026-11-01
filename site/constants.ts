@@ -6,6 +6,9 @@ export const view_modes = {
   TILE: 5,
 }
 
+// Views that select notes with circles for multi-select (#155)
+export const compact_view_modes = [view_modes.SLIM, view_modes.GRID, view_modes.TILE]
+
 // No selection: No specific note is selected
 // Not selected: This specific note is not the one selected (and there is one selected)
 // Selected: This note is selected. Tabbing should be limited to this note.
