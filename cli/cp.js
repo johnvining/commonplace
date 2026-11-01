@@ -546,10 +546,64 @@ async function cmdCapture(args, config) {
   }
 }
 
+// Note ids from a comma-separated list of ids and nicks, or from stdin
+// (whitespace- or comma-separated) when the argument is "-". Lets another
+// command's --ids output feed a bulk write (#356).
+async function noteIdsFromArg(arg, config) {
+  let refs
+  if (arg === '-') {
+    let input = ''
+    for await (const chunk of process.stdin) input += chunk
+    refs = input.split(/[\s,]+/)
+  } else {
+    refs = arg.split(',')
+  }
+  const ids = []
+  for (const ref of refs.map(r => r.trim()).filter(Boolean)) {
+    if (/^[0-9a-f]{24}$/i.test(ref)) { ids.push(ref); continue }
+    const resolved = /^n\d+$/i.test(ref) ? await resolveByNick(ref, config) : null
+    if (resolved?.type !== 'note') throw new Error(`Not a note id or nick: ${ref}`)
+    ids.push(resolved.id)
+  }
+  return [...new Set(ids)]
+}
+
+// `cp set a,b,c ...` or `cp set - ...`: one request for every note.
+async function bulkSet(idArg, flags, config) {
+  if (flags.title || flags.text) { console.error('--title and --text take one note at a time.'); return }
+  const ids = await noteIdsFromArg(idArg, config)
+  if (!ids.length) { console.error('No notes given.'); return }
+  const refs = (value) => (value || '').split(',').map(s => s.trim()).filter(Boolean)
+  const resolveAll = async (type, value) => {
+    const out = []
+    for (const ref of refs(value)) {
+      const rid = await resolveOrCreate(type, ref, config)
+      if (!rid) throw new Error(`Could not resolve ${type} "${ref}"`)
+      out.push(rid)
+    }
+    return out
+  }
+  const body = { ids }
+  if (flags.work) body.work = (await resolveAll('work', flags.work))[0]
+  if (flags.author) body.authors = await resolveAll('auth', flags.author)
+  if (flags.idea) body.ideas = await resolveAll('idea', flags.idea)
+  if (flags.pile) body.piles = await resolveAll('pile', flags.pile)
+  if (Object.keys(body).length === 1) { console.error('Nothing to set: pass --work, --author, --idea or --pile.'); return }
+  const res = await api('POST', 'note/bulk-update', body, config)
+  const { matched = 0, modified = 0 } = res?.data || {}
+  console.log(`${GREEN}Done.${RESET} ${modified} of ${matched} notes changed.`)
+}
+
 async function cmdSet(args, config) {
   const id = args[0]
   const { flags } = parseFlags(args.slice(1))
-  if (!id) { console.error('Usage: cplace set <id> [--author REF] [--work REF] [--idea REF] [--pile REF] [--title TEXT] [--text TEXT]'); return }
+  if (!id) {
+    console.error('Usage: cplace set <id> [--author REF] [--work REF] [--idea REF] [--pile REF] [--title TEXT] [--text TEXT]')
+    console.error('       cplace set <id,id,...|-> [--author REF] [--work REF] [--idea REF] [--pile REF]')
+    console.error('  A comma list, or - to read ids from stdin, updates every note in one request.')
+    return
+  }
+  if (id === '-' || id.includes(',')) return bulkSet(id, flags, config)
 
   if (flags.title || flags.text) {
     const body = {}
@@ -1441,7 +1495,7 @@ async function cmdWork(args, config) {
   if (!sub) {
     console.error('Usage: cp work <add-author|rm-author> <workTarget> <authorTarget>')
     console.error('       cp work <add-editor|rm-editor|add-translator|rm-translator> <workTarget> <authorTarget>')
-    console.error('       cp work merge <fromWork> <intoWork> [--yes]')
+    console.error('       cp work merge <fromWork> [<fromWork>...] <intoWork> [--yes]')
     return
   }
 
@@ -1492,41 +1546,123 @@ async function cmdWork(args, config) {
   console.error(`Unknown work subcommand: ${sub}`)
 }
 
-// `cp work merge` / `cp auth merge <from> <into> [--yes]` (#360). Shows
-// what will move (a dry run on the server), asks, then merges.
+// `cp work merge` / `cp auth merge <from> [<from>...] <into> [--yes]`
+// (#360, #356). The last argument is the one kept. Shows what will move
+// (a dry run on the server for each), asks once, then merges each.
 async function mergeCommand(type, args, config) {
   const flagYes = args.includes('--yes') || args.includes('-y')
-  const [fromInput, intoInput] = args.filter(a => a !== '--yes' && a !== '-y')
+  const inputs = args.filter(a => a !== '--yes' && a !== '-y')
   const label = type === 'auth' ? 'author' : 'work'
-  if (!fromInput || !intoInput) {
-    console.error(`Usage: cp ${type} merge <from${label}> <into${label}> [--yes]`)
+  if (inputs.length < 2) {
+    console.error(`Usage: cp ${type} merge <from${label}> [<from${label}>...] <into${label}> [--yes]`)
     return
   }
-  const from = await resolveTarget(fromInput, type, config)
-  if (!from) { console.error(`Could not resolve ${label} "${fromInput}".`); return }
+  const intoInput = inputs.pop()
   const into = await resolveTarget(intoInput, type, config)
   if (!into) { console.error(`Could not resolve ${label} "${intoInput}".`); return }
-  if (String(from.id) === String(into.id)) { console.error(`Both are the same ${label}.`); return }
+  const froms = []
+  for (const fromInput of inputs) {
+    const from = await resolveTarget(fromInput, type, config)
+    if (!from) { console.error(`Could not resolve ${label} "${fromInput}".`); return }
+    if (String(from.id) === String(into.id)) { console.error(`"${fromInput}" is the ${label} being kept.`); return }
+    if (!froms.some(f => String(f.id) === String(from.id))) froms.push(from)
+  }
 
-  const plan = (await api('POST', `${type}/${from.id}/merge`, { into: into.id, dryRun: true }, config))?.data
-  if (!plan) { console.error('Merge preview failed.'); return }
-  console.log(`Merge ${label} ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET}`)
-  console.log(`   into ${BOLD}${plan.into.name}${RESET} ${DIM}${plan.into._id}${RESET}`)
-  const moves = type === 'auth'
-    ? [['notes by', plan.notes], ['notes about', plan.notesAbout], ['works', plan.works],
-       ['works edited', plan.edited], ['works translated', plan.translated]]
-    : [['notes', plan.notes], ['piles', plan.piles], ['ideas', plan.ideas], ['authors', plan.authors],
-       ['editors', plan.editors], ['translators', plan.translators]]
-  console.log('  ' + moves.map(([what, n]) => `${n} ${what}`).join(', '))
-  if (plan.fields.length) console.log(`  fills in: ${plan.fields.join(', ')}`)
-  console.log(`  then deletes ${plan.from.name}`)
+  const plans = []
+  for (const from of froms) {
+    const plan = (await api('POST', `${type}/${from.id}/merge`, { into: into.id, dryRun: true }, config))?.data
+    if (!plan) { console.error('Merge preview failed.'); return }
+    plans.push(plan)
+  }
+  console.log(`Into ${label} ${BOLD}${plans[0].into.name}${RESET} ${DIM}${plans[0].into._id}${RESET}, merge:`)
+  for (const plan of plans) {
+    const moves = type === 'auth'
+      ? [['notes by', plan.notes], ['notes about', plan.notesAbout], ['works', plan.works],
+         ['works edited', plan.edited], ['works translated', plan.translated]]
+      : [['notes', plan.notes], ['piles', plan.piles], ['ideas', plan.ideas], ['authors', plan.authors],
+         ['editors', plan.editors], ['translators', plan.translators]]
+    console.log(`  ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET}`)
+    console.log('    ' + moves.map(([what, n]) => `${n} ${what}`).join(', '))
+    if (plan.fields.length) console.log(`    fills in: ${plan.fields.join(', ')}`)
+  }
+  console.log(`  then deletes ${plans.length === 1 ? 'it' : `those ${plans.length}`}`)
 
   if (!flagYes) {
     const ok = await confirm('Merge? [y/N] ')
     if (!ok) { console.log('Cancelled.'); return }
   }
-  await api('POST', `${type}/${from.id}/merge`, { into: into.id }, config)
-  console.log(`${GREEN}Merged${RESET} into ${plan.into.name}`)
+  for (const from of froms) await api('POST', `${type}/${from.id}/merge`, { into: into.id }, config)
+  console.log(`${GREEN}Merged${RESET} ${froms.length} into ${plans[0].into.name}`)
+}
+
+// `cp auth split <author> --into "Name A" --into "Name B" [--keep] [--yes]`
+// (#356): one author per name in the old one's place everywhere.
+async function splitCommand(args, config) {
+  const flagYes = args.includes('--yes') || args.includes('-y')
+  const keep = args.includes('--keep')
+  const names = []
+  const positional = []
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--into' && i + 1 < args.length) names.push(args[++i])
+    else if (args[i].startsWith('--into=')) names.push(args[i].slice(7))
+    else if (!['--yes', '-y', '--keep'].includes(args[i])) positional.push(args[i])
+  }
+  const input = positional.join(' ').trim()
+  if (!input || !names.length) {
+    console.error('Usage: cp auth split <author> --into "Name A" --into "Name B" [--keep] [--yes]')
+    console.error('  Existing authors are reused by name; --keep keeps the old author record.')
+    return
+  }
+  const target = await resolveTarget(input, 'auth', config)
+  if (!target) { console.error(`Could not resolve author "${input}".`); return }
+  const plan = (await api('POST', `auth/${target.id}/split`, { names, keep, dryRun: true }, config))?.data
+  if (!plan) { console.error('Split preview failed.'); return }
+  console.log(`Split author ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET} into:`)
+  plan.into.forEach(t => console.log(`  ${t.name}  ${DIM}${t.existing ? t._id : '(new)'}${RESET}`))
+  console.log(`  on ${plan.notes} notes by, ${plan.notesAbout} notes about, ${plan.works} works, ` +
+    `${plan.edited} edited, ${plan.translated} translated`)
+  console.log(plan.deletesOld ? `  then deletes ${plan.from.name}` : `  keeping ${plan.from.name}`)
+  if (!flagYes) {
+    const ok = await confirm('Split? [y/N] ')
+    if (!ok) { console.log('Cancelled.'); return }
+  }
+  await api('POST', `auth/${target.id}/split`, { names, keep }, config)
+  console.log(`${GREEN}Split${RESET} into ${names.length}`)
+}
+
+// `cp notes <subcommand>`: operations over many notes (#356).
+async function cmdNotes(args, config) {
+  const sub = args[0]
+  const rest = args.slice(1)
+  if (sub === 'link-by-title') {
+    const flagYes = rest.includes('--yes') || rest.includes('-y')
+    const all = rest.includes('--all')
+    const { flags } = parseFlags(rest.filter(a => !['--yes', '-y', '--all'].includes(a)))
+    if (!flags.work) {
+      console.error('Usage: cp notes link-by-title --work <work> [--title "T"] [--all] [--yes]')
+      console.error('  Links notes titled exactly like the work (or --title), ignoring case.')
+      console.error('  Only notes with no work, unless --all.')
+      return
+    }
+    const work = await resolveTarget(flags.work, 'work', config)
+    if (!work) { console.error(`Could not resolve work "${flags.work}".`); return }
+    const body = { work: work.id, title: flags.title, all }
+    const plan = (await api('POST', 'note/link-by-title', { ...body, dryRun: true }, config))?.data
+    if (!plan) { console.error('Preview failed.'); return }
+    console.log(`Notes titled "${plan.title}" → ${BOLD}${plan.work.name}${RESET}: ${plan.matched}` +
+      (plan.fromOtherWorks ? ` (${plan.fromOtherWorks} from other works)` : ''))
+    plan.notes.forEach(n => console.log(`  ${n.title}  ${DIM}${n._id}${RESET}`))
+    if (plan.matched > plan.notes.length) console.log(`  …and ${plan.matched - plan.notes.length} more`)
+    if (!plan.matched) return
+    if (!flagYes) {
+      const ok = await confirm('Link them? [y/N] ')
+      if (!ok) { console.log('Cancelled.'); return }
+    }
+    await api('POST', 'note/link-by-title', body, config)
+    console.log(`${GREEN}Linked${RESET} ${plan.matched} notes`)
+    return
+  }
+  console.error('Usage: cp notes link-by-title --work <work> [--title "T"] [--all] [--yes]')
 }
 
 async function cmdAuth(args, config) {
@@ -1535,6 +1671,7 @@ async function cmdAuth(args, config) {
   const sub = args[0]
   const rest = args.slice(1)
   if (sub === 'merge') return mergeCommand('auth', rest, config)
+  if (sub === 'split') return splitCommand(rest, config)
   if (sub === 'rm') {
     const flagYes = rest.includes('--yes') || rest.includes('-y')
     const input = rest.filter(a => a !== '--yes' && a !== '-y').join(' ').trim()
@@ -1570,7 +1707,8 @@ async function cmdAuth(args, config) {
     return
   }
   console.error('Usage: cp auth rm <author> [--yes]')
-  console.error('       cp auth merge <fromAuthor> <intoAuthor> [--yes]')
+  console.error('       cp auth merge <fromAuthor> [<fromAuthor>...] <intoAuthor> [--yes]')
+  console.error('       cp auth split <author> --into "Name A" --into "Name B" [--keep] [--yes]')
 }
 
 async function cmdAllPiles(args, config) {
@@ -1761,14 +1899,26 @@ ${BOLD}Works${RESET}
   work add-translator / rm-translator <work> <author>
                                    Credit (or uncredit) an editor or
                                    translator, kept apart from authors
-  work merge <from> <into> [--yes] Move a duplicate work's notes, piles,
-                                   ideas and authors to another, then
-                                   delete it
+  work merge <from...> <into> [--yes]
+                                   Move duplicate works' notes, piles,
+                                   ideas and authors to the last one
+                                   named, then delete them
 
 ${BOLD}Authors${RESET}
   auth rm <author> [--yes]         Delete an author (says what still uses it)
-  auth merge <from> <into> [--yes] Move a duplicate author's works and notes
-                                   to another, then delete it
+  auth merge <from...> <into> [--yes]
+                                   Move duplicate authors' works and notes
+                                   to the last one named, then delete them
+  auth split <author> --into "A" --into "B" [--keep] [--yes]
+                                   Replace a combined author with one per
+                                   name everywhere it's used
+
+${BOLD}Many notes at once${RESET}
+  notes link-by-title --work <work> [--title "T"] [--all] [--yes]
+                                   Link notes titled like the work
+  set <id,id,...|-> [--work N] [--author N] [--idea N] [--pile N]
+                                   Update many notes in one request
+                                   (- reads ids or nicks from stdin)
 
 ${BOLD}Standalone create${RESET}
   new <work|idea|auth|pile> "<name>"   Create an empty entity of any type
@@ -1850,6 +2000,7 @@ const commands = {
   authors: cmdAuthors,
   author:  cmdAuthor,
   auth:    cmdAuth,
+  notes:   cmdNotes,
   ideas:   cmdIdeas,
   works:   cmdWorks,
   piles:   cmdPiles,
