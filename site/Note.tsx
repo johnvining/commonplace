@@ -1273,7 +1273,7 @@ class Note extends React.Component<any, any> {
                       label="Cancel"
                       shortcut="Esc"
                       onClick={() => {
-                        this.props.setNoteMode(this.props.id, '')
+                        this.props.setNoteMode(this.props.id, constants.note_modes.SELECTED)
                       }}
                     />
                   </div>
@@ -1448,9 +1448,11 @@ function NoteWithKeyboard(props: any) {
 
   const scope = getScope()
 
-  // Section 5: Note Editing keyboard shortcuts
+  // Section 5: Note Editing keyboard shortcuts. An unselected note
+  // registers no scope; it used to fall back to NOTE_EDIT, which made Flip
+  // think a note was still being edited and ignore its keys (#352).
   useKeyboardShortcuts(
-    scope || constants.keyboardScopes.NOTE_EDIT, // fallback scope, won't match if null
+    scope,
     (event: any) => {
       if (!noteRef.current || !scope) return false
       return noteRef.current.handleKeyboardShortcut(event)

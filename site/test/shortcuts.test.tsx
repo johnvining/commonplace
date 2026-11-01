@@ -1,5 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { shortcuts } from '../KeyboardContext'
+import React from 'react'
+import { describe, it, expect, afterEach } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
+import { KeyboardProvider, useKeyboardShortcuts, useKeyboardScopes, shortcuts } from '../KeyboardContext'
 import * as constants from '../constants'
 
 function key(keyCode: number, mods: Partial<KeyboardEvent> = {}) {
@@ -17,5 +19,29 @@ describe('shortcuts', () => {
 
   it('Cmd+J does not move through the list', () => {
     expect(shortcuts.noteList.next(key(constants.keyCodes.listNext, { metaKey: true }))).toBe(false)
+  })
+})
+
+afterEach(cleanup)
+
+function Registers({ scope }: { scope: string | null }) {
+  useKeyboardShortcuts(scope, () => false)
+  return null
+}
+
+function Scopes() {
+  return <div data-testid="scopes">{Array.from(useKeyboardScopes()).join(',')}</div>
+}
+
+describe('useKeyboardShortcuts', () => {
+  it('registers no scope for a null scope (#352)', () => {
+    render(
+      <KeyboardProvider>
+        <Registers scope={null} />
+        <Registers scope={constants.keyboardScopes.FLIP} />
+        <Scopes />
+      </KeyboardProvider>
+    )
+    expect(screen.getByTestId('scopes').textContent).toBe(constants.keyboardScopes.FLIP)
   })
 })

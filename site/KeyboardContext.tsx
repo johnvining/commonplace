@@ -116,8 +116,9 @@ export function KeyboardProvider({ children }: any) {
   )
 }
 
-// Hook for components to register keyboard handlers
-export function useKeyboardShortcuts(scope: string, handler: KeyHandler, deps: unknown[] = []) {
+// Hook for components to register keyboard handlers. A null scope
+// registers nothing, so it doesn't show up in useKeyboardScopes.
+export function useKeyboardShortcuts(scope: string | null, handler: KeyHandler, deps: unknown[] = []) {
   const context = useContext(KeyboardContext)
   const register = context?.register
   const unregister = context?.unregister
@@ -129,7 +130,7 @@ export function useKeyboardShortcuts(scope: string, handler: KeyHandler, deps: u
   })
 
   useEffect(() => {
-    if (!register || !unregister) return
+    if (!register || !unregister || !scope) return
 
     // Use a wrapper that calls the ref so we always get the latest handler
     const wrappedHandler: KeyHandler = (event: any) => handlerRef.current(event)
