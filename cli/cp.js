@@ -142,14 +142,13 @@ function formatEntity(type, item) {
   const color = typeColor(type)
   const label = typeLabel(type)
   let name = item.name || '(unnamed)'
-  const nick = item.nick ? `${DIM}:${item.nick}${RESET}` : ''
   let meta = ''
   if (type === 'work') {
     const authorStr = joinAuthorNames(item.authors)
     if (authorStr) meta = ` ${DIM}— ${authorStr}${RESET}`
     if (item.year) meta += ` ${DIM}(${item.year < 0 ? `${-item.year} BC` : item.year})${RESET}`
   }
-  return `${BOLD}${color}[${label}]${RESET} ${name}${meta}${nick ? '  ' + nick : ''}\n  ${DIM}${item._id}${RESET}`
+  return `${BOLD}${color}[${label}]${RESET} ${name}${nickSuffix(item.nick)}${meta}\n  ${DIM}${item._id}${RESET}`
 }
 
 // Map a nick (e.g. "p12345", "n42") to {type, id} by hitting /nick/:nick.
@@ -248,6 +247,19 @@ async function ensureNick(type, id, config) {
     const res = await api('PUT', `nick/${nickType}/${id}`, null, config)
     return res?.data?.key || null
   } catch { return null }
+}
+
+// Sets each item's nick, creating any that are missing, so list output
+// can show it inline like search does (#346).
+async function withNicks(type, items, config) {
+  await Promise.all(items.map(async (item) => {
+    if (!item.nick) item.nick = await ensureNick(type, item._id, config)
+  }))
+  return items
+}
+
+function nickSuffix(nick) {
+  return nick ? ` ${DIM}(${nick})${RESET}` : ''
 }
 
 function urlFor(type, id) {
@@ -683,9 +695,10 @@ async function cmdIdeas(args, config) {
   const res = await api('POST', 'idea/autocomplete', { string: query }, config)
   const ideas = res?.data || []
   if (args.includes('--show')) return showMatches('idea', ideas, args, config)
+  await withNicks('idea', ideas, config)
   if (jsonFlag) { console.log(JSON.stringify(ideas)); return }
   if (!ideas.length) { console.log('No ideas found.'); return }
-  ideas.forEach(i => console.log(`${BLUE}${i.name}${RESET}  ${DIM}${i._id}${RESET}`))
+  ideas.forEach(i => console.log(`${BLUE}${i.name}${RESET}${nickSuffix(i.nick)}  ${DIM}${i._id}${RESET}`))
 }
 
 async function cmdWorks(args, config) {
@@ -695,12 +708,13 @@ async function cmdWorks(args, config) {
   const res = await api('POST', 'work/autocomplete', { string: query }, config)
   const works = res?.data || []
   if (args.includes('--show')) return showMatches('work', works, args, config)
+  await withNicks('work', works, config)
   if (jsonFlag) { console.log(JSON.stringify(works)); return }
   if (!works.length) { console.log('No works found.'); return }
   works.forEach(w => {
     const names = joinAuthorNames(w.authors)
     const auth = names ? ` ${DIM}— ${names}${RESET}` : ''
-    console.log(`${YELLOW}${w.name}${RESET}${auth}  ${DIM}${w._id}${RESET}`)
+    console.log(`${YELLOW}${w.name}${RESET}${nickSuffix(w.nick)}${auth}  ${DIM}${w._id}${RESET}`)
   })
 }
 
@@ -718,9 +732,10 @@ async function cmdPiles(args, config) {
   }
   const piles = await matchPiles(query, config)
   if (args.includes('--show')) return showMatches('pile', piles, args, config)
+  await withNicks('pile', piles, config)
   if (jsonFlag) { console.log(JSON.stringify(piles)); return }
   if (!piles.length) { console.log('No piles found.'); return }
-  piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}  ${DIM}${p._id}${RESET}`))
+  piles.forEach(p => console.log(`${MAGENTA}${p.name}${RESET}${nickSuffix(p.nick)}  ${DIM}${p._id}${RESET}`))
 }
 
 // Resolves a pile query string to a list of piles. Three modes:
@@ -930,7 +945,7 @@ async function cmdShow(args, config) {
       fetchAllNotes(`pile/${id}/notes`, config),
       api('GET', `pile/${id}/works`, null, config),
     ])
-    const works = worksRes?.data || []
+    const works = await withNicks('work', worksRes?.data || [], config)
     if (jsonFlag) {
       console.log(JSON.stringify({ type, id, nick: displayNick, info, works, notes }))
       return
@@ -956,7 +971,7 @@ async function cmdShow(args, config) {
       fetchAllNotes(`idea/${id}/notes`, config),
       api('GET', `idea/${id}/works`, null, config),
     ])
-    const works = worksRes?.data || []
+    const works = await withNicks('work', worksRes?.data || [], config)
     if (jsonFlag) {
       console.log(JSON.stringify({ type, id, nick: displayNick, info, works, notes }))
       return
@@ -1040,7 +1055,7 @@ async function cmdAuthor(args, config) {
     fetchAllNotes(`auth/${id}/notes`, config),
     fetchAllNotes(`auth/${id}/notes-about`, config),
   ])
-  const works = worksRes?.data || []
+  const works = await withNicks('work', worksRes?.data || [], config)
   const workIds = new Set(works.map(w => String(w._id)))
   const standalone = notes.filter(n => !n.work?._id || !workIds.has(String(n.work._id)))
 
