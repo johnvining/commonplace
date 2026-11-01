@@ -54,6 +54,23 @@ describe('note imports', () => {
       expect(res.body.data).toBe(2)
     })
 
+    it('leaves the year empty when the year cell is empty (#349)', async () => {
+      const agent = await authedAgent()
+      const csv = 'Aristotle,Title,quote,Some Work,,,,,,,'
+      await agent.put('/api/note/import/csv').send({ importList: csv }).expect(200)
+      const notes = await agent.get('/api/note/all/1').expect(200)
+      expect(notes.body.data).toHaveLength(1)
+      expect(notes.body.data[0].year ?? null).toBeNull()
+    })
+
+    it('keeps a year from the year cell', async () => {
+      const agent = await authedAgent()
+      const csv = 'Aristotle,Title,quote,Some Work,,,,,1999,,'
+      await agent.put('/api/note/import/csv').send({ importList: csv }).expect(200)
+      const notes = await agent.get('/api/note/all/1').expect(200)
+      expect(notes.body.data[0].year).toBe(1999)
+    })
+
     it('returns null for empty input', async () => {
       const agent = await authedAgent()
       const res = await agent

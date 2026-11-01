@@ -264,12 +264,14 @@ async function importNote(importObject: NoteImportObject) {
     importObject.piles.map((pile) => PileControllers.findOrCreatePile(pile))
   )
 
-  // Year normalization: NaN → null, otherwise prefer URL inference when present
-  const yearAsNumber = typeof importObject.year === 'number'
-    ? importObject.year
-    : Number(importObject.year)
+  // Year normalization: empty or NaN → null (Number('') is 0, #349), and
+  // prefer URL inference when present
+  const rawYear = typeof importObject.year === 'string'
+    ? importObject.year.trim()
+    : importObject.year
+  const yearAsNumber = rawYear === '' || rawYear === null ? NaN : Number(rawYear)
   let year: number | null = Number.isFinite(yearAsNumber) ? yearAsNumber : null
-  if (year !== null && importObject.url) {
+  if (importObject.url) {
     year = guessYearFromUrl(importObject.url) ?? year
   }
 
