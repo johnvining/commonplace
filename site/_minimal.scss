@@ -462,10 +462,20 @@ div .top-bar {
       }
     }
 
+    // One line per row: a long title ends in an ellipsis instead of
+    // wrapping, and the create row keeps its + beside the text (#350).
     &.option {
       font-family: $main_font;
       font-size: 14px;
       padding: 4px 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &.new::before {
+        vertical-align: middle;
+        margin-right: 4px;
+      }
     }
   }
 
