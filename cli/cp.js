@@ -146,6 +146,11 @@ function formatEntity(type, item) {
   if (type === 'work') {
     const authorStr = joinAuthorNames(item.authors)
     if (authorStr) meta = ` ${DIM}— ${authorStr}${RESET}`
+    // Populated only where the server sends them (a work's own page)
+    const editors = item.editors?.[0]?.name ? joinAuthorNames(item.editors) : ''
+    const translators = item.translators?.[0]?.name ? joinAuthorNames(item.translators) : ''
+    if (editors) meta += ` ${DIM}ed. ${editors}${RESET}`
+    if (translators) meta += ` ${DIM}tr. ${translators}${RESET}`
     if (item.year) meta += ` ${DIM}(${item.year < 0 ? `${-item.year} BC` : item.year})${RESET}`
   }
   return `${BOLD}${color}[${label}]${RESET} ${name}${nickSuffix(item.nick)}${meta}\n  ${DIM}${item._id}${RESET}`
@@ -1435,13 +1440,18 @@ async function cmdWork(args, config) {
   const rest = args.slice(1)
   if (!sub) {
     console.error('Usage: cp work <add-author|rm-author> <workTarget> <authorTarget>')
+    console.error('       cp work <add-editor|rm-editor|add-translator|rm-translator> <workTarget> <authorTarget>')
     console.error('       cp work merge <fromWork> <intoWork> [--yes]')
     return
   }
 
   if (sub === 'merge') return mergeCommand('work', rest, config)
 
-  if (sub === 'add-author' || sub === 'rm-author') {
+  // Editors and translators are author records credited apart (#358)
+  const role = sub.match(/^(add|rm)-(author|editor|translator)$/)
+  if (role) {
+    const [, op, kind] = role
+    const field = kind + 's'
     const [workInput, authorInput] = rest
     if (!workInput || !authorInput) {
       console.error(`Usage: cp work ${sub} <workTarget> <authorTarget>`)
@@ -1454,11 +1464,11 @@ async function cmdWork(args, config) {
 
     const info = (await api('GET', `work/${workTarget.id}`, null, config))?.data
     if (!info) { console.error(`Work ${workTarget.id} not found.`); return }
-    const current = (info.authors || []).map(a => String(a._id || a))
+    const current = (info[field] || []).map(a => String(a._id || a))
     const authorId = String(authorTarget.id)
 
     let next
-    if (sub === 'add-author') {
+    if (op === 'add') {
       if (current.includes(authorId)) {
         console.log(`${DIM}Already attached.${RESET}`)
         return
@@ -1466,16 +1476,16 @@ async function cmdWork(args, config) {
       next = [...current, authorId]
     } else {
       if (!current.includes(authorId)) {
-        console.log(`${DIM}Author not on this work.${RESET}`)
+        console.log(`${DIM}Not a${kind === 'author' ? 'n' : ''} ${kind} on this work.${RESET}`)
         return
       }
       next = current.filter(id => id !== authorId)
     }
 
-    await api('PUT', `work/${workTarget.id}`, { authors: next }, config)
-    const verb = sub === 'add-author' ? 'Added' : 'Removed'
-    const prep = sub === 'add-author' ? 'to' : 'from'
-    console.log(`${GREEN}${verb}${RESET} author ${authorTarget.id} ${prep} work ${workTarget.id}`)
+    await api('PUT', `work/${workTarget.id}`, { [field]: next }, config)
+    const verb = op === 'add' ? 'Added' : 'Removed'
+    const prep = op === 'add' ? 'to' : 'from'
+    console.log(`${GREEN}${verb}${RESET} ${kind} ${authorTarget.id} ${prep} work ${workTarget.id}`)
     return
   }
 
@@ -1503,8 +1513,10 @@ async function mergeCommand(type, args, config) {
   console.log(`Merge ${label} ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET}`)
   console.log(`   into ${BOLD}${plan.into.name}${RESET} ${DIM}${plan.into._id}${RESET}`)
   const moves = type === 'auth'
-    ? [['notes by', plan.notes], ['notes about', plan.notesAbout], ['works', plan.works]]
-    : [['notes', plan.notes], ['piles', plan.piles], ['ideas', plan.ideas], ['authors', plan.authors]]
+    ? [['notes by', plan.notes], ['notes about', plan.notesAbout], ['works', plan.works],
+       ['works edited', plan.edited], ['works translated', plan.translated]]
+    : [['notes', plan.notes], ['piles', plan.piles], ['ideas', plan.ideas], ['authors', plan.authors],
+       ['editors', plan.editors], ['translators', plan.translators]]
   console.log('  ' + moves.map(([what, n]) => `${n} ${what}`).join(', '))
   if (plan.fields.length) console.log(`  fills in: ${plan.fields.join(', ')}`)
   console.log(`  then deletes ${plan.from.name}`)
@@ -1531,16 +1543,20 @@ async function cmdAuth(args, config) {
     if (!target) { console.error(`Could not resolve author "${input}".`); return }
     const info = (await api('GET', `auth/${target.id}`, null, config))?.data
     if (!info) { console.error('Not found.'); return }
-    const [worksRes, notes, notesAbout] = await Promise.all([
+    const [worksRes, creditsRes, notes, notesAbout] = await Promise.all([
       api('GET', `auth/${target.id}/works`, null, config),
+      api('GET', `auth/${target.id}/credits`, null, config),
       fetchAllNotes(`auth/${target.id}/notes`, config),
       fetchAllNotes(`auth/${target.id}/notes-about`, config),
     ])
     const works = worksRes?.data || []
-    const used = works.length + notes.length + notesAbout.length
+    const edited = creditsRes?.data?.edited || []
+    const translated = creditsRes?.data?.translated || []
+    const used = works.length + edited.length + translated.length + notes.length + notesAbout.length
     console.log(`Author ${BOLD}${info.name}${RESET} ${DIM}${target.id}${RESET}`)
     if (used) {
-      console.log(`  still on ${works.length} works, ${notes.length} notes by, ${notesAbout.length} notes about;`)
+      console.log(`  still on works: ${works.length} written, ${edited.length} edited, ${translated.length} translated; ` +
+        `${notes.length} notes by, ${notesAbout.length} notes about;`)
       console.log('  deleting removes it from all of them (use `cp auth merge` to move them instead)')
     } else {
       console.log('  not used by any work or note')
@@ -1741,6 +1757,10 @@ ${BOLD}Piles${RESET}
 ${BOLD}Works${RESET}
   work add-author <work> <author>  Attach an existing author to a work
   work rm-author  <work> <author>  Detach an author from a work
+  work add-editor / rm-editor <work> <author>
+  work add-translator / rm-translator <work> <author>
+                                   Credit (or uncredit) an editor or
+                                   translator, kept apart from authors
   work merge <from> <into> [--yes] Move a duplicate work's notes, piles,
                                    ideas and authors to another, then
                                    delete it
