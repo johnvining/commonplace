@@ -80,6 +80,7 @@ Most specific (highest priority) to least specific:
 | `Ctrl+I/J/K`, `←` / `→` | Image navigation | NOTE_EDIT, NOTE_SELECTED |
 | `Enter` | Execute/select/add | Various |
 | `Escape` | Close/exit | Various |
+| `Cmd+.`, `Ctrl+[` | Same as Escape (re-sent as an Escape keypress) | Everywhere |
 | `Backspace` | Go back | SEARCH_BAR, AUTOCOMPLETE |
 | `1` / `2` / `3` | Rate card fast / med / slow | FLIP |
 | `n` / `p` | Next / previous card | FLIP |

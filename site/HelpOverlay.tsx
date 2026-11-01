@@ -28,6 +28,7 @@ function HelpOverlay({ isVisible, onClose, currentContext }: any) {
         { key: 'h', action: 'Home' },
         { key: 'c', action: 'Create a note' },
         { key: 'd', action: 'Day / night / system' },
+        { key: 'Cmd+. or Ctrl+[', action: 'Same as Escape (for keyboards without one)' },
         { key: 'Ctrl+Shift+1', action: 'Full view' },
         { key: 'Ctrl+Shift+2', action: 'Slim view' },
         { key: 'Ctrl+Shift+3', action: 'Grid view' },

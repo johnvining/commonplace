@@ -1,7 +1,7 @@
 import React from 'react'
 import { describe, it, expect, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
-import { KeyboardProvider, useKeyboardShortcuts, useKeyboardScopes, shortcuts } from '../KeyboardContext'
+import { render, screen, cleanup, fireEvent } from '@testing-library/react'
+import { KeyboardProvider, useKeyboardShortcuts, useKeyboardScopes, shortcuts, isEscapeAlias } from '../KeyboardContext'
 import * as constants from '../constants'
 
 function key(keyCode: number, mods: Partial<KeyboardEvent> = {}) {
@@ -43,5 +43,33 @@ describe('useKeyboardShortcuts', () => {
       </KeyboardProvider>
     )
     expect(screen.getByTestId('scopes').textContent).toBe(constants.keyboardScopes.FLIP)
+  })
+})
+
+describe('Escape stand-ins (#340)', () => {
+  it('Cmd+. and Ctrl+[ count as Escape; plain [ does not', () => {
+    expect(isEscapeAlias(new KeyboardEvent('keydown', { key: '.', metaKey: true }))).toBe(true)
+    expect(isEscapeAlias(new KeyboardEvent('keydown', { key: '[', ctrlKey: true }))).toBe(true)
+    expect(isEscapeAlias(new KeyboardEvent('keydown', { key: '[' }))).toBe(false)
+    expect(isEscapeAlias(new KeyboardEvent('keydown', { key: '.', metaKey: true, shiftKey: true }))).toBe(false)
+  })
+
+  it('reaches shortcut handlers and a field as an Escape keypress', () => {
+    const seen: string[] = []
+    function EscHandler() {
+      useKeyboardShortcuts(constants.keyboardScopes.GLOBAL, (e) => {
+        if (shortcuts.searchBar.close(e)) { seen.push('shortcut'); return true }
+        return false
+      })
+      return null
+    }
+    render(
+      <KeyboardProvider>
+        <EscHandler />
+        <input data-testid="field" onKeyDown={(e) => { if (e.key === 'Escape') seen.push('field') }} />
+      </KeyboardProvider>
+    )
+    fireEvent.keyDown(screen.getByTestId('field'), { key: '[', code: 'BracketLeft', ctrlKey: true })
+    expect(seen).toEqual(['field', 'shortcut'])
   })
 })

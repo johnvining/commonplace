@@ -14,6 +14,7 @@ Always available throughout the application.
 | `h` | Go home |
 | `c` | Create a note |
 | `d` | Cycle day / night / follow system |
+| `Cmd+.` or `Ctrl+[` | Same as `Escape` anywhere, for keyboards without one (iPad) |
 
 Single-key shortcuts (`/`, `?`, `j`, `k`, `e`, `o`, …) are ignored while typing in a field.
 

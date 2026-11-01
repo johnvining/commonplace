@@ -11,6 +11,35 @@ interface KeyboardContextShape {
 
 const KeyboardContext = createContext<KeyboardContextShape | null>(null)
 
+// iPad keyboards have no Esc key (#340). Cmd+. is the iPadOS stand-in and
+// Ctrl+[ the terminal one; either counts as Escape everywhere.
+export function isEscapeAlias(e: KeyboardEvent) {
+  if (e.shiftKey || e.altKey) return false
+  if (e.metaKey && !e.ctrlKey) return e.key === '.' || e.code === 'Period'
+  if (e.ctrlKey && !e.metaKey) return e.key === '[' || e.code === 'BracketLeft'
+  return false
+}
+
+// Swap an alias for a real Escape keypress at the same element before
+// anything else sees it, so shortcut handlers and fields' own Esc
+// handling (pickers, pill inputs) both treat it as Escape.
+function redispatchEscapeAlias(e: KeyboardEvent) {
+  if (!isEscapeAlias(e)) return
+  e.preventDefault()
+  e.stopImmediatePropagation()
+  const escape = new KeyboardEvent('keydown', {
+    key: 'Escape',
+    code: 'Escape',
+    bubbles: true,
+    cancelable: true,
+  })
+  // keyCode can't be set through the constructor everywhere
+  Object.defineProperty(escape, 'keyCode', { get: () => constants.keyCodes.esc })
+  Object.defineProperty(escape, 'which', { get: () => constants.keyCodes.esc })
+  const target = (e.target as Element | null) ?? document.activeElement ?? document.body
+  target.dispatchEvent(escape)
+}
+
 // Scope priority - lower number = higher priority (more specific)
 const scopePriority = {
   [constants.keyboardScopes.AUTOCOMPLETE]: 0,
@@ -108,6 +137,11 @@ export function KeyboardProvider({ children }: any) {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
+
+  useEffect(() => {
+    window.addEventListener('keydown', redispatchEscapeAlias, true)
+    return () => window.removeEventListener('keydown', redispatchEscapeAlias, true)
+  }, [])
 
   return (
     <KeyboardContext.Provider value={{ register, unregister, activeScopes }}>
