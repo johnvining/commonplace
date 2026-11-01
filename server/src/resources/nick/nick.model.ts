@@ -7,6 +7,9 @@ export interface NickDoc {
   idea?: Types.ObjectId
   work?: Types.ObjectId
   pile?: Types.ObjectId
+  // Set once the entity is deleted. The row stays so the key is never
+  // handed to another entity (#348).
+  retired?: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -18,6 +21,7 @@ const nickSchema = new Schema<NickDoc>(
     idea: { type: Schema.Types.ObjectId, ref: 'idea' },
     work: { type: Schema.Types.ObjectId, ref: 'work' },
     pile: { type: Schema.Types.ObjectId, ref: 'pile' },
+    retired: Boolean,
   },
   { timestamps: true }
 )

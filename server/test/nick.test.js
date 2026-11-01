@@ -86,6 +86,22 @@ describe('nick', () => {
       expect(String(res.body.data.idea)).toBe(String(idea._id))
     })
 
+    it('does not resolve or reissue the key of a deleted entity (#348)', async () => {
+      const agent = await authedAgent()
+      const work = await createWork(agent)
+      const created = await ensureNickFor(agent, 'work', work._id)
+      await agent.delete(`/api/work/${work._id}`).expect(204)
+      const res = await agent.get(`/api/nick/${created.key}`).expect(200)
+      expect(res.body.data).toBeNull()
+      // The row stays, so the key-uniqueness checks treat it as taken
+      const row = await Nick.findOne({ key: created.key }).lean()
+      expect(row.retired).toBe(true)
+      expect(row.work).toBeUndefined()
+      // and the same id would hash to a different key now
+      const again = await generateNick('work', work._id)
+      expect(again.key).not.toBe(created.key)
+    })
+
     it('returns null for an unknown key', async () => {
       const agent = await authedAgent()
       const res = await agent.get('/api/nick/x000000').expect(200)

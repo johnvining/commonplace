@@ -46,11 +46,12 @@ export const generateNick = async (type: NickEntityType, id: unknown) => {
   }
 }
 
-// Drop the nick row for an entity that's about to be deleted. Keeps the
-// global key -> entity index clean so a stale lookup can't resolve to a
-// deleted parent.
+// Retire the nick of an entity that's about to be deleted: clear its
+// entity so a stale lookup can't resolve to the deleted parent, but keep
+// the row so the key-uniqueness checks above never reissue the key and a
+// stored reference to it can't resolve to some other entity (#348).
 export const deleteNickFor = async (type: NickEntityType, id: unknown) => {
-  await Nick.deleteOne({ [type]: id }).exec()
+  await Nick.updateOne({ [type]: id }, { $unset: { [type]: 1 }, $set: { retired: true } }).exec()
 }
 
 export const reqGenerateNickForNote = async (req: Request, res: Response) => generateNick('note', req.params.id)
@@ -59,7 +60,7 @@ export const reqGenerateNickForIdea = async (req: Request, res: Response) => gen
 export const reqGenerateNickForPile = async (req: Request, res: Response) => generateNick('pile', req.params.id)
 
 export const reqGetNick = async (req: Request, res: Response) => {
-  return Nick.findOne({ key: req.params.nick })
+  return Nick.findOne({ key: req.params.nick, retired: { $ne: true } })
 }
 
 export const reqBackfillNicks = async (req: Request, res: Response) => {
