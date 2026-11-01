@@ -6,7 +6,7 @@ import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
-import { mergeAuthors } from '../../utils/merge.js'
+import { mergeAuthors, splitAuthor } from '../../utils/merge.js'
 import type { Request, Response } from 'express'
 
 
@@ -141,6 +141,14 @@ export const reqGetCreditsForAuthor = async (req: Request, res: Response) => {
       .then(withNoteCounts)
   const [edited, translated] = await Promise.all([find('editors'), find('translators')])
   return { edited, translated }
+}
+
+// POST /auth/:id/split { names, keep, dryRun }: one author per name (#356)
+export const reqSplitAuthor = async (req: Request, res: Response) => {
+  return splitAuthor(String(req.params.id), req.body.names, {
+    keep: Boolean(req.body.keep),
+    dryRun: Boolean(req.body.dryRun),
+  })
 }
 
 export const reqDeleteAuthor = async (req: Request, res: Response) => {

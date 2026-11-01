@@ -1,12 +1,14 @@
-// Merging duplicate works and authors (#360). Everything goes through
-// Mongoose so timestamps bump: merged notes surface on the home feed.
-// With dryRun the plan comes back and nothing is written, so the CLI can
-// show what will move before asking.
+// Merging duplicate works and authors (#360), and splitting a combined
+// author into several (#356). Everything goes through Mongoose so
+// timestamps bump: changed notes surface on the home feed. With dryRun
+// the plan comes back and nothing is written, so the CLI can show what
+// will change before asking.
 import Work from '../resources/work/work.model.js'
 import Note from '../resources/note/note.model.js'
 import Pin from '../resources/pin/pin.model.js'
 import { Auth } from '../resources/auth/auth.model.js'
 import { deleteNickFor } from '../resources/nick/nick.controllers.js'
+import { escapeRegexInput } from './searchInput.js'
 
 function httpError(status: number, message: string) {
   return Object.assign(new Error(message), { status })
@@ -96,15 +98,18 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
   return plan
 }
 
-// Replace `from` with `into` in each doc's `field` array, keeping its
-// place in the order (the first author is the byline) and not doubling up.
-async function replaceInArrays(Model: any, field: string, from: string, into: string) {
+// Replace `from` with `into` (one id or several) in each doc's `field`
+// array, keeping its place in the order (the first author is the byline)
+// and not doubling up.
+async function replaceInArrays(Model: any, field: string, from: string, into: string | string[]) {
+  const replacement = Array.isArray(into) ? into : [into]
   const docs = await Model.find({ [field]: from }, { [field]: 1 }).lean().exec()
   for (const doc of docs) {
     const next: string[] = []
     for (const id of ids(doc[field])) {
-      const mapped = id === from ? into : id
-      if (!next.includes(mapped)) next.push(mapped)
+      for (const mapped of id === from ? replacement : [id]) {
+        if (!next.includes(mapped)) next.push(mapped)
+      }
     }
     await Model.updateOne({ _id: doc._id }, { $set: { [field]: next } }).exec()
   }
@@ -151,5 +156,59 @@ export async function mergeAuthors(from: string, into: string, dryRun = false) {
   await Auth.updateOne({ _id: into }, { $set: fill, $push: { usernames: { $each: usernames } } }).exec()
   await movePin('auth', from, into)
   await Auth.deleteOne({ _id: from }).exec()
+  return plan
+}
+
+// Every array that can hold an author
+const AUTHOR_FIELDS: [any, string][] = [
+  [Note, 'authors'],
+  [Note, 'people'],
+  [Work, 'authors'],
+  [Work, 'editors'],
+  [Work, 'translators'],
+]
+
+// Split a combined author ("A, B & C" as one record) into one author per
+// name: existing authors are reused by exact name (ignoring case), the
+// rest are created, and every reference to the old author becomes the new
+// list in its place. The old author is deleted unless `keep` is set or it
+// is one of the names.
+export async function splitAuthor(id: string, rawNames: unknown, { keep = false, dryRun = false } = {}) {
+  const old = await Auth.findById(id).lean().exec()
+  if (!old) throw httpError(404, `No author ${id}`)
+  const names = [...new Set((Array.isArray(rawNames) ? rawNames : [])
+    .map((n) => String(n ?? '').trim())
+    .filter(Boolean))]
+  if (names.length < 1) throw httpError(400, 'Give at least one name to split into')
+
+  const targets = await Promise.all(names.map(async (name) => {
+    if (name.toLowerCase() === (old.name ?? '').toLowerCase()) return { name, _id: String(old._id), existing: true }
+    const found = await Auth.findOne({ name: new RegExp(`^${escapeRegexInput(name)}$`, 'i') }).lean().exec()
+    return found ? { name: found.name, _id: String(found._id), existing: true } : { name, _id: null, existing: false }
+  }))
+  const counts = await Promise.all(AUTHOR_FIELDS.map(([Model, field]) => Model.countDocuments({ [field]: id })))
+  const keepOld = keep || targets.some((t) => t._id === String(old._id))
+  const plan = {
+    from: { _id: id, name: old.name },
+    into: targets.map(({ name, _id, existing }) => ({ name, _id, existing })),
+    notes: counts[0],
+    notesAbout: counts[1],
+    works: counts[2],
+    edited: counts[3],
+    translated: counts[4],
+    deletesOld: !keepOld,
+  }
+  if (dryRun) return plan
+
+  for (const target of targets) {
+    if (!target._id) target._id = String((await Auth.create({ name: target.name }))._id)
+  }
+  const newIds = targets.map((t) => t._id as string)
+  for (const [Model, field] of AUTHOR_FIELDS) await replaceInArrays(Model, field, id, newIds)
+  if (!keepOld) {
+    await Pin.deleteOne({ type: 'auth', target: id }).exec()
+    await Auth.deleteOne({ _id: id }).exec()
+  }
+  plan.into = targets.map(({ name, _id, existing }) => ({ name, _id, existing }))
   return plan
 }

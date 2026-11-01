@@ -37,6 +37,7 @@ import { asyncWrapper } from '../../utils/requests.js'
 import { requireObjectIdParam } from '../../utils/validateObjectId.js'
 import { recordOpened } from '../../utils/default.controllers.js'
 import Note from './note.model.js'
+import { bulkUpdateNotes, linkNotesByTitle } from '../../utils/bulkNotes.js'
 
 const router = Router()
 
@@ -94,6 +95,10 @@ router.route('/import/work/:work').put(asyncWrapper(reqBulkImportForWork, 200))
 router.route('/import/csv').put(asyncWrapper(reqBulkImportNotesCSV, 200))
 
 router.route('/import/instapaper').put(asyncWrapper(reqBulkImportInstapaper, 200))
+
+// Many notes in one call (#356)
+router.route('/bulk-update').post(asyncWrapper(async (req) => bulkUpdateNotes(req.body), 200))
+router.route('/link-by-title').post(asyncWrapper(async (req) => linkNotesByTitle(req.body), 200))
 
 router.route('/bulk-embed').post(asyncWrapper(reqBulkEmbedNotes, 200))
 
