@@ -1,4 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import mongoose from 'mongoose'
+import Nick from '../src/resources/nick/nick.model.js'
+import { generateNick } from '../src/resources/nick/nick.controllers.js'
 import { authedAgent, createIdea, createNote, createPile, createWork } from './setup.js'
 
 async function ensureNickFor(agent, type, id) {
@@ -31,6 +34,28 @@ describe('nick', () => {
       const a = await ensureNickFor(agent, 'note', note._id)
       const b = await ensureNickFor(agent, 'note', note._id)
       expect(a.key).toBe(b.key)
+    })
+  })
+
+  describe('generateNick', () => {
+    it('retries when another entity takes the key first (#347)', async () => {
+      await Nick.init()
+      const id = new mongoose.Types.ObjectId()
+      const otherId = new mongoose.Types.ObjectId()
+      const realCreate = Nick.create.bind(Nick)
+      const spy = vi.spyOn(Nick, 'create').mockImplementationOnce(async (doc) => {
+        // Another work claims the same key between the check and the create
+        await realCreate({ key: doc.key, work: otherId })
+        return realCreate(doc)
+      })
+      try {
+        const nick = await generateNick('work', id)
+        expect(nick).not.toBeNull()
+        expect(String(nick.work)).toBe(String(id))
+        expect(nick.key).toMatch(/^w\d{6}$/)
+      } finally {
+        spy.mockRestore()
+      }
     })
   })
 

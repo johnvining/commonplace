@@ -31,11 +31,18 @@ export const generateNick = async (type: NickEntityType, id: unknown) => {
   }
   if (!key) key = await generateRandomNickKey(prefix)
 
-  try {
-    return await Nick.create({ key, [type]: id })
-  } catch (e: any) {
-    if (e?.code === 11000) return Nick.findOne({ [type]: id })
-    throw e
+  // A duplicate key error is either a race on this entity (another caller
+  // made its nick, so return that) or a race on the key with a different
+  // entity, in which case try again with a fresh random key (#347).
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await Nick.create({ key, [type]: id })
+    } catch (e: any) {
+      if (e?.code !== 11000) throw e
+      const winner = await Nick.findOne({ [type]: id })
+      if (winner || attempt >= 4) return winner
+      key = await generateRandomNickKey(prefix)
+    }
   }
 }
 
