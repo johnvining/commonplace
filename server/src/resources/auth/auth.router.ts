@@ -8,7 +8,8 @@ import defaultControllers, {
   reqGetNotesForAuthor,
   reqGetAllNotesForAuthor,
   reqGetNotesAboutAuthor,
-  reqGetWorksForAuthor
+  reqGetWorksForAuthor,
+  reqGetCreditsForAuthor
 } from './auth.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
 
@@ -25,6 +26,7 @@ router.route('/:id/notes').get(asyncWrapper(reqGetNotesForAuthor, 200))
 router.route('/:id/all-notes').get(asyncWrapper(reqGetAllNotesForAuthor, 200))
 router.route('/:id/notes-about').get(asyncWrapper(reqGetNotesAboutAuthor, 200))
 router.route('/:id/works').get(asyncWrapper(reqGetWorksForAuthor, 200))
+router.route('/:id/credits').get(asyncWrapper(reqGetCreditsForAuthor, 200))
 // DELETE /:id is what the site sends (as for works, piles and notes);
 // /:id/delete stays for the CLI.
 router

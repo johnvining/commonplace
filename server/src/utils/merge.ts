@@ -51,6 +51,8 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
   const piles = missingFrom(intoWork.piles, fromWork.piles)
   const ideas = missingFrom(intoWork.ideas, fromWork.ideas)
   const authors = missingFrom(intoWork.authors, fromWork.authors)
+  const editors = missingFrom(intoWork.editors, fromWork.editors)
+  const translators = missingFrom(intoWork.translators, fromWork.translators)
   // Fields the kept work lacks are taken from the merged one
   const fill: Record<string, unknown> = {}
   for (const field of WORK_FILL_FIELDS) {
@@ -68,6 +70,8 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
     piles: piles.length,
     ideas: ideas.length,
     authors: authors.length,
+    editors: editors.length,
+    translators: translators.length,
     fields: Object.keys(fill),
   }
   if (dryRun) return plan
@@ -76,7 +80,13 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
   await Work.updateOne(
     { _id: into },
     {
-      $push: { piles: { $each: piles }, ideas: { $each: ideas }, authors: { $each: authors } },
+      $push: {
+        piles: { $each: piles },
+        ideas: { $each: ideas },
+        authors: { $each: authors },
+        editors: { $each: editors },
+        translators: { $each: translators },
+      },
       $set: fill,
     }
   ).exec()
@@ -114,10 +124,12 @@ export async function mergeAuthors(from: string, into: string, dryRun = false) {
   if (intoAuth.death_year == null && fromAuth.death_year != null) fill.death_year = fromAuth.death_year
   const usernames = (fromAuth.usernames ?? []).filter((u) => !(intoAuth.usernames ?? []).includes(u))
 
-  const [notes, notesAbout, works] = await Promise.all([
+  const [notes, notesAbout, works, edited, translated] = await Promise.all([
     Note.countDocuments({ authors: from }),
     Note.countDocuments({ people: from }),
     Work.countDocuments({ authors: from }),
+    Work.countDocuments({ editors: from }),
+    Work.countDocuments({ translators: from }),
   ])
   const plan = {
     from: { _id: from, name: fromAuth.name },
@@ -125,6 +137,8 @@ export async function mergeAuthors(from: string, into: string, dryRun = false) {
     notes,
     notesAbout,
     works,
+    edited,
+    translated,
     fields: [...Object.keys(fill), ...(usernames.length ? ['usernames'] : [])],
   }
   if (dryRun) return plan
@@ -132,6 +146,8 @@ export async function mergeAuthors(from: string, into: string, dryRun = false) {
   await replaceInArrays(Note, 'authors', from, into)
   await replaceInArrays(Note, 'people', from, into)
   await replaceInArrays(Work, 'authors', from, into)
+  await replaceInArrays(Work, 'editors', from, into)
+  await replaceInArrays(Work, 'translators', from, into)
   await Auth.updateOne({ _id: into }, { $set: fill, $push: { usernames: { $each: usernames } } }).exec()
   await movePin('auth', from, into)
   await Auth.deleteOne({ _id: from }).exec()

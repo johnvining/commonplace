@@ -17,7 +17,8 @@ import { mergeWorks } from '../../utils/merge.js'
 import type { Request, Response } from 'express'
 
 const WORK_WRITABLE = [
-  'name', 'original_name', 'authors', 'url', 'year', 'citation_information', 'summary',
+  'name', 'original_name', 'authors', 'editors', 'translators', 'url', 'year',
+  'citation_information', 'summary',
   'piles', 'ideas',
 ] as const
 
@@ -184,6 +185,8 @@ export const createWork = async function(name: string) {
 export const getWorkInfo = async function(workId: string) {
   const results = await Work.findOne({ _id: workId })
     .populate('authors')
+    .populate('editors')
+    .populate('translators')
     .populate('piles')
     .populate('ideas')
     .lean()

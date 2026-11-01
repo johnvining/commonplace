@@ -5,6 +5,8 @@ export interface WorkDoc {
   name?: string
   original_name?: string
   authors: Types.ObjectId[]
+  editors: Types.ObjectId[]
+  translators: Types.ObjectId[]
   url?: string
   year?: number
   citation_information?: string
@@ -23,6 +25,10 @@ const workSchema = new Schema<WorkDoc>(
     // Title in the original language when `name` is a translation (#221).
     original_name: { type: String, trim: true },
     authors: [{ type: Schema.Types.ObjectId, ref: 'author' }],
+    // Credited apart from the authors: editors of an edited volume and
+    // translators of a translation (#358).
+    editors: [{ type: Schema.Types.ObjectId, ref: 'author' }],
+    translators: [{ type: Schema.Types.ObjectId, ref: 'author' }],
     url: String,
     year: Number,
     citation_information: String,
@@ -38,6 +44,8 @@ const workSchema = new Schema<WorkDoc>(
 
 workSchema.index({ name: 1 })
 workSchema.index({ authors: 1 })
+workSchema.index({ editors: 1 })
+workSchema.index({ translators: 1 })
 workSchema.index({ ideas: 1 })
 
 export default mongoose.model<WorkDoc>('work', workSchema)

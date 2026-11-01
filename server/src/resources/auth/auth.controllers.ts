@@ -129,6 +129,20 @@ export const reqMergeAuthor = async (req: Request, res: Response) => {
   return mergeAuthors(String(req.params.id), String(req.body.into), Boolean(req.body.dryRun))
 }
 
+// Works this person edited or translated, credited apart from the works
+// they wrote (#358).
+export const reqGetCreditsForAuthor = async (req: Request, res: Response) => {
+  const find = (field: string) =>
+    Work.find({ [field]: req.params.id })
+      .populate('authors')
+      .sort({ year: 1 })
+      .lean()
+      .exec()
+      .then(withNoteCounts)
+  const [edited, translated] = await Promise.all([find('editors'), find('translators')])
+  return { edited, translated }
+}
+
 export const reqDeleteAuthor = async (req: Request, res: Response) => {
   await deleteAuthor(String(req.params.id))
 }
@@ -161,6 +175,8 @@ export const deleteAuthor = async function (id: string) {
     () => Note.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
     () => Note.updateMany({ people: id }, { $pull: { people: id } }).exec(),
     () => Work.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
+    () => Work.updateMany({ editors: id }, { $pull: { editors: id } }).exec(),
+    () => Work.updateMany({ translators: id }, { $pull: { translators: id } }).exec(),
   ]
   await runCascadeSteps('deleteAuthor', steps)
   await Auth.findOneAndDelete({ _id: id })
