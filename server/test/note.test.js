@@ -29,6 +29,15 @@ describe('note CRUD', () => {
     })
   })
 
+  describe('GET /api/note/all/:page', () => {
+    it('treats page 0 as the first page instead of failing (#353)', async () => {
+      const agent = await authedAgent()
+      await createNote(agent, { title: 'Recent' })
+      const res = await agent.get('/api/note/all/0').expect(200)
+      expect(res.body.data.map(n => n.title)).toEqual(['Recent'])
+    })
+  })
+
   describe('GET /api/note/:id', () => {
     it('returns the note (populated)', async () => {
       const agent = await authedAgent()

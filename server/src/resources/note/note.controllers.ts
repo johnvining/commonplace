@@ -175,7 +175,8 @@ export const reqGetRecentNotes = async (req: Request, res: Response) => {
     {},
     { updatedAt: -1 },
     false,
-    (Number(req.params.skip) - 1) * pageSize,
+    // Pages start at 1; clamp so page 0 or junk can't send a negative skip
+    Math.max(0, (Number(req.params.skip) - 1) * pageSize || 0),
     pageSize
   )
 }
