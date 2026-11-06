@@ -23,6 +23,7 @@ import { reqAuthenticate } from './resources/user/user.controllers.js'
 import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
 import { requireXhr } from './utils/requireXhr.js'
+import { scheduleEmbeddingRefresh } from './utils/embeddingRefresh.js'
 
 export const app = express()
 
@@ -104,6 +105,9 @@ export const start = async () => {
   const server = app.listen(config.port, () => {
     console.log(`REST API on http://localhost:${config.port}/api`)
   })
+
+  // Pick up notes left stale when the server last stopped (#373)
+  scheduleEmbeddingRefresh()
 
   // server.close() refuses to terminate while a request is in flight —
   // long OpenAI calls (OCR / bulk embed) can hold the socket for tens of
