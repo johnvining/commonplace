@@ -84,3 +84,13 @@ export function wornTitle(openCount?: number | null): string | undefined {
   const n = openCount ?? 0
   return n > 0 ? `Opened ${n} ${n === 1 ? 'time' : 'times'}` : undefined
 }
+
+// What to say about a nick whose record was deleted (#366): the API sends
+// { retired, name, retiredAt }. Nicks retired before names were kept
+// have neither.
+export function retiredNickMessage(key: string, data: { name?: string | null; retiredAt?: string | null }): string {
+  const when = data.retiredAt ? ' on ' + new Date(data.retiredAt).toLocaleDateString(undefined, { dateStyle: 'medium' }) : ''
+  return data.name
+    ? `${key} pointed to “${data.name}”, which was deleted${when}.`
+    : `${key} pointed to something that has since been deleted.`
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import { retiredNickMessage } from './utils'
 
 // Every nick is a type letter and six digits: n (note), w (work),
 // i (idea), p (pile).
@@ -11,6 +12,8 @@ function NickView(props: any) {
   const navigate = useNavigate()
   const { setPageTitle } = props
   const [error, setError] = useState(false)
+  // Set when the nick's record was deleted (#366)
+  const [retired, setRetired] = useState<string | null>(null)
   // At /:nick any unknown one-segment URL lands here; only nick-shaped
   // ones are looked up.
   const notANick = props.shortUrl && !NICK_PATTERN.test(nick ?? '')
@@ -32,6 +35,10 @@ function NickView(props: any) {
           if (isMounted) {
             setError(true)
           }
+          return
+        }
+        if (nickData.retired) {
+          if (isMounted) setRetired(retiredNickMessage(nick, nickData))
           return
         }
         // Replace the nick URL in history, so Back from the page doesn't
@@ -72,6 +79,10 @@ function NickView(props: any) {
 
   if (notANick) {
     return <div>Page not found</div>
+  }
+
+  if (retired) {
+    return <div className="search-empty-state">{retired}</div>
   }
 
   if (error) {

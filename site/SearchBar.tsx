@@ -4,7 +4,7 @@ import Autocomplete from './Autocomplete'
 import * as db from './Database'
 import * as constants from './constants'
 import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
-import { NO_AUTOFILL } from './utils'
+import { NO_AUTOFILL, retiredNickMessage } from './utils'
 
 // A nick is a type letter (note, work, idea, pile) and six digits.
 const NICK_PATTERN = /^[nwip]\d{6}$/
@@ -151,6 +151,10 @@ function SearchBar(props: any) {
       const nickData = nickResponse?.data?.data
       if (!nickData) {
         setSearchError('Nick not found')
+        return
+      }
+      if (nickData.retired) {
+        setSearchError(retiredNickMessage(text, nickData))
         return
       }
       props.beforeNavigate()
