@@ -10,6 +10,9 @@ export interface NickDoc {
   // Set once the entity is deleted. The row stays so the key is never
   // handed to another entity (#348).
   retired?: boolean
+  // What a retired nick pointed to, so its link can say so (#366)
+  name?: string
+  retiredAt?: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -22,6 +25,8 @@ const nickSchema = new Schema<NickDoc>(
     work: { type: Schema.Types.ObjectId, ref: 'work' },
     pile: { type: Schema.Types.ObjectId, ref: 'pile' },
     retired: Boolean,
+    name: String,
+    retiredAt: Date,
   },
   { timestamps: true }
 )

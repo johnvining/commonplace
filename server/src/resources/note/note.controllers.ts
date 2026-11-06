@@ -148,9 +148,10 @@ export const reqDeleteNote = async (req: Request, res: Response) => {
   const id = req.params.id
   const note = await Note.findOne({ _id: id }).lean()
   if (note) await deleteNoteImageFiles(note)
+  // Before the delete, so the retired nick can keep the note's title
+  await deleteNickFor('note', id)
   await Note.deleteOne({ _id: id })
   invalidateEmbedding(id)
-  await deleteNickFor('note', id)
   res.status(200).end()
 }
 

@@ -88,11 +88,13 @@ describe('nick', () => {
 
     it('does not resolve or reissue the key of a deleted entity (#348)', async () => {
       const agent = await authedAgent()
-      const work = await createWork(agent)
+      const work = await createWork(agent, { name: 'Gone Work' })
       const created = await ensureNickFor(agent, 'work', work._id)
       await agent.delete(`/api/work/${work._id}`).expect(204)
       const res = await agent.get(`/api/nick/${created.key}`).expect(200)
-      expect(res.body.data).toBeNull()
+      // No entity id, but it says what it was (#366)
+      expect(res.body.data).toMatchObject({ key: created.key, retired: true, name: 'Gone Work' })
+      expect(res.body.data.work).toBeUndefined()
       // The row stays, so the key-uniqueness checks treat it as taken
       const row = await Nick.findOne({ key: created.key }).lean()
       expect(row.retired).toBe(true)
@@ -100,6 +102,16 @@ describe('nick', () => {
       // and the same id would hash to a different key now
       const again = await generateNick('work', work._id)
       expect(again.key).not.toBe(created.key)
+    })
+
+    it('remembers the title of a deleted note (#366)', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: '', text: 'Only some text here' })
+      const created = await ensureNickFor(agent, 'note', note._id)
+      await agent.delete(`/api/note/${note._id}`).expect(200)
+      const res = await agent.get(`/api/nick/${created.key}`).expect(200)
+      expect(res.body.data).toMatchObject({ retired: true, name: 'Only some text here' })
+      expect(res.body.data.retiredAt).toBeTruthy()
     })
 
     it('returns null for an unknown key', async () => {

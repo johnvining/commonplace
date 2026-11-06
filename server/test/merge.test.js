@@ -26,7 +26,7 @@ describe('merge (#360)', () => {
       expect(notes.map(n => n._id)).toEqual([note._id])
       const gone = await agent.get(`/api/work/${drop._id}`)
       expect(gone.body.data ?? null).toBeFalsy()
-      expect((await agent.get(`/api/nick/${dropNick}`).expect(200)).body.data).toBeNull()
+      expect((await agent.get(`/api/nick/${dropNick}`).expect(200)).body.data).toMatchObject({ retired: true, name: 'Drop' })
       const pins = (await agent.get('/api/pin').expect(200)).body.data
       expect(pins.map(p => p.id)).toEqual([keep._id])
     })

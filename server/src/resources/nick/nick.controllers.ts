@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import Nick from '../nick/nick.model.js'
 import type { Request, Response } from 'express'
 
@@ -46,12 +47,23 @@ export const generateNick = async (type: NickEntityType, id: unknown) => {
   }
 }
 
+// The name a retired nick keeps: a note's title, or the start of its text
+async function snapshotName(type: NickEntityType, id: unknown): Promise<string | undefined> {
+  const doc: any = await mongoose.model(type).findById(id, { name: 1, title: 1, text: 1 }).lean().exec()
+  const name = (doc?.name || doc?.title || doc?.text || '').trim()
+  return name ? name.slice(0, 120) : undefined
+}
+
 // Retire the nick of an entity that's about to be deleted: clear its
 // entity so a stale lookup can't resolve to the deleted parent, but keep
 // the row so the key-uniqueness checks above never reissue the key and a
-// stored reference to it can't resolve to some other entity (#348).
+// stored reference to it can't resolve to some other entity (#348). The
+// row remembers the entity's name and when it went (#366).
 export const deleteNickFor = async (type: NickEntityType, id: unknown) => {
-  await Nick.updateOne({ [type]: id }, { $unset: { [type]: 1 }, $set: { retired: true } }).exec()
+  const $set: Record<string, unknown> = { retired: true, retiredAt: new Date() }
+  const name = await snapshotName(type, id)
+  if (name) $set.name = name
+  await Nick.updateOne({ [type]: id }, { $unset: { [type]: 1 }, $set }).exec()
 }
 
 export const reqGenerateNickForNote = async (req: Request, res: Response) => generateNick('note', req.params.id)
@@ -59,8 +71,13 @@ export const reqGenerateNickForWork = async (req: Request, res: Response) => gen
 export const reqGenerateNickForIdea = async (req: Request, res: Response) => generateNick('idea', req.params.id)
 export const reqGenerateNickForPile = async (req: Request, res: Response) => generateNick('pile', req.params.id)
 
+// A live nick comes back as its row. A retired one comes back as
+// { key, retired, name, retiredAt }, with no entity id, so callers can say
+// what it pointed to (#366).
 export const reqGetNick = async (req: Request, res: Response) => {
-  return Nick.findOne({ key: req.params.nick, retired: { $ne: true } })
+  const row = await Nick.findOne({ key: req.params.nick }).lean().exec()
+  if (!row?.retired) return row
+  return { key: row.key, retired: true, name: row.name ?? null, retiredAt: row.retiredAt ?? null }
 }
 
 export const reqBackfillNicks = async (req: Request, res: Response) => {
