@@ -18,5 +18,10 @@ const linkSchema = new Schema<LinkDoc>(
 
 linkSchema.index({ left_note: 1 })
 linkSchema.index({ right_note: 1 })
+// Links are undirected and stored with the smaller note id on the left
+// (see canonicalPair), so one pair can only be stored once (#371). On a
+// database with duplicate or reversed links this index can't build until
+// the "Tidy note links" maintenance task has run.
+linkSchema.index({ left_note: 1, right_note: 1 }, { unique: true })
 
 export default mongoose.model<LinkDoc>('link', linkSchema)

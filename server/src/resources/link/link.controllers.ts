@@ -4,6 +4,30 @@ import Note from '../note/note.model.js'
 import { isValidObjectId } from 'mongoose'
 import type { Request, Response } from 'express'
 
+// A link joins two notes with no direction. It's stored with the smaller
+// id on the left, so each pair has one canonical row (#371).
+export function canonicalPair(a: unknown, b: unknown): [string, string] {
+  const [x, y] = [String(a), String(b)]
+  return x < y ? [x, y] : [y, x]
+}
+
+// Create the link between two notes, or return the one already there.
+// The upsert and the unique index make this safe to race.
+export async function linkNotes(a: unknown, b: unknown) {
+  const [left, right] = canonicalPair(a, b)
+  if (left === right) throw Object.assign(new Error('A note cannot link to itself'), { status: 400 })
+  const filter = { left_note: left, right_note: right }
+  try {
+    return await Link.findOneAndUpdate(filter, { $setOnInsert: filter }, { upsert: true, new: true }).exec()
+  } catch (e: any) {
+    if (e?.code === 11000) return Link.findOne(filter).exec()
+    throw e
+  }
+}
+
+// Remove every link touching a note, for its delete cascade
+export const unlinkAllFor = (noteId: unknown) =>
+  Link.deleteMany({ $or: [{ left_note: noteId }, { right_note: noteId }] }).exec()
 
 export const reqLinkNoteToNote = async (req: Request, res: Response) => {
   const { fromId, toId, leftNoteNick, rightNoteNick } = req.body ?? {}
@@ -38,25 +62,28 @@ export const reqLinkNoteToNote = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Provide fromId and toId note IDs' })
   }
 
-  const existing_link = await Link.findOne({
-    left_note: leftNoteId,
-    right_note: rightNoteId,
-  })
-  const existing_link_inverse = await Link.findOne({
-    left_note: rightNoteId,
-    right_note: leftNoteId,
-  })
+  return linkNotes(leftNoteId, rightNoteId)
+}
 
-  if (existing_link || existing_link_inverse) {
-    return existing_link ?? existing_link_inverse
-  }
+// DELETE /link/:id
+export const reqDeleteLink = async (req: Request, res: Response) => {
+  if (!isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid link id' })
+  const { deletedCount } = await Link.deleteOne({ _id: req.params.id }).exec()
+  if (!deletedCount) return res.status(404).json({ message: 'Link not found' })
+  return null
+}
 
-  const new_link = await Link.create({
-    left_note: leftNoteId,
-    right_note: rightNoteId,
-  })
-
-  return new_link
+// DELETE /link/between/:a/:b, in either order
+export const reqDeleteLinkBetween = async (req: Request, res: Response) => {
+  const { a, b } = req.params
+  if (!isValidObjectId(a) || !isValidObjectId(b)) return res.status(400).json({ message: 'Invalid note id' })
+  const [left, right] = canonicalPair(a, b)
+  // Also catches a reversed row left from before links were canonical
+  const { deletedCount } = await Link.deleteMany({
+    $or: [{ left_note: left, right_note: right }, { left_note: right, right_note: left }],
+  }).exec()
+  if (!deletedCount) return res.status(404).json({ message: 'Link not found' })
+  return null
 }
 
 export const reqGetLinksForNote = async (req: Request, res: Response) => {

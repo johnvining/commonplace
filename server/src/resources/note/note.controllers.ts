@@ -18,6 +18,7 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
 import { nickFor, nickKeysFor, resolveNick, retireNick } from '../nick/nickLifecycle.js'
+import { unlinkAllFor } from '../link/link.controllers.js'
 import { sanitizeSearchInput, escapeRegexInput, wordPrefixFilter } from '../../utils/searchInput.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
@@ -145,6 +146,7 @@ export const reqDeleteNote = async (req: Request, res: Response) => {
   if (note) await deleteNoteImageFiles(note)
   // Before the delete, so the retired nick can keep the note's title
   await retireNick('note', id)
+  await unlinkAllFor(id)
   await Note.deleteOne({ _id: id })
   invalidateEmbedding(id)
   res.status(200).end()

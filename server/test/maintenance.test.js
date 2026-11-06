@@ -38,6 +38,7 @@ describe('maintenance tasks', () => {
     const res = await agent.get('/api/maintenance/').expect(200)
     expect(res.body.data.map((t) => t.id)).toEqual([
       'trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals', 'remove-missing-authors',
+      'tidy-note-links',
     ])
     expect(res.body.data.every((t) => t.pending && t.lastRun === null)).toBe(true)
   })
@@ -134,6 +135,31 @@ describe('maintenance tasks', () => {
 
     const again = await runJob(agent, 'remove-missing-authors', false)
     expect(again.output).toContain('note authors: 0 missing authors on 0 records')
+  })
+
+  it('tidies existing links into one canonical row per pair (#371)', async () => {
+    const agent = await authedAgent()
+    const { default: Link } = await import('../src/resources/link/link.model.js')
+    const mongoose = (await import('mongoose')).default
+    await Link.collection.dropIndexes().catch(() => {})
+    const { insertedIds } = await models.Note.collection.insertMany([{ title: 'A' }, { title: 'B' }])
+    const [a, b] = Object.values(insertedIds)
+    const [lo, hi] = String(a) < String(b) ? [a, b] : [b, a]
+    await Link.collection.insertMany([
+      { left_note: hi, right_note: lo },
+      { left_note: lo, right_note: hi },
+      { left_note: lo, right_note: lo },
+      { left_note: lo, right_note: new mongoose.Types.ObjectId() },
+    ])
+    const dry = await runJob(agent, 'tidy-note-links', true)
+    expect(dry.output[0]).toBe('links: 4 checked; would remove 1 self-links, 1 to deleted notes, 1 duplicates; would reorder 1')
+    expect(await Link.countDocuments({})).toBe(4)
+
+    const real = await runJob(agent, 'tidy-note-links', false)
+    expect(real.status).toBe('done')
+    const left = await Link.find({}).lean()
+    expect(left.map((l) => [String(l.left_note), String(l.right_note)])).toEqual([[String(lo), String(hi)]])
+    await expect(Link.collection.insertOne({ left_note: lo, right_note: hi })).rejects.toThrow(/duplicate key/)
   })
 
   it('404s for unknown tasks and jobs', async () => {

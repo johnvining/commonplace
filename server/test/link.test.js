@@ -120,4 +120,52 @@ describe('GET /api/link/note/:id order', () => {
     }
   })
 })
+
+  describe('one undirected link per pair (#371)', () => {
+    const link = (agent, a, b) => agent.put('/api/link/').send({ fromId: String(a._id), toId: String(b._id) })
+    const linksOf = async (agent, n) => (await agent.get(`/api/link/note/${n._id}`).expect(200)).body.data
+
+    it('stores the pair once, whichever way or however often it is linked', async () => {
+      const agent = await authedAgent()
+      const a = await createNote(agent, { title: 'A' })
+      const b = await createNote(agent, { title: 'B' })
+      const [one, two, three] = await Promise.all([link(agent, a, b), link(agent, b, a), link(agent, a, b)])
+      expect(new Set([one.body.data._id, two.body.data._id, three.body.data._id]).size).toBe(1)
+      const { default: Link } = await import('../src/resources/link/link.model.js')
+      expect(await Link.countDocuments({})).toBe(1)
+      expect((await linksOf(agent, a)).map((n) => n._id)).toEqual([b._id])
+      expect((await linksOf(agent, b)).map((n) => n._id)).toEqual([a._id])
+    })
+
+    it('refuses to link a note to itself', async () => {
+      const agent = await authedAgent()
+      const a = await createNote(agent, { title: 'A' })
+      await link(agent, a, a).expect(400)
+    })
+
+    it('deletes a link by id or by its two notes in either order', async () => {
+      const agent = await authedAgent()
+      const a = await createNote(agent, { title: 'A' })
+      const b = await createNote(agent, { title: 'B' })
+      const c = await createNote(agent, { title: 'C' })
+      const ab = (await link(agent, a, b).expect(200)).body.data
+      await link(agent, a, c).expect(200)
+      await agent.delete(`/api/link/${ab._id}`).expect(200)
+      await agent.delete(`/api/link/${ab._id}`).expect(404)
+      await agent.delete(`/api/link/between/${c._id}/${a._id}`).expect(200)
+      expect(await linksOf(agent, a)).toEqual([])
+      await agent.delete('/api/link/not-an-id').expect(400)
+    })
+
+    it("removes a deleted note's links", async () => {
+      const agent = await authedAgent()
+      const a = await createNote(agent, { title: 'A' })
+      const b = await createNote(agent, { title: 'B' })
+      await link(agent, a, b).expect(200)
+      await agent.delete(`/api/note/${a._id}`).expect(200)
+      const { default: Link } = await import('../src/resources/link/link.model.js')
+      expect(await Link.countDocuments({})).toBe(0)
+    })
+  })
 })
+

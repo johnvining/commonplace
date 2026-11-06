@@ -6,6 +6,8 @@ import { runOcrBacklog } from '../../utils/ocrBacklog.js'
 import Note from '../note/note.model.js'
 import { cleanOcrText } from '../../utils/ocrText.js'
 import Pin from '../pin/pin.model.js'
+import Link from '../link/link.model.js'
+import { canonicalPair } from '../link/link.controllers.js'
 
 export interface TaskContext {
   dryRun: boolean
@@ -159,6 +161,45 @@ const removeMissingAuthors: MaintenanceTask = {
   },
 }
 
+const tidyNoteLinks: MaintenanceTask = {
+  id: 'tidy-note-links',
+  title: 'Tidy note links',
+  issue: 371,
+  description:
+    'Links are now stored once per pair, smaller note id first, under a ' +
+    'unique index. Puts existing links in that order, removes duplicates, ' +
+    'links from a note to itself and links to deleted notes, then builds ' +
+    'the index. Dry run counts each kind.',
+  async run({ dryRun, log }) {
+    const links = await Link.find({}, { left_note: 1, right_note: 1 }).lean()
+    const noteIds = new Set((await Note.distinct('_id')).map(String))
+    const seen = new Set<string>()
+    const remove: unknown[] = []
+    const reorder: { id: unknown; left: string; right: string }[] = []
+    let self = 0, dangling = 0, duplicate = 0
+    for (const link of links) {
+      const [left, right] = canonicalPair(link.left_note, link.right_note)
+      if (left === right) { self++; remove.push(link._id); continue }
+      if (!noteIds.has(left) || !noteIds.has(right)) { dangling++; remove.push(link._id); continue }
+      const pair = left + ':' + right
+      if (seen.has(pair)) { duplicate++; remove.push(link._id); continue }
+      seen.add(pair)
+      if (String(link.left_note) !== left) reorder.push({ id: link._id, left, right })
+    }
+    if (!dryRun) {
+      if (remove.length) await Link.deleteMany({ _id: { $in: remove } })
+      for (const r of reorder) {
+        await Link.updateOne({ _id: r.id }, { $set: { left_note: r.left, right_note: r.right } }, { timestamps: false })
+      }
+      await Link.syncIndexes()
+    }
+    const verb = dryRun ? 'would' : 'did'
+    log(`links: ${links.length} checked; ${verb} remove ${self} self-links, ${dangling} to deleted notes, ` +
+      `${duplicate} duplicates; ${verb} reorder ${reorder.length}`)
+    if (!dryRun) log('unique pair index built')
+  },
+}
+
 // In the order they should be run.
 export const TASKS: MaintenanceTask[] = [
   trimEntityNames,
@@ -166,6 +207,7 @@ export const TASKS: MaintenanceTask[] = [
   ocrBacklog,
   clearOcrRefusals,
   removeMissingAuthors,
+  tidyNoteLinks,
 ]
 
 export const findTask = (id: string) => TASKS.find((t) => t.id === id)
