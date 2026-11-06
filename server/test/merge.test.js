@@ -26,7 +26,8 @@ describe('merge (#360)', () => {
       expect(notes.map(n => n._id)).toEqual([note._id])
       const gone = await agent.get(`/api/work/${drop._id}`)
       expect(gone.body.data ?? null).toBeFalsy()
-      expect((await agent.get(`/api/nick/${dropNick}`).expect(200)).body.data).toMatchObject({ retired: true, name: 'Drop' })
+      // The merged work's nick now leads to the kept work (#366)
+      expect((await agent.get(`/api/nick/${dropNick}`).expect(200)).body.data).toMatchObject({ key: dropNick, work: keep._id, mergedFrom: 'Drop' })
       const pins = (await agent.get('/api/pin').expect(200)).body.data
       expect(pins.map(p => p.id)).toEqual([keep._id])
     })
@@ -70,6 +71,40 @@ describe('merge (#360)', () => {
       expect((await agent.get(`/api/auth/${keep._id}`).expect(200)).body.data.birth_year).toBe(1900)
       const gone = await agent.get(`/api/auth/${drop._id}`)
       expect(gone.body.data ?? null).toBeFalsy()
+    })
+  })
+
+  describe('nicks of merged works (#366)', () => {
+    async function nick(agent, id) {
+      return (await agent.put(`/api/nick/work/${id}`).expect(200)).body.data.key
+    }
+    const resolve = async (agent, key) => (await agent.get(`/api/nick/${key}`).expect(200)).body.data
+
+    it('follow a chain of merges, and retire when the kept work is deleted', async () => {
+      const agent = await authedAgent()
+      const a = await createWork(agent, { name: 'A' })
+      const b = await createWork(agent, { name: 'B' })
+      const c = await createWork(agent, { name: 'C' })
+      const aKey = await nick(agent, a._id)
+      const bKey = await nick(agent, b._id)
+      const cKey = await nick(agent, c._id)
+
+      await agent.post(`/api/work/${a._id}/merge`).send({ into: b._id }).expect(200)
+      expect((await resolve(agent, aKey)).work).toBe(b._id)
+      // B keeps its own nick
+      expect((await resolve(agent, bKey)).work).toBe(b._id)
+
+      await agent.post(`/api/work/${b._id}/merge`).send({ into: c._id }).expect(200)
+      expect((await resolve(agent, aKey)).work).toBe(c._id)
+      expect((await resolve(agent, bKey))).toMatchObject({ work: c._id, mergedFrom: 'B' })
+      expect((await resolve(agent, cKey)).work).toBe(c._id)
+
+      await agent.delete(`/api/work/${c._id}`).expect(204)
+      for (const [key, name] of [[aKey, 'A'], [bKey, 'B'], [cKey, 'C']]) {
+        const data = await resolve(agent, key)
+        expect(data).toMatchObject({ retired: true, name })
+        expect(data.work).toBeUndefined()
+      }
     })
   })
 })

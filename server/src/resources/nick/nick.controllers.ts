@@ -59,11 +59,18 @@ async function snapshotName(type: NickEntityType, id: unknown): Promise<string |
 // the row so the key-uniqueness checks above never reissue the key and a
 // stored reference to it can't resolve to some other entity (#348). The
 // row remembers the entity's name and when it went (#366).
-export const deleteNickFor = async (type: NickEntityType, id: unknown) => {
+//
+// When the entity is being merged into another, its nick becomes an alias
+// that resolves to `mergedInto`, so old links keep working. Aliases that
+// pointed at this entity follow it to `mergedInto`, or retire with it.
+export const deleteNickFor = async (type: NickEntityType, id: unknown, mergedInto?: unknown) => {
   const $set: Record<string, unknown> = { retired: true, retiredAt: new Date() }
   const name = await snapshotName(type, id)
   if (name) $set.name = name
+  if (mergedInto) $set.mergedInto = mergedInto
   await Nick.updateOne({ [type]: id }, { $unset: { [type]: 1 }, $set }).exec()
+  if (mergedInto) await Nick.updateMany({ mergedInto: id }, { $set: { mergedInto } }).exec()
+  else await Nick.updateMany({ mergedInto: id }, { $unset: { mergedInto: 1 } }).exec()
 }
 
 export const reqGenerateNickForNote = async (req: Request, res: Response) => generateNick('note', req.params.id)
@@ -71,12 +78,17 @@ export const reqGenerateNickForWork = async (req: Request, res: Response) => gen
 export const reqGenerateNickForIdea = async (req: Request, res: Response) => generateNick('idea', req.params.id)
 export const reqGenerateNickForPile = async (req: Request, res: Response) => generateNick('pile', req.params.id)
 
-// A live nick comes back as its row. A retired one comes back as
-// { key, retired, name, retiredAt }, with no entity id, so callers can say
-// what it pointed to (#366).
+const TYPE_BY_PREFIX: Record<string, NickEntityType> = { n: 'note', w: 'work', i: 'idea', p: 'pile' }
+
+// A live nick comes back as its row. A merged one comes back shaped like a
+// live one, pointing at the entity it was merged into, plus mergedFrom (the
+// old name). A retired one comes back as { key, retired, name, retiredAt },
+// with no entity id, so callers can say what it pointed to (#366).
 export const reqGetNick = async (req: Request, res: Response) => {
   const row = await Nick.findOne({ key: req.params.nick }).lean().exec()
   if (!row?.retired) return row
+  const type = TYPE_BY_PREFIX[row.key?.charAt(0) ?? '']
+  if (row.mergedInto && type) return { key: row.key, [type]: row.mergedInto, mergedFrom: row.name ?? null }
   return { key: row.key, retired: true, name: row.name ?? null, retiredAt: row.retiredAt ?? null }
 }
 

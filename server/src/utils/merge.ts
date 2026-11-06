@@ -93,7 +93,8 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
     }
   ).exec()
   await movePin('work', from, into)
-  await deleteNickFor('work', from)
+  // Old links to the merged work land on the kept one (#366)
+  await deleteNickFor('work', from, into)
   await Work.deleteOne({ _id: from }).exec()
   return plan
 }
