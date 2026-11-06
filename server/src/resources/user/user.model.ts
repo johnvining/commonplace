@@ -5,6 +5,8 @@ export interface UserDoc {
   username: string
   password: string
   role?: string
+  // Bumped to cut off every outstanding token (#375)
+  tokenVersion: number
   createdAt: Date
   updatedAt: Date
 }
@@ -20,6 +22,7 @@ const userSchema = new Schema<UserDoc>(
       type: String,
       required: true,
     },
+    tokenVersion: { type: Number, default: 0 },
   },
   { timestamps: true }
 )

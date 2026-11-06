@@ -41,11 +41,18 @@ async function api(method, path, body, config) {
     try { message = JSON.parse(errText).message || errText } catch {}
     throw Object.assign(new Error(`HTTP ${res.status}${message ? ': ' + message : ''}`), { status: res.status })
   }
-  // Capture Set-Cookie on login
+  // A token from the server: at login, for cmdLogin to save; otherwise
+  // the server sliding the session forward (#375), saved at once so the
+  // CLI stays signed in with use instead of dying after 7 days
   const setCookie = res.headers.get('set-cookie')
-  if (setCookie) {
-    const match = setCookie.match(/jwt=([^;]+)/)
-    if (match) config._newToken = match[1]
+  const match = setCookie?.match(/jwt=([^;]+)/)
+  if (match) {
+    if (config.token && path !== 'user/auth') {
+      config.token = match[1]
+      saveConfig(config)
+    } else {
+      config._newToken = match[1]
+    }
   }
   const text = await res.text()
   if (!text) return null
@@ -1973,13 +1980,16 @@ async function cmdRecentItems(args, config) {
   })
 }
 
+// `cp logout [--everywhere]`: ends this session, or every session
+// (browsers too) with --everywhere (#375)
 async function cmdLogout(args, config) {
+  const everywhere = args.includes('--everywhere')
   try {
-    await api('POST', 'user/logout', null, config)
+    await api('POST', everywhere ? 'user/logout-everywhere' : 'user/logout', null, config)
   } catch {}
   delete config.token
   saveConfig(config)
-  console.log(`${GREEN}Logged out.${RESET}`)
+  console.log(`${GREEN}Logged out${everywhere ? ' everywhere' : ''}.${RESET}`)
 }
 
 async function cmdNickGen(args, config) {
@@ -2113,7 +2123,8 @@ ${BOLD}Admin${RESET}
   stats              Show counts (notes, authors, works, ideas, piles)
   config [url <url>] Show or set config (server URL)
   login              Authenticate with the server
-  logout             Drop the saved token
+  logout [--everywhere]  End this session (--everywhere: every session,
+                     browsers too)
   ping               Check server status
   backfill-nicks     Backfill nicks for all entity types
   backfill-embeddings  Backfill embeddings for all notes
