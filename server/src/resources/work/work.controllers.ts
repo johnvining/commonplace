@@ -1,14 +1,11 @@
 import Work from '../work/work.model.js'
-import Note from '../note/note.model.js'
 import Pile from '../pile/pile.model.js'
 import Idea from '../idea/idea.model.js'
 import { createAuthor, findAuthorByUrl } from '../auth/auth.controllers.js'
 import { guessYearFromUrl } from '../../utils/urls.js'
-import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { createIdea } from '../idea/idea.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
-import { retireNick } from '../nick/nickLifecycle.js'
-import { runCascadeSteps } from '../../utils/cascadeDelete.js'
+import { deleteEntity } from '../../utils/deleteEntity.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
@@ -211,15 +208,7 @@ export const findOrCreateWork = async function(name: string) {
   return await createWork(name)
 }
 
-export const deleteWork = async function(id: string) {
-  const notes = await findNotesAndPopulate({ work: id }, {}, true)
-  const steps: Array<() => Promise<unknown>> = notes.map(
-    (note) => () => updateNote(note._id, { work: null })
-  )
-  steps.push(() => retireNick('work', id))
-  await runCascadeSteps('deleteWork', steps)
-  await Work.findOneAndDelete({ _id: id })
-}
+export const deleteWork = (id: string) => deleteEntity('work', id)
 
 export const addPileToId = async (workId: string, pileId: unknown) => {
   const doc = await Work.findOneAndUpdate(

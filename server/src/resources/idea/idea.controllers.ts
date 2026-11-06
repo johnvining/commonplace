@@ -2,12 +2,7 @@ import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
 import Work from '../work/work.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
-import {
-  removeIdeaFromNote,
-  findNotesAndPopulate
-} from '../note/note.controllers'
-import { retireNick } from '../nick/nickLifecycle.js'
-import { runCascadeSteps } from '../../utils/cascadeDelete.js'
+import { deleteEntity } from '../../utils/deleteEntity.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
@@ -92,16 +87,7 @@ export const findOrCreateIdea = async function(name: string) {
   return await createIdea(name)
 }
 
-export const deleteIdea = async function(ideaId: string) {
-  const notes = await findNotesAndPopulate({ ideas: ideaId }, {}, true)
-  const steps: Array<() => Promise<unknown>> = notes.map(
-    (note) => () => removeIdeaFromNote(note._id, ideaId)
-  )
-  steps.push(() => Work.updateMany({ ideas: ideaId }, { $pull: { ideas: ideaId } }))
-  steps.push(() => retireNick('idea', ideaId))
-  await runCascadeSteps('deleteIdea', steps)
-  await Idea.findOneAndDelete({ _id: ideaId })
-}
+export const deleteIdea = (ideaId: string) => deleteEntity('idea', ideaId)
 
 const IDEA_WRITABLE = ['name', 'start_year', 'end_year', 'person', 'text'] as const
 export default defaultControllers(Idea, { writable: IDEA_WRITABLE })

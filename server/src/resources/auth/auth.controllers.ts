@@ -2,10 +2,10 @@ import Note from '../note/note.model.js'
 import { Auth } from './auth.model.js'
 import Work from '../work/work.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
-import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
+import { deleteEntity } from '../../utils/deleteEntity.js'
 import { mergeAuthors, splitAuthor } from '../../utils/merge.js'
 import type { Request, Response } from 'express'
 
@@ -175,20 +175,7 @@ export const findOrCreateAuthor = async function (name: string) {
   return await createAuthor(name)
 }
 
-export const deleteAuthor = async function (id: string) {
-  // Pull the author from every note's and every work's authors[] in one
-  // updateMany each — cleaner than the per-doc loop the single-author
-  // version needed. Author has no nick, so nothing to drop on that side.
-  const steps: Array<() => Promise<unknown>> = [
-    () => Note.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
-    () => Note.updateMany({ people: id }, { $pull: { people: id } }).exec(),
-    () => Work.updateMany({ authors: id }, { $pull: { authors: id } }).exec(),
-    () => Work.updateMany({ editors: id }, { $pull: { editors: id } }).exec(),
-    () => Work.updateMany({ translators: id }, { $pull: { translators: id } }).exec(),
-  ]
-  await runCascadeSteps('deleteAuthor', steps)
-  await Auth.findOneAndDelete({ _id: id })
-}
+export const deleteAuthor = (id: string) => deleteEntity('auth', id)
 
 const AUTH_WRITABLE = ['name', 'birth_year', 'death_year', 'usernames'] as const
 export default defaultControllers(Auth, { writable: AUTH_WRITABLE })

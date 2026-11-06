@@ -1,11 +1,9 @@
 import Pile from './pile.model.js'
 import Note from '../note/note.model.js'
 import Work from '../work/work.model.js'
-import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
-import { removePileFromWork } from '../work/work.controllers.js'
-import { mintNick, retireNick } from '../nick/nickLifecycle.js'
-import { runCascadeSteps } from '../../utils/cascadeDelete.js'
+import { mintNick } from '../nick/nickLifecycle.js'
+import { deleteEntity } from '../../utils/deleteEntity.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
@@ -89,24 +87,7 @@ export const filePilesByString = async function (string: string, withCounts: boo
   }))
 }
 
-export const deletePile = async function (pileId: string) {
-  const notes = await findNotesAndPopulate(
-    { piles: pileId },
-    { updatedAt: -1 },
-    true
-  )
-  const works = await getWorksForPile(pileId)
-  const steps: Array<() => Promise<unknown>> = []
-  for (const note of notes) {
-    steps.push(() => updateNote(note._id, { $pull: { piles: pileId } }))
-  }
-  for (const work of works) {
-    steps.push(() => removePileFromWork(String(work._id), pileId))
-  }
-  steps.push(() => retireNick('pile', pileId))
-  await runCascadeSteps('deletePile', steps)
-  await Pile.findOneAndDelete({ _id: pileId })
-}
+export const deletePile = (pileId: string) => deleteEntity('pile', pileId)
 
 export const findOrCreatePile = async (name: string) => {
   // Blank names must be caught here: an upsert takes the name from the

@@ -52,11 +52,6 @@ export const createOne = (model: AnyModel, opts: ControllerOpts = {}) => async (
   }
 }
 
-export const removeOne = (model: AnyModel) => async (req: Request) => {
-  await model.deleteOne({ _id: req.params.id })
-  return null
-}
-
 export const updateOne = (model: AnyModel, opts: ControllerOpts = {}) => async (
   req: Request
 ) => {
@@ -66,7 +61,6 @@ export const updateOne = (model: AnyModel, opts: ControllerOpts = {}) => async (
 }
 
 export const defaultControllers = (model: AnyModel, opts: ControllerOpts = {}) => ({
-  removeOne: removeOne(model),
   updateOne: updateOne(model, opts),
   getOne: getOne(model),
   createOne: createOne(model, opts),

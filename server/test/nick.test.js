@@ -118,7 +118,12 @@ describe('nick', () => {
       const agent = await authedAgent()
       const work = await createWork(agent, { name: 'W' })
       const created = await ensureNickFor(agent, 'work', work._id)
-      const spy = vi.spyOn(mongoose.Model, 'findById').mockImplementationOnce(() => { throw new Error('boom') })
+      // Fail only the name lookup, which asks for just name, title and text
+      const realFindById = mongoose.Model.findById
+      const spy = vi.spyOn(mongoose.Model, 'findById').mockImplementation(function (id, projection, ...rest) {
+        if (projection && 'title' in projection) throw new Error('boom')
+        return realFindById.call(this, id, projection, ...rest)
+      })
       try {
         await agent.delete(`/api/work/${work._id}`).expect(204)
       } finally {
