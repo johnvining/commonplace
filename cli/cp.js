@@ -1866,16 +1866,20 @@ async function cmdImport(args, config) {
   }
   const importList = readFileSync(file, 'utf8')
 
+  // The server reports each row (#374)
+  const report = (result) => {
+    console.log(`${GREEN}Imported${RESET} ${result?.imported ?? '?'} notes` +
+      (result?.failed ? `, ${YELLOW}${result.failed} with problems${RESET}:` : ''))
+    for (const r of (result?.rows ?? []).filter((r) => !r.ok)) {
+      console.log(`  row ${r.row}: ${r.error}${r.id ? `  ${DIM}(note ${r.id} made)${RESET}` : ''}`)
+    }
+  }
   if (kind === 'csv') {
-    const res = await api('PUT', 'note/import/csv', { importList }, config)
-    const n = res?.data
-    console.log(`${GREEN}Imported${RESET} ${n ?? '?'} notes`)
+    report((await api('PUT', 'note/import/csv', { importList }, config))?.data)
     return
   }
   if (kind === 'instapaper') {
-    const res = await api('PUT', 'note/import/instapaper', { importList }, config)
-    const n = res?.data
-    console.log(`${GREEN}Imported${RESET} ${n ?? '?'} notes`)
+    report((await api('PUT', 'note/import/instapaper', { importList }, config))?.data)
     return
   }
   if (kind === 'work') {

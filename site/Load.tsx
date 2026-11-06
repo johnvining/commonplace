@@ -14,6 +14,8 @@ import * as constants from './constants'
 function Load(props: any) {
   const [pendingImportText, setPendingImportText] = useState('')
   const [notesImported, setNotesImported] = useState(-1)
+  // Rows that didn't fully import, as the server reported them (#374)
+  const [failedRows, setFailedRows] = useState<{ row: number; error?: string; id?: string }[]>([])
   const [importFormat, setImportFormat] = useState('csv')
   const [importing, setImporting] = useState(false)
   const [importProgress, setImportProgress] = useState<any>(null)
@@ -90,22 +92,26 @@ function Load(props: any) {
     setImportProgress(null)
   }
 
+  const showImportResult = (result: any) => {
+    setNotesImported(result?.imported ?? 0)
+    setFailedRows((result?.rows ?? []).filter((r: any) => !r.ok))
+  }
+
   const handleImport = async () => {
     cancelRef.current = false
     setImporting(true)
     setNotesImported(-1)
+    setFailedRows([])
     setImportError(null)
     let importText = pendingImportText
     setPendingImportText('')
     try {
       if (importFormat === 'csv') {
-        let imported = await db.importNotesCsv(importText)
-        setNotesImported(imported.data.data)
+        showImportResult((await db.importNotesCsv(importText)).data.data)
         // TODO: Error handling on bad CSV
         // TODO: Validate CSV then load all records, rather than erroring midway through
       } else if (importFormat === 'instapaper') {
-        let imported = await db.importNotesInstapaper(importText)
-        setNotesImported(imported.data.data)
+        showImportResult((await db.importNotesInstapaper(importText)).data.data)
       } else {
         await importUrlsAsNotes()
       }
@@ -213,9 +219,23 @@ function Load(props: any) {
             : importError
             ? importError
             : notesImported > -1
-            ? notesImported + ' notes imported'
+            ? notesImported + ' notes imported' + (failedRows.length ? `, ${failedRows.length} with problems:` : '')
             : null}
         </span>
+        {failedRows.length ? (
+          <ul className="import-failures">
+            {failedRows.map((r) => (
+              <li key={r.row}>
+                Row {r.row}: {r.error}
+                {r.id ? (
+                  <>
+                    {' '}(<a href={'/note/' + r.id}>note made</a>)
+                  </>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </div>
   )
