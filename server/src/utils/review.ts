@@ -21,6 +21,9 @@ const DAY = 24 * 60 * 60 * 1000
 // Cards to rate per day; each deck holds what's left of it.
 export const FLIP_PER_DAY = 100
 
+// The day's remaining quota: how big today's next deck may be
+export const deckSize = (ratedToday: number) => Math.max(0, FLIP_PER_DAY - ratedToday)
+
 export const RATINGS = ['fast', 'med', 'slow'] as const
 export type Rating = (typeof RATINGS)[number]
 
@@ -79,6 +82,24 @@ export function reviewPriority(state: ReviewState, now = new Date()): number {
   return now.getTime() >= due ? Math.max(1, ratio) : ratio
 }
 
+// Where a note stands for review, in one place (#380):
+//   unreviewed  never rated (a reviewedAt alone doesn't count; see top)
+//   scheduled   rated, and not yet due
+//   due         at or past its due date, by less than a whole interval
+//   overdue     past its due date by a whole interval or more
+export type ReviewStateName = 'unreviewed' | 'scheduled' | 'due' | 'overdue'
+
+export function reviewState(state: ReviewState, now = new Date()): ReviewStateName {
+  if (!state.reviewCount || !state.reviewedAt) return 'unreviewed'
+  const priority = reviewPriority(state, now)
+  return priority >= 2 ? 'overdue' : priority >= 1 ? 'due' : 'scheduled'
+}
+
+const isDue = (state: ReviewState, now: Date) => {
+  const name = reviewState(state, now)
+  return name === 'due' || name === 'overdue'
+}
+
 // How long since the note was last opened, as 0 (just now) to 1 (never,
 // or at least STALE_DAYS ago).
 const STALE_DAYS = 30
@@ -113,7 +134,7 @@ export function buildDeck<T extends ReviewState>(
   rand: () => number = Math.random
 ): T[] {
   const ranked = reviewed
-    .filter((card) => reviewPriority(card, now) >= 1)
+    .filter((card) => isDue(card, now))
     .map((card) => ({
       card,
       score:

@@ -28,11 +28,12 @@ import type { Request, Response } from 'express'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import mongoose, { isValidObjectId } from 'mongoose'
 import {
-  FLIP_PER_DAY,
   NEVER_REVIEWED,
   RATINGS,
   REVIEWED,
   buildDeck,
+  deckSize,
+  reviewState,
   scheduleReview,
   type Rating,
 } from '../../utils/review.js'
@@ -182,7 +183,7 @@ export const reqGetRandomNotes = async (req: Request, res: Response) => {
     since.setHours(0, 0, 0, 0)
   }
   const ratedToday = await Note.countDocuments({ ...REVIEWED, reviewedAt: { $gte: since } }).exec()
-  const size = Math.max(0, FLIP_PER_DAY - ratedToday)
+  const size = deckSize(ratedToday)
   if (!size) return []
   const reviewFields = { reviewedAt: 1, reviewDueAt: 1, reviewCount: 1, lastOpenedAt: 1 }
   const [reviewed, unreviewed] = await Promise.all([
@@ -215,7 +216,7 @@ export const reqReviewNote = async (req: Request, res: Response) => {
   if (!existing) return res.status(404).json({ message: 'Not found' })
   const update = scheduleReview(existing, rating as Rating)
   await Note.updateOne({ _id: existing._id }, { $set: update }, { timestamps: false })
-  return update
+  return { ...update, reviewState: reviewState(update) }
 }
 
 export const reqAddIdea = async (req: Request, res: Response) => {
@@ -888,6 +889,9 @@ export const findNotesAndPopulate = async function (
   }
 
   await attachNicks(notes)
+  // Where each note stands for review, worked out once, here (#380)
+  const now = new Date()
+  notes.forEach((note: any) => { note.reviewState = reviewState(note, now) })
   return notes
 }
 

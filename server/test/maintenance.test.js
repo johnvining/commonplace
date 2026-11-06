@@ -42,7 +42,7 @@ describe('maintenance tasks', () => {
     const res = await agent.get('/api/maintenance/').expect(200)
     expect(res.body.data.map((t) => t.id)).toEqual([
       'trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals', 'remove-missing-authors',
-      'tidy-note-links', 'reconcile-images', 'refresh-embeddings',
+      'tidy-note-links', 'reconcile-images', 'refresh-embeddings', 'clear-unrated-review-dates',
     ])
     expect(res.body.data.every((t) => t.pending && t.lastRun === null)).toBe(true)
   })
@@ -290,6 +290,20 @@ describe('maintenance tasks', () => {
       expect(statusOf({ ok: true })).toBe('done')
       expect(statusOf({ ok: false })).toBe('failed')
     })
+  })
+
+  it('clears review dates from notes never rated, and only those (#380)', async () => {
+    const agent = await authedAgent()
+    const when = new Date()
+    const { insertedIds } = await models.Note.collection.insertMany([
+      { title: 'edited once', reviewedAt: when },
+      { title: 'rated', reviewedAt: when, reviewDueAt: when, reviewCount: 2 },
+    ])
+    const [unrated, rated] = Object.values(insertedIds)
+    expect((await runJob(agent, 'clear-unrated-review-dates', true)).output).toEqual(['1 never-rated notes with review dates, would clear'])
+    await runJob(agent, 'clear-unrated-review-dates', false)
+    expect((await models.Note.collection.findOne({ _id: unrated })).reviewedAt).toBeUndefined()
+    expect((await models.Note.collection.findOne({ _id: rated })).reviewedAt).toEqual(when)
   })
 
   it('404s for unknown tasks and jobs', async () => {

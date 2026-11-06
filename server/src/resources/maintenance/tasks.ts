@@ -318,6 +318,28 @@ const refreshEmbeddings: MaintenanceTask = {
   },
 }
 
+const clearUnratedReviewDates: MaintenanceTask = {
+  id: 'clear-unrated-review-dates',
+  title: 'Clear review dates on notes never rated',
+  issue: 380,
+  description:
+    'An early version set a note\'s review date when it was edited, so some ' +
+    'notes look reviewed without ever being rated. Review state already ' +
+    'ignores those dates; this clears them (and any due date) from notes with ' +
+    'no ratings, leaving updatedAt alone. Dry run counts them.',
+  async run({ dryRun, log }) {
+    const query = {
+      reviewCount: { $not: { $gt: 0 } },
+      $or: [{ reviewedAt: { $ne: null } }, { reviewDueAt: { $ne: null } }],
+    }
+    const count = await Note.countDocuments(query)
+    if (!dryRun && count) {
+      await Note.updateMany(query, { $unset: { reviewedAt: 1, reviewDueAt: 1, reviewInterval: 1 } }, { timestamps: false })
+    }
+    log(`${count} never-rated notes with review dates${count ? (dryRun ? ', would clear' : ', cleared') : ''}`)
+  },
+}
+
 // In the order they should be run.
 export const TASKS: MaintenanceTask[] = [
   trimEntityNames,
@@ -328,6 +350,7 @@ export const TASKS: MaintenanceTask[] = [
   tidyNoteLinks,
   reconcileImages,
   refreshEmbeddings,
+  clearUnratedReviewDates,
 ]
 
 export const findTask = (id: string) => TASKS.find((t) => t.id === id)

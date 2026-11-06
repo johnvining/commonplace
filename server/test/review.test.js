@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { authedAgent, createIdea, createNote } from './setup.js'
 import Note from '../src/resources/note/note.model.js'
-import { FLIP_PER_DAY, NEVER_REVIEWED, REVIEWED, buildDeck, reviewPriority, scheduleReview, staleness } from '../src/utils/review.js'
+import { FLIP_PER_DAY, NEVER_REVIEWED, REVIEWED, buildDeck, deckSize, reviewPriority, reviewState, scheduleReview, staleness } from '../src/utils/review.js'
 
 vi.mock('../src/utils/embeddings.js', async (orig) => {
   const actual = await orig()
@@ -172,3 +172,37 @@ describe('review endpoints', () => {
     expect(res.body.data).toEqual([])
   })
 })
+
+describe('reviewState (#380)', () => {
+  const rated = (daysAgo, dueInDays) => ({
+    reviewCount: 1,
+    reviewedAt: new Date(now.getTime() - daysAgo * DAY),
+    reviewDueAt: new Date(now.getTime() + dueInDays * DAY),
+  })
+
+  it('names each state from the review fields, in one place', () => {
+    expect(reviewState({}, now)).toBe('unreviewed')
+    // A review date from an old edit, with no rating, is still unreviewed
+    expect(reviewState({ reviewedAt: now, reviewCount: 0 }, now)).toBe('unreviewed')
+    expect(reviewState(rated(1, 9), now)).toBe('scheduled')
+    expect(reviewState(rated(10, 0), now)).toBe('due')
+    expect(reviewState(rated(10, -1), now)).toBe('due')
+    expect(reviewState(rated(20, -10), now)).toBe('overdue')
+  })
+
+  it('gives the day its remaining quota', () => {
+    expect(deckSize(0)).toBe(FLIP_PER_DAY)
+    expect(deckSize(FLIP_PER_DAY - 3)).toBe(3)
+    expect(deckSize(FLIP_PER_DAY + 5)).toBe(0)
+  })
+
+  it('comes with every note from the API, and with a rating', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'N' })
+    expect((await agent.get(`/api/note/${note._id}`).expect(200)).body.data[0].reviewState).toBe('unreviewed')
+    const rating = (await agent.post(`/api/note/${note._id}/review`).send({ rating: 'med' }).expect(200)).body.data
+    expect(rating.reviewState).toBe('scheduled')
+    expect((await agent.get(`/api/note/${note._id}`).expect(200)).body.data[0].reviewState).toBe('scheduled')
+  })
+})
+
