@@ -1,7 +1,7 @@
 import React from 'react'
 import { showToast } from './Toast'
 import { Link } from 'react-router-dom'
-import { guessYearFromURL, NO_AUTOFILL, wornClass } from './utils'
+import { guessYearFromURL, NO_AUTOFILL, wornClass, titleSourceOf, isAiTitleSource, type TitleSource } from './utils'
 import * as db from './Database'
 import Autocomplete from './Autocomplete'
 import AuthorsChipList from './AuthorsChipList'
@@ -71,6 +71,9 @@ class Note extends React.Component<any, any> {
     pendingTake: '',
     pendingText: '',
     pendingTitle: '',
+    // Where the title being edited came from: as saved, typed here, or an
+    // AI suggestion fetched here (#370)
+    titleOrigin: 'saved' as 'saved' | 'typed' | 'suggestion',
     pendingUrl: '',
     pendingWorkId: null,
     pendingWorkName: '',
@@ -158,6 +161,7 @@ class Note extends React.Component<any, any> {
       pendingTake: this.props.note.take,
       pendingText: this.props.note.text,
       pendingTitle: this.props.note.title,
+      titleOrigin: 'saved',
       pendingUrl: this.props.note.url,
       pendingWorkId: this.props.note.work?._id,
       pendingWorkName: this.props.note.work?.name,
@@ -376,7 +380,7 @@ class Note extends React.Component<any, any> {
 
   // A title is one paragraph: line breaks (from a paste) become spaces
   handleTitleChange = (val: any) => {
-    this.setState({ pendingTitle: val.target.value.replace(/\s*[\r\n]+\s*/g, ' ') })
+    this.setState({ pendingTitle: val.target.value.replace(/\s*[\r\n]+\s*/g, ' '), titleOrigin: 'typed' })
   }
 
   handlePageChange = (val: any) => {
@@ -482,6 +486,7 @@ class Note extends React.Component<any, any> {
       take: this.state.pendingTake,
       text: this.state.pendingText,
       title: this.state.pendingTitle,
+      titleSource: this.titleSourceToSave(),
       url: this.state.pendingUrl,
       work: this.state.pendingWorkId,
     }
@@ -524,13 +529,20 @@ class Note extends React.Component<any, any> {
     this.props.refetchMe(this.props.index)
   }
 
-  // True while the title is exactly what AI suggested (#330); editing it
-  // clears the mark. The server remembers the suggestion as aiTitle; a
-  // suggestion fetched in this editor counts before it's saved.
+  // The title's source as it will be saved: a suggestion taken here is
+  // ai-accepted, anything typed is the user's, and an untouched title
+  // keeps its source, which may be null (not sure). The server checks any
+  // AI claim (#370).
+  titleSourceToSave(): TitleSource | null {
+    if (this.state.titleOrigin === 'typed') return 'user'
+    if (this.state.titleOrigin === 'suggestion') return 'ai-accepted'
+    return titleSourceOf(this.props.note)
+  }
+
+  // Whether the title is AI-made (#330): from a suggestion and not typed
+  // over since, or saved as such
   isAiTitle() {
-    const title = this.state.pendingTitle
-    const suggested = this.state.suggestedTitle ?? this.props.note.aiTitle
-    return Boolean(title) && title === suggested
+    return Boolean(this.state.pendingTitle) && isAiTitleSource(this.titleSourceToSave())
   }
 
   async generateTitleSuggestion() {
@@ -538,7 +550,7 @@ class Note extends React.Component<any, any> {
     await db.getTitleSuggestion(this.props.id).then((response: any) => {
       this.setState({
         pendingTitle: response.data.suggested_title,
-        suggestedTitle: response.data.suggested_title,
+        titleOrigin: 'suggestion',
         fetchingTitleSuggestion: false,
       })
     })

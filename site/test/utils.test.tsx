@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatYear, yearsLabel, retiredNickMessage } from '../utils'
+import { formatYear, yearsLabel, retiredNickMessage, titleSourceOf, isAiTitleSource } from '../utils'
 
 describe('formatYear', () => {
   it('shows years before 1 as BC (#361)', () => {
@@ -26,5 +26,17 @@ describe('retiredNickMessage (#366)', () => {
 
   it('says less for nicks retired before names were kept', () => {
     expect(retiredNickMessage('n1', {})).toBe('n1 pointed to something that has since been deleted.')
+  })
+})
+
+describe('titleSourceOf (#370)', () => {
+  it('uses the recorded source, never the title', () => {
+    expect(titleSourceOf({ titleSource: 'user' })).toBe('user')
+    expect(titleSourceOf({ titleSource: 'ai-accepted' })).toBe('ai-accepted')
+    expect(titleSourceOf({ titleSource: 'ai-suggested' })).toBe('ai-suggested')
+    expect(titleSourceOf({})).toBe(null)
+    expect(isAiTitleSource(null)).toBe(false)
+    expect(isAiTitleSource('user')).toBe(false)
+    expect(isAiTitleSource('ai-accepted')).toBe(true)
   })
 })

@@ -94,3 +94,14 @@ export function retiredNickMessage(key: string, data: { name?: string | null; re
     ? `${key} pointed to “${data.name}”, which was deleted${when}.`
     : `${key} pointed to something that has since been deleted.`
 }
+
+// Where a note's title came from (#370): the server's recorded
+// titleSource, or null for not sure (saved before it existed). Nothing is
+// inferred from the title.
+export type TitleSource = 'user' | 'ai-suggested' | 'ai-accepted'
+export function titleSourceOf(note: { titleSource?: string | null }): TitleSource | null {
+  const s = note.titleSource
+  return s === 'user' || s === 'ai-suggested' || s === 'ai-accepted' ? s : null
+}
+
+export const isAiTitleSource = (source: TitleSource | null) => source === 'ai-suggested' || source === 'ai-accepted'

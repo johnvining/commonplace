@@ -4,7 +4,7 @@ import note_img from 'url:./icons/write.svg'
 import WorkCitationSpan from './WorkCitationSpan'
 import PinButton from './PinButton'
 import { authorsWithWorkFallback } from './authorsDisplay'
-import { wornClass, wornTitle } from './utils'
+import { wornClass, wornTitle, titleSourceOf, isAiTitleSource } from './utils'
 
 function snippetAround(text: any, query: any) {
   const idx = text.toLowerCase().indexOf(query.toLowerCase())
@@ -100,7 +100,7 @@ class NoteResult extends React.PureComponent<any> {
                 </>
               ) : null}
               {primaryContent}
-              {title && title === note.aiTitle ? (
+              {title && isAiTitleSource(titleSourceOf(note)) ? (
                 <span className="ai-title-tag" title="Title suggested by AI">AI</span>
               ) : null}
               {fallback}
