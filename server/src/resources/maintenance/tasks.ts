@@ -5,6 +5,7 @@ import Pile from '../pile/pile.model.js'
 import { runOcrBacklog } from '../../utils/ocrBacklog.js'
 import Note from '../note/note.model.js'
 import { cleanOcrText } from '../../utils/ocrText.js'
+import Pin from '../pin/pin.model.js'
 
 export interface TaskContext {
   dryRun: boolean
@@ -120,7 +121,51 @@ const clearOcrRefusals: MaintenanceTask = {
   },
 }
 
+// Every field that holds author ids
+const AUTHOR_REFS = [
+  { label: 'note authors', Model: Note, field: 'authors' },
+  { label: 'note people', Model: Note, field: 'people' },
+  { label: 'work authors', Model: Work, field: 'authors' },
+  { label: 'work editors', Model: Work, field: 'editors' },
+  { label: 'work translators', Model: Work, field: 'translators' },
+] as const
+
+const removeMissingAuthors: MaintenanceTask = {
+  id: 'remove-missing-authors',
+  title: 'Remove links to deleted authors',
+  issue: 345,
+  description:
+    'Notes and works could still list an author whose record is gone, so the ' +
+    'author link 404ed. Removes those ids from notes (by and about) and works ' +
+    '(authors, editors, translators), and unstars them. Dry run lists the ' +
+    'missing ids and how many records each would change.',
+  async run({ dryRun, log }) {
+    const existing = new Set((await Auth.distinct('_id')).map(String))
+    for (const { label, Model, field } of AUTHOR_REFS) {
+      const missing = ((await (Model as any).distinct(field)) as unknown[]).filter(
+        (id) => id != null && !existing.has(String(id))
+      )
+      const query = { [field]: { $in: missing } }
+      const count = missing.length ? await (Model as any).countDocuments(query) : 0
+      if (!dryRun && count) {
+        await (Model as any).updateMany(query, { $pullAll: { [field]: missing } }, { timestamps: false })
+      }
+      log(`${label}: ${missing.length} missing authors on ${count} records${count ? (dryRun ? ', would remove' : ', removed') : ''}`)
+      if (missing.length) log(`  missing ids: ${missing.map(String).join(', ')}`)
+    }
+    const pins = (await Pin.find({ type: 'auth' }, { target: 1 }).lean()).filter((p) => !existing.has(p.target))
+    if (!dryRun && pins.length) await Pin.deleteMany({ _id: { $in: pins.map((p) => p._id) } })
+    log(`stars: ${pins.length} on missing authors${pins.length ? (dryRun ? ', would remove' : ', removed') : ''}`)
+  },
+}
+
 // In the order they should be run.
-export const TASKS: MaintenanceTask[] = [trimEntityNames, addWorkIdeas, ocrBacklog, clearOcrRefusals]
+export const TASKS: MaintenanceTask[] = [
+  trimEntityNames,
+  addWorkIdeas,
+  ocrBacklog,
+  clearOcrRefusals,
+  removeMissingAuthors,
+]
 
 export const findTask = (id: string) => TASKS.find((t) => t.id === id)

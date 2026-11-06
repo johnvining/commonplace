@@ -36,7 +36,9 @@ describe('maintenance tasks', () => {
   it('lists tasks in run order, all pending at first', async () => {
     const agent = await authedAgent()
     const res = await agent.get('/api/maintenance/').expect(200)
-    expect(res.body.data.map((t) => t.id)).toEqual(['trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals'])
+    expect(res.body.data.map((t) => t.id)).toEqual([
+      'trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals', 'remove-missing-authors',
+    ])
     expect(res.body.data.every((t) => t.pending && t.lastRun === null)).toBe(true)
   })
 
@@ -103,6 +105,35 @@ describe('maintenance tasks', () => {
     expect((await models.Note.collection.findOne({ title: 'photo' })).text).toBe('')
     expect((await models.Note.collection.findOne({ title: 'real' })).text).toMatch(/^Sorry for the delay/)
     expect((await models.Note.collection.findOne({ title: 'typed' })).text).toMatch(/^no visible/)
+  })
+
+  it('removes links to deleted authors, keeping the rest (#345)', async () => {
+    const agent = await authedAgent()
+    const mongoose = (await import('mongoose')).default
+    const real = await models.Auth.create({ name: 'Real' })
+    const gone = new mongoose.Types.ObjectId()
+    const noteId = (await models.Note.collection.insertOne({ title: 'N', authors: [gone, real._id], people: [gone] })).insertedId
+    const workId = (await models.Work.collection.insertOne({ name: 'W', authors: [real._id], editors: [gone] })).insertedId
+    await agent.put('/api/pin').send({ type: 'auth', id: String(gone), label: 'Gone' }).expect(200)
+    await agent.put('/api/pin').send({ type: 'auth', id: String(real._id), label: 'Real' }).expect(200)
+
+    const dry = await runJob(agent, 'remove-missing-authors', true)
+    expect(dry.output).toContain('note authors: 1 missing authors on 1 records, would remove')
+    expect(dry.output).toContain('stars: 1 on missing authors, would remove')
+    expect((await models.Note.collection.findOne({ _id: noteId })).authors).toHaveLength(2)
+
+    await runJob(agent, 'remove-missing-authors', false)
+    const note = await models.Note.collection.findOne({ _id: noteId })
+    expect(note.authors.map(String)).toEqual([String(real._id)])
+    expect(note.people).toEqual([])
+    const work = await models.Work.collection.findOne({ _id: workId })
+    expect(work.authors.map(String)).toEqual([String(real._id)])
+    expect(work.editors).toEqual([])
+    const pins = (await agent.get('/api/pin').expect(200)).body.data
+    expect(pins.map((p) => p.label)).toEqual(['Real'])
+
+    const again = await runJob(agent, 'remove-missing-authors', false)
+    expect(again.output).toContain('note authors: 0 missing authors on 0 records')
   })
 
   it('404s for unknown tasks and jobs', async () => {
