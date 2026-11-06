@@ -6,6 +6,21 @@ import {
 } from './TopLevelStandardButton'
 import { TopLevelFormInput, TopLevelFormContainer } from './TopLevelFormItems'
 
+// What went wrong signing in. The server answers a wrong password with
+// 400 "Incorrect password" and too many tries with 429; only no answer
+// at all, or a server error, means it's unavailable.
+export function loginErrorMessage(err: any): string {
+  const status = err?.response?.status
+  const said = err?.response?.data?.message
+  if (!status) return 'Can\'t reach the server — check your connection and try again'
+  if (status >= 500) return `Server unavailable — try again shortly (${status})`
+  if (status === 429) return 'Too many tries — wait a minute and try again'
+  if (status === 400 || status === 401 || status === 403) {
+    return said === 'Incorrect password' || status !== 400 ? 'Incorrect password' : said || 'Could not sign in'
+  }
+  return said || `Could not sign in (${status})`
+}
+
 function Login(props: any) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -17,13 +32,7 @@ function Login(props: any) {
       const response = await db.getAuthentication(password)
       props.onTokenReceived(response.data.token)
     } catch (err: any) {
-      const status = err?.response?.status
-      const code = status ? ` (${status})` : ''
-      if (status === 401 || status === 403) {
-        setError(`Incorrect password${code}`)
-      } else {
-        setError(`Server unavailable — try again shortly${code}`)
-      }
+      setError(loginErrorMessage(err))
     }
   }
 
