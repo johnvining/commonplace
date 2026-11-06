@@ -25,7 +25,9 @@ function writeSidebarCache(data: any) {
   } catch {}
 }
 
-function Sidebar() {
+// Below 1100px the sidebar is hidden unless `open`, when it slides in as
+// a panel (#108); following a link in it calls onClose.
+function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => void }) {
   const cached = readSidebarCache()
   const [recentIdeas, setRecentIdeas] = useState<any[]>(cached?.ideas || [])
   const [recentPiles, setRecentPiles] = useState<any[]>(cached?.piles || [])
@@ -105,7 +107,12 @@ function Sidebar() {
   }
 
   return (
-    <aside className="sidebar">
+    <aside
+      className={'sidebar' + (open ? ' open' : '')}
+      onClick={(e) => {
+        if (onClose && (e.target as Element).closest('a')) onClose()
+      }}
+    >
       {pendingTasks > 0 ? (
         <div className="sidebar-section">
           <Link to="/maintenance" className="sidebar-maintenance">

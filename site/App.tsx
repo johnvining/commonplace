@@ -72,7 +72,7 @@ const Work        = React.lazy(() => import('./Work'))
 const Read        = React.lazy(() => import('./Read'))
 
 class App extends React.Component<any, any> {
-  state: any = { barOpen: false, viewMode: 1, hasToken: false }
+  state: any = { barOpen: false, viewMode: 1, hasToken: false, sidebarOpen: false }
   redirectTo: string | null = null
 
   constructor(props: any) {
@@ -162,6 +162,18 @@ class App extends React.Component<any, any> {
           </div>
           <div className="top-action-bar">
             <RefreshButton />
+            {/* Below 1100px the sidebar has no room beside the page, so it
+                opens as a panel from here (#108) */}
+            <div className="tool-bar div sidebar-toggle">
+              <TopLevelStandardButton
+                label="Starred and recent"
+                onClick={() => this.setState({ sidebarOpen: !this.state.sidebarOpen })}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
+                  <path d="M2.5 4h11M2.5 8h11M2.5 12h11" />
+                </svg>
+              </TopLevelStandardButton>
+            </div>
             <div className="tool-bar div">
               <TopLevelStandardButton
                 label="Search"
@@ -222,7 +234,10 @@ class App extends React.Component<any, any> {
         ) : null}
 
         <div className="app-shell">
-          <Sidebar />
+          {this.state.sidebarOpen ? (
+            <div className="sidebar-backdrop" onClick={() => this.setState({ sidebarOpen: false })} />
+          ) : null}
+          <Sidebar open={this.state.sidebarOpen} onClose={() => this.setState({ sidebarOpen: false })} />
           <div className="app-content">
             <ErrorBoundary>
             <Suspense fallback={null}>
