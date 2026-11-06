@@ -3688,6 +3688,23 @@ input {
   border-radius: 0;
 }
 
+@media (max-width: 600px) {
+  .entity-page-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .entity-page-header-right {
+    max-width: 100%;
+    width: 100%;
+    align-items: stretch;
+    padding-right: 0;
+  }
+  .entity-page-header-right .top-level-button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
 div.note-slim.button {
   border: none;
   background: transparent;

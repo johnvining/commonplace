@@ -923,6 +923,28 @@ input {
   border-radius: 0;
 }
 
+// Phones: title across the full width, buttons in rows under it, rather
+// than a squeezed title beside ragged button rows (#108).
+@media (max-width: 600px) {
+  .entity-page-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .entity-page-header-right {
+    max-width: 100%;
+    width: 100%;
+    align-items: stretch;
+    padding-right: 0;
+  }
+
+  .entity-page-header-right .top-level-button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
 // The slim checkbox's wrapper carries the generic .button class.
 div.note-slim.button {
   border: none;
