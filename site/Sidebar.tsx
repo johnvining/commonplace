@@ -125,7 +125,11 @@ function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => vo
         {pinnedItems.length ? (
           <div className="sidebar-list sidebar-list-compact">
             {pinnedItems.map((item: any) => (
-              <div className="sidebar-pin-row" key={`${item.type}-${item.id}`}>
+              <div
+                className={'sidebar-pin-row' + (item.pending ? ' pending' : '')}
+                key={`${item.type}-${item.id}`}
+                title={item.pending ? 'Not synced yet' : undefined}
+              >
                 <Link
                   to={item.href ?? '#'}
                   className="sidebar-link sidebar-link-compact"

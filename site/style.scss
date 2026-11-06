@@ -822,6 +822,11 @@ a {
   }
 }
 
+// A star made here that the server hasn't confirmed yet (#381)
+.sidebar-pin-row.pending {
+  opacity: 0.55;
+}
+
 // Closes the search bar without Esc (#340)
 .search-bar-close {
   flex: none;

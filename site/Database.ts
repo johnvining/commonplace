@@ -367,16 +367,9 @@ export async function getPins() {
   return (await axios.get(url_api + 'pin/')).data.data
 }
 
-export async function putPin(item: { type: string; id: string; label?: string; href?: string }) {
-  return axios.put(url_api + 'pin/', item)
-}
-
-export async function deletePin(type: string, id: string) {
-  return axios.delete(url_api + 'pin/' + type + '/' + id)
-}
-
-export async function importPins(items: unknown[]) {
-  return (await axios.post(url_api + 'pin/import', { items })).data.data
+// Send queued star and unstar changes; returns the starred list (#381)
+export async function syncPins(changes: unknown[]) {
+  return (await axios.post(url_api + 'pin/sync', { ops: changes })).data.data
 }
 
 // Nick lookups are cached for the session: a nick always names the same
