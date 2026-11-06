@@ -91,20 +91,18 @@
     margin-bottom: 10px;
   }
 
+  // The single-line fields: shown as text, or edited with .edit (#162)
+  .title,
+  .url,
   .year,
   .page {
     width: 100%;
     text-align: left;
     border-radius: 4px;
-
-    &.input {
-      width: 100%;
-      text-align: left;
-    }
+    color: $font_color;
 
     &.edit {
       background-color: $input_background;
-      color:$font_color;
     }
 
     &:focus {
@@ -184,30 +182,6 @@
 
     li {
       margin: 0;
-    }
-  }
-
-  .title,
-  .url {
-    width: 100%;
-    text-align: left;
-    border-radius: 4px;
-    color:$font_color;
-
-    &.input {
-      width: 100%;
-      text-align: left;
-    }
-
-    &.edit {
-      background-color: $input_background;
-      color:$font_color;
-    }
-
-    &:focus {
-      background-color: $button_input_background_selected;
-      outline: none;
-      border-radius: 2px;
     }
   }
 

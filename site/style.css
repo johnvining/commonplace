@@ -131,22 +131,23 @@
   padding: 2px;
   margin-bottom: 10px;
 }
+.note-full .title,
+.note-full .url,
 .note-full .year,
 .note-full .page {
   width: 100%;
   text-align: left;
   border-radius: 4px;
+  color: var(--font-color);
 }
-.note-full .year.input,
-.note-full .page.input {
-  width: 100%;
-  text-align: left;
-}
+.note-full .title.edit,
+.note-full .url.edit,
 .note-full .year.edit,
 .note-full .page.edit {
   background-color: var(--input-background);
-  color: var(--font-color);
 }
+.note-full .title:focus,
+.note-full .url:focus,
 .note-full .year:focus,
 .note-full .page:focus {
   background-color: var(--button-input-background-selected);
@@ -223,29 +224,6 @@
 .note-full .note-text.markdown li,
 .note-full .note-take.markdown li {
   margin: 0;
-}
-.note-full .title,
-.note-full .url {
-  width: 100%;
-  text-align: left;
-  border-radius: 4px;
-  color: var(--font-color);
-}
-.note-full .title.input,
-.note-full .url.input {
-  width: 100%;
-  text-align: left;
-}
-.note-full .title.edit,
-.note-full .url.edit {
-  background-color: var(--input-background);
-  color: var(--font-color);
-}
-.note-full .title:focus,
-.note-full .url:focus {
-  background-color: var(--button-input-background-selected);
-  outline: none;
-  border-radius: 2px;
 }
 .note-full .title {
   font-size: 18px;

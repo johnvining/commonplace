@@ -856,7 +856,7 @@ class Note extends React.Component<any, any> {
 
                 <input
                   id="title"
-                  className="note-full title input edit"
+                  className="note-full title edit"
                   autoFocus
                   value={this.state.pendingTitle}
                   onChange={this.handleTitleChange}
@@ -1165,7 +1165,7 @@ class Note extends React.Component<any, any> {
                 </label>
                 <input
                   id="url"
-                  className={'note-full url input edit'}
+                  className="note-full url edit"
                   name="url"
                   defaultValue={this.state.pendingUrl}
                   onChange={this.handleUrlChange}
@@ -1233,7 +1233,7 @@ class Note extends React.Component<any, any> {
                 </label>
                 <input
                   id="page"
-                  className={'note-full page input edit'}
+                  className="note-full page edit"
                   name="url"
                   defaultValue={this.state.pendingPage}
                   onChange={this.handlePageChange}
@@ -1245,7 +1245,7 @@ class Note extends React.Component<any, any> {
                 </label>
                 <input
                   id="year"
-                  className="note-full year input edit"
+                  className="note-full year edit"
                   defaultValue={this.state.pendingYear}
                   onChange={this.handleYearChange}
                 ></input>
