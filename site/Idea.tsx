@@ -212,6 +212,7 @@ function Idea(props: any) {
                     setEdit(true)
                   }}
                 />
+                <TopLevelStandardButton name="Add Note" shortcut="Ctrl+N" onClick={createNoteForIdea} />
                 <TopLevelStandardButton
                   name="Narrow"
                   shortcut="f"

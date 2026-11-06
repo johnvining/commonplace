@@ -232,6 +232,7 @@ function Pile(props: any) {
                     }}
                   />
                 )}
+                <TopLevelStandardButton name="Add Note" shortcut="Ctrl+N" onClick={createNoteForPile} />
                 <TopLevelStandardButton
                   name="Narrow"
                   shortcut="f"
