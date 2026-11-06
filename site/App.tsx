@@ -45,6 +45,7 @@ class ErrorBoundary extends React.Component<any, any> {
 
 // Always-visible shell components — kept eager so the chrome renders immediately
 import Login from './Login'
+import AuthGate from './AuthGate'
 import RecentList from './RecentList'
 import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
@@ -72,7 +73,9 @@ const Work        = React.lazy(() => import('./Work'))
 const Read        = React.lazy(() => import('./Read'))
 
 class App extends React.Component<any, any> {
-  state: any = { barOpen: false, viewMode: 1, hasToken: false, sidebarOpen: false }
+  // auth: see AuthGate. Starts 'checking', so the login page doesn't
+  // flash up for a signed-in user while the server is asked.
+  state: any = { barOpen: false, viewMode: 1, auth: 'checking', sidebarOpen: false }
   redirectTo: string | null = null
 
   constructor(props: any) {
@@ -106,28 +109,30 @@ class App extends React.Component<any, any> {
   setNewToken() {
     const redirectTo = this.redirectTo || '/'
     this.redirectTo = null
-    this.setState({ authorized: true }, () => {
+    this.setState({ auth: 'in' }, () => {
       this.props.navigate(redirectTo)
     })
   }
 
   validateAuth() {
+    this.setState({ auth: 'checking' })
     getAuthStatus()
-      .then(() => this.setState({ authorized: true }))
+      .then(() => this.setState({ auth: 'in' }))
       .catch((error: any) => {
-        // Only kick to login on a real auth failure. Network errors or
-        // server outages used to log the user out and lose their place;
-        // now they stay where they are and the toast surfaces the issue.
+        // Only a real auth failure goes to the login page; a network error
+        // or server outage keeps the user signed in and offers a retry.
         if (error?.response?.status === 401) {
           this.redirectTo = window.location.pathname + window.location.search
-          this.setState({ authorized: false })
+          this.setState({ auth: 'out' })
+        } else {
+          this.setState({ auth: 'unreachable' })
         }
       })
   }
 
   async handleLogout() {
     await logout()
-    this.setState({ authorized: false })
+    this.setState({ auth: 'out' })
   }
 
   // New empty note, opened for editing (the + button, or c).
@@ -137,8 +142,16 @@ class App extends React.Component<any, any> {
   }
 
   render() {
-    if (!this.state.authorized) {
-      return <Login onTokenReceived={this.setNewToken.bind(this)} />
+    if (this.state.auth !== 'in') {
+      return (
+        <AuthGate
+          auth={this.state.auth}
+          login={() => <Login onTokenReceived={this.setNewToken.bind(this)} />}
+          onRetry={() => this.validateAuth()}
+        >
+          {null}
+        </AuthGate>
+      )
     }
 
     let environment = process.env.NODE_ENV

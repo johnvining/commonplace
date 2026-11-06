@@ -1509,6 +1509,18 @@ div .top-bar {
   opacity: 1;
 }
 
+.auth-checking {
+  min-height: 100vh;
+}
+
+.auth-unreachable {
+  max-width: 420px;
+  margin: 20vh auto 0;
+  padding: 0 16px;
+  text-align: center;
+  color: var(--font-color);
+}
+
 .sidebar-pin-row.pending {
   opacity: 0.55;
 }

@@ -822,6 +822,19 @@ a {
   }
 }
 
+// While the sign-in check runs: just the page background, no login flash
+.auth-checking {
+  min-height: 100vh;
+}
+
+.auth-unreachable {
+  max-width: 420px;
+  margin: 20vh auto 0;
+  padding: 0 16px;
+  text-align: center;
+  color: $font_color;
+}
+
 // A star made here that the server hasn't confirmed yet (#381)
 .sidebar-pin-row.pending {
   opacity: 0.55;
