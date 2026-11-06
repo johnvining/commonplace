@@ -49,7 +49,36 @@ describe('note images', () => {
         const res = await agent.put(`/api/note/${note._id}/image`).attach('image', Buffer.from('x'), name).expect(200)
         stored.push(res.body.data.newNote.images.at(-1).split('/')[1])
       }
-      expect(stored).toEqual(['1-kids.jpeg', '2-Free_Drivers_German.jpeg', '3-scan.v2.png'])
+      // Each file gets a fresh id prefix (#368)
+      expect(stored.map((s) => s.replace(/^[0-9a-f]{24}-/, ''))).toEqual(['kids.jpeg', 'Free_Drivers_German.jpeg', 'scan.v2.png'])
+      expect(stored.every((s) => /^[0-9a-f]{24}-/.test(s))).toBe(true)
+    })
+
+    it('never overwrites an image still on the note after another was removed (#368)', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'X' })
+      const up = (bytes, name) => agent.put(`/api/note/${note._id}/image`).attach('image', Buffer.from(bytes), name).expect(200)
+      const first = (await up('first', 'a.jpg')).body.data.newNote.images[0]
+      const second = (await up('second', 'b.jpg')).body.data.newNote.images[1]
+      await agent.delete(`/api/note/${note._id}/image/`).send({ filename: first }).expect(200)
+      const images = (await up('third', 'b.jpg')).body.data.newNote.images
+      expect(images).toHaveLength(2)
+      expect(new Set(images).size).toBe(2)
+      expect(fs.readFileSync(path.join(imageStoreRoot, second), 'utf8')).toBe('second')
+    })
+
+    it('removes the file again when the note is gone by the time it is saved', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'X' })
+      const { default: Note } = await import('../src/resources/note/note.model.js')
+      const spy = vi.spyOn(Note, 'findOneAndUpdate').mockImplementationOnce(() => ({ lean: () => ({ exec: async () => null }) }))
+      try {
+        await agent.put(`/api/note/${note._id}/image`).attach('image', Buffer.from('x'), 'lost.jpg').expect(404)
+      } finally {
+        spy.mockRestore()
+      }
+      const dir = path.join(imageStoreRoot, String(note._id))
+      expect(fs.existsSync(dir) ? fs.readdirSync(dir) : []).toEqual([])
     })
 
     it('returns "No file" message when no upload sent', async () => {
@@ -94,6 +123,17 @@ describe('note images', () => {
 
       const refreshed = await agent.get(`/api/note/${note._id}`).expect(200)
       expect(refreshed.body.data[0].images).not.toContain(filename)
+    })
+
+    it('still succeeds when the file was already gone from disk', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: 'X' })
+      const upload = await agent.put(`/api/note/${note._id}/image`).attach('image', Buffer.from('x'), 'gone.jpg').expect(200)
+      const filename = upload.body.data.newNote.images[0]
+      fs.unlinkSync(path.join(imageStoreRoot, filename))
+      await agent.delete(`/api/note/${note._id}/image/`).send({ filename }).expect(200)
+      const refreshed = await agent.get(`/api/note/${note._id}`).expect(200)
+      expect(refreshed.body.data[0].images).toEqual([])
     })
 
     it('returns 400 when the filename is not on the note', async () => {

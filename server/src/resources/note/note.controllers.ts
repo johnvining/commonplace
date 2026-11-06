@@ -24,7 +24,7 @@ import { pickAllowed } from '../../utils/pickAllowed.js'
 import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
 import type { Request, Response } from 'express'
 import { findEntityNotesPage } from '../../utils/pagination.js'
-import { isValidObjectId } from 'mongoose'
+import mongoose, { isValidObjectId } from 'mongoose'
 import {
   FLIP_PER_DAY,
   NEVER_REVIEWED,
@@ -348,26 +348,43 @@ export const reqAddImageToNote = async (req: Request, res: Response) => {
         res.send({ status: false, message: 'No file' })
         return
       }
-      const currentNote = await Note.findOne({ _id: req.params.id })
+      const currentNote = await Note.findOne({ _id: req.params.id }, { _id: 1 }).lean()
       if (!currentNote) {
         res.status(404).json({ message: 'Note not found' })
         return
       }
-      const numberNotes = currentNote.images.length + 1
 
+      // A fresh id per file: numbering by image count reused the name of
+      // an image still on the note after one was removed, and overwrote
+      // it (#368). The folder is the stored _id, never the URL param.
+      const noteId = String(currentNote._id)
       const safeName = image.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-      let localPath = req.params.id + '/' + numberNotes + '-' + safeName
+      const localPath = noteId + '/' + new mongoose.Types.ObjectId().toHexString() + '-' + safeName
+      const fullPath = config.imageStorePath + '/' + localPath
 
-      await fs.promises.mkdir(config.imageStorePath + '/' + req.params.id, { recursive: true })
-      await image.mv(config.imageStorePath + '/' + localPath)
+      await fs.promises.mkdir(config.imageStorePath + '/' + noteId, { recursive: true })
+      await image.mv(fullPath)
 
-      const newNote = await Note.findOneAndUpdate(
-        { _id: req.params.id },
-        { $addToSet: { images: localPath } },
-        { new: true }
-      )
-        .lean()
-        .exec()
+      // If the note can't take the file (deleted meanwhile, or the write
+      // fails), don't leave the file behind on disk.
+      let newNote
+      try {
+        newNote = await Note.findOneAndUpdate(
+          { _id: noteId },
+          { $addToSet: { images: localPath } },
+          { new: true }
+        )
+          .lean()
+          .exec()
+      } catch (e) {
+        await fs.promises.unlink(fullPath).catch(() => {})
+        throw e
+      }
+      if (!newNote) {
+        await fs.promises.unlink(fullPath).catch(() => {})
+        res.status(404).json({ message: 'Note not found' })
+        return
+      }
 
       // Read the new image into the note's text (#331). The upload has
       // already succeeded, so an OCR failure only gets logged.
@@ -418,7 +435,12 @@ export const reqRemoveImageFromNote = async function (req: Request, res: Respons
       { $pull: { images: filename } },
       { new: true }
     )
-    await fs.promises.unlink(config.imageStorePath + '/' + filename)
+    // The note no longer lists it, so the removal has happened. A file
+    // that's already gone is fine; any other failure leaves an orphan for
+    // the image reconciliation task, not an error for the user.
+    await fs.promises.unlink(config.imageStorePath + '/' + filename).catch((e) => {
+      if (e?.code !== 'ENOENT') console.error(`Could not remove image file ${filename}`, e)
+    })
     res.status(200).json({ data: doc })
   } catch (e) {
     console.error(e)
