@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
@@ -236,6 +236,59 @@ describe('maintenance tasks', () => {
       await runJob(agent, 'reconcile-images', false)
       expect(await pileNames(a[0])).toEqual([])
       expect(await pileNames(b[0])).toEqual(['Images: Blank entry', 'Images: Unlisted file'])
+    })
+  })
+
+  describe('runs are saved as they go (#376)', () => {
+    let TASKS, MaintenanceRun, release
+    beforeAll(async () => {
+      TASKS = (await import('../src/resources/maintenance/tasks.js')).TASKS
+      MaintenanceRun = (await import('../src/resources/maintenance/maintenance.model.js')).default
+      // A task the test controls: it logs, then waits to be released
+      TASKS.push({
+        id: 'test-slow', title: 'Slow', issue: 0, description: '',
+        run: async ({ log }) => { log('started'); await new Promise((r) => { release = r }) },
+      })
+    })
+    afterAll(() => { TASKS.splice(TASKS.findIndex((t) => t.id === 'test-slow'), 1) })
+
+    it('writes the run when it starts, refuses a second, and finishes it', async () => {
+      const agent = await authedAgent()
+      await MaintenanceRun.syncIndexes()
+      const { jobId } = (await agent.post('/api/maintenance/test-slow/run').send({ dryRun: false }).expect(202)).body.data
+      const row = await MaintenanceRun.findById(jobId).lean()
+      expect(row).toMatchObject({ taskId: 'test-slow', status: 'running' })
+      await agent.post('/api/maintenance/test-slow/run').send({ dryRun: false }).expect(409)
+      const pending = (await agent.get('/api/maintenance/').expect(200)).body.data.find((t) => t.id === 'test-slow')
+      expect(pending).toMatchObject({ pending: true, lastRun: { status: 'running' } })
+
+      release()
+      await vi.waitFor(async () => expect((await MaintenanceRun.findById(jobId).lean()).status).toBe('done'))
+      const done = (await agent.get('/api/maintenance/').expect(200)).body.data.find((t) => t.id === 'test-slow')
+      expect(done).toMatchObject({ pending: false, lastRun: { status: 'done', ok: true, output: ['started'] } })
+    })
+
+    it('shows a run whose process stopped as interrupted, and frees the task', async () => {
+      const agent = await authedAgent()
+      await MaintenanceRun.syncIndexes()
+      const old = new Date(Date.now() - 5 * 60 * 1000)
+      const ghost = await MaintenanceRun.create({
+        taskId: 'test-slow', dryRun: false, status: 'running', output: ['halfway'], startedAt: old, heartbeatAt: old,
+      })
+      const job = (await agent.get(`/api/maintenance/jobs/${ghost._id}`).expect(200)).body.data
+      expect(job).toMatchObject({ status: 'interrupted', output: ['halfway'] })
+      const listed = (await agent.get('/api/maintenance/').expect(200)).body.data.find((t) => t.id === 'test-slow')
+      expect(listed).toMatchObject({ pending: true, lastRun: { status: 'interrupted' } })
+
+      await agent.post('/api/maintenance/test-slow/run').send({ dryRun: true }).expect(202)
+      expect((await MaintenanceRun.findById(ghost._id).lean()).status).toBe('interrupted')
+      release()
+    })
+
+    it('reads runs saved before status existed from ok', async () => {
+      const { statusOf } = await import('../src/resources/maintenance/jobs.js')
+      expect(statusOf({ ok: true })).toBe('done')
+      expect(statusOf({ ok: false })).toBe('failed')
     })
   })
 
