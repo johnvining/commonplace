@@ -2,6 +2,7 @@ import { createNewNoteFromTitle, getAuthStatus, logout } from './Database'
 import { createRoot } from 'react-dom/client'
 import { applyTheme, getTheme } from './theme'
 import ThemeToggle from './ThemeToggle'
+import RefreshButton from './RefreshButton'
 import InstantTooltip from './InstantTooltip'
 import { Routes, Route, Link, BrowserRouter, useNavigate } from 'react-router-dom'
 import plus from 'url:./icons/plus.svg'
@@ -158,6 +159,7 @@ class App extends React.Component<any, any> {
             <Stats />
           </div>
           <div className="top-action-bar">
+            <RefreshButton />
             <div className="tool-bar div">
               <TopLevelStandardButton
                 label="Search"
