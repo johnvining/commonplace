@@ -374,8 +374,9 @@ class Note extends React.Component<any, any> {
     }
   }
 
+  // A title is one paragraph: line breaks (from a paste) become spaces
   handleTitleChange = (val: any) => {
-    this.setState({ pendingTitle: val.target.value })
+    this.setState({ pendingTitle: val.target.value.replace(/\s*[\r\n]+\s*/g, ' ') })
   }
 
   handlePageChange = (val: any) => {
@@ -854,13 +855,20 @@ class Note extends React.Component<any, any> {
                   {this.isAiTitle() ? <AiTitleTag /> : null}
                 </label>
 
-                <input
+                {/* A text box that grows, so a long title wraps instead of
+                    scrolling out of sight on a phone (#162) */}
+                <textarea
                   id="title"
                   className="note-full title edit"
+                  rows={1}
                   autoFocus
+                  ref={(el) => { if (el) autosize(el) }}
                   value={this.state.pendingTitle}
                   onChange={this.handleTitleChange}
-                ></input>
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) e.preventDefault()
+                  }}
+                ></textarea>
               </div>
             </>
           ) : this.state.pendingTitle ? (

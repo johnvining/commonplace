@@ -464,6 +464,12 @@ div .top-bar {
 
   .title.edit {
     padding-right: 8px;
+    // A one-row text box that grows to fit (see Note.tsx)
+    display: block;
+    resize: none;
+    overflow: hidden;
+    font-family: $main_font;
+    font-weight: 600;
   }
 
   // Monospace reads larger than the other fields at the same size
