@@ -1,4 +1,7 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 import { authedAgent } from './setup.js'
 
 vi.mock('../src/utils/suggestions.js', async (orig) => {
@@ -19,6 +22,7 @@ beforeAll(async () => {
     Idea: (await import('../src/resources/idea/idea.model.js')).default,
     Work: (await import('../src/resources/work/work.model.js')).default,
     Note: (await import('../src/resources/note/note.model.js')).default,
+    Pile: (await import('../src/resources/pile/pile.model.js')).default,
   }
 })
 
@@ -38,7 +42,7 @@ describe('maintenance tasks', () => {
     const res = await agent.get('/api/maintenance/').expect(200)
     expect(res.body.data.map((t) => t.id)).toEqual([
       'trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals', 'remove-missing-authors',
-      'tidy-note-links',
+      'tidy-note-links', 'reconcile-images',
     ])
     expect(res.body.data.every((t) => t.pending && t.lastRun === null)).toBe(true)
   })
@@ -160,6 +164,79 @@ describe('maintenance tasks', () => {
     const left = await Link.find({}).lean()
     expect(left.map((l) => [String(l.left_note), String(l.right_note)])).toEqual([[String(lo), String(hi)]])
     await expect(Link.collection.insertOne({ left_note: lo, right_note: hi })).rejects.toThrow(/duplicate key/)
+  })
+
+  describe('reconcile images (#368)', () => {
+    let root, config, realRoot
+    beforeAll(async () => {
+      config = (await import('../src/config/index.js')).default
+      realRoot = config.imageStorePath
+    })
+    beforeEach(async () => {
+      root = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'cprec-'))
+      config.imageStorePath = root
+    })
+    afterEach(async () => {
+      config.imageStorePath = realRoot
+      await fs.promises.rm(root, { recursive: true, force: true })
+    })
+    const write = (rel) => {
+      fs.mkdirSync(path.join(root, path.dirname(rel)), { recursive: true })
+      fs.writeFileSync(path.join(root, rel), 'x')
+    }
+
+    const pileNames = async (id) => {
+      const note = await models.Note.collection.findOne({ _id: id })
+      const piles = await models.Pile.collection.find({ _id: { $in: note.piles ?? [] } }).toArray()
+      return piles.map((p) => p.name).sort()
+    }
+
+    it('files notes into a pile per problem, and changes no image', async () => {
+      const agent = await authedAgent()
+      const { insertedIds } = await models.Note.collection.insertMany([{ title: 'A' }, { title: 'B' }, { title: 'C' }])
+      const [a, b, c] = Object.values(insertedIds).map((id) => [id, String(id)])
+      write(`${a[1]}/kept.jpg`)
+      write(`${a[1]}/extra.jpg`)
+      write(`${b[1]}/1-lost.jpg`)
+      write('aaaaaaaaaaaaaaaaaaaaaaaa/of-deleted-note.jpg')
+      write('loose-top-level.jpg')
+      const images = {
+        [a[1]]: [`${a[1]}/kept.jpg`, `${a[1]}/gone.jpg`],
+        [b[1]]: [null, ''],
+        [c[1]]: [`${c[1]}/fine.jpg`],
+      }
+      write(`${c[1]}/fine.jpg`)
+      for (const [id] of [a, b, c]) await models.Note.collection.updateOne({ _id: id }, { $set: { images: images[String(id)] } })
+      const files = () => fs.readdirSync(root, { recursive: true }).sort()
+      const before = files()
+
+      const dry = await runJob(agent, 'reconcile-images', true)
+      expect(dry.status).toBe('done')
+      expect(dry.output).toEqual([
+        'Images: Missing file: 1 notes (1 of 3 listed files gone), would file',
+        'Images: Blank entry: 1 notes (2 empty names), would file',
+        'Images: Unlisted file: 2 notes (2 files), would file',
+        'files in folders of deleted notes: 1, left alone — aaaaaaaaaaaaaaaaaaaaaaaa/of-deleted-note.jpg',
+      ])
+      expect(await models.Pile.collection.countDocuments({})).toBe(0)
+
+      const real = await runJob(agent, 'reconcile-images', false)
+      expect(real.status).toBe('done')
+      expect(await pileNames(a[0])).toEqual(['Images: Missing file', 'Images: Unlisted file'])
+      expect(await pileNames(b[0])).toEqual(['Images: Blank entry', 'Images: Unlisted file'])
+      expect(await pileNames(c[0])).toEqual([])
+      // Nothing about the images themselves changed
+      expect(files()).toEqual(before)
+      for (const [id] of [a, b, c]) {
+        expect((await models.Note.collection.findOne({ _id: id })).images).toEqual(images[String(id)])
+      }
+
+      // Fixed notes leave the pile on the next run
+      await models.Note.collection.updateOne({ _id: a[0] }, { $set: { images: [`${a[1]}/kept.jpg`, `${a[1]}/extra.jpg`] } })
+      await runJob(agent, 'reconcile-images', false)
+      expect(await pileNames(a[0])).toEqual([])
+      expect(await pileNames(b[0])).toEqual(['Images: Blank entry', 'Images: Unlisted file'])
+    })
   })
 
   it('404s for unknown tasks and jobs', async () => {
