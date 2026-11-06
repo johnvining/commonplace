@@ -1,6 +1,7 @@
 import Note from '../resources/note/note.model.js'
 import { autoOcrNote, isOcrConfigured } from './autoOcr.js'
 import { embedNoteIfStale } from './embeddings.js'
+import { saveEmbedding } from './embeddingRefresh.js'
 
 const BLANK_IMAGE_NOTES = {
   'images.0': { $exists: true },
@@ -49,9 +50,9 @@ export async function runOcrBacklog({
         log(`${label} skipped (text changed or no text found)`)
         continue
       }
-      // Keep search in step with the new text.
-      const embedding = await embedNoteIfStale(updated)
-      if (embedding) await Note.findByIdAndUpdate(_id, embedding)
+      // Keep search in step with the new text, now rather than in the
+      // background, since the backlog may run in a short-lived process
+      await saveEmbedding(_id, await embedNoteIfStale(updated))
       filled++
       log(`${label} filled (${updated.text?.length ?? 0} chars)`)
     } catch (e) {

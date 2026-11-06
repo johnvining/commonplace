@@ -1,4 +1,5 @@
 import mongoose, { Schema, Types } from 'mongoose'
+import { markNotesStaleOnRename } from '../../utils/embeddingFreshness.js'
 
 export interface AuthDoc {
   _id: Types.ObjectId
@@ -22,5 +23,8 @@ const authSchema = new Schema<AuthDoc>(
 
 authSchema.index({ name: 1 })
 authSchema.index({ usernames: 1 })
+
+// Its name is part of its notes' embeddings (#373)
+markNotesStaleOnRename(authSchema, ['authors', 'people'])
 
 export const Auth = mongoose.model<AuthDoc>('author', authSchema)

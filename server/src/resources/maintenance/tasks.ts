@@ -9,6 +9,8 @@ import Pin from '../pin/pin.model.js'
 import fs from 'fs'
 import path from 'path'
 import config from '../../config'
+import { countOutdatedEmbeddings } from '../../utils/embeddingRefresh.js'
+import { isOcrConfigured } from '../../utils/autoOcr.js'
 import Link from '../link/link.model.js'
 import { findOrCreatePile } from '../pile/pile.controllers.js'
 import { canonicalPair } from '../link/link.controllers.js'
@@ -294,6 +296,28 @@ const reconcileImages: MaintenanceTask = {
   },
 }
 
+const refreshEmbeddings: MaintenanceTask = {
+  id: 'refresh-embeddings',
+  title: 'Refresh search embeddings',
+  issue: 373,
+  description:
+    'Edits now keep search embeddings current, but some older ones (bulk OCR, ' +
+    'bulk titles, bulk updates) changed notes without re-embedding them. ' +
+    'Re-embeds every note whose embedding no longer matches its content. Uses ' +
+    'OpenAI, one call per outdated note. Dry run counts them without calling it.',
+  async run({ dryRun, log }) {
+    if (dryRun) {
+      log(`${await countOutdatedEmbeddings()} notes have an outdated or missing embedding`)
+      return
+    }
+    if (!isOcrConfigured()) throw new Error('No OpenAI key configured (OPENAI_API_KEY)')
+    const { embedStaleNotes } = await import('../note/note.controllers.js')
+    const { processed, skipped, failed } = await embedStaleNotes()
+    log(`re-embedded ${processed}, already current ${skipped}, failed ${failed}`)
+    if (failed) throw new Error(`${failed} notes failed`)
+  },
+}
+
 // In the order they should be run.
 export const TASKS: MaintenanceTask[] = [
   trimEntityNames,
@@ -303,6 +327,7 @@ export const TASKS: MaintenanceTask[] = [
   removeMissingAuthors,
   tidyNoteLinks,
   reconcileImages,
+  refreshEmbeddings,
 ]
 
 export const findTask = (id: string) => TASKS.find((t) => t.id === id)

@@ -2,6 +2,7 @@ import mongoose, { Schema, Types } from 'mongoose'
 import { mintNickOnCreate } from '../nick/nickLifecycle.js'
 import { TEXT_SOURCES, trackTextSource, type TextSource } from '../../utils/noteText.js'
 import { TITLE_SOURCES, trackTitleSource, type TitleSource } from '../../utils/noteTitle.js'
+import { trackEmbeddingFreshness } from '../../utils/embeddingFreshness.js'
 
 export interface NoteDoc {
   _id: Types.ObjectId
@@ -29,6 +30,7 @@ export interface NoteDoc {
   reviewCount?: number
   embedding: number[]
   embeddingHash?: string
+  embeddingStale?: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -74,6 +76,9 @@ const noteSchema = new Schema<NoteDoc>(
     reviewCount: { type: Number, default: 0 },
     embedding: [Number],
     embeddingHash: String,
+    // Set when the embedding inputs changed since the last embedding
+    // (#373); see embeddingFreshness.ts
+    embeddingStale: Boolean,
   },
   { timestamps: true }
 )
@@ -91,5 +96,6 @@ noteSchema.index({ reviewCount: 1 })
 mintNickOnCreate(noteSchema, 'note')
 trackTextSource(noteSchema)
 trackTitleSource(noteSchema)
+trackEmbeddingFreshness(noteSchema)
 
 export default mongoose.model<NoteDoc>('note', noteSchema)

@@ -1,5 +1,6 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { mintNickOnCreate } from '../nick/nickLifecycle.js'
+import { markNotesStaleOnRename } from '../../utils/embeddingFreshness.js'
 
 export interface IdeaDoc {
   _id: Types.ObjectId
@@ -29,5 +30,7 @@ ideaSchema.index({ name: 1 })
 
 // Every new idea gets its nick before the save returns (#367)
 mintNickOnCreate(ideaSchema, 'idea')
+// Its name is part of its notes' embeddings (#373)
+markNotesStaleOnRename(ideaSchema, ['ideas'])
 
 export default mongoose.model<IdeaDoc>('idea', ideaSchema)

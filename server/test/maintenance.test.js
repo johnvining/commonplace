@@ -42,7 +42,7 @@ describe('maintenance tasks', () => {
     const res = await agent.get('/api/maintenance/').expect(200)
     expect(res.body.data.map((t) => t.id)).toEqual([
       'trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals', 'remove-missing-authors',
-      'tidy-note-links', 'reconcile-images',
+      'tidy-note-links', 'reconcile-images', 'refresh-embeddings',
     ])
     expect(res.body.data.every((t) => t.pending && t.lastRun === null)).toBe(true)
   })

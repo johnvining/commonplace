@@ -15,7 +15,8 @@ import config from '../../config'
 import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
-import { getEmbeddingCache, upsertEmbedding } from '../../utils/embeddingCache.js'
+import { getEmbeddingCache } from '../../utils/embeddingCache.js'
+import { saveEmbedding } from '../../utils/embeddingRefresh.js'
 import { ocrMayWrite } from '../../utils/noteText.js'
 import { checkedTitleSource, suggestTitle } from '../../utils/noteTitle.js'
 import { nickFor, nickKeysFor, resolveNick } from '../nick/nickLifecycle.js'
@@ -329,24 +330,9 @@ export const reqUpdateNote = async (req: Request, res: Response) => {
     await inferWorkUrl(updated.work, url)
   }
 
-  if (updated) reembedInBackground(req.params.id, updated)
-
   return updated
 }
 
-
-// Refresh a note's search embedding after its content changed, without
-// holding up the response.
-function reembedInBackground(noteId: string, note: Parameters<typeof embedNoteIfStale>[0]) {
-  embedNoteIfStale(note)
-    .then(async (embeddingUpdate) => {
-      if (embeddingUpdate) {
-        await Note.findByIdAndUpdate(noteId, embeddingUpdate)
-        upsertEmbedding(noteId, embeddingUpdate.embedding)
-      }
-    })
-    .catch((err) => console.error('[embed] error for note', noteId, err))
-}
 
 // TODO: Create specific file for note.image.controllers
 export const reqAddImageToNote = async (req: Request, res: Response) => {
@@ -405,10 +391,7 @@ export const reqAddImageToNote = async (req: Request, res: Response) => {
       if (isOcrConfigured()) {
         try {
           const ocrNote = await autoOcrNote(req.params.id, [localPath])
-          if (ocrNote) {
-            note = ocrNote
-            reembedInBackground(req.params.id, ocrNote)
-          }
+          if (ocrNote) note = ocrNote
         } catch (e) {
           console.error('[auto-ocr] failed for note', req.params.id, e)
         }
@@ -567,17 +550,6 @@ export const reqOcrForNote = async (req: Request, res: Response) => {
 // rows or burning the OpenAI bill via a giant noteIds list.
 const BULK_LIMIT = 1000
 
-// Notes created by import have no embedding/hash yet. After each bulk
-// import, kick a background pass scoped to those notes so they enter the
-// embedding cache and become searchable without a manual bulk-embed run.
-const EMBED_PENDING = { embeddingHash: { $exists: false } } as const
-
-function backgroundEmbedPending() {
-  embedStaleNotes(EMBED_PENDING).catch((err) =>
-    console.error('[import] background embed failed', err)
-  )
-}
-
 export const reqBulkImportForWork = async (req: Request, res: Response) => {
   // TODO: Validate work ID
   const input: string = req.body.notesText
@@ -586,21 +558,18 @@ export const reqBulkImportForWork = async (req: Request, res: Response) => {
     .map((line) => Note.create({ title: '', work: req.params.work, text: line }))
 
   await Promise.all(notePromises)
-  backgroundEmbedPending()
   return null
 }
 
 export const reqBulkImportNotesCSV = async (req: Request, res: Response) => {
   let csv = req.body.importList
   const recordsImported = await importCsvFromString(csv, 1)
-  backgroundEmbedPending()
   return recordsImported
 }
 
 export const reqBulkImportInstapaper = async (req: Request, res: Response) => {
   let tsv = req.body.importList
   const recordsImported = await importCsvFromString(tsv, 3)
-  backgroundEmbedPending()
   return recordsImported
 }
 
@@ -863,13 +832,9 @@ export async function embedStaleNotes(filter: Record<string, unknown> = {}) {
       batch.map(async (note: any) => {
         try {
           const update = await embedNoteIfStale(note)
-          if (update) {
-            await Note.findByIdAndUpdate(note._id, update)
-            upsertEmbedding(String(note._id), update.embedding)
-            processed++
-          } else {
-            skipped++
-          }
+          await saveEmbedding(note._id, update, note.updatedAt)
+          if (update) processed++
+          else skipped++
         } catch (err) {
           console.error('[bulk-embed] error for note', note._id, err)
           failed++

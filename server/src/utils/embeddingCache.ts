@@ -3,7 +3,14 @@ import Note from '../resources/note/note.model.js'
 type Embedding = number[]
 type Cache = Map<string, Embedding>
 
+// A view of the embeddings in Mongo for semantic search (#373). This
+// process keeps it current through saveEmbedding and note deletes; it
+// also reloads every RELOAD_MS, in the background, to pick up writes from
+// other processes (the CLI, maintenance scripts).
+const RELOAD_MS = 10 * 60 * 1000
+
 let cache: Cache | null = null
+let loadedAt = 0
 let loadPromise: Promise<Cache> | null = null
 
 async function loadAll(): Promise<Cache> {
@@ -18,16 +25,25 @@ async function loadAll(): Promise<Cache> {
   return map
 }
 
-export async function getEmbeddingCache(): Promise<Cache> {
-  if (cache) return cache
+function reload(): Promise<Cache> {
   if (!loadPromise) {
-    loadPromise = loadAll().then((m) => {
-      cache = m
-      loadPromise = null
-      return m
-    })
+    loadPromise = loadAll()
+      .then((m) => {
+        cache = m
+        loadedAt = Date.now()
+        return m
+      })
+      .finally(() => { loadPromise = null })
   }
   return loadPromise
+}
+
+export async function getEmbeddingCache(): Promise<Cache> {
+  if (!cache) return reload()
+  if (Date.now() - loadedAt > RELOAD_MS) {
+    reload().catch((e) => console.error('[embed] cache reload failed', e))
+  }
+  return cache
 }
 
 export function invalidateEmbedding(noteId: string): void {
