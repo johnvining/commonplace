@@ -157,18 +157,34 @@ function formatEntity(type, item) {
 }
 
 // Map a nick (e.g. "p12345", "n42") to {type, id} by hitting /nick/:nick.
-// Returns null if the nick can't be resolved.
+// Returns null if the nick can't be resolved. The old nick of a merged
+// work resolves to the work it was merged into; the result then carries
+// `merged` (the old name, or '') so destructive commands can refuse it
+// (#366).
 async function resolveByNick(nick, config) {
   try {
     const res = await api('GET', `nick/${nick}`, null, config)
     const data = res?.data
     if (!data) return null
-    if (data.note) return { type: 'note', id: data.note }
-    if (data.work) return { type: 'work', id: data.work }
-    if (data.idea) return { type: 'idea', id: data.idea }
-    if (data.pile) return { type: 'pile', id: data.pile }
+    const merged = 'mergedFrom' in data ? { merged: data.mergedFrom ?? '' } : {}
+    if (merged.merged !== undefined) {
+      console.error(`${DIM}note: ${nick} was ${merged.merged ? `"${merged.merged}", ` : ''}merged into another work; using the kept work${RESET}`)
+    }
+    if (data.note) return { type: 'note', id: data.note, ...merged }
+    if (data.work) return { type: 'work', id: data.work, ...merged }
+    if (data.idea) return { type: 'idea', id: data.idea, ...merged }
+    if (data.pile) return { type: 'pile', id: data.pile, ...merged }
   } catch {}
   return null
+}
+
+// Deleting or merging through an old nick would act on the kept work,
+// not the one the nick was made for
+function refuseMergedNick(target, input, action) {
+  if (target?.merged === undefined) return false
+  console.error(`${input} is the old nick of a work that was merged away. Refusing to ${action} the kept work through it;`)
+  console.error('use the kept work\'s own nick or ObjectId if that is what you mean.')
+  return true
 }
 
 // Resolve <input> to {type, id}. Accepts three forms:
@@ -1006,7 +1022,8 @@ async function cmdShow(args, config) {
   // Pass the original input through as the displayed nick only when it
   // actually looked like one — for ObjectIds / names, look up the real
   // nick so the header doesn't show a hex string in the "nick" slot.
-  const looksLikeNick = /^[nwip]\d+$/i.test(input)
+  // An old nick of a merged work isn't the kept work's own nick.
+  const looksLikeNick = /^[nwip]\d+$/i.test(input) && target.merged === undefined
   const displayNick = looksLikeNick ? input : await fetchNick(type, id, config)
 
   if (type === 'note') {
@@ -1178,6 +1195,7 @@ async function cmdDelete(args, config) {
   if (!input) { console.error('Usage: cp delete <id|nick> [--type note|work|idea|pile|auth] [--yes]'); return }
   const target = await resolveTarget(input, typeFlag, config)
   if (!target) { console.error('Could not resolve target — pass a nick, or both an ObjectId and --type.'); return }
+  if (refuseMergedNick(target, input, 'delete')) return
   const { type, id } = target
 
   if (!flagYes) {
@@ -1589,10 +1607,12 @@ async function mergeCommand(type, args, config) {
   const intoInput = inputs.pop()
   const into = await resolveTarget(intoInput, type, config)
   if (!into) { console.error(`Could not resolve ${label} "${intoInput}".`); return }
+  if (refuseMergedNick(into, intoInput, 'merge into')) return
   const froms = []
   for (const fromInput of inputs) {
     const from = await resolveTarget(fromInput, type, config)
     if (!from) { console.error(`Could not resolve ${label} "${fromInput}".`); return }
+    if (refuseMergedNick(from, fromInput, 'merge')) return
     if (String(from.id) === String(into.id)) { console.error(`"${fromInput}" is the ${label} being kept.`); return }
     if (!froms.some(f => String(f.id) === String(from.id))) froms.push(from)
   }
