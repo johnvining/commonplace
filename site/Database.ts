@@ -430,3 +430,8 @@ export async function addNoteLinkToNote(leftNick: string, rightNick: string) {
 export async function getLinkedNotes(noteId: string) {
   return axios.get(url_api + 'link/note/' + noteId)
 }
+
+// Remove the link between two notes, in either order (#371)
+export async function unlinkNotes(noteId: string, otherId: string) {
+  return axios.delete(url_api + 'link/between/' + noteId + '/' + otherId)
+}

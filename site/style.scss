@@ -802,6 +802,26 @@ a {
   font-size: var(--font-size-sm);
 }
 
+// A linked note's tag, with a remove button while editing links (#371)
+.link-chip {
+  display: inline-flex;
+  align-items: center;
+
+  .link-remove {
+    margin: 0 4px 0 -2px;
+    padding: 0 4px;
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.6;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
 // Closes the search bar without Esc (#340)
 .search-bar-close {
   flex: none;

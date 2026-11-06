@@ -1492,6 +1492,23 @@ div .top-bar {
   font-size: var(--font-size-sm);
 }
 
+.link-chip {
+  display: inline-flex;
+  align-items: center;
+}
+.link-chip .link-remove {
+  margin: 0 4px 0 -2px;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.link-chip .link-remove:hover {
+  opacity: 1;
+}
+
 .search-bar-close {
   flex: none;
   align-self: center;

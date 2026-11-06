@@ -406,6 +406,15 @@ class Note extends React.Component<any, any> {
     }
   }
 
+  // While editing links, each linked note has a × that removes the link
+  async removeLink(otherId: string) {
+    try {
+      await db.unlinkNotes(this.props.id, otherId)
+    } finally {
+      this.fetchLinkedNotes()
+    }
+  }
+
   fetchLinkedNotes() {
     db.getLinkedNotes(this.props.id).then((response: any) => {
       const entries = response.data.data.map((note: any) => [note._id, note.nick])
@@ -1218,15 +1227,26 @@ class Note extends React.Component<any, any> {
               ))}
               {Object.keys(this.state.linkedNotes).length > 0 &&
                 Object.keys(this.state.linkedNotes).map((note: any) => (
-                  <Link key={note} to={'/note/' + note} tabIndex={-1}>
-                    <button
-                      className="link label"
-                      key={'link-button' + note}
-                      tabIndex={selected || edit_ideas ? undefined : -1}
-                    >
-                      {this.state.linkedNotes[note]}
-                    </button>
-                  </Link>
+                  <span key={note} className="link-chip">
+                    <Link to={'/note/' + note} tabIndex={-1}>
+                      <button
+                        className="link label"
+                        key={'link-button' + note}
+                        tabIndex={selected || edit_ideas ? undefined : -1}
+                      >
+                        {this.state.linkedNotes[note]}
+                      </button>
+                    </Link>
+                    {edit_links ? (
+                      <button
+                        type="button"
+                        className="pill-remove link-remove"
+                        aria-label={'Remove link to ' + (this.state.linkedNotes[note] || 'note')}
+                        title="Remove link"
+                        onClick={() => this.removeLink(note)}
+                      >×</button>
+                    ) : null}
+                  </span>
                 ))}
             </div>
           ) : (
