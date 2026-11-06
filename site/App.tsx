@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { applyTheme, getTheme } from './theme'
 import ThemeToggle from './ThemeToggle'
 import RefreshButton from './RefreshButton'
+import PullToRefresh from './PullToRefresh'
 import InstantTooltip from './InstantTooltip'
 import { Routes, Route, Link, BrowserRouter, useNavigate } from 'react-router-dom'
 import plus from 'url:./icons/plus.svg'
@@ -144,6 +145,7 @@ class App extends React.Component<any, any> {
     return (
       <ErrorBoundary>
       <InstantTooltip />
+      <PullToRefresh />
       <div className="main">
         <div className="top-bar">
           <div className="title-bar">

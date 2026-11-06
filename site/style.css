@@ -1497,6 +1497,23 @@ div .top-bar {
   align-self: center;
 }
 
+.pull-to-refresh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6px;
+  overflow: hidden;
+  background: var(--background-color);
+  border-bottom: 1px solid var(--note-border);
+  color: darkgray;
+  font-size: var(--font-size-sm);
+}
+
 .search-bar-close {
   flex: none;
   align-self: center;

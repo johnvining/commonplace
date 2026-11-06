@@ -783,6 +783,25 @@ a {
   align-self: center;
 }
 
+// Grows down from the top while pulling to refresh in the installed
+// app (#364)
+.pull-to-refresh {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6px;
+  overflow: hidden;
+  background: $background_color;
+  border-bottom: 1px solid $note_border;
+  color: $grey3;
+  font-size: var(--font-size-sm);
+}
+
 // Closes the search bar without Esc (#340)
 .search-bar-close {
   flex: none;
