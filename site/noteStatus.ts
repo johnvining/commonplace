@@ -29,12 +29,17 @@ export function noteStatus(note: any) {
   const parts = []
   if (note.createdAt) parts.push(`Created ${ago(note.createdAt)}`)
   if (note.updatedAt) parts.push(`edited ${ago(note.updatedAt)}`)
-  // Rated at least once; a reviewedAt alone may be left over from an edit.
-  if (!note.reviewCount) {
+  // The server names the review state (#380); notes from an older server
+  // fall back to its rule: rated at least once.
+  const state = note.reviewState ?? (note.reviewCount ? 'scheduled' : 'unreviewed')
+  if (state === 'unreviewed') {
     parts.push('never reviewed')
   } else {
     parts.push(`reviewed ${ago(note.reviewedAt)} (${note.reviewCount || 0}×)`)
-    if (note.reviewDueAt) parts.push(`due ${ago(note.reviewDueAt)}`)
+    if (note.reviewDueAt) {
+      const due = ago(note.reviewDueAt)
+      parts.push(state === 'overdue' ? `overdue (due ${due})` : `due ${due}`)
+    }
   }
   parts.push(
     note.lastOpenedAt
