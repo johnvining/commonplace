@@ -63,12 +63,20 @@ const missingFrom = (base: unknown[] | undefined, extra: unknown[] | undefined) 
 }
 
 // Point the from-entity's star at the kept one, or drop it when the kept
-// one is starred already.
+// one is starred already. An unstarred tombstone for the kept one (#381)
+// gives way to the moved star.
 async function movePin(type: string, from: string, into: string) {
-  const pin = await Pin.findOne({ type, target: from }).exec()
-  if (!pin) return false
-  if (await Pin.exists({ type, target: into })) await Pin.deleteOne({ _id: pin._id }).exec()
-  else await Pin.updateOne({ _id: pin._id }, { $set: { target: into } }).exec()
+  const pin = await Pin.findOne({ type, target: from, unpinnedAt: null }).exec()
+  if (!pin) {
+    await Pin.deleteMany({ type, target: from }).exec()
+    return false
+  }
+  if (await Pin.exists({ type, target: into, unpinnedAt: null })) {
+    await Pin.deleteOne({ _id: pin._id }).exec()
+  } else {
+    await Pin.deleteMany({ type, target: into }).exec()
+    await Pin.updateOne({ _id: pin._id }, { $set: { target: into, changedAt: new Date() } }).exec()
+  }
   return true
 }
 

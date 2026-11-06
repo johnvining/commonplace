@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { authedAgent, createIdea, createWork } from './setup.js'
+import { authedAgent, createIdea, createNote, createPile, createWork } from './setup.js'
 
 describe('starred items (pins)', () => {
   it('stars, lists newest first, and unstars', async () => {
@@ -24,8 +24,9 @@ describe('starred items (pins)', () => {
 
   it('imports browser stars, keeping order and existing ones', async () => {
     const agent = await authedAgent()
-    const a = '507f1f77bcf86cd799439011'
-    const b = '507f1f77bcf86cd799439012'
+    // Stars must name real records; ones that don't are dropped (#381)
+    const a = (await createNote(agent, { title: 'A' }))._id
+    const b = (await createPile(agent, 'B'))._id
     await agent.put('/api/pin/').send({ type: 'note', id: a, label: 'Kept' }).expect(200)
     const res = await agent
       .post('/api/pin/import')
@@ -45,4 +46,46 @@ describe('starred items (pins)', () => {
     await agent.post('/api/user/logout').expect(200)
     await agent.get('/api/pin/').expect(401)
   })
+
+  describe('sync (#381)', () => {
+    const sync = (agent, ops) => agent.post('/api/pin/sync').send({ ops }).expect(200)
+    const labels = (res) => res.body.data.map((p) => p.label)
+
+    it('applies queued stars and unstars by when they were made, last one winning', async () => {
+      const agent = await authedAgent()
+      const idea = await createIdea(agent, 'I')
+      const t = Date.now() - 10_000
+      await sync(agent, [{ op: 'pin', type: 'idea', id: idea._id, label: 'I', at: t }])
+      // An unstar made later on a phone, synced first
+      await sync(agent, [{ op: 'unpin', type: 'idea', id: idea._id, at: t + 2000 }])
+      // An older star from a laptop that was offline doesn't bring it back
+      const res = await sync(agent, [{ op: 'pin', type: 'idea', id: idea._id, label: 'I', at: t + 1000 }])
+      expect(labels(res)).toEqual([])
+      // A newer one does
+      expect(labels(await sync(agent, [{ op: 'pin', type: 'idea', id: idea._id, label: 'I', at: t + 3000 }]))).toEqual(['I'])
+    })
+
+    it('keeps an unstar of something never starred, against older stars', async () => {
+      const agent = await authedAgent()
+      const work = await createWork(agent, { name: 'W' })
+      const t = Date.now() - 10_000
+      await sync(agent, [{ op: 'unpin', type: 'work', id: work._id, at: t + 1000 }])
+      expect(labels(await sync(agent, [{ op: 'pin', type: 'work', id: work._id, label: 'W', at: t }]))).toEqual([])
+    })
+
+    it('drops stars whose record is gone, and caps far-future times', async () => {
+      const agent = await authedAgent()
+      const idea = await createIdea(agent, 'Gone')
+      await sync(agent, [{ op: 'pin', type: 'idea', id: idea._id, label: 'Gone' }])
+      const { default: Idea } = await import('../src/resources/idea/idea.model.js')
+      await Idea.collection.deleteOne({ _id: Idea.castObject({ _id: idea._id })._id })
+      expect(labels(await sync(agent, []))).toEqual([])
+
+      const other = await createIdea(agent, 'Skewed')
+      await sync(agent, [{ op: 'pin', type: 'idea', id: other._id, label: 'Skewed', at: Date.now() + 365 * 86400000 }])
+      // A normal unstar a moment later still wins over the skewed clock
+      expect(labels(await sync(agent, [{ op: 'unpin', type: 'idea', id: other._id, at: Date.now() + 120_000 }]))).toEqual([])
+    })
+  })
 })
+

@@ -1,7 +1,10 @@
 import mongoose, { Schema, Types } from 'mongoose'
 
 // A starred item, shown in the sidebar. Stored here (not just in the
-// browser) so stars sync across devices.
+// browser) so stars sync across devices. Unstarring leaves a tombstone
+// (unpinnedAt) rather than deleting the row, and every change records when
+// it was made on the device (changedAt), so conflicting changes from
+// several devices resolve by the latest one (#381).
 export interface PinDoc {
   _id: Types.ObjectId
   type: string
@@ -9,6 +12,8 @@ export interface PinDoc {
   label?: string
   href?: string
   pinnedAt: Date
+  unpinnedAt?: Date
+  changedAt?: Date
 }
 
 const pinSchema = new Schema<PinDoc>({
@@ -18,6 +23,8 @@ const pinSchema = new Schema<PinDoc>({
   label: String,
   href: String,
   pinnedAt: { type: Date, default: () => new Date() },
+  unpinnedAt: Date,
+  changedAt: Date,
 })
 
 pinSchema.index({ type: 1, target: 1 }, { unique: true })
