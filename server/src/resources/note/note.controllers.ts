@@ -17,6 +17,7 @@ import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, upsertEmbedding } from '../../utils/embeddingCache.js'
+import { ocrMayWrite } from '../../utils/noteText.js'
 import { nickFor, nickKeysFor, resolveNick } from '../nick/nickLifecycle.js'
 import { deleteEntity } from '../../utils/deleteEntity.js'
 import { sanitizeSearchInput, escapeRegexInput, wordPrefixFilter } from '../../utils/searchInput.js'
@@ -599,35 +600,16 @@ export const reqBulkOcrForNotes = async (req: Request, res: Response) => {
 
   const notePromises = noteIds.map(async (noteId: unknown) => {
     try {
-      let note = noteMap[String(noteId)]
+      const note = noteMap[String(noteId)]
+      if (!note) return { noteId, success: false, error: 'Note not found' }
+      if (!note.images?.length) return { noteId, success: true, textUpdated: false, reason: 'No images to process' }
+      if (!ocrMayWrite(note)) return { noteId, success: true, textUpdated: false, reason: 'Note already has text' }
 
-      if (!note.text && note.images && note.images.length > 0) {
-        const imagePromises = note.images.map((imagePath) =>
-          getOpenAiOCR(config.imageStorePath + '/' + imagePath)
-        )
-
-        const imageResults = await Promise.all(imagePromises)
-        const ocrText = imageResults.filter((t) => t?.trim()).join('\n\n').trim()
-        if (!ocrText) {
-          return { noteId, success: true, textUpdated: false, reason: 'No text in the images' }
-        }
-
-        await Note.updateOne({ _id: noteId }, { $set: { text: ocrText } })
-
-        return {
-          noteId: noteId,
-          success: true,
-          textUpdated: true,
-          ocrText: ocrText,
-        }
-      } else {
-        return {
-          noteId: noteId,
-          success: true,
-          textUpdated: false,
-          reason: note.text ? 'Note already has text' : 'No images to process',
-        }
-      }
+      // The same path as OCR on upload, so text, ocrText and the text
+      // source stay in step (#379)
+      const updated = await autoOcrNote(note._id)
+      if (!updated) return { noteId, success: true, textUpdated: false, reason: 'No new text in the images' }
+      return { noteId, success: true, textUpdated: true, ocrText: updated.text }
     } catch (error) {
       return {
         noteId: noteId,

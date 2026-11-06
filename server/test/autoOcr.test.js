@@ -123,3 +123,68 @@ describe('auto OCR on image upload', () => {
     expect((await getNote(agent, note._id)).text).toBe('typed during OCR')
   })
 })
+
+describe('text source (#379)', () => {
+  const Note = async () => (await import('../src/resources/note/note.model.js')).default
+  const source = async (id) => (await (await Note()).findById(id).lean()).textSource
+
+  it('records OCR text as ocr and typed text as user, on every kind of write', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'N' })
+    await upload(agent, note._id, 'a.jpg')
+    expect(await source(note._id)).toBe('ocr')
+    await agent.put(`/api/note/${note._id}`).send({ text: 'typed' }).expect(200)
+    expect(await source(note._id)).toBe('user')
+    await agent.put(`/api/note/${note._id}`).send({ text: '  ' }).expect(200)
+    expect(await source(note._id)).toBe('blank')
+    const typed = await createNote(agent, { title: 'T', text: 'from the start' })
+    expect(await source(typed._id)).toBe('user')
+    await (await Note()).updateMany({ _id: typed._id }, { $set: { text: '' } })
+    expect(await source(typed._id)).toBe('blank')
+  })
+
+  it('keeps OCR text OCR\'s when a save sends it back unchanged', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'N' })
+    await upload(agent, note._id, 'a.jpg')
+    // The editor sends the text back with every save, e.g. a title fix
+    await agent.put(`/api/note/${note._id}`).send({ title: 'Fixed', text: 'text of a.jpg' }).expect(200)
+    expect(await source(note._id)).toBe('ocr')
+    const res = await upload(agent, note._id, 'b.jpg')
+    expect(res.body.data.newNote.text).toBe('text of a.jpg\n\ntext of b.jpg')
+  })
+
+  it('stops OCR once the user has edited the text', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'N' })
+    await upload(agent, note._id, 'a.jpg')
+    await agent.put(`/api/note/${note._id}`).send({ text: 'text of a.jpg, edited' }).expect(200)
+    expect(await source(note._id)).toBe('user')
+    ocrCalls.length = 0
+    await upload(agent, note._id, 'b.jpg')
+    expect(ocrCalls).toEqual([])
+    expect((await getNote(agent, note._id)).text).toBe('text of a.jpg, edited')
+  })
+
+  it('lets bulk OCR text grow with later uploads', async () => {
+    const agent = await authedAgent()
+    const note = await createNote(agent, { title: 'N' })
+    await (await Note()).collection.updateOne(
+      { _id: new (await import('mongoose')).default.Types.ObjectId(note._id) },
+      { $set: { images: ['x/old.jpg'] } }
+    )
+    const bulk = await agent.post('/api/note/bulk-ocr').send({ noteIds: [note._id] }).expect(200)
+    expect(bulk.body.data[0]).toMatchObject({ textUpdated: true, ocrText: 'text of old.jpg' })
+    expect(await source(note._id)).toBe('ocr')
+    const res = await upload(agent, note._id, 'new.jpg')
+    expect(res.body.data.newNote.text).toBe('text of old.jpg\n\ntext of new.jpg')
+  })
+
+  it('reads notes saved before the field existed by the old rule', async () => {
+    const { textSourceOf } = await import('../src/utils/noteText.js')
+    expect(textSourceOf({ text: '' })).toBe('blank')
+    expect(textSourceOf({ text: 'same', ocrText: 'same' })).toBe('ocr')
+    expect(textSourceOf({ text: 'mine', ocrText: 'other' })).toBe('user')
+    expect(textSourceOf({ text: 'same', ocrText: 'same', textSource: 'user' })).toBe('user')
+  })
+})

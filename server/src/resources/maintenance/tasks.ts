@@ -112,14 +112,19 @@ const clearOcrRefusals: MaintenanceTask = {
   async run({ dryRun, log }) {
     const candidates = await Note.find(
       { 'images.0': { $exists: true }, text: { $regex: /transcri|text|NO_TEXT/i } },
-      { text: 1, title: 1 }
+      { text: 1, title: 1, textSource: 1 }
     ).lean()
-    const refusals = candidates.filter((n) => n.text?.trim() && cleanOcrText(n.text) === '')
+    // Only text that isn't marked as the user's; old bulk OCR left its
+    // text unmarked, so unmarked text still counts (#379)
+    const refusals = candidates.filter(
+      (n) => n.text?.trim() && cleanOcrText(n.text) === '' && n.textSource !== 'user'
+    )
     for (const n of refusals) log(`  ${n._id} ${n.title ?? '(no title)'}: "${n.text?.trim().slice(0, 70)}"`)
     if (!dryRun && refusals.length) {
       await Note.updateMany(
         { _id: { $in: refusals.map((n) => n._id) } },
-        { $set: { text: '', ocrText: '' } },
+        // Out of the ocr state, back to blank
+        { $set: { text: '', ocrText: '', textSource: 'blank' } },
         { timestamps: false }
       )
     }
