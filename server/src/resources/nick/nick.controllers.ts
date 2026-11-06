@@ -47,11 +47,17 @@ export const generateNick = async (type: NickEntityType, id: unknown) => {
   }
 }
 
-// The name a retired nick keeps: a note's title, or the start of its text
+// The name a retired nick keeps: a note's title, or the start of its text.
+// Best effort: a failed lookup must never stop the delete that called it.
 async function snapshotName(type: NickEntityType, id: unknown): Promise<string | undefined> {
-  const doc: any = await mongoose.model(type).findById(id, { name: 1, title: 1, text: 1 }).lean().exec()
-  const name = (doc?.name || doc?.title || doc?.text || '').trim()
-  return name ? name.slice(0, 120) : undefined
+  try {
+    const doc: any = await mongoose.model(type).findById(id, { name: 1, title: 1, text: 1 }).lean().exec()
+    const name = String(doc?.name || doc?.title || doc?.text || '').trim()
+    return name ? name.slice(0, 120) : undefined
+  } catch (e) {
+    console.error(`Could not keep the name of ${type} ${id} for its nick`, e)
+    return undefined
+  }
 }
 
 // Retire the nick of an entity that's about to be deleted: clear its

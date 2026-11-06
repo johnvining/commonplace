@@ -114,6 +114,20 @@ describe('nick', () => {
       expect(res.body.data.retiredAt).toBeTruthy()
     })
 
+    it('still deletes when the name lookup fails', async () => {
+      const agent = await authedAgent()
+      const work = await createWork(agent, { name: 'W' })
+      const created = await ensureNickFor(agent, 'work', work._id)
+      const spy = vi.spyOn(mongoose.Model, 'findById').mockImplementationOnce(() => { throw new Error('boom') })
+      try {
+        await agent.delete(`/api/work/${work._id}`).expect(204)
+      } finally {
+        spy.mockRestore()
+      }
+      const res = await agent.get(`/api/nick/${created.key}`).expect(200)
+      expect(res.body.data).toMatchObject({ retired: true, name: null })
+    })
+
     it('returns null for an unknown key', async () => {
       const agent = await authedAgent()
       const res = await agent.get('/api/nick/x000000').expect(200)
