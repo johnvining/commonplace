@@ -191,4 +191,69 @@ describe('note OpenAI-backed endpoints', () => {
       await agent.put(`/api/note/${note._id}`).send({ aiTitle: 'Mine' }).expect(400)
     })
   })
+
+  describe('title source (#370)', () => {
+    const source = async (id) => (await (await import('../src/resources/note/note.model.js')).default.findById(id).lean()).titleSource
+
+    it('marks a saved suggestion ai-accepted, and typing the same words as the user’s', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: '', text: 'Lorem ipsum' })
+      expect(await source(note._id)).toBe('user')
+      const { suggested_title } = (await agent.get(`/api/note/${note._id}/title/suggest`).expect(200)).body
+      await agent.put(`/api/note/${note._id}`).send({ title: suggested_title, titleSource: 'ai-accepted' }).expect(200)
+      expect(await source(note._id)).toBe('ai-accepted')
+      // Typed by hand, even with the suggestion's exact words
+      await agent.put(`/api/note/${note._id}`).send({ title: suggested_title, titleSource: 'user' }).expect(200)
+      expect(await source(note._id)).toBe('user')
+    })
+
+    it('keeps the source when a save resends the title unchanged', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: '', text: 'has text' })
+      await agent.post('/api/note/bulk-suggest-titles').send({ noteIds: [note._id] }).expect(200)
+      const { title } = await (await import('../src/resources/note/note.model.js')).default.findById(note._id).lean()
+      await agent.put(`/api/note/${note._id}`).send({ title, text: 'edited text' }).expect(200)
+      expect(await source(note._id)).toBe('ai-suggested')
+      // A changed title with no source is the user's
+      await agent.put(`/api/note/${note._id}`).send({ title: title + '!' }).expect(200)
+      expect(await source(note._id)).toBe('user')
+    })
+
+    it('refuses an AI claim for a title that is not the suggestion', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: '', text: 'Lorem ipsum' })
+      await agent.get(`/api/note/${note._id}/title/suggest`).expect(200)
+      await agent.put(`/api/note/${note._id}`).send({ title: 'Something else', titleSource: 'ai-accepted' }).expect(200)
+      expect(await source(note._id)).toBe('user')
+    })
+
+    it('marks bulk-suggested titles ai-suggested through the same path', async () => {
+      const agent = await authedAgent()
+      const note = await createNote(agent, { title: '', text: 'has text' })
+      await agent.post('/api/note/bulk-suggest-titles').send({ noteIds: [note._id] }).expect(200)
+      const saved = await (await import('../src/resources/note/note.model.js')).default.findById(note._id).lean()
+      expect(saved).toMatchObject({ titleSource: 'ai-suggested', aiTitle: saved.title })
+    })
+
+    it('never infers a source from the title: no record means not sure', async () => {
+      const { titleSourceOf } = await import('../src/utils/noteTitle.js')
+      expect(titleSourceOf({ title: 'T', aiTitle: 'T' })).toBe(null)
+      expect(titleSourceOf({ title: 'T', aiTitle: 'T', titleSource: 'ai-suggested' })).toBe('ai-suggested')
+    })
+
+    it('keeps an old note not sure until its title changes', async () => {
+      const agent = await authedAgent()
+      const Note = (await import('../src/resources/note/note.model.js')).default
+      const id = (await Note.collection.insertOne({ title: 'Old', aiTitle: 'Old', text: 't' })).insertedId
+      // The editor sends titleSource null for a title it isn't sure of
+      await agent.put(`/api/note/${id}`).send({ title: 'Old', titleSource: null, text: 'edited' }).expect(200)
+      expect(await source(id)).toBeUndefined()
+      await agent.put(`/api/note/${id}`).send({ title: 'Old' }).expect(200)
+      expect(await source(id)).toBeUndefined()
+      // Typed: the user's
+      await agent.put(`/api/note/${id}`).send({ title: 'New', titleSource: null }).expect(200)
+      expect(await source(id)).toBe('user')
+    })
+  })
 })
+

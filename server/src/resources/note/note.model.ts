@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { mintNickOnCreate } from '../nick/nickLifecycle.js'
 import { TEXT_SOURCES, trackTextSource, type TextSource } from '../../utils/noteText.js'
+import { TITLE_SOURCES, trackTitleSource, type TitleSource } from '../../utils/noteTitle.js'
 
 export interface NoteDoc {
   _id: Types.ObjectId
@@ -19,6 +20,7 @@ export interface NoteDoc {
   ocrText?: string
   textSource?: TextSource
   aiTitle?: string
+  titleSource?: TitleSource
   openCount?: number
   lastOpenedAt?: Date
   reviewedAt?: Date
@@ -53,10 +55,14 @@ const noteSchema = new Schema<NoteDoc>(
     // Where `text` came from, so OCR never overwrites typed text (#379).
     // Kept up to date by trackTextSource; read it with textSourceOf.
     textSource: { type: String, enum: TEXT_SOURCES },
-    // The last title suggested for this note. While the title still
-    // equals it, the title is marked as AI-generated (#330); editing the
-    // title clears the mark.
+    // The last title suggested for this note. A save may mark its title
+    // as AI-made only when it equals this (#330, #370); the mark itself
+    // is titleSource.
     aiTitle: String,
+    // Whether the title is the user's or AI's (#370). Missing means not
+    // sure (saved before this existed). Kept up to date by
+    // trackTitleSource; read it with titleSourceOf.
+    titleSource: { type: String, enum: TITLE_SOURCES },
     // How often its page has been opened, for the well-worn look (#333).
     openCount: { type: Number, default: 0 },
     lastOpenedAt: Date,
@@ -84,5 +90,6 @@ noteSchema.index({ reviewCount: 1 })
 // Every new note gets its nick before the save returns (#367)
 mintNickOnCreate(noteSchema, 'note')
 trackTextSource(noteSchema)
+trackTitleSource(noteSchema)
 
 export default mongoose.model<NoteDoc>('note', noteSchema)

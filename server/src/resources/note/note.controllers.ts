@@ -9,7 +9,6 @@ import * as IdeaControllers from '../idea/idea.controllers.js'
 import * as WorkControllers from '../work/work.controllers.js'
 import {
   getSuggestedIdeas,
-  getSuggestedTitle,
   getOpenAiOCR,
 } from '../../utils/suggestions.js'
 import config from '../../config'
@@ -18,6 +17,7 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, upsertEmbedding } from '../../utils/embeddingCache.js'
 import { ocrMayWrite } from '../../utils/noteText.js'
+import { checkedTitleSource, suggestTitle } from '../../utils/noteTitle.js'
 import { nickFor, nickKeysFor, resolveNick } from '../nick/nickLifecycle.js'
 import { deleteEntity } from '../../utils/deleteEntity.js'
 import { sanitizeSearchInput, escapeRegexInput, wordPrefixFilter } from '../../utils/searchInput.js'
@@ -46,7 +46,7 @@ const LIST_OMIT = '-embedding -ocrText'
 // payload should be able to overwrite them.
 const NOTE_WRITABLE = [
   'title', 'authors', 'text', 'ideas', 'work', 'year', 'url',
-  'images', 'page', 'piles', 'take', 'ocrText', 'people',
+  'images', 'page', 'piles', 'take', 'ocrText', 'people', 'titleSource',
 ] as const
 
 // Lean note + runtime augmentations added across the request pipeline:
@@ -294,6 +294,18 @@ const inferWorkUrl = async function (workId: unknown, noteUrl: string) {
 export const reqUpdateNote = async (req: Request, res: Response) => {
   const updates: Record<string, unknown> = pickAllowed(req.body, NOTE_WRITABLE)
 
+  // A title claimed as AI-made must be the note's last suggestion (#370).
+  // With no source (null: not sure), the model decides: an unchanged
+  // title keeps its source, a changed one becomes the user's.
+  if ('titleSource' in updates) {
+    if (updates.titleSource == null) {
+      delete updates.titleSource
+    } else {
+      const current = await Note.findById(req.params.id, { title: 1, aiTitle: 1 }).lean()
+      updates.titleSource = checkedTitleSource(updates.titleSource, updates.title ?? current?.title, current?.aiTitle)
+    }
+  }
+
   const url = typeof updates.url === 'string' ? updates.url : null
   if (url) {
     const existing = await Note.findById(req.params.id).lean()
@@ -475,9 +487,8 @@ export const reqGetSuggestionForNoteTitle = async function (req: Request, res: R
       res.status(404).json({ message: 'Note not found' })
       return
     }
-    const suggestion = await getSuggestedTitle(note.text ?? '')
-    // Remember it, so if it's saved as the title it's marked as AI-made.
-    await Note.updateOne({ _id: note._id }, { $set: { aiTitle: suggestion } })
+    // Remembered as aiTitle, so saving it can mark the title as AI-made
+    const { suggestion } = await suggestTitle(Note, note)
     res.send({ suggested_title: suggestion })
   } catch (e) {
     console.error(e)
@@ -630,17 +641,16 @@ export const reqBulkSuggestTitlesForNotes = async (req: Request, res: Response) 
 
   const notePromises = noteIds.map(async (noteId: unknown) => {
     try {
-      let note = noteMap[String(noteId)]
+      const note = noteMap[String(noteId)]
+      if (!note) return { noteId, success: false, error: 'Note not found' }
 
       if (!note.title && note.text) {
-        let suggestion = await getSuggestedTitle(note.text)
-
-        await Note.updateOne({ _id: noteId }, { $set: { title: suggestion, aiTitle: suggestion } })
-
+        // The same path as a single suggestion, applied as the title
+        const { suggestion, applied } = await suggestTitle(Note, note, { apply: true })
         return {
           noteId: noteId,
           success: true,
-          titleUpdated: true,
+          titleUpdated: applied,
           suggestedTitle: suggestion,
         }
       } else {
