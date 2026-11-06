@@ -39,7 +39,7 @@ async function api(method, path, body, config) {
     const errText = await res.text().catch(() => '')
     let message = errText
     try { message = JSON.parse(errText).message || errText } catch {}
-    throw new Error(`HTTP ${res.status}${message ? ': ' + message : ''}`)
+    throw Object.assign(new Error(`HTTP ${res.status}${message ? ': ' + message : ''}`), { status: res.status })
   }
   // Capture Set-Cookie on login
   const setCookie = res.headers.get('set-cookie')
@@ -1617,31 +1617,45 @@ async function mergeCommand(type, args, config) {
     if (!froms.some(f => String(f.id) === String(from.id))) froms.push(from)
   }
 
-  const plans = []
-  for (const from of froms) {
-    const plan = (await api('POST', `${type}/${from.id}/merge`, { into: into.id, dryRun: true }, config))?.data
-    if (!plan) { console.error('Merge preview failed.'); return }
-    plans.push(plan)
-  }
-  console.log(`Into ${label} ${BOLD}${plans[0].into.name}${RESET} ${DIM}${plans[0].into._id}${RESET}, merge:`)
-  for (const plan of plans) {
-    const moves = type === 'auth'
-      ? [['notes by', plan.notes], ['notes about', plan.notesAbout], ['works', plan.works],
-         ['works edited', plan.edited], ['works translated', plan.translated]]
-      : [['notes', plan.notes], ['piles', plan.piles], ['ideas', plan.ideas], ['authors', plan.authors],
-         ['editors', plan.editors], ['translators', plan.translators]]
-    console.log(`  ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET}`)
-    console.log('    ' + moves.map(([what, n]) => `${n} ${what}`).join(', '))
-    if (plan.fields.length) console.log(`    fills in: ${plan.fields.join(', ')}`)
-  }
-  console.log(`  then deletes ${plans.length === 1 ? 'it' : `those ${plans.length}`}`)
+  // Each merge runs only if its plan still matches the preview (#369);
+  // if one changed, show the new plans for what's left and ask again.
+  let remaining = froms
+  for (let attempt = 0; remaining.length; attempt++) {
+    if (attempt === 3) { console.error('Still changing after 3 previews; try again later.'); return }
+    const plans = []
+    for (const from of remaining) {
+      const plan = (await api('POST', `${type}/${from.id}/merge`, { into: into.id, dryRun: true }, config))?.data
+      if (!plan) { console.error('Merge preview failed.'); return }
+      plans.push(plan)
+    }
+    console.log(`Into ${label} ${BOLD}${plans[0].into.name}${RESET} ${DIM}${plans[0].into._id}${RESET}, merge:`)
+    for (const plan of plans) {
+      const moves = type === 'auth'
+        ? [['notes by', plan.notes], ['notes about', plan.notesAbout], ['works', plan.works],
+           ['works edited', plan.edited], ['works translated', plan.translated]]
+        : [['notes', plan.notes], ['piles', plan.piles], ['ideas', plan.ideas], ['authors', plan.authors],
+           ['editors', plan.editors], ['translators', plan.translators]]
+      console.log(`  ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET}`)
+      console.log('    ' + moves.map(([what, n]) => `${n} ${what}`).join(', '))
+      if (plan.fields.length) console.log(`    fills in: ${plan.fields.join(', ')}`)
+    }
+    console.log(`  then deletes ${plans.length === 1 ? 'it' : `those ${plans.length}`}`)
 
-  if (!flagYes) {
-    const ok = await confirm('Merge? [y/N] ')
-    if (!ok) { console.log('Cancelled.'); return }
+    if (!flagYes) {
+      const ok = await confirm('Merge? [y/N] ')
+      if (!ok) { console.log('Cancelled.'); return }
+    }
+    try {
+      for (const [i, from] of remaining.entries()) {
+        await api('POST', `${type}/${from.id}/merge`, { into: into.id, expect: plans[i].fingerprint }, config)
+        console.log(`${GREEN}Merged${RESET} ${plans[i].from.name} into ${plans[i].into.name}`)
+        remaining = remaining.filter((f) => f !== from)
+      }
+    } catch (e) {
+      if (e.status !== 409) throw e
+      console.error(`${YELLOW}Changed since the preview.${RESET} Here is the plan now:`)
+    }
   }
-  for (const from of froms) await api('POST', `${type}/${from.id}/merge`, { into: into.id }, config)
-  console.log(`${GREEN}Merged${RESET} ${froms.length} into ${plans[0].into.name}`)
 }
 
 // `cp auth split <author> --into "Name A" --into "Name B" [--keep] [--yes]`
@@ -1664,19 +1678,29 @@ async function splitCommand(args, config) {
   }
   const target = await resolveTarget(input, 'auth', config)
   if (!target) { console.error(`Could not resolve author "${input}".`); return }
-  const plan = (await api('POST', `auth/${target.id}/split`, { names, keep, dryRun: true }, config))?.data
-  if (!plan) { console.error('Split preview failed.'); return }
-  console.log(`Split author ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET} into:`)
-  plan.into.forEach(t => console.log(`  ${t.name}  ${DIM}${t.existing ? t._id : '(new)'}${RESET}`))
-  console.log(`  on ${plan.notes} notes by, ${plan.notesAbout} notes about, ${plan.works} works, ` +
-    `${plan.edited} edited, ${plan.translated} translated`)
-  console.log(plan.deletesOld ? `  then deletes ${plan.from.name}` : `  keeping ${plan.from.name}`)
-  if (!flagYes) {
-    const ok = await confirm('Split? [y/N] ')
-    if (!ok) { console.log('Cancelled.'); return }
+  // Runs only if the plan still matches the preview (#369)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const plan = (await api('POST', `auth/${target.id}/split`, { names, keep, dryRun: true }, config))?.data
+    if (!plan) { console.error('Split preview failed.'); return }
+    console.log(`Split author ${BOLD}${plan.from.name}${RESET} ${DIM}${plan.from._id}${RESET} into:`)
+    plan.into.forEach(t => console.log(`  ${t.name}  ${DIM}${t.existing ? t._id : '(new)'}${RESET}`))
+    console.log(`  on ${plan.notes} notes by, ${plan.notesAbout} notes about, ${plan.works} works, ` +
+      `${plan.edited} edited, ${plan.translated} translated`)
+    console.log(plan.deletesOld ? `  then deletes ${plan.from.name}` : `  keeping ${plan.from.name}`)
+    if (!flagYes) {
+      const ok = await confirm('Split? [y/N] ')
+      if (!ok) { console.log('Cancelled.'); return }
+    }
+    try {
+      await api('POST', `auth/${target.id}/split`, { names, keep, expect: plan.fingerprint }, config)
+      console.log(`${GREEN}Split${RESET} into ${names.length}`)
+      return
+    } catch (e) {
+      if (e.status !== 409) throw e
+      console.error(`${YELLOW}Changed since the preview.${RESET} Here is the plan now:`)
+    }
   }
-  await api('POST', `auth/${target.id}/split`, { names, keep }, config)
-  console.log(`${GREEN}Split${RESET} into ${names.length}`)
+  console.error('Still changing after 3 previews; try again later.')
 }
 
 // `cp notes <subcommand>`: operations over many notes (#356).
