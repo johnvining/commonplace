@@ -107,4 +107,49 @@ describe('merge (#360)', () => {
       }
     })
   })
+
+  describe('plans are re-checked when executed (#369)', () => {
+    it('refuses a work merge whose plan changed since the preview, and runs the current one', async () => {
+      const agent = await authedAgent()
+      const keep = await createWork(agent, { name: 'Keep' })
+      const drop = await createWork(agent, { name: 'Drop' })
+      await createNote(agent, { title: 'First', work: drop._id })
+      const preview = (await agent.post(`/api/work/${drop._id}/merge`).send({ into: keep._id, dryRun: true }).expect(200)).body.data
+      expect(preview).toMatchObject({ notes: 1 })
+      expect(preview.fingerprint).toMatch(/^[0-9a-f]{16}$/)
+
+      // Something changes before the merge is confirmed
+      await createNote(agent, { title: 'Second', work: drop._id })
+      const refused = await agent.post(`/api/work/${drop._id}/merge`).send({ into: keep._id, expect: preview.fingerprint }).expect(409)
+      expect(refused.body.data).toMatchObject({ notes: 2 })
+      expect(refused.body.data.fingerprint).not.toBe(preview.fingerprint)
+      expect((await agent.get(`/api/work/${drop._id}`).expect(200)).body.data.name).toBe('Drop')
+
+      await agent.post(`/api/work/${drop._id}/merge`).send({ into: keep._id, expect: refused.body.data.fingerprint }).expect(200)
+      expect((await agent.get(`/api/work/${keep._id}/notes`).expect(200)).body.data).toHaveLength(2)
+    })
+
+    it('gives the same fingerprint for the same data', async () => {
+      const agent = await authedAgent()
+      const keep = await createAuthor(agent, 'Keep')
+      const drop = await createAuthor(agent, 'Drop')
+      await createNote(agent, { title: 'N', authors: [drop._id] })
+      const one = (await agent.post(`/api/auth/${drop._id}/merge`).send({ into: keep._id, dryRun: true }).expect(200)).body.data
+      const two = (await agent.post(`/api/auth/${drop._id}/merge`).send({ into: keep._id, dryRun: true }).expect(200)).body.data
+      expect(two.fingerprint).toBe(one.fingerprint)
+    })
+
+    it('re-checks author merges and splits too', async () => {
+      const agent = await authedAgent()
+      const keep = await createAuthor(agent, 'Keep')
+      const drop = await createAuthor(agent, 'A & B')
+      const merge = (await agent.post(`/api/auth/${drop._id}/merge`).send({ into: keep._id, dryRun: true }).expect(200)).body.data
+      const split = (await agent.post(`/api/auth/${drop._id}/split`).send({ names: ['A', 'B'], dryRun: true }).expect(200)).body.data
+      await createWork(agent, { name: 'W', authors: [drop._id] })
+      await agent.post(`/api/auth/${drop._id}/merge`).send({ into: keep._id, expect: merge.fingerprint }).expect(409)
+      await agent.post(`/api/auth/${drop._id}/split`).send({ names: ['A', 'B'], expect: split.fingerprint }).expect(409)
+      expect((await agent.get(`/api/auth/${drop._id}`).expect(200)).body.data.name).toBe('A & B')
+    })
+  })
 })
+

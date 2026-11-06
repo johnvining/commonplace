@@ -6,7 +6,7 @@ import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
 import { deleteEntity } from '../../utils/deleteEntity.js'
-import { mergeAuthors, splitAuthor } from '../../utils/merge.js'
+import { mergeAuthors, planOptionsFrom, respondWithPlan, splitAuthor } from '../../utils/merge.js'
 import type { Request, Response } from 'express'
 
 
@@ -125,9 +125,8 @@ export const reqGetWorksForAuthor = async (req: Request, res: Response) => {
 }
 
 // POST /auth/:id/merge { into, dryRun }: fold this author into `into` (#360)
-export const reqMergeAuthor = async (req: Request, res: Response) => {
-  return mergeAuthors(String(req.params.id), String(req.body.into), Boolean(req.body.dryRun))
-}
+export const reqMergeAuthor = async (req: Request, res: Response) =>
+  respondWithPlan(res, () => mergeAuthors(String(req.params.id), String(req.body.into), planOptionsFrom(req.body)))
 
 // Works this person edited or translated, credited apart from the works
 // they wrote (#358).
@@ -144,12 +143,9 @@ export const reqGetCreditsForAuthor = async (req: Request, res: Response) => {
 }
 
 // POST /auth/:id/split { names, keep, dryRun }: one author per name (#356)
-export const reqSplitAuthor = async (req: Request, res: Response) => {
-  return splitAuthor(String(req.params.id), req.body.names, {
-    keep: Boolean(req.body.keep),
-    dryRun: Boolean(req.body.dryRun),
-  })
-}
+export const reqSplitAuthor = async (req: Request, res: Response) =>
+  respondWithPlan(res, () =>
+    splitAuthor(String(req.params.id), req.body.names, { keep: Boolean(req.body.keep), ...planOptionsFrom(req.body) }))
 
 export const reqDeleteAuthor = async (req: Request, res: Response) => {
   await deleteAuthor(String(req.params.id))

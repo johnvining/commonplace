@@ -10,7 +10,7 @@ import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
-import { mergeWorks } from '../../utils/merge.js'
+import { mergeWorks, planOptionsFrom, respondWithPlan } from '../../utils/merge.js'
 import type { Request, Response } from 'express'
 
 const WORK_WRITABLE = [
@@ -81,10 +81,10 @@ export const reqCreateAndAddAuth = async (req: Request, res: Response) => {
   return doc
 }
 
-// POST /work/:id/merge { into, dryRun }: fold this work into `into` (#360)
-export const reqMergeWork = async (req: Request, res: Response) => {
-  return mergeWorks(String(req.params.id), String(req.body.into), Boolean(req.body.dryRun))
-}
+// POST /work/:id/merge { into, dryRun, expect }: fold this work into `into`
+// (#360). `expect` is the previewed plan's fingerprint (#369).
+export const reqMergeWork = async (req: Request, res: Response) =>
+  respondWithPlan(res, () => mergeWorks(String(req.params.id), String(req.body.into), planOptionsFrom(req.body)))
 
 export const reqDeleteWork = async (req: Request, res: Response) => {
   await deleteWork(req.params.id)

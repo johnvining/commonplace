@@ -1,8 +1,14 @@
 // Merging duplicate works and authors (#360), and splitting a combined
 // author into several (#356). Everything goes through Mongoose so
-// timestamps bump: changed notes surface on the home feed. With dryRun
-// the plan comes back and nothing is written, so the CLI can show what
-// will change before asking.
+// timestamps bump: changed notes surface on the home feed.
+//
+// Each operation first works out its plan: what will move. With dryRun
+// the plan is returned and nothing is written. Every plan carries a
+// fingerprint of the exact ids it would move (#369); pass it back as
+// `expect` when executing, and if the data changed since the preview the
+// execute refuses with PlanChangedError, carrying the new plan, instead
+// of doing something other than what was approved.
+import crypto from 'crypto'
 import Work from '../resources/work/work.model.js'
 import Note from '../resources/note/note.model.js'
 import Pin from '../resources/pin/pin.model.js'
@@ -13,6 +19,40 @@ import { escapeRegexInput } from './searchInput.js'
 function httpError(status: number, message: string) {
   return Object.assign(new Error(message), { status })
 }
+
+export class PlanChangedError extends Error {
+  status = 409
+  constructor(public plan: unknown) {
+    super('This changed since the preview; check the new plan and try again')
+  }
+}
+
+export interface PlanOptions {
+  dryRun?: boolean
+  // The fingerprint of the plan that was previewed
+  expect?: string
+}
+
+// A stable hash of what a plan would do: sorted ids, filled fields
+function fingerprintOf(details: Record<string, unknown>): string {
+  const canonical = JSON.stringify(details, (_, value) =>
+    value && typeof value === 'object' && !Array.isArray(value)
+      ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)))
+      : value
+  )
+  return crypto.createHash('sha256').update(canonical).digest('hex').slice(0, 16)
+}
+
+// Return the plan for a dry run; refuse an execute whose plan no longer
+// matches the previewed one; otherwise let the execute go ahead.
+function checkPlan<T extends { fingerprint: string }>(plan: T, { dryRun, expect }: PlanOptions): boolean {
+  if (dryRun) return true
+  if (expect !== undefined && expect !== plan.fingerprint) throw new PlanChangedError(plan)
+  return false
+}
+
+const sortedIds = async (Model: any, query: object) =>
+  (await Model.find(query, { _id: 1 }).lean().exec()).map((d: any) => String(d._id)).sort()
 
 const ids = (list: unknown[] | undefined) => (list ?? []).map(String)
 
@@ -42,7 +82,7 @@ async function loadPair<T>(find: (id: string) => Promise<T | null>, from: string
 
 const WORK_FILL_FIELDS = ['original_name', 'url', 'year', 'citation_information', 'summary'] as const
 
-export async function mergeWorks(from: string, into: string, dryRun = false) {
+export async function mergeWorks(from: string, into: string, options: PlanOptions = {}) {
   const [fromWork, intoWork] = await loadPair(
     (id) => Work.findById(id).lean().exec(),
     from,
@@ -64,19 +104,20 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
       fill[field] = other
     }
   }
-  const notes = await Note.countDocuments({ work: from })
+  const noteIds = await sortedIds(Note, { work: from })
   const plan = {
     from: { _id: from, name: fromWork.name },
     into: { _id: into, name: intoWork.name },
-    notes,
+    notes: noteIds.length,
     piles: piles.length,
     ideas: ideas.length,
     authors: authors.length,
     editors: editors.length,
     translators: translators.length,
     fields: Object.keys(fill),
+    fingerprint: fingerprintOf({ from, into, noteIds, piles, ideas, authors, editors, translators, fill }),
   }
-  if (dryRun) return plan
+  if (checkPlan(plan, options)) return plan
 
   await Note.updateMany({ work: from }, { $set: { work: into } }).exec()
   await Work.updateOne(
@@ -99,6 +140,24 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
   return plan
 }
 
+// Every array that can hold an author, and the plan count each feeds
+const AUTHOR_FIELDS: [any, string, string][] = [
+  [Note, 'authors', 'notes'],
+  [Note, 'people', 'notesAbout'],
+  [Work, 'authors', 'works'],
+  [Work, 'editors', 'edited'],
+  [Work, 'translators', 'translated'],
+]
+
+// The ids of the notes and works that list an author, per field
+async function affectedByAuthor(id: string): Promise<Record<string, string[]>> {
+  const lists = await Promise.all(AUTHOR_FIELDS.map(([Model, field]) => sortedIds(Model, { [field]: id })))
+  return Object.fromEntries(AUTHOR_FIELDS.map(([, , count], i) => [count, lists[i]]))
+}
+
+const countsOf = (affected: Record<string, string[]>) =>
+  Object.fromEntries(Object.entries(affected).map(([count, list]) => [count, list.length])) as Record<string, number>
+
 // Replace `from` with `into` (one id or several) in each doc's `field`
 // array, keeping its place in the order (the first author is the byline)
 // and not doubling up.
@@ -117,7 +176,9 @@ async function replaceInArrays(Model: any, field: string, from: string, into: st
   return docs.length
 }
 
-export async function mergeAuthors(from: string, into: string, dryRun = false) {
+// Like mergeWorks, but authors have no nick, so there's no re-point step:
+// the merged author's links simply go when it's deleted.
+export async function mergeAuthors(from: string, into: string, options: PlanOptions = {}) {
   const [fromAuth, intoAuth] = await loadPair(
     (id) => Auth.findById(id).lean().exec(),
     from,
@@ -130,51 +191,30 @@ export async function mergeAuthors(from: string, into: string, dryRun = false) {
   if (intoAuth.death_year == null && fromAuth.death_year != null) fill.death_year = fromAuth.death_year
   const usernames = (fromAuth.usernames ?? []).filter((u) => !(intoAuth.usernames ?? []).includes(u))
 
-  const [notes, notesAbout, works, edited, translated] = await Promise.all([
-    Note.countDocuments({ authors: from }),
-    Note.countDocuments({ people: from }),
-    Work.countDocuments({ authors: from }),
-    Work.countDocuments({ editors: from }),
-    Work.countDocuments({ translators: from }),
-  ])
+  const affected = await affectedByAuthor(from)
   const plan = {
     from: { _id: from, name: fromAuth.name },
     into: { _id: into, name: intoAuth.name },
-    notes,
-    notesAbout,
-    works,
-    edited,
-    translated,
+    ...countsOf(affected),
     fields: [...Object.keys(fill), ...(usernames.length ? ['usernames'] : [])],
+    fingerprint: fingerprintOf({ from, into, affected, fill, usernames }),
   }
-  if (dryRun) return plan
+  if (checkPlan(plan, options)) return plan
 
-  await replaceInArrays(Note, 'authors', from, into)
-  await replaceInArrays(Note, 'people', from, into)
-  await replaceInArrays(Work, 'authors', from, into)
-  await replaceInArrays(Work, 'editors', from, into)
-  await replaceInArrays(Work, 'translators', from, into)
+  for (const [Model, field] of AUTHOR_FIELDS) await replaceInArrays(Model, field, from, into)
   await Auth.updateOne({ _id: into }, { $set: fill, $push: { usernames: { $each: usernames } } }).exec()
   await movePin('auth', from, into)
   await Auth.deleteOne({ _id: from }).exec()
   return plan
 }
 
-// Every array that can hold an author
-const AUTHOR_FIELDS: [any, string][] = [
-  [Note, 'authors'],
-  [Note, 'people'],
-  [Work, 'authors'],
-  [Work, 'editors'],
-  [Work, 'translators'],
-]
 
 // Split a combined author ("A, B & C" as one record) into one author per
 // name: existing authors are reused by exact name (ignoring case), the
 // rest are created, and every reference to the old author becomes the new
 // list in its place. The old author is deleted unless `keep` is set or it
 // is one of the names.
-export async function splitAuthor(id: string, rawNames: unknown, { keep = false, dryRun = false } = {}) {
+export async function splitAuthor(id: string, rawNames: unknown, { keep = false, ...options }: PlanOptions & { keep?: boolean } = {}) {
   const old = await Auth.findById(id).lean().exec()
   if (!old) throw httpError(404, `No author ${id}`)
   const names = [...new Set((Array.isArray(rawNames) ? rawNames : [])
@@ -187,19 +227,17 @@ export async function splitAuthor(id: string, rawNames: unknown, { keep = false,
     const found = await Auth.findOne({ name: new RegExp(`^${escapeRegexInput(name)}$`, 'i') }).lean().exec()
     return found ? { name: found.name, _id: String(found._id), existing: true } : { name, _id: null, existing: false }
   }))
-  const counts = await Promise.all(AUTHOR_FIELDS.map(([Model, field]) => Model.countDocuments({ [field]: id })))
+  const affected = await affectedByAuthor(id)
   const keepOld = keep || targets.some((t) => t._id === String(old._id))
+  const into = targets.map(({ name, _id, existing }) => ({ name, _id, existing }))
   const plan = {
     from: { _id: id, name: old.name },
-    into: targets.map(({ name, _id, existing }) => ({ name, _id, existing })),
-    notes: counts[0],
-    notesAbout: counts[1],
-    works: counts[2],
-    edited: counts[3],
-    translated: counts[4],
+    into,
+    ...countsOf(affected),
     deletesOld: !keepOld,
+    fingerprint: fingerprintOf({ id, into, affected, keepOld }),
   }
-  if (dryRun) return plan
+  if (checkPlan(plan, options)) return plan
 
   for (const target of targets) {
     if (!target._id) target._id = String((await Auth.create({ name: target.name }))._id)
@@ -213,3 +251,20 @@ export async function splitAuthor(id: string, rawNames: unknown, { keep = false,
   plan.into = targets.map(({ name, _id, existing }) => ({ name, _id, existing }))
   return plan
 }
+
+// Run a plan operation for an HTTP handler: a changed plan becomes a 409
+// whose data is the new plan, for the client to show and confirm.
+export async function respondWithPlan(res: { status: (code: number) => { json: (body: unknown) => unknown } }, run: () => Promise<unknown>) {
+  try {
+    return await run()
+  } catch (e) {
+    if (e instanceof PlanChangedError) return res.status(409).json({ message: e.message, data: e.plan })
+    throw e
+  }
+}
+
+// The plan options from a request body
+export const planOptionsFrom = (body: any): PlanOptions => ({
+  dryRun: Boolean(body?.dryRun),
+  expect: typeof body?.expect === 'string' ? body.expect : undefined,
+})
