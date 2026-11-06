@@ -15,6 +15,18 @@ import * as constants from './constants'
 // One-off data fixes to run after deploying an update (listed in
 // SCRIPTS_TO_RUN.md). Each task has a dry run that changes nothing; a
 // real run asks for confirmation first.
+// A task's last real run (#376): it may still be going, or have been cut
+// off by a restart, as well as finished or failed
+function lastRunLabel(run: { status?: string; ok?: boolean; startedAt?: string; finishedAt?: string | null }) {
+  const at = (when?: string | null) => (when ? ' ' + new Date(when).toLocaleString() : '')
+  switch (run.status ?? (run.ok ? 'done' : 'failed')) {
+    case 'running': return 'Running since' + at(run.startedAt)
+    case 'interrupted': return 'Interrupted' + at(run.startedAt) + ' (the server stopped mid-run)'
+    case 'done': return 'Ran' + at(run.finishedAt)
+    default: return 'Failed' + at(run.finishedAt)
+  }
+}
+
 function Maintenance(props: any) {
   const [tasks, setTasks] = useState<any[] | null>(null)
   const [jobs, setJobs] = useState<Record<string, any>>({})
@@ -115,9 +127,7 @@ function Maintenance(props: any) {
                 <div className="maintenance-task-title">{task.title}</div>
                 <div className="maintenance-task-status">
                   {task.issue ? `#${task.issue} · ` : null}
-                  {task.lastRun
-                    ? `${task.lastRun.ok ? 'Ran' : 'Failed'} ${new Date(task.lastRun.finishedAt).toLocaleString()}`
-                    : 'Not run yet'}
+                  {task.lastRun ? lastRunLabel(task.lastRun) : 'Not run yet'}
                   {task.pending ? null : ' · done'}
                 </div>
               </div>
@@ -159,7 +169,13 @@ function Maintenance(props: any) {
             {job ? (
               <pre className="maintenance-output">
                 {job.dryRun ? 'Dry run' : 'Run'}
-                {running ? ' (running…)' : job.status === 'failed' ? ' (failed)' : ' (finished)'}
+                {running
+                  ? ' (running…)'
+                  : job.status === 'failed'
+                  ? ' (failed)'
+                  : job.status === 'interrupted'
+                  ? ' (interrupted: the server stopped before it finished)'
+                  : ' (finished)'}
                 {'\n'}
                 {job.output.join('\n')}
               </pre>
