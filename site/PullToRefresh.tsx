@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { isStandaloneApp } from './RefreshButton'
+import { hasOpenFields, isStandaloneApp } from './RefreshButton'
 
 // How far to pull down, in px, before letting go reloads
 export const PULL_THRESHOLD = 70
@@ -34,7 +34,8 @@ export default function PullToRefresh({
     let startY: number | null = null
     let distance = 0
     const start = (e: TouchEvent) => {
-      startY = e.touches.length === 1 && window.scrollY <= 0 && !pullBelongsElsewhere(e.target)
+      // Off while editing, so a stray drag can't throw an edit away
+      startY = e.touches.length === 1 && window.scrollY <= 0 && !pullBelongsElsewhere(e.target) && !hasOpenFields()
         ? e.touches[0].clientY
         : null
       distance = 0

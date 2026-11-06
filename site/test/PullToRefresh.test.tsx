@@ -47,6 +47,14 @@ describe('PullToRefresh (#364)', () => {
     expect(onRefresh).not.toHaveBeenCalled()
   })
 
+  it('is off while anything is being edited', () => {
+    const onRefresh = vi.fn()
+    render(<><PullToRefresh enabled onRefresh={onRefresh} /><input data-testid="field" /></>)
+    drag(document.body, 10, 200)
+    fireEvent.touchEnd(document.body)
+    expect(onRefresh).not.toHaveBeenCalled()
+  })
+
   it('leaves drags in a text field alone', () => {
     const onRefresh = vi.fn()
     render(<><PullToRefresh enabled onRefresh={onRefresh} /><textarea data-testid="field" /></>)

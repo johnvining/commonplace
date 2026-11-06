@@ -21,6 +21,19 @@ describe('RefreshButton (#364)', () => {
     expect(screen.queryByLabelText('Refresh')).toBeNull()
   })
 
+  it('asks before reloading while something is being edited', () => {
+    standalone(true)
+    const onRefresh = vi.fn()
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true)
+    render(<><RefreshButton onRefresh={onRefresh} /><textarea /></>)
+    fireEvent.click(screen.getByLabelText('Refresh'))
+    expect(onRefresh).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByLabelText('Refresh'))
+    expect(onRefresh).toHaveBeenCalledOnce()
+    expect(confirm).toHaveBeenCalledTimes(2)
+    confirm.mockRestore()
+  })
+
   it('reloads from the installed app', () => {
     standalone(true)
     const onRefresh = vi.fn()
