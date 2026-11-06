@@ -107,10 +107,12 @@ describe('note OpenAI-backed endpoints', () => {
 
     it('returns failure rows when nick is missing', async () => {
       const agent = await authedAgent()
-      const note = await createNote(agent, { title: 'NoNick' })
+      // Notes get a nick when created (#367); a legacy note may not have one
+      const { default: Note } = await import('../src/resources/note/note.model.js')
+      const { insertedId } = await Note.collection.insertOne({ title: 'NoNick' })
       const res = await agent
         .post('/api/note/bulk-markdown')
-        .send({ noteIds: [note._id] })
+        .send({ noteIds: [String(insertedId)] })
         .expect(200)
       expect(res.body.data[0].success).toBe(false)
       expect(res.body.data[0].error).toMatch(/Nick not found/)

@@ -7,7 +7,7 @@ import { guessYearFromUrl } from '../../utils/urls.js'
 import { findNotesAndPopulate, updateNote } from '../note/note.controllers.js'
 import { createIdea } from '../idea/idea.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
-import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
+import { retireNick } from '../nick/nickLifecycle.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
@@ -100,7 +100,6 @@ export const reqAddPile = async (req: Request, res: Response) => {
 
 export const reqAddNewPile = async (req: Request, res: Response) => {
   const newPile = await Pile.create({ name: req.body.name })
-  generateNick('pile', newPile._id).catch(() => {})
   const doc = await addPileToId(req.params.id, newPile._id)
   return doc
 }
@@ -178,7 +177,6 @@ export const findWorksByString = async function(string: string, withCounts = fal
 
 export const createWork = async function(name: string) {
   const work = await Work.create({ name: name })
-  generateNick('work', work._id).catch(() => {})
   return work
 }
 
@@ -218,7 +216,7 @@ export const deleteWork = async function(id: string) {
   const steps: Array<() => Promise<unknown>> = notes.map(
     (note) => () => updateNote(note._id, { work: null })
   )
-  steps.push(() => deleteNickFor('work', id))
+  steps.push(() => retireNick('work', id))
   await runCascadeSteps('deleteWork', steps)
   await Work.findOneAndDelete({ _id: id })
 }

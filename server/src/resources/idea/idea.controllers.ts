@@ -2,12 +2,11 @@ import Idea from './idea.model.js'
 import Note from '../note/note.model.js'
 import Work from '../work/work.model.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
-import { generateNick } from '../nick/nick.controllers.js'
 import {
   removeIdeaFromNote,
   findNotesAndPopulate
 } from '../note/note.controllers'
-import { deleteNickFor } from '../nick/nick.controllers.js'
+import { retireNick } from '../nick/nickLifecycle.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
@@ -74,7 +73,6 @@ export const reqDeleteIdea = async (req: Request, res: Response) => {
 // Idea
 export const createIdea = async function(name: string) {
   const idea = await Idea.create({ name: name })
-  generateNick('idea', idea._id).catch(() => {})
   return idea
 }
 
@@ -100,7 +98,7 @@ export const deleteIdea = async function(ideaId: string) {
     (note) => () => removeIdeaFromNote(note._id, ideaId)
   )
   steps.push(() => Work.updateMany({ ideas: ideaId }, { $pull: { ideas: ideaId } }))
-  steps.push(() => deleteNickFor('idea', ideaId))
+  steps.push(() => retireNick('idea', ideaId))
   await runCascadeSteps('deleteIdea', steps)
   await Idea.findOneAndDelete({ _id: ideaId })
 }

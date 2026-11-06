@@ -1,4 +1,5 @@
 import mongoose, { Schema, Types } from 'mongoose'
+import { mintNickOnCreate } from '../nick/nickLifecycle.js'
 
 export interface WorkDoc {
   _id: Types.ObjectId
@@ -47,5 +48,8 @@ workSchema.index({ authors: 1 })
 workSchema.index({ editors: 1 })
 workSchema.index({ translators: 1 })
 workSchema.index({ ideas: 1 })
+
+// Every new work gets its nick before the save returns (#367)
+mintNickOnCreate(workSchema, 'work')
 
 export default mongoose.model<WorkDoc>('work', workSchema)

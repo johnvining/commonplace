@@ -1,4 +1,5 @@
 import mongoose, { Schema, Types } from 'mongoose'
+import { mintNickOnCreate } from '../nick/nickLifecycle.js'
 
 export interface PileDoc {
   _id: Types.ObjectId
@@ -22,5 +23,8 @@ const pileSchema = new Schema<PileDoc>(
 )
 
 pileSchema.index({ name: 1 })
+
+// Every new pile gets its nick before the save returns (#367)
+mintNickOnCreate(pileSchema, 'pile')
 
 export default mongoose.model<PileDoc>('pile', pileSchema)

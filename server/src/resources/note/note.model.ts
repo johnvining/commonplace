@@ -1,4 +1,5 @@
 import mongoose, { Schema, Types } from 'mongoose'
+import { mintNickOnCreate } from '../nick/nickLifecycle.js'
 
 export interface NoteDoc {
   _id: Types.ObjectId
@@ -74,5 +75,8 @@ noteSchema.index({ piles: 1 })
 noteSchema.index({ ideas: 1 })
 noteSchema.index({ updatedAt: -1 })
 noteSchema.index({ reviewCount: 1 })
+
+// Every new note gets its nick before the save returns (#367)
+mintNickOnCreate(noteSchema, 'note')
 
 export default mongoose.model<NoteDoc>('note', noteSchema)

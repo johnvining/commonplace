@@ -11,7 +11,7 @@ import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
 import * as NoteControllers from '../resources/note/note.controllers.js'
 import * as PileControllers from '../resources/pile/pile.controllers.js'
-import { generateNick, type NickEntityType } from '../resources/nick/nick.controllers.js'
+import { mintNick, type NickEntityType } from '../resources/nick/nickLifecycle.js'
 
 export async function importCSV(filePath: string, recordType: number) {
   console.log('Importing records from file ' + filePath)
@@ -242,13 +242,12 @@ interface NewNoteFields {
   take: string
 }
 
-// Records create their nicks in the background. Wait for each row's nicks
-// so a CLI run can't disconnect with one still in flight and leave that
-// record without a nick (#223). generateNick returns an existing nick, so
-// racing the background call is harmless.
+// New records get their nicks as they're created (#367). An import also
+// reuses existing works, ideas and piles, which may predate nicks, so
+// mint any that are missing (#223). Minting an active nick is a no-op.
 async function ensureNicks(records: [NickEntityType, unknown][]) {
   await Promise.all(
-    records.filter(([, id]) => id).map(([type, id]) => generateNick(type, id))
+    records.filter(([, id]) => id).map(([type, id]) => mintNick(type, id))
   )
 }
 

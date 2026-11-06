@@ -1,4 +1,5 @@
 import mongoose, { Schema, Types } from 'mongoose'
+import { mintNickOnCreate } from '../nick/nickLifecycle.js'
 
 export interface IdeaDoc {
   _id: Types.ObjectId
@@ -25,5 +26,8 @@ const ideaSchema = new Schema<IdeaDoc>(
 )
 
 ideaSchema.index({ name: 1 })
+
+// Every new idea gets its nick before the save returns (#367)
+mintNickOnCreate(ideaSchema, 'idea')
 
 export default mongoose.model<IdeaDoc>('idea', ideaSchema)

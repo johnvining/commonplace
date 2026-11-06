@@ -7,7 +7,7 @@ import Work from '../resources/work/work.model.js'
 import Note from '../resources/note/note.model.js'
 import Pin from '../resources/pin/pin.model.js'
 import { Auth } from '../resources/auth/auth.model.js'
-import { deleteNickFor } from '../resources/nick/nick.controllers.js'
+import { repointNick } from '../resources/nick/nickLifecycle.js'
 import { escapeRegexInput } from './searchInput.js'
 
 function httpError(status: number, message: string) {
@@ -94,7 +94,7 @@ export async function mergeWorks(from: string, into: string, dryRun = false) {
   ).exec()
   await movePin('work', from, into)
   // Old links to the merged work land on the kept one (#366)
-  await deleteNickFor('work', from, into)
+  await repointNick('work', from, into)
   await Work.deleteOne({ _id: from }).exec()
   return plan
 }

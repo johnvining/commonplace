@@ -4,9 +4,8 @@ import Work from '../work/work.model.js'
 import { updateNote, findNotesAndPopulate } from '../note/note.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { removePileFromWork } from '../work/work.controllers.js'
-import { deleteNickFor } from '../nick/nick.controllers.js'
+import { mintNick, retireNick } from '../nick/nickLifecycle.js'
 import { runCascadeSteps } from '../../utils/cascadeDelete.js'
-import { generateNick } from '../nick/nick.controllers.js'
 import { rankByName, wordPrefixFilter } from '../../utils/searchInput.js'
 import { findEntityNotesPage } from '../../utils/pagination.js'
 import { withNoteCounts } from '../../utils/noteCounts.js'
@@ -104,7 +103,7 @@ export const deletePile = async function (pileId: string) {
   for (const work of works) {
     steps.push(() => removePileFromWork(String(work._id), pileId))
   }
-  steps.push(() => deleteNickFor('pile', pileId))
+  steps.push(() => retireNick('pile', pileId))
   await runCascadeSteps('deletePile', steps)
   await Pile.findOneAndDelete({ _id: pileId })
 }
@@ -114,7 +113,8 @@ export const findOrCreatePile = async (name: string) => {
   // filter, which schema validators don't check.
   if (!name?.trim()) return
   const pile = await Pile.findOneAndUpdate({ name: name }, {}, { upsert: true, new: true })
-  generateNick('pile', pile._id).catch(() => {})
+  // An upsert skips the save hook that mints new piles' nicks (#367)
+  if (pile) await mintNick('pile', pile._id)
   return pile
 }
 

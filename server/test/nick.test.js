@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import mongoose from 'mongoose'
 import Nick from '../src/resources/nick/nick.model.js'
-import { generateNick } from '../src/resources/nick/nick.controllers.js'
+import { mintNick as generateNick } from '../src/resources/nick/nickLifecycle.js'
 import { authedAgent, createIdea, createNote, createPile, createWork } from './setup.js'
 
 async function ensureNickFor(agent, type, id) {
@@ -138,11 +138,8 @@ describe('nick', () => {
   describe('POST /api/nick/backfill', () => {
     it('creates nicks for entities that lack them', async () => {
       const agent = await authedAgent()
-      // Create entities with no nicks (createNote uses default createOne which skips nick gen)
-      await createNote(agent, { title: 'A' })
-      await createNote(agent, { title: 'B' })
-      // Use createOne for work too — auth.test created via /api/work which uses reqCreateWork (does generate nick)
-      // So just call backfill and confirm it returns counts.
+      // New notes get nicks when created (#367), so make legacy ones directly
+      await Nick.db.collection('notes').insertMany([{ title: 'A' }, { title: 'B' }])
       const res = await agent.post('/api/nick/backfill').expect(200)
       expect(res.body.data.note).toBeDefined()
       expect(res.body.data.note.total).toBeGreaterThanOrEqual(2)

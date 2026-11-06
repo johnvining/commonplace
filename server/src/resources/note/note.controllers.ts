@@ -3,7 +3,6 @@ import { Auth } from '../auth/auth.model.js'
 import Pile from '../pile/pile.model.js'
 import Idea from '../idea/idea.model.js'
 import Work from '../work/work.model.js'
-import Nick from '../nick/nick.model.js'
 import { importCsvFromString } from '../../cli/import.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import * as IdeaControllers from '../idea/idea.controllers.js'
@@ -18,7 +17,7 @@ import fs from 'fs'
 import { guessYearFromUrl } from '../../utils/urls.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache, invalidateEmbedding, upsertEmbedding } from '../../utils/embeddingCache.js'
-import { generateNick, deleteNickFor } from '../nick/nick.controllers.js'
+import { nickFor, nickKeysFor, resolveNick, retireNick } from '../nick/nickLifecycle.js'
 import { sanitizeSearchInput, escapeRegexInput, wordPrefixFilter } from '../../utils/searchInput.js'
 import { pickAllowed } from '../../utils/pickAllowed.js'
 import { autoOcrNote, isOcrConfigured } from '../../utils/autoOcr.js'
@@ -118,12 +117,8 @@ async function keywordSearchNotes(rawQuery: string, limit: number): Promise<Popu
 }
 
 async function attachNicks(notes: PopulatedNote[]) {
-  const nicks = await Nick.find({ note: { $in: notes.map((n) => n._id) } }).lean().exec()
-  const nickMap: Record<string, string> = {}
-  nicks.forEach((nick) => {
-    if (nick.note && nick.key) nickMap[String(nick.note)] = nick.key
-  })
-  notes.forEach((note) => { note.nick = nickMap[String(note._id)] || null })
+  const keys = await nickKeysFor('note', notes.map((n) => n._id))
+  notes.forEach((note) => { note.nick = keys.get(String(note._id)) ?? null })
 }
 
 export const reqFindNotesByString = async (req: Request, res: Response) => {
@@ -139,9 +134,9 @@ export const reqGetNoteDetails = async (req: Request, res: Response) => {
 // Resolves a nick string → the populated note. Mirrors the shape returned by
 // reqGetNoteDetails so the frontend can swap calls transparently.
 export const reqGetNoteByNick = async (req: Request, res: Response) => {
-  const nickDoc = await Nick.findOne({ key: req.params.nick }).lean().exec()
-  if (!nickDoc?.note) return []
-  return await findNotesAndPopulate({ _id: nickDoc.note }, null, false, null, null, null)
+  const found = await resolveNick(String(req.params.nick))
+  if (!found || found.state === 'retired' || found.type !== 'note') return []
+  return await findNotesAndPopulate({ _id: found.id }, null, false, null, null, null)
 }
 
 export const reqDeleteNote = async (req: Request, res: Response) => {
@@ -149,7 +144,7 @@ export const reqDeleteNote = async (req: Request, res: Response) => {
   const note = await Note.findOne({ _id: id }).lean()
   if (note) await deleteNoteImageFiles(note)
   // Before the delete, so the retired nick can keep the note's title
-  await deleteNickFor('note', id)
+  await retireNick('note', id)
   await Note.deleteOne({ _id: id })
   invalidateEmbedding(id)
   res.status(200).end()
@@ -505,18 +500,14 @@ export const reqGetSuggestedIdeasForNote = async function (req: Request, res: Re
 
 export const createNote = async function (title: string, author: unknown) {
   const authors = author ? [author as any] : []
-  const note = await Note.create({ title: title, authors: authors })
-  generateNick('note', note._id).catch(() => {})
-  return note
+  return Note.create({ title: title, authors: authors })
 }
 
 // Accepts any plain object; the schema decides which fields land. Callers
 // (importers, CLI scripts) construct heterogeneous shapes and Mongoose
 // silently drops anything not in the schema.
 export const createNoteObj = async function (obj: object) {
-  const note = await Note.create(obj)
-  generateNick('note', note._id).catch(() => {})
-  return note
+  return Note.create(obj)
 }
 
 export const updateNote = async (noteId: unknown, updateObj: Record<string, unknown>) => {
@@ -707,7 +698,7 @@ export const reqBulkGetNotesForMarkdown = async (req: Request, res: Response) =>
         }
       }
 
-      let nick = await Nick.findOne({ note: noteId })
+      const nick = await nickFor('note', noteId)
 
       if (!nick) {
         return {
@@ -801,13 +792,7 @@ async function hybridSearch(query: string, limit = 20): Promise<PopulatedNote[]>
   scored.sort((a, b) => (b._hybridScore ?? 0) - (a._hybridScore ?? 0))
   const top = scored.filter((n) => (n._hybridScore ?? 0) >= 0.15).slice(0, limit)
 
-  const noteIds = top.map((n) => n._id)
-  const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
-  const nickMap: Record<string, string> = {}
-  nicks.forEach((nick) => {
-    if (nick.note && nick.key) nickMap[String(nick.note)] = nick.key
-  })
-  top.forEach((note) => { note.nick = nickMap[String(note._id)] || null })
+  await attachNicks(top)
 
   return top
 }
@@ -944,18 +929,7 @@ export const findNotesAndPopulate = async function (
       .exec()) as PopulatedNote[]
   }
 
-  const noteIds = notes.map((note) => note._id)
-  const nicks = await Nick.find({ note: { $in: noteIds } }).lean().exec()
-
-  const nickMap: Record<string, string> = {}
-  nicks.forEach((nick) => {
-    if (nick.note && nick.key) nickMap[String(nick.note)] = nick.key
-  })
-
-  notes.forEach((note) => {
-    note.nick = nickMap[String(note._id)] || null
-  })
-
+  await attachNicks(notes)
   return notes
 }
 
