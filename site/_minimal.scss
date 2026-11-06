@@ -160,6 +160,9 @@ div .top-bar {
     width: auto;
     gap: 2px;
     align-items: center;
+    // On phones the title and counts are hidden, so nothing else pushes
+    // the buttons right (#365).
+    margin-left: auto;
   }
 
   .tool-bar.div {

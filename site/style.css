@@ -3019,6 +3019,7 @@ div .top-bar {
   width: auto;
   gap: 2px;
   align-items: center;
+  margin-left: auto;
 }
 .top-bar .tool-bar.div {
   margin: 0;
