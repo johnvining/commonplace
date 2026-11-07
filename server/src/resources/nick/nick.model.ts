@@ -43,4 +43,13 @@ nickSchema.index({ work: 1 }, { unique: true, sparse: true })
 nickSchema.index({ idea: 1 }, { unique: true, sparse: true })
 nickSchema.index({ pile: 1 }, { unique: true, sparse: true })
 
-export default mongoose.model<NickDoc>('nick', nickSchema)
+const Nick = mongoose.model<NickDoc>('nick', nickSchema)
+
+// The unique indexes are what keep a key from being shared, or a thing from
+// getting a second nick, when two saves race (#347). A database holding
+// duplicates can't build them, and Mongo says so only here.
+Nick.on('index', (err?: Error) => {
+  if (err) console.error('[nick] unique indexes could not be built; run the "Repair nicks" maintenance task.', err.message)
+})
+
+export default Nick

@@ -14,6 +14,8 @@ import { isOcrConfigured } from '../../utils/autoOcr.js'
 import Link from '../link/link.model.js'
 import { findOrCreatePile } from '../pile/pile.controllers.js'
 import { canonicalPair } from '../link/link.controllers.js'
+import Nick from '../nick/nick.model.js'
+import { mintNick, type NickEntityType } from '../nick/nickLifecycle.js'
 
 export interface TaskContext {
   dryRun: boolean
@@ -211,6 +213,101 @@ const tidyNoteLinks: MaintenanceTask = {
   },
 }
 
+const NICK_MODELS: Record<NickEntityType, any> = { note: Note, work: Work, idea: Idea, pile: Pile }
+const LIST_LIMIT = 20
+
+// The unique indexes on nicks are what stop a key being shared, or a thing
+// getting a second nick, when two saves race. A database holding
+// duplicates can't build them, and the server then runs without them.
+const repairNicks: MaintenanceTask = {
+  id: 'repair-nicks',
+  title: 'Repair nicks',
+  issue: 347,
+  description:
+    'Nick keys must be unique, and each note, work, idea and pile may have ' +
+    'only one live nick. Unique indexes enforce both, but they cannot be ' +
+    'built while duplicates exist. Keeps the oldest row of each repeated key ' +
+    '(the one lookups already found) and removes the rest. When a thing has ' +
+    'several nicks, keeps the oldest and turns the others into aliases that ' +
+    'still lead to it, so no link breaks. Marks rows pointing at deleted ' +
+    'things retired. Then builds the indexes, and gives a nick to anything ' +
+    'a removed row leaves without one. Dry run lists every change.',
+  async run({ dryRun, log }) {
+    const types = Object.keys(NICK_MODELS) as NickEntityType[]
+    const live: Record<string, Set<string>> = {}
+    for (const t of types) live[t] = new Set((await NICK_MODELS[t].distinct('_id')).map(String))
+    const refOf = (row: any) => {
+      const type = types.find((t) => row[t])
+      return type ? { type, id: String(row[type]) } : null
+    }
+
+    // Oldest first: with no index, a lookup found the first row inserted
+    const rows = await Nick.find({}).sort({ _id: 1 }).lean()
+    const keys = new Set<string>()
+    const owners = new Set<string>()
+    const remove: any[] = [], retire: any[] = [], alias: { row: any; to: string }[] = []
+    for (const row of rows) {
+      const ref = refOf(row)
+      if (row.key && keys.has(row.key)) { remove.push(row); continue }
+      if (row.key) keys.add(row.key)
+      if (!ref) continue
+      if (!live[ref.type].has(ref.id)) { retire.push(row); continue }
+      const owner = ref.type + ':' + ref.id
+      if (owners.has(owner)) alias.push({ row, to: ref.id })
+      else owners.add(owner)
+    }
+    // Live things whose only nick was a removed duplicate key
+    const orphans = remove
+      .map(refOf)
+      .filter((ref): ref is { type: NickEntityType; id: string } => !!ref && live[ref.type].has(ref.id))
+      .filter((ref) => !owners.has(ref.type + ':' + ref.id))
+      .filter((ref, i, all) => all.findIndex((o) => o.type === ref.type && o.id === ref.id) === i)
+
+    const verb = dryRun ? 'would' : 'did'
+    const list = (label: string, items: string[]) => {
+      for (const line of items.slice(0, LIST_LIMIT)) log(`  ${label}: ${line}`)
+      if (items.length > LIST_LIMIT) log(`  …and ${items.length - LIST_LIMIT} more`)
+    }
+    const describe = (row: any) => {
+      const ref = refOf(row)
+      return `${row.key ?? '(no key)'}${ref ? ` → ${ref.type} ${ref.id}` : ''}`
+    }
+    log(`nicks: ${rows.length} checked`)
+    log(`repeated keys: ${verb} remove ${remove.length} later copies`)
+    list('remove', remove.map(describe))
+    log(`second nicks: ${verb} turn ${alias.length} into aliases of the oldest`)
+    list('alias', alias.map(({ row }) => describe(row)))
+    log(`deleted things: ${verb} mark ${retire.length} nicks retired`)
+    list('retire', retire.map(describe))
+    log(`left without a nick: ${orphans.length}, ${verb} get a new one`)
+    list('new nick', orphans.map((o) => `${o.type} ${o.id}`))
+
+    if (dryRun) return
+    const now = new Date()
+    if (remove.length) await Nick.deleteMany({ _id: { $in: remove.map((r) => r._id) } })
+    for (const { row, to } of alias) {
+      const type = refOf(row)!.type
+      await Nick.updateOne(
+        { _id: row._id },
+        { $unset: { [type]: 1 }, $set: { mergedInto: to, retired: true, retiredAt: now } }
+      )
+    }
+    for (const row of retire) {
+      const type = refOf(row)!.type
+      await Nick.updateOne(
+        { _id: row._id },
+        { $unset: { [type]: 1 }, $set: { retired: true, ...(row.retiredAt ? {} : { retiredAt: now }) } }
+      )
+    }
+    await Nick.syncIndexes()
+    log('unique indexes built: key, note, work, idea, pile')
+    for (const o of orphans) {
+      const row = await mintNick(o.type, o.id)
+      log(`  ${o.type} ${o.id} now ${row?.key}`)
+    }
+  },
+}
+
 // Piles the image check files notes into, one per kind of problem. The
 // shared prefix keeps them together in pile lists.
 export const IMAGE_CHECK_PILES = {
@@ -348,6 +445,7 @@ export const TASKS: MaintenanceTask[] = [
   clearOcrRefusals,
   removeMissingAuthors,
   tidyNoteLinks,
+  repairNicks,
   reconcileImages,
   refreshEmbeddings,
   clearUnratedReviewDates,

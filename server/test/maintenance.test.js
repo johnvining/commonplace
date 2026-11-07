@@ -42,7 +42,7 @@ describe('maintenance tasks', () => {
     const res = await agent.get('/api/maintenance/').expect(200)
     expect(res.body.data.map((t) => t.id)).toEqual([
       'trim-entity-names', 'add-work-ideas', 'ocr-backlog', 'clear-ocr-refusals', 'remove-missing-authors',
-      'tidy-note-links', 'reconcile-images', 'refresh-embeddings', 'clear-unrated-review-dates',
+      'tidy-note-links', 'repair-nicks', 'reconcile-images', 'refresh-embeddings', 'clear-unrated-review-dates',
     ])
     expect(res.body.data.every((t) => t.pending && t.lastRun === null)).toBe(true)
   })
@@ -164,6 +164,59 @@ describe('maintenance tasks', () => {
     const left = await Link.find({}).lean()
     expect(left.map((l) => [String(l.left_note), String(l.right_note)])).toEqual([[String(lo), String(hi)]])
     await expect(Link.collection.insertOne({ left_note: lo, right_note: hi })).rejects.toThrow(/duplicate key/)
+  })
+
+  it('repairs duplicate nicks so the unique indexes can be built (#347)', async () => {
+    const agent = await authedAgent()
+    const { default: Nick } = await import('../src/resources/nick/nick.model.js')
+    const { resolveNick } = await import('../src/resources/nick/nickLifecycle.js')
+    const mongoose = (await import('mongoose')).default
+    // As an old database has them: no unique indexes, a non-unique note index
+    await Nick.collection.dropIndexes().catch(() => {})
+    await Nick.collection.createIndex({ note: 1 })
+    const { insertedIds } = await models.Note.collection.insertMany([{ title: 'A' }, { title: 'B' }, { title: 'C' }])
+    const [a, b, c] = Object.values(insertedIds)
+    const gone = new mongoose.Types.ObjectId()
+    const oid = () => new mongoose.Types.ObjectId()
+    const ids = Array.from({ length: 6 }, oid).sort((x, y) => String(x).localeCompare(String(y)))
+    await Nick.collection.insertMany([
+      { _id: ids[0], key: 'n000001', note: a },
+      { _id: ids[1], key: 'n000001', note: b }, // shares A's key: B loses it
+      { _id: ids[2], key: 'n000002', note: a }, // A's second nick
+      { _id: ids[3], key: 'testing!', note: gone },
+      { _id: ids[4], key: 'testing!', note: gone },
+      { _id: ids[5], key: 'n000003', note: c },
+    ])
+
+    const dry = await runJob(agent, 'repair-nicks', true)
+    expect(dry.status).toBe('done')
+    expect(dry.output).toEqual(expect.arrayContaining([
+      'nicks: 6 checked',
+      'repeated keys: would remove 2 later copies',
+      'second nicks: would turn 1 into aliases of the oldest',
+      'deleted things: would mark 1 nicks retired',
+      'left without a nick: 1, would get a new one',
+    ]))
+    expect(await Nick.countDocuments({})).toBe(6)
+
+    const real = await runJob(agent, 'repair-nicks', false)
+    expect(real.status).toBe('done')
+    // Lookups that worked keep working, and lead where they did
+    expect(await resolveNick('n000001')).toMatchObject({ state: 'active', id: String(a) })
+    expect(await resolveNick('n000002')).toMatchObject({ state: 'alias', id: String(a) })
+    expect(await resolveNick('n000003')).toMatchObject({ state: 'active', id: String(c) })
+    expect(await resolveNick('testing!')).toMatchObject({ state: 'retired' })
+    expect(await Nick.countDocuments({ key: 'testing!' })).toBe(1)
+    const bNick = await Nick.findOne({ note: b }).lean()
+    expect(bNick.key).toMatch(/^n\d{6}$/)
+    expect(bNick.key).not.toBe('n000001')
+    // The indexes now hold
+    await expect(Nick.collection.insertOne({ key: 'n000003', note: oid() })).rejects.toThrow(/duplicate key/)
+    await expect(Nick.collection.insertOne({ key: 'n999999', note: c })).rejects.toThrow(/duplicate key/)
+
+    const again = await runJob(agent, 'repair-nicks', false)
+    expect(again.output).toContain('repeated keys: did remove 0 later copies')
+    expect(again.output).toContain('second nicks: did turn 0 into aliases of the oldest')
   })
 
   describe('reconcile images (#368)', () => {
