@@ -48,8 +48,10 @@ const Nick = mongoose.model<NickDoc>('nick', nickSchema)
 // The unique indexes are what keep a key from being shared, or a thing from
 // getting a second nick, when two saves race (#347). A database holding
 // duplicates can't build them, and Mongo says so only here.
-Nick.on('index', (err?: Error) => {
-  if (err) console.error('[nick] unique indexes could not be built; run the "Repair nicks" maintenance task.', err.message)
+Nick.on('index', (err?: Error & { code?: number }) => {
+  if (!err) return
+  const duplicates = err.code === 11000 || /E11000/.test(err.message)
+  console.error(`[nick] unique indexes could not be built${duplicates ? '; run the "Repair nicks" maintenance task' : ''}.`, err.message)
 })
 
 export default Nick
