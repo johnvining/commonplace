@@ -162,6 +162,36 @@ describe('nick', () => {
     await agent.put('/api/nick/idea/not-an-id').expect(400)
   })
 
+  describe('author nicks (#382)', () => {
+    it('mints one for a new author, and resolves it', async () => {
+      const agent = await authedAgent()
+      const author = (await agent.post('/api/auth/').send({ name: 'Seneca' }).expect(201)).body.data
+      const row = await Nick.findOne({ auth: author._id }).lean()
+      expect(row.key).toMatch(/^a\d{6}$/)
+      const res = await agent.get(`/api/nick/${row.key}`).expect(200)
+      expect(res.body.data).toMatchObject({ state: 'active', auth: String(author._id) })
+      expect((await agent.get(`/api/nick/auth/${author._id}`).expect(200)).body.data.key).toBe(row.key)
+    })
+
+    it('retires it with the author, keeping the name', async () => {
+      const agent = await authedAgent()
+      const author = (await agent.post('/api/auth/').send({ name: 'Gone' }).expect(201)).body.data
+      const { key } = await Nick.findOne({ auth: author._id }).lean()
+      await agent.delete(`/api/auth/${author._id}`).expect(204)
+      expect((await agent.get(`/api/nick/${key}`).expect(200)).body.data).toMatchObject({ state: 'retired', name: 'Gone' })
+      expect((await agent.get(`/api/nick/former/auth/${author._id}`).expect(200)).body.data).toMatchObject({ name: 'Gone' })
+    })
+
+    it('leads a merged author to the kept one', async () => {
+      const agent = await authedAgent()
+      const from = (await agent.post('/api/auth/').send({ name: 'Old' }).expect(201)).body.data
+      const into = (await agent.post('/api/auth/').send({ name: 'Kept' }).expect(201)).body.data
+      const { key } = await Nick.findOne({ auth: from._id }).lean()
+      await agent.post(`/api/auth/${from._id}/merge`).send({ into: into._id }).expect(200)
+      expect((await agent.get(`/api/nick/${key}`).expect(200)).body.data).toMatchObject({ state: 'alias', auth: String(into._id) })
+    })
+  })
+
   describe('GET /api/nick/former/:type/:id (#384)', () => {
     it('leads a merged work to the kept one, and names a deleted record', async () => {
       const agent = await authedAgent()
@@ -183,7 +213,7 @@ describe('nick', () => {
       await agent.delete(`/api/idea/${idea._id}`).expect(204)
       expect((await agent.get(`/api/nick/former/work/${idea._id}`).expect(200)).body.data).toBeNull()
       expect((await agent.get(`/api/nick/former/work/${new mongoose.Types.ObjectId()}`).expect(200)).body.data).toBeNull()
-      await agent.get('/api/nick/former/auth/507f1f77bcf86cd799439011').expect(400)
+      await agent.get('/api/nick/former/link/507f1f77bcf86cd799439011').expect(400)
     })
   })
 })

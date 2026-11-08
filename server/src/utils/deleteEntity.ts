@@ -26,8 +26,8 @@ const MODELS: Record<EntityType, any> = { note: Note, work: Work, idea: Idea, pi
 
 type Step = [label: string, run: () => Promise<unknown>]
 
-// What refers to each type of entity. Stars (pins) are on all of them;
-// authors have no nick.
+// What refers to each type of entity. Stars (pins) and nicks are on all
+// of them.
 export const CASCADE: Record<EntityType, (id: string) => Step[]> = {
   note: (id) => [
     ['links', () => unlinkAllFor(id)],
@@ -57,6 +57,7 @@ export const CASCADE: Record<EntityType, (id: string) => Step[]> = {
     ['work authors', () => Work.updateMany({ authors: id }, { $pull: { authors: id } }).exec()],
     ['work editors', () => Work.updateMany({ editors: id }, { $pull: { editors: id } }).exec()],
     ['work translators', () => Work.updateMany({ translators: id }, { $pull: { translators: id } }).exec()],
+    ['nick', () => retireNick('auth', id)],
     ['star', () => unpin('auth', id)],
   ],
 }

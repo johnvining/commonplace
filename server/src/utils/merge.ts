@@ -13,7 +13,7 @@ import Work from '../resources/work/work.model.js'
 import Note from '../resources/note/note.model.js'
 import Pin from '../resources/pin/pin.model.js'
 import { Auth } from '../resources/auth/auth.model.js'
-import { repointNick } from '../resources/nick/nickLifecycle.js'
+import { repointNick, retireNick } from '../resources/nick/nickLifecycle.js'
 import { escapeRegexInput } from './searchInput.js'
 
 function httpError(status: number, message: string) {
@@ -184,8 +184,8 @@ async function replaceInArrays(Model: any, field: string, from: string, into: st
   return docs.length
 }
 
-// Like mergeWorks, but authors have no nick, so there's no re-point step:
-// the merged author's links simply go when it's deleted.
+// Like mergeWorks, for authors: the merged author's nick leads to the
+// kept one (#382)
 export async function mergeAuthors(from: string, into: string, options: PlanOptions = {}) {
   const [fromAuth, intoAuth] = await loadPair(
     (id) => Auth.findById(id).lean().exec(),
@@ -212,6 +212,7 @@ export async function mergeAuthors(from: string, into: string, options: PlanOpti
   for (const [Model, field] of AUTHOR_FIELDS) await replaceInArrays(Model, field, from, into)
   await Auth.updateOne({ _id: into }, { $set: fill, $push: { usernames: { $each: usernames } } }).exec()
   await movePin('auth', from, into)
+  await repointNick('auth', from, into)
   await Auth.deleteOne({ _id: from }).exec()
   return plan
 }
@@ -254,6 +255,8 @@ export async function splitAuthor(id: string, rawNames: unknown, { keep = false,
   for (const [Model, field] of AUTHOR_FIELDS) await replaceInArrays(Model, field, id, newIds)
   if (!keepOld) {
     await Pin.deleteOne({ type: 'auth', target: id }).exec()
+    // Split into several, so its nick can't lead to one of them
+    await retireNick('auth', id)
     await Auth.deleteOne({ _id: id }).exec()
   }
   plan.into = targets.map(({ name, _id, existing }) => ({ name, _id, existing }))

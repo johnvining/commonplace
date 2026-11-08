@@ -1,5 +1,6 @@
 import mongoose, { Schema, Types } from 'mongoose'
 import { markNotesStaleOnRename } from '../../utils/embeddingFreshness.js'
+import { mintNickOnCreate } from '../nick/nickLifecycle.js'
 
 export interface AuthDoc {
   _id: Types.ObjectId
@@ -26,5 +27,7 @@ authSchema.index({ usernames: 1 })
 
 // Its name is part of its notes' embeddings (#373)
 markNotesStaleOnRename(authSchema, ['authors', 'people'])
+// Every new author gets its nick before the save returns (#382)
+mintNickOnCreate(authSchema, 'auth')
 
 export const Auth = mongoose.model<AuthDoc>('author', authSchema)

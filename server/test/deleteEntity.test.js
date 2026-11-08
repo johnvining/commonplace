@@ -30,11 +30,11 @@ afterAll(async () => {
 const star = (agent, type, id) => agent.put('/api/pin').send({ type, id: String(id), label: type }).expect(200)
 
 describe('one delete path for every entity (#372)', () => {
-  it('lists a star step for every type, and a nick step for all but authors', () => {
-    for (const [type, steps] of Object.entries(CASCADE)) {
+  it('lists a star step and a nick step for every type (#382)', () => {
+    for (const steps of Object.values(CASCADE)) {
       const labels = steps('000000000000000000000000').map(([label]) => label)
       expect(labels).toContain('star')
-      expect(labels.includes('nick')).toBe(type !== 'auth')
+      expect(labels).toContain('nick')
     }
   })
 

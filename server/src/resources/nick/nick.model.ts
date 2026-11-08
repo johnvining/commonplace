@@ -7,6 +7,8 @@ export interface NickDoc {
   idea?: Types.ObjectId
   work?: Types.ObjectId
   pile?: Types.ObjectId
+  // An author's nick (#382)
+  auth?: Types.ObjectId
   // Set once the entity is deleted. The row stays so the key is never
   // handed to another entity (#348).
   retired?: boolean
@@ -31,6 +33,7 @@ const nickSchema = new Schema<NickDoc>(
     idea: { type: Schema.Types.ObjectId, ref: 'idea' },
     work: { type: Schema.Types.ObjectId, ref: 'work' },
     pile: { type: Schema.Types.ObjectId, ref: 'pile' },
+    auth: { type: Schema.Types.ObjectId, ref: 'author' },
     retired: Boolean,
     name: String,
     retiredAt: Date,
@@ -47,6 +50,7 @@ nickSchema.index({ formerId: 1 }, { sparse: true })
 nickSchema.index({ work: 1 }, { unique: true, sparse: true })
 nickSchema.index({ idea: 1 }, { unique: true, sparse: true })
 nickSchema.index({ pile: 1 }, { unique: true, sparse: true })
+nickSchema.index({ auth: 1 }, { unique: true, sparse: true })
 
 const Nick = mongoose.model<NickDoc>('nick', nickSchema)
 

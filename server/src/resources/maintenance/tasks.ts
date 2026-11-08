@@ -213,7 +213,7 @@ const tidyNoteLinks: MaintenanceTask = {
   },
 }
 
-const NICK_MODELS: Record<NickEntityType, any> = { note: Note, work: Work, idea: Idea, pile: Pile }
+const NICK_MODELS: Record<NickEntityType, any> = { note: Note, work: Work, idea: Idea, pile: Pile, auth: Auth }
 const LIST_LIMIT = 20
 
 // The unique indexes on nicks are what stop a key being shared, or a thing
@@ -300,7 +300,7 @@ const repairNicks: MaintenanceTask = {
       )
     }
     await Nick.syncIndexes()
-    log('unique indexes built: key, note, work, idea, pile')
+    log('unique indexes built: key, note, work, idea, pile, author')
     for (const o of orphans) {
       const row = await mintNick(o.type, o.id)
       log(`  ${o.type} ${o.id} now ${row?.key}`)

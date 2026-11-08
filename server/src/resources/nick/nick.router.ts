@@ -4,12 +4,14 @@ import {
   reqGenerateNickForWork,
   reqGenerateNickForIdea,
   reqGenerateNickForPile,
+  reqGenerateNickForAuth,
   reqGetNick,
   reqGetFormer,
   reqGetNickForNote,
   reqGetNickForWork,
   reqGetNickForIdea,
   reqGetNickForPile,
+  reqGetNickForAuth,
   reqBackfillNicks,
 } from './nick.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
@@ -22,6 +24,7 @@ router.route('/note/:id').get(asyncWrapper(reqGetNickForNote, 200)).put(asyncWra
 router.route('/work/:id').get(asyncWrapper(reqGetNickForWork, 200)).put(asyncWrapper(reqGenerateNickForWork, 200))
 router.route('/idea/:id').get(asyncWrapper(reqGetNickForIdea, 200)).put(asyncWrapper(reqGenerateNickForIdea, 200))
 router.route('/pile/:id').get(asyncWrapper(reqGetNickForPile, 200)).put(asyncWrapper(reqGenerateNickForPile, 200))
+router.route('/auth/:id').get(asyncWrapper(reqGetNickForAuth, 200)).put(asyncWrapper(reqGenerateNickForAuth, 200))
 
 router.route('/former/:type/:id').get(asyncWrapper(reqGetFormer, 200))
 router.route('/:nick').get(asyncWrapper(reqGetNick, 200))

@@ -5,6 +5,7 @@ import {
   entitiesWithNicks,
   resolveNick,
   resolveFormer,
+  NICK_TYPES,
   type NickEntityType,
   type NickResolution,
 } from './nickLifecycle.js'
@@ -16,6 +17,7 @@ export const reqGenerateNickForNote = async (req: Request, res: Response) => min
 export const reqGenerateNickForWork = async (req: Request, res: Response) => mintNick('work', req.params.id)
 export const reqGenerateNickForIdea = async (req: Request, res: Response) => mintNick('idea', req.params.id)
 export const reqGenerateNickForPile = async (req: Request, res: Response) => mintNick('pile', req.params.id)
+export const reqGenerateNickForAuth = async (req: Request, res: Response) => mintNick('auth', req.params.id)
 
 // GET /nick/:key. Every answer carries `state`:
 //   active   { key, state, <type>: id }
@@ -29,7 +31,7 @@ export const reqGetNick = async (req: Request, res: Response) => answerFor(await
 // nothing is known (#384)
 export const reqGetFormer = async (req: Request, res: Response) => {
   const type = String(req.params.type) as NickEntityType
-  if (!['note', 'work', 'idea', 'pile'].includes(type)) return res.status(400).json({ message: 'Unknown type' })
+  if (!NICK_TYPES.includes(type)) return res.status(400).json({ message: 'Unknown type' })
   return answerFor(await resolveFormer(type, String(req.params.id)))
 }
 
@@ -51,12 +53,14 @@ export const reqBackfillNicks = async (req: Request, res: Response) => {
   const { default: Work } = await import('../work/work.model.js')
   const { default: Idea } = await import('../idea/idea.model.js')
   const { default: Pile } = await import('../pile/pile.model.js')
+  const { Auth } = await import('../auth/auth.model.js')
 
   const types: { type: NickEntityType; Model: any }[] = [
     { type: 'note', Model: Note },
     { type: 'work', Model: Work },
     { type: 'idea', Model: Idea },
     { type: 'pile', Model: Pile },
+    { type: 'auth', Model: Auth },
   ]
 
   const results: Record<string, any> = {}
@@ -79,3 +83,4 @@ export const reqGetNickForNote = async (req: Request, res: Response) => nickFor(
 export const reqGetNickForWork = async (req: Request, res: Response) => nickFor('work', req.params.id)
 export const reqGetNickForIdea = async (req: Request, res: Response) => nickFor('idea', req.params.id)
 export const reqGetNickForPile = async (req: Request, res: Response) => nickFor('pile', req.params.id)
+export const reqGetNickForAuth = async (req: Request, res: Response) => nickFor('auth', req.params.id)

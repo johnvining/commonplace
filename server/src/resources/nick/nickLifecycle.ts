@@ -15,13 +15,16 @@
 import mongoose, { type Schema } from 'mongoose'
 import Nick, { type NickDoc } from './nick.model.js'
 
-export type NickEntityType = 'note' | 'work' | 'idea' | 'pile'
+export type NickEntityType = 'note' | 'work' | 'idea' | 'pile' | 'auth'
 export type NickState = 'unminted' | 'active' | 'alias' | 'retired'
 export type NickTransition = 'mint' | 'retire' | 'repoint'
 
-const ENTITY_TYPES: NickEntityType[] = ['note', 'work', 'idea', 'pile']
-const PREFIX: Record<NickEntityType, string> = { note: 'n', work: 'w', idea: 'i', pile: 'p' }
-const TYPE_BY_PREFIX: Record<string, NickEntityType> = { n: 'note', w: 'work', i: 'idea', p: 'pile' }
+export const NICK_TYPES: NickEntityType[] = ['note', 'work', 'idea', 'pile', 'auth']
+const ENTITY_TYPES = NICK_TYPES
+const PREFIX: Record<NickEntityType, string> = { note: 'n', work: 'w', idea: 'i', pile: 'p', auth: 'a' }
+const TYPE_BY_PREFIX: Record<string, NickEntityType> = { n: 'note', w: 'work', i: 'idea', p: 'pile', a: 'auth' }
+// Authors are the 'auth' type everywhere but their model's name (#382)
+const modelOf = (type: NickEntityType) => mongoose.model(type === 'auth' ? 'author' : type)
 
 // From each state, where each transition leads. A missing entry is an
 // illegal move. Minting an active nick returns it unchanged; retiring or
@@ -131,7 +134,7 @@ export function mintNickOnCreate(schema: Schema, type: NickEntityType) {
 // Best effort: a failed lookup must never stop the delete that called it.
 async function snapshotName(type: NickEntityType, id: unknown): Promise<string | undefined> {
   try {
-    const doc: any = await mongoose.model(type).findById(id, { name: 1, title: 1, text: 1 }).lean().exec()
+    const doc: any = await modelOf(type).findById(id, { name: 1, title: 1, text: 1 }).lean().exec()
     const name = String(doc?.name || doc?.title || doc?.text || '').trim()
     return name ? name.slice(0, 120) : undefined
   } catch (e) {
@@ -180,7 +183,7 @@ export type NickResolution =
 
 async function entityExists(type: NickEntityType, id: unknown) {
   try {
-    return Boolean(await mongoose.model(type).exists({ _id: id }))
+    return Boolean(await modelOf(type).exists({ _id: id }))
   } catch {
     return false
   }
