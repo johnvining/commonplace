@@ -175,28 +175,31 @@ async function resolveByNick(nick, config) {
     if (!data) return null
     const merged = 'mergedFrom' in data ? { merged: data.mergedFrom ?? '' } : {}
     if (merged.merged !== undefined) {
-      console.error(`${DIM}note: ${nick} was ${merged.merged ? `"${merged.merged}", ` : ''}merged into another work; using the kept work${RESET}`)
+      const what = data.auth ? 'author' : 'work'
+      console.error(`${DIM}note: ${nick} was ${merged.merged ? `"${merged.merged}", ` : ''}merged into another ${what}; using the kept ${what}${RESET}`)
     }
     if (data.note) return { type: 'note', id: data.note, ...merged }
     if (data.work) return { type: 'work', id: data.work, ...merged }
     if (data.idea) return { type: 'idea', id: data.idea, ...merged }
     if (data.pile) return { type: 'pile', id: data.pile, ...merged }
+    if (data.auth) return { type: 'auth', id: data.auth, ...merged }
   } catch {}
   return null
 }
 
-// Deleting or merging through an old nick would act on the kept work,
-// not the one the nick was made for
+// Deleting or merging through an old nick would act on the kept work or
+// author, not the one the nick was made for
 function refuseMergedNick(target, input, action) {
   if (target?.merged === undefined) return false
-  console.error(`${input} is the old nick of a work that was merged away. Refusing to ${action} the kept work through it;`)
-  console.error('use the kept work\'s own nick or ObjectId if that is what you mean.')
+  const what = target.type === 'auth' ? 'author' : 'work'
+  console.error(`${input} is the old nick of a ${what} that was merged away. Refusing to ${action} the kept ${what} through it;`)
+  console.error(`use the kept ${what}'s own nick or ObjectId if that is what you mean.`)
   return true
 }
 
 // Resolve <input> to {type, id}. Accepts three forms:
 //
-//   1. Nick pattern (n12345 / w12345 / p12345 / i12345) — looks up the nick.
+//   1. Nick pattern (n12345 / w12345 / p12345 / i12345 / a12345) — looks up the nick.
 //   2. Raw ObjectId (24-char hex) — requires a hintedType OR probes each
 //      resource's GET endpoint until one returns a doc.
 //   3. Freeform name — autocomplete by hintedType (or try pile / work /
@@ -206,7 +209,7 @@ function refuseMergedNick(target, input, action) {
 async function resolveTarget(input, hintedType, config) {
   if (!input) return null
 
-  if (/^[nwip]\d+$/i.test(input)) {
+  if (/^[nwipa]\d+$/i.test(input)) {
     const resolved = await resolveByNick(input, config)
     if (resolved) return resolved
     return null
@@ -258,7 +261,7 @@ function formatResult(entry) {
 }
 
 async function fetchNick(type, id, config) {
-  const map = { note: 'note', auth: null, work: 'work', idea: 'idea', pile: 'pile' }
+  const map = { note: 'note', auth: 'auth', work: 'work', idea: 'idea', pile: 'pile' }
   const nickType = map[type]
   if (!nickType) return null
   try {
@@ -268,7 +271,7 @@ async function fetchNick(type, id, config) {
 }
 
 async function ensureNick(type, id, config) {
-  const map = { note: 'note', auth: null, work: 'work', idea: 'idea', pile: 'pile' }
+  const map = { note: 'note', auth: 'auth', work: 'work', idea: 'idea', pile: 'pile' }
   const nickType = map[type]
   if (!nickType) return null
   try {
@@ -370,7 +373,7 @@ async function cmdNote(args, config) {
   let id = positional[0]
   if (!id) { console.error('Usage: cplace note <id|nick> [--json]'); return }
   let resolvedNick = null
-  if (/^[nwip]\d+$/.test(id)) {
+  if (/^[nwipa]\d+$/.test(id)) {
     resolvedNick = id
     const nickRes = await api('GET', `nick/${id}`, null, config)
     const noteId = nickRes?.data?.note
@@ -476,7 +479,7 @@ async function resolveOrCreate(type, input, config) {
   // Accepts nick, ObjectId, or name. Nicks/ObjectIds skip the autocomplete
   // path so an exact ref never gets ambiguity-matched. Only name input
   // creates a new entity when nothing matches.
-  if (/^[nwip]\d+$/i.test(input)) {
+  if (/^[nwipa]\d+$/i.test(input)) {
     const resolved = await resolveByNick(input, config)
     if (resolved && (type === 'auth' ? resolved.type === 'auth' : resolved.type === type)) {
       return resolved.id
@@ -494,7 +497,7 @@ async function resolveOrCreate(type, input, config) {
 // Like resolveOrCreate but never creates. Used on the rm path where we
 // need to identify an existing relationship to detach, not invent one.
 async function resolveExisting(type, input, config) {
-  if (/^[nwip]\d+$/i.test(input)) {
+  if (/^[nwipa]\d+$/i.test(input)) {
     const resolved = await resolveByNick(input, config)
     if (resolved && resolved.type === type) {
       return { id: resolved.id }
@@ -1030,7 +1033,7 @@ async function cmdShow(args, config) {
   // actually looked like one — for ObjectIds / names, look up the real
   // nick so the header doesn't show a hex string in the "nick" slot.
   // An old nick of a merged work isn't the kept work's own nick.
-  const looksLikeNick = /^[nwip]\d+$/i.test(input) && target.merged === undefined
+  const looksLikeNick = /^[nwipa]\d+$/i.test(input) && target.merged === undefined
   const displayNick = looksLikeNick ? input : await fetchNick(type, id, config)
 
   if (type === 'note') {
@@ -1919,7 +1922,7 @@ async function cmdUpdate(args, config) {
   if (!valid.has(type)) { console.error(`Unknown type: ${type}`); return }
 
   let id = idOrNick
-  if (type !== 'auth' && /^[nwip]\d+$/i.test(idOrNick)) {
+  if (/^[nwipa]\d+$/i.test(idOrNick)) {
     const target = await resolveByNick(idOrNick, config)
     if (!target || target.type !== type) {
       console.error(`Nick ${idOrNick} doesn't resolve to a ${type}.`)
