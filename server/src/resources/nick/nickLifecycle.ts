@@ -77,6 +77,9 @@ export async function mintNick(type: NickEntityType, id: unknown) {
   if (!prefix) return null
   const existing = await Nick.findOne({ [type]: id })
   if (nextState(stateOf(existing), 'mint') === 'active' && existing) return existing
+  // Never for a record that doesn't exist: the page of a deleted one asks
+  // for its nick too, and would leave a nick for a dead id (#384)
+  if (!(await entityExists(type, id))) return null
 
   let key: string | undefined
   let hash = hashFunc(String(id))

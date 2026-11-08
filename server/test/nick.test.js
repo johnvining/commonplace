@@ -40,7 +40,9 @@ describe('nick', () => {
   describe('generateNick', () => {
     it('retries when another entity takes the key first (#347)', async () => {
       await Nick.init()
-      const id = new mongoose.Types.ObjectId()
+      const { default: Work } = await import('../src/resources/work/work.model.js')
+      // Straight to the collection, so no nick is minted on create
+      const id = (await Work.collection.insertOne({ name: 'W' })).insertedId
       const otherId = new mongoose.Types.ObjectId()
       const realCreate = Nick.create.bind(Nick)
       const spy = vi.spyOn(Nick, 'create').mockImplementationOnce(async (doc) => {
@@ -99,9 +101,8 @@ describe('nick', () => {
       const row = await Nick.findOne({ key: created.key }).lean()
       expect(row.retired).toBe(true)
       expect(row.work).toBeUndefined()
-      // and the same id would hash to a different key now
-      const again = await generateNick('work', work._id)
-      expect(again.key).not.toBe(created.key)
+      // and the deleted work gets no new nick (#384)
+      expect(await generateNick('work', work._id)).toBeNull()
     })
 
     it('remembers the title of a deleted note (#366)', async () => {
@@ -150,6 +151,15 @@ describe('nick', () => {
       expect(res.body.data.note.total).toBeGreaterThanOrEqual(2)
       expect(res.body.data.note.created).toBeGreaterThanOrEqual(2)
     })
+  })
+
+  it('mints no nick for a record that does not exist (#384)', async () => {
+    const agent = await authedAgent()
+    const missing = new mongoose.Types.ObjectId()
+    const res = await agent.put(`/api/nick/work/${missing}`).expect(200)
+    expect(res.body.data).toBeNull()
+    expect(await Nick.countDocuments({ work: missing })).toBe(0)
+    await agent.put('/api/nick/idea/not-an-id').expect(400)
   })
 
   describe('GET /api/nick/former/:type/:id (#384)', () => {
