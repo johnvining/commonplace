@@ -350,6 +350,11 @@ export async function getNoteNick(noteID: string) {
   return axios.put(url_api + `nick/note/` + noteID)
 }
 
+// What became of a deleted or merged record, by its old id (#384)
+export async function getFormer(type: string, id: string) {
+  return axios.get(url_api + `nick/former/${type}/${id}`)
+}
+
 export async function getWorkNick(workID: string) {
   return axios.put(url_api + `nick/work/` + workID)
 }

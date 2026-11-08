@@ -17,6 +17,7 @@ import AuthorsChipList from './AuthorsChipList'
 import PilesPillList from './PilesPillList'
 import IdeasPillList from './IdeasPillList'
 import ClickToCopyNick from './ClickToCopyNick'
+import Missing, { isNotFound, whatBecameOf } from './Missing'
 import ImageUploader from './ImageUploader'
 import {
   TopLevelStandardButtonContainer,
@@ -60,6 +61,8 @@ function Work(props: any) {
   const [ideas, setIdeas] = useState<any[]>([])
   const [nick, setNick] = useState<any>()
   const [notesRefreshKey, setNotesRefreshKey] = useState(0)
+  // Set when the work doesn't exist (#384)
+  const [missing, setMissing] = useState<{ name?: string | null } | null>(null)
   const navigate = useNavigate()
 
   // Function to handle nick navigation
@@ -79,6 +82,7 @@ function Work(props: any) {
   }
 
   const fetchWorkInfo = (workId: any) => {
+    setMissing(null)
     Promise.all([
       db.getInfo(db.types.work, workId),
       db.getWorkNick(workId),
@@ -99,7 +103,12 @@ function Work(props: any) {
       setIdeas(work.ideas ?? [])
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
-      console.error(error)
+      if (!isNotFound(error)) return console.error(error)
+      // Gone: follow a merge to the kept work, else say so (#384)
+      whatBecameOf('work', workId).then(({ forwardTo, name }) => {
+        if (forwardTo) navigate('/work/' + forwardTo, { replace: true })
+        else setMissing({ name })
+      })
     })
   }
 
@@ -322,6 +331,11 @@ function Work(props: any) {
     handleImport()
     return true
   })
+
+  if (missing) {
+    props.setPageTitle('Work does not exist')
+    return <Missing type="work" name={missing.name} />
+  }
 
   props.setPageTitle(titleWithNick(pending.name, nick))
 

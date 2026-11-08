@@ -1521,6 +1521,17 @@ div .top-bar {
   color: var(--font-color);
 }
 
+.missing-record {
+  max-width: 480px;
+  margin: 15vh auto 0;
+  padding: 0 16px;
+  text-align: center;
+  color: var(--font-color);
+}
+.missing-record h2 {
+  margin-bottom: 8px;
+}
+
 .sidebar-pin-row.pending {
   opacity: 0.55;
 }
