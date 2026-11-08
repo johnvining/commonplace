@@ -131,7 +131,10 @@ export const reqFindNotesByString = async (req: Request, res: Response) => {
   return notes
 }
 
+// An empty list for a note that doesn't exist, as for a retired nick, so
+// its page can say so (#388)
 export const reqGetNoteDetails = async (req: Request, res: Response) => {
+  if (!isValidObjectId(req.params.id)) return []
   return await findNotesAndPopulate({ _id: req.params.id }, null, false, null, null, null)
 }
 

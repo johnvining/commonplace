@@ -27,9 +27,9 @@ describe('work', () => {
       expect(res.body.data.authors?.[0]?._id).toBe(String(author._id))
     })
 
-    it('returns 400 for missing id', async () => {
+    it('returns 404 for missing id', async () => {
       const agent = await authedAgent()
-      await agent.get('/api/work/507f1f77bcf86cd799439011').expect(400)
+      await agent.get('/api/work/507f1f77bcf86cd799439011').expect(404)
     })
   })
 
@@ -67,7 +67,7 @@ describe('work', () => {
       const agent = await authedAgent()
       const work = await createWork(agent, { name: 'Doomed' })
       await agent.delete(`/api/work/${work._id}`).expect(204)
-      await agent.get(`/api/work/${work._id}`).expect(400)
+      await agent.get(`/api/work/${work._id}`).expect(404)
     })
   })
 

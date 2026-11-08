@@ -12,9 +12,12 @@ describe('error responses say why', () => {
       [`/api/pile/${MISSING}`, 'pile not found'],
       [`/api/auth/${MISSING}`, 'author not found'],
     ]) {
-      const res = await agent.get(url).expect(400)
+      const res = await agent.get(url).expect(404)
       expect(res.body.message, url).toBe(message)
     }
+    // A malformed id is just as missing
+    for (const type of ['work', 'idea', 'pile', 'auth']) await agent.get(`/api/${type}/not-an-id`).expect(404)
+    expect((await agent.get('/api/note/not-an-id').expect(200)).body.data).toEqual([])
     const res = await agent.get(`/api/note/${MISSING}/images/1`).expect(404)
     expect(res.body.message).toBe('Note not found')
   })

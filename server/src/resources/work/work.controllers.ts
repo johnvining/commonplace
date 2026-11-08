@@ -1,3 +1,4 @@
+import { isValidObjectId } from 'mongoose'
 import Work from '../work/work.model.js'
 import Pile from '../pile/pile.model.js'
 import Idea from '../idea/idea.model.js'
@@ -27,9 +28,10 @@ export const reqGetNotesForWork = async (req: Request, res: Response) => {
 }
 
 export const reqGetWorkInfo = async (req: Request, res: Response) => {
-  const doc = await getWorkInfo(req.params.id)
+  // A missing work is a 404, so its page can say so (#384)
+  const doc = isValidObjectId(req.params.id) ? await getWorkInfo(req.params.id) : null
   if (!doc) {
-    return res.status(400).json({ message: 'Work not found' })
+    return res.status(404).json({ message: 'Work not found' })
   }
   return doc
 }

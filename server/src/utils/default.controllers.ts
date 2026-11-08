@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import type { Model } from 'mongoose'
+import { isValidObjectId, type Model } from 'mongoose'
 import { pickAllowed } from './pickAllowed.js'
 
 // Accept any Mongoose Model — controllers across resources pass concretely
@@ -18,10 +18,12 @@ export type ControllerOpts = {
   writable?: readonly string[]
 }
 
+// A record that doesn't exist (deleted, or never was) is a 404, so pages
+// can say so (#384-#388)
 export const getOne = (model: AnyModel) => async (req: Request, res: Response) => {
-  const doc = await model.findOne({ _id: req.params.id }).lean().exec()
+  const doc = isValidObjectId(req.params.id) ? await model.findOne({ _id: req.params.id }).lean().exec() : null
   if (!doc) {
-    res.status(400).json({ message: `${model.modelName} not found` })
+    res.status(404).json({ message: `${model.modelName} not found` })
     return
   }
   return doc

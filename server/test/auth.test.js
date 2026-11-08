@@ -25,9 +25,9 @@ describe('auth (authors)', () => {
       expect(res.body.data.name).toBe('Plato')
     })
 
-    it('returns 400 for missing id', async () => {
+    it('returns 404 for missing id', async () => {
       const agent = await authedAgent()
-      await agent.get('/api/auth/507f1f77bcf86cd799439011').expect(400)
+      await agent.get('/api/auth/507f1f77bcf86cd799439011').expect(404)
     })
   })
 
@@ -46,7 +46,7 @@ describe('auth (authors)', () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent, 'Doomed')
       await agent.delete(`/api/auth/${author._id}/delete`).expect(204)
-      await agent.get(`/api/auth/${author._id}`).expect(400)
+      await agent.get(`/api/auth/${author._id}`).expect(404)
     })
 
     // The site deletes with DELETE /:id, like works and piles.
@@ -54,7 +54,7 @@ describe('auth (authors)', () => {
       const agent = await authedAgent()
       const author = await createAuthor(agent, 'Doomed')
       await agent.delete(`/api/auth/${author._id}`).expect(204)
-      await agent.get(`/api/auth/${author._id}`).expect(400)
+      await agent.get(`/api/auth/${author._id}`).expect(404)
     })
   })
 

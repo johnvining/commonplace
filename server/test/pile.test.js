@@ -53,7 +53,7 @@ describe('pile', () => {
       const agent = await authedAgent()
       const pile = await createPile(agent, 'Doomed')
       await agent.delete(`/api/pile/${pile._id}`).expect(204)
-      await agent.get(`/api/pile/${pile._id}`).expect(400)
+      await agent.get(`/api/pile/${pile._id}`).expect(404)
     })
   })
 

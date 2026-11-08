@@ -25,9 +25,9 @@ describe('idea', () => {
       expect(res.body.data.name).toBe('Aesthetics')
     })
 
-    it('returns 400 for missing id', async () => {
+    it('returns 404 for missing id', async () => {
       const agent = await authedAgent()
-      await agent.get('/api/idea/507f1f77bcf86cd799439011').expect(400)
+      await agent.get('/api/idea/507f1f77bcf86cd799439011').expect(404)
     })
   })
 
@@ -46,7 +46,7 @@ describe('idea', () => {
       const agent = await authedAgent()
       const idea = await createIdea(agent, 'Doomed')
       await agent.delete(`/api/idea/${idea._id}/delete`).expect(204)
-      await agent.get(`/api/idea/${idea._id}`).expect(400)
+      await agent.get(`/api/idea/${idea._id}`).expect(404)
     })
 
     // The site deletes with DELETE /:id, like works and piles.
@@ -54,7 +54,7 @@ describe('idea', () => {
       const agent = await authedAgent()
       const idea = await createIdea(agent, 'Doomed')
       await agent.delete(`/api/idea/${idea._id}`).expect(204)
-      await agent.get(`/api/idea/${idea._id}`).expect(400)
+      await agent.get(`/api/idea/${idea._id}`).expect(404)
     })
   })
 
