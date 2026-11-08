@@ -363,6 +363,10 @@ export async function getIdeaNick(ideaID: string) {
   return axios.put(url_api + `nick/idea/` + ideaID)
 }
 
+export async function getAuthNick(authorID: string) {
+  return axios.put(url_api + `nick/auth/` + authorID)
+}
+
 export async function getPileNick(pileID: string) {
   return axios.put(url_api + `nick/pile/` + pileID)
 }

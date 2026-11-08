@@ -71,7 +71,7 @@ function Work(props: any) {
   const processHtmlForNicks = (html: any) => {
     if (!html) return html
     // Match nick patterns: letter (n, w, i, p) followed by digits
-    const nickPattern = /\b([nwip]\d+)\b/g
+    const nickPattern = /\b([nwipa]\d+)\b/g
 
     // Process the HTML string, replacing nicks with anchor tags
     // We need to handle both regular text and text inside code/pre tags

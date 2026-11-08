@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
-import Missing, { isNotFound } from './Missing'
+import Missing, { isNotFound, whatBecameOf } from './Missing'
+import ClickToCopyNick from './ClickToCopyNick'
+import { titleWithNick } from './utils'
 import ResultWork from './ResultWork'
 import NoteResult from './NoteResult'
 import YearSpan from './YearSpan'
@@ -40,13 +42,16 @@ function Author(props: any) {
   const [notesAboutTotal, setNotesAboutTotal] = useState(0)
   // Works they edited or translated, listed apart from their own (#358).
   const [credits, setCredits] = useState<{ edited: any[]; translated: any[] }>({ edited: [], translated: [] })
-  // Set when the author doesn't exist (#386). Authors have no nick, so
-  // nothing records what became of a deleted one.
-  const [missing, setMissing] = useState(false)
+  // Set when the author doesn't exist (#386)
+  const [missing, setMissing] = useState<{ name?: string | null } | null>(null)
+  const [nick, setNick] = useState('')
   const navigate = useNavigate()
 
   const fetchAuthorInfo = (id: any) => {
-    setMissing(false)
+    setMissing(null)
+    setNick('')
+    // Its nick, made now if it predates author nicks (#382)
+    db.getAuthNick(id).then((r: any) => setNick(r?.data?.data?.key ?? '')).catch(() => {})
     db.getInfo(db.types.auth, id)
       .then((response: any) => {
         const author = response.data.data
@@ -58,8 +63,12 @@ function Author(props: any) {
         })
       })
       .catch((error: any) => {
-        if (isNotFound(error)) setMissing(true)
-        else console.error(error)
+        if (!isNotFound(error)) return console.error(error)
+        // Gone: follow a merge to the kept author, else say so (#386)
+        whatBecameOf('auth', id).then(({ forwardTo, name }) => {
+          if (forwardTo) navigate('/auth/' + forwardTo, { replace: true })
+          else setMissing({ name })
+        })
       })
   }
 
@@ -153,10 +162,10 @@ function Author(props: any) {
 
   if (missing) {
     props.setPageTitle('Author does not exist')
-    return <Missing type="author" />
+    return <Missing type="author" name={missing.name} />
   }
 
-  props.setPageTitle(pending.name)
+  props.setPageTitle(titleWithNick(pending.name, nick))
   return (
     <div>
       {/* Header and Edit */}
@@ -221,6 +230,11 @@ function Author(props: any) {
                   {pending.usernames.split(',').map(u => u.trim()).filter(Boolean).map(u => `@${u}`).join(', ')}
                 </div>
               ) : null}
+              {nick && (
+                <div className="entity-page-nick">
+                  <ClickToCopyNick nick={nick} />
+                </div>
+              )}
             </div>
             <div className="entity-page-header-right">
               <TopLevelStandardButtonContainer className="top-level-toolbar">

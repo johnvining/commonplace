@@ -7,7 +7,7 @@ import { useKeyboardShortcuts, shortcuts } from './KeyboardContext'
 import { NO_AUTOFILL, retiredNickMessage } from './utils'
 
 // A nick is a type letter (note, work, idea, pile) and six digits.
-const NICK_PATTERN = /^[nwip]\d{6}$/
+const NICK_PATTERN = /^[nwipa]\d{6}$/
 
 function SearchBar(props: any) {
   const [modifier, setModifier] = useState('')
@@ -170,6 +170,9 @@ function SearchBar(props: any) {
           return
         case 'p':
           navigate('/pile/' + nickData.pile)
+          return
+        case 'a':
+          navigate('/auth/' + nickData.auth)
           return
         default:
           setSearchError('Nick not found')

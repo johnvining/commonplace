@@ -5,7 +5,7 @@ import { retiredNickMessage } from './utils'
 
 // Every nick is a type letter and six digits: n (note), w (work),
 // i (idea), p (pile).
-const NICK_PATTERN = /^[nwip]\d{6}$/
+const NICK_PATTERN = /^[nwipa]\d{6}$/
 
 function NickView(props: any) {
   const { nick } = useParams()
@@ -55,6 +55,9 @@ function NickView(props: any) {
             return
           case 'p':
             navigate('/pile/' + nickData.pile, { replace: true })
+            return
+          case 'a':
+            navigate('/auth/' + nickData.auth, { replace: true })
             return
           default:
             if (isMounted) {
