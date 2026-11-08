@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import Missing, { isNotFound, whatBecameOf } from './Missing'
 import { titleWithNick } from './utils'
 import * as constants from './constants'
 import NoteList from './NoteList'
@@ -35,9 +36,12 @@ function Idea(props: any) {
   })
   const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [nick, setNick] = useState('')
+  // Set when the idea doesn't exist (#385)
+  const [missing, setMissing] = useState<{ name?: string | null } | null>(null)
   const navigate = useNavigate()
 
   const fetchIdeaInfo = (ideaId: any) => {
+    setMissing(null)
     Promise.all([
       db.getInfo(db.types.idea, ideaId),
       db.getIdeaNick(ideaId),
@@ -52,7 +56,12 @@ function Idea(props: any) {
       })
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
-      console.error(error)
+      if (!isNotFound(error)) return console.error(error)
+      // Gone: say so, with its name if its nick kept one (#385)
+      whatBecameOf('idea', ideaId).then(({ forwardTo, name }) => {
+        if (forwardTo) navigate('/idea/' + forwardTo, { replace: true })
+        else setMissing({ name })
+      })
     })
   }
 
@@ -122,6 +131,11 @@ function Idea(props: any) {
     onDelete: deleteIdea,
     onNarrow: () => navigate('/filter?ideas=' + id),
   })
+
+  if (missing) {
+    props.setPageTitle('Idea does not exist')
+    return <Missing type="idea" name={missing.name} />
+  }
 
   props.setPageTitle(titleWithNick(pending.name, nick))
 
