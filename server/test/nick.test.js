@@ -151,4 +151,29 @@ describe('nick', () => {
       expect(res.body.data.note.created).toBeGreaterThanOrEqual(2)
     })
   })
+
+  describe('GET /api/nick/former/:type/:id (#384)', () => {
+    it('leads a merged work to the kept one, and names a deleted record', async () => {
+      const agent = await authedAgent()
+      const from = await createWork(agent, { name: 'Old' })
+      const into = await createWork(agent, { name: 'Kept' })
+      await agent.post(`/api/work/${from._id}/merge`).send({ into: into._id }).expect(200)
+      const merged = (await agent.get(`/api/nick/former/work/${from._id}`).expect(200)).body.data
+      expect(merged).toMatchObject({ state: 'alias', work: String(into._id), mergedFrom: 'Old' })
+
+      const idea = await createIdea(agent, 'Gone idea')
+      await agent.delete(`/api/idea/${idea._id}`).expect(204)
+      const deleted = (await agent.get(`/api/nick/former/idea/${idea._id}`).expect(200)).body.data
+      expect(deleted).toMatchObject({ state: 'retired', name: 'Gone idea' })
+    })
+
+    it('knows nothing of an id that never had a nick, or the wrong type', async () => {
+      const agent = await authedAgent()
+      const idea = await createIdea(agent, 'I')
+      await agent.delete(`/api/idea/${idea._id}`).expect(204)
+      expect((await agent.get(`/api/nick/former/work/${idea._id}`).expect(200)).body.data).toBeNull()
+      expect((await agent.get(`/api/nick/former/work/${new mongoose.Types.ObjectId()}`).expect(200)).body.data).toBeNull()
+      await agent.get('/api/nick/former/auth/507f1f77bcf86cd799439011').expect(400)
+    })
+  })
 })

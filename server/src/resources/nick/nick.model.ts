@@ -17,6 +17,9 @@ export interface NickDoc {
   // resolves to; the per-entity unique indexes allow only one live nick
   // per entity, so a merged key is kept as an alias here (#366)
   mergedInto?: Types.ObjectId
+  // The id of the entity a retired or merged nick was for, so that
+  // entity's old page can say what became of it (#384)
+  formerId?: Types.ObjectId
   createdAt: Date
   updatedAt: Date
 }
@@ -32,6 +35,7 @@ const nickSchema = new Schema<NickDoc>(
     name: String,
     retiredAt: Date,
     mergedInto: Schema.Types.ObjectId,
+    formerId: Schema.Types.ObjectId,
   },
   { timestamps: true }
 )
@@ -39,6 +43,7 @@ const nickSchema = new Schema<NickDoc>(
 nickSchema.index({ key: 1 }, { unique: true, sparse: true })
 nickSchema.index({ note: 1 }, { unique: true, sparse: true })
 nickSchema.index({ mergedInto: 1 }, { sparse: true })
+nickSchema.index({ formerId: 1 }, { sparse: true })
 nickSchema.index({ work: 1 }, { unique: true, sparse: true })
 nickSchema.index({ idea: 1 }, { unique: true, sparse: true })
 nickSchema.index({ pile: 1 }, { unique: true, sparse: true })

@@ -5,6 +5,7 @@ import {
   reqGenerateNickForIdea,
   reqGenerateNickForPile,
   reqGetNick,
+  reqGetFormer,
   reqGetNickForNote,
   reqGetNickForWork,
   reqGetNickForIdea,
@@ -22,6 +23,7 @@ router.route('/work/:id').get(asyncWrapper(reqGetNickForWork, 200)).put(asyncWra
 router.route('/idea/:id').get(asyncWrapper(reqGetNickForIdea, 200)).put(asyncWrapper(reqGenerateNickForIdea, 200))
 router.route('/pile/:id').get(asyncWrapper(reqGetNickForPile, 200)).put(asyncWrapper(reqGenerateNickForPile, 200))
 
+router.route('/former/:type/:id').get(asyncWrapper(reqGetFormer, 200))
 router.route('/:nick').get(asyncWrapper(reqGetNick, 200))
 
 export default router

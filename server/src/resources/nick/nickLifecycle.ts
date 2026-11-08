@@ -146,7 +146,7 @@ export async function retireNick(type: NickEntityType, id: unknown) {
     const name = await snapshotName(type, id)
     await Nick.updateOne(
       { _id: row._id },
-      { $unset: { [type]: 1, mergedInto: 1 }, $set: { retired: true, retiredAt: new Date(), ...(name ? { name } : {}) } }
+      { $unset: { [type]: 1, mergedInto: 1 }, $set: { retired: true, retiredAt: new Date(), formerId: id, ...(name ? { name } : {}) } }
     ).exec()
   }
   await Nick.updateMany({ mergedInto: id }, { $unset: { mergedInto: 1 }, $set: { retired: true } }).exec()
@@ -162,7 +162,7 @@ export async function repointNick(type: NickEntityType, id: unknown, into: unkno
     const name = await snapshotName(type, id)
     await Nick.updateOne(
       { _id: row._id },
-      { $unset: { [type]: 1 }, $set: { mergedInto: into, retired: true, retiredAt: new Date(), ...(name ? { name } : {}) } }
+      { $unset: { [type]: 1 }, $set: { mergedInto: into, retired: true, retiredAt: new Date(), formerId: id, ...(name ? { name } : {}) } }
     ).exec()
   }
   await Nick.updateMany({ mergedInto: id }, { $set: { mergedInto: into } }).exec()
@@ -200,6 +200,16 @@ export async function resolveNick(key: string): Promise<NickResolution | null> {
   return state === 'active'
     ? { state: 'active', key: row.key!, type, id: String(id) }
     : { state: 'alias', key: row.key!, type, id: String(id), mergedFrom: row.name ?? null }
+}
+
+// What became of an entity that no longer exists, by its old id: the
+// resolution of the nick it had, so a merged work leads to the kept one and
+// a deleted record keeps its name (#384). Null when nothing is known, e.g.
+// it was deleted before formerId was recorded.
+export async function resolveFormer(type: NickEntityType, id: string): Promise<NickResolution | null> {
+  if (!PREFIX[type] || !mongoose.isValidObjectId(id)) return null
+  const row = await Nick.findOne({ formerId: id, key: new RegExp('^' + PREFIX[type]) }, { key: 1 }).lean().exec()
+  return row?.key ? resolveNick(row.key) : null
 }
 
 // ---- reads by entity ------------------------------------------------------------

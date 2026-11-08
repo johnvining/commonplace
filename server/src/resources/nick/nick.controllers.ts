@@ -4,7 +4,9 @@ import {
   nickFor,
   entitiesWithNicks,
   resolveNick,
+  resolveFormer,
   type NickEntityType,
+  type NickResolution,
 } from './nickLifecycle.js'
 
 // The lifecycle itself lives in nickLifecycle.ts (#367); these are its
@@ -20,8 +22,18 @@ export const reqGenerateNickForPile = async (req: Request, res: Response) => min
 //   alias    { key, state, <type>: id of the work it was merged into, mergedFrom }
 //   retired  { key, state, retired: true, name, retiredAt }, with no entity id
 // and a key never minted gives null.
-export const reqGetNick = async (req: Request, res: Response) => {
-  const found = await resolveNick(String(req.params.nick))
+export const reqGetNick = async (req: Request, res: Response) => answerFor(await resolveNick(String(req.params.nick)))
+
+// GET /nick/former/:type/:id: what became of an entity that no longer
+// exists, by its old id, in the same shape as GET /nick/:key; null when
+// nothing is known (#384)
+export const reqGetFormer = async (req: Request, res: Response) => {
+  const type = String(req.params.type) as NickEntityType
+  if (!['note', 'work', 'idea', 'pile'].includes(type)) return res.status(400).json({ message: 'Unknown type' })
+  return answerFor(await resolveFormer(type, String(req.params.id)))
+}
+
+function answerFor(found: NickResolution | null) {
   if (!found) return null
   if (found.state === 'retired') {
     return { key: found.key, state: found.state, retired: true, name: found.name, retiredAt: found.retiredAt }
