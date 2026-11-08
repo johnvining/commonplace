@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import * as db from './Database'
+import Missing, { isNotFound } from './Missing'
 import ResultWork from './ResultWork'
 import NoteResult from './NoteResult'
 import YearSpan from './YearSpan'
@@ -39,9 +40,13 @@ function Author(props: any) {
   const [notesAboutTotal, setNotesAboutTotal] = useState(0)
   // Works they edited or translated, listed apart from their own (#358).
   const [credits, setCredits] = useState<{ edited: any[]; translated: any[] }>({ edited: [], translated: [] })
+  // Set when the author doesn't exist (#386). Authors have no nick, so
+  // nothing records what became of a deleted one.
+  const [missing, setMissing] = useState(false)
   const navigate = useNavigate()
 
   const fetchAuthorInfo = (id: any) => {
+    setMissing(false)
     db.getInfo(db.types.auth, id)
       .then((response: any) => {
         const author = response.data.data
@@ -53,7 +58,8 @@ function Author(props: any) {
         })
       })
       .catch((error: any) => {
-        console.error(error)
+        if (isNotFound(error)) setMissing(true)
+        else console.error(error)
       })
   }
 
@@ -143,6 +149,11 @@ function Author(props: any) {
 
     await db.deleteRecord(db.types.auth, id)
     navigate('/')
+  }
+
+  if (missing) {
+    props.setPageTitle('Author does not exist')
+    return <Missing type="author" />
   }
 
   props.setPageTitle(pending.name)
