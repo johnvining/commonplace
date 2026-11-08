@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import PileName from './PileName'
 import * as constants from './constants'
 import * as db from './Database'
+import Missing, { isNotFound, whatBecameOf } from './Missing'
 import { titleWithNick } from './utils'
 import NoteList from './NoteList'
 import WorkList from './WorkList'
@@ -35,9 +36,12 @@ function Pile(props: any) {
   })
   const { editing: edit, setEditing: setEdit, values: pending } = editor
   const [nick, setNick] = useState('')
+  // Set when the pile doesn't exist (#387)
+  const [missing, setMissing] = useState<{ name?: string | null } | null>(null)
   const navigate = useNavigate()
 
   const fetchPileInfo = (pileId: any) => {
+    setMissing(null)
     Promise.all([
       db.getInfo(db.types.pile, pileId),
       db.getPileNick(pileId),
@@ -51,7 +55,12 @@ function Pile(props: any) {
       })
       setNick(nickResponse.data.data.key)
     }).catch((error: any) => {
-      console.error(error)
+      if (!isNotFound(error)) return console.error(error)
+      // Gone: say so, with its name if its nick kept one (#387)
+      whatBecameOf('pile', pileId).then(({ forwardTo, name }) => {
+        if (forwardTo) navigate('/pile/' + forwardTo, { replace: true })
+        else setMissing({ name })
+      })
     })
   }
 
@@ -136,6 +145,11 @@ function Pile(props: any) {
     onViewNotes: () => navigate(props.showNotes ? '/pile/' + id : '/pile/' + id + '/notes'),
     onNarrow: () => navigate('/filter?piles=' + id),
   })
+
+  if (missing) {
+    props.setPageTitle('Pile does not exist')
+    return <Missing type="pile" name={missing.name} />
+  }
 
   props.setPageTitle(titleWithNick(pending.name, nick))
   return (
