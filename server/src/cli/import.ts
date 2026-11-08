@@ -5,7 +5,7 @@ import https from 'https'
 import { parse } from 'csv-parse'
 import config from '../config'
 import { Readable } from 'stream'
-import { guessYearFromUrl } from '../utils/urls'
+import { yearForImport } from '../utils/inference.js'
 import * as AuthControllers from '../resources/auth/auth.controllers.js'
 import * as WorkControllers from '../resources/work/work.controllers.js'
 import * as IdeaControllers from '../resources/idea/idea.controllers.js'
@@ -287,16 +287,8 @@ async function importNote(importObject: NoteImportObject, result: RowResult) {
     importObject.piles.map((pile) => PileControllers.findOrCreatePile(pile))
   )
 
-  // Year normalization: empty or NaN → null (Number('') is 0, #349), and
-  // prefer URL inference when present
-  const rawYear = typeof importObject.year === 'string'
-    ? importObject.year.trim()
-    : importObject.year
-  const yearAsNumber = rawYear === '' || rawYear === null ? NaN : Number(rawYear)
-  let year: number | null = Number.isFinite(yearAsNumber) ? yearAsNumber : null
-  if (importObject.url) {
-    year = guessYearFromUrl(importObject.url) ?? year
-  }
+  // The year cell wins; an empty one is filled from the URL (#349, #377)
+  const year = yearForImport(importObject.year, importObject.url)
 
   const newNote: NewNoteFields = {
     authors: author?._id ? [String(author._id)] : [],
@@ -338,7 +330,7 @@ async function importInstapaperNote(importObject: NoteImportObject, result: RowR
     text: importObject.text,
     title: importObject.title,
     url: importObject.url,
-    year: importObject.url ? guessYearFromUrl(importObject.url) : null,
+    year: yearForImport(null, importObject.url),
     page: '',
     take: '',
   }
@@ -384,15 +376,9 @@ async function importWork(importObject: WorkImportObject, result: RowResult) {
     piles: [],
   }
 
-  if (importObject.year) {
-    const yearNum = Number(importObject.year)
-    if (Number.isFinite(yearNum)) {
-      updateObject.year = yearNum
-    }
-  } else if (importObject.url) {
-    const inferred = guessYearFromUrl(importObject.url)
-    if (inferred !== null) updateObject.year = inferred
-  }
+  // The year cell wins, else the URL's (#377)
+  const year = yearForImport(importObject.year, importObject.url)
+  if (year !== null) updateObject.year = year
 
   if (importObject.url) {
     updateObject.url = importObject.url

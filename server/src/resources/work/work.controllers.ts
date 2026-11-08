@@ -1,8 +1,8 @@
 import Work from '../work/work.model.js'
 import Pile from '../pile/pile.model.js'
 import Idea from '../idea/idea.model.js'
-import { createAuthor, findAuthorByUrl } from '../auth/auth.controllers.js'
-import { guessYearFromUrl } from '../../utils/urls.js'
+import { createAuthor } from '../auth/auth.controllers.js'
+import { fillFromUrl } from '../../utils/inference.js'
 import { createIdea } from '../idea/idea.controllers.js'
 import { defaultControllers } from '../../utils/default.controllers.js'
 import { deleteEntity } from '../../utils/deleteEntity.js'
@@ -45,21 +45,8 @@ export const reqCreateWork = async (req: Request, res: Response) => {
 export const reqUpdateWork = async (req: Request, res: Response) => {
   const updates: Record<string, unknown> = pickAllowed(req.body, WORK_WRITABLE)
 
-  const url = typeof updates.url === 'string' ? updates.url : null
-  if (url) {
-    const existing = await Work.findById(req.params.id).lean()
-    // Only infer authors from URL if the caller didn't already set them and
-    // the work had none before. Don't clobber a deliberate choice.
-    const incomingAuthors = Array.isArray(updates.authors) ? updates.authors : null
-    if (existing && !existing.authors?.length && !incomingAuthors?.length) {
-      const author = await findAuthorByUrl(url)
-      if (author) updates.authors = [author._id]
-    }
-    if (!updates.year) {
-      const year = guessYearFromUrl(url)
-      if (year) updates.year = year
-    }
-  }
+  // An empty year and authors are filled from the URL, by the shared rule (#377)
+  if (typeof updates.url === 'string') await fillFromUrl(await Work.findById(req.params.id).lean(), updates)
 
   const doc = await updateWorkInfo(req.params.id, updates)
   if (!doc) return res.status(400).json({ message: 'Work not found' })

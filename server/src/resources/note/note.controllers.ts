@@ -13,7 +13,7 @@ import {
 } from '../../utils/suggestions.js'
 import config from '../../config'
 import fs from 'fs'
-import { guessYearFromUrl } from '../../utils/urls.js'
+import { fillFromUrl, fillWorkUrl } from '../../utils/inference.js'
 import { embedNoteIfStale, generateEmbedding, cosineSimilarity } from '../../utils/embeddings.js'
 import { getEmbeddingCache } from '../../utils/embeddingCache.js'
 import { saveEmbedding } from '../../utils/embeddingRefresh.js'
@@ -273,26 +273,6 @@ export const reqAddNewWork = async (req: Request, res: Response) => {
   return await updateNote(req.params.id, { work: newWork._id })
 }
 
-const inferWorkUrl = async function (workId: unknown, noteUrl: string) {
-  if (!workId) return
-  const work = await Work.findById(workId).lean()
-  if (!work || work.url) return
-
-  const [allNotes, notesWithUrl] = await Promise.all([
-    Note.find({ work: workId }).lean(),
-    Note.find({ work: workId, url: { $exists: true, $ne: '' } }).lean(),
-  ])
-
-  if (allNotes.length === 0 || notesWithUrl.length !== allNotes.length) return
-
-  // If all notes share the same hostname, use that origin; otherwise use the triggering URL
-  try {
-    const origins = notesWithUrl.map((n) => new URL(n.url ?? '').origin)
-    const unique = [...new Set(origins)]
-    await Work.findByIdAndUpdate(workId, { url: unique.length === 1 ? unique[0] : noteUrl })
-  } catch {}
-}
-
 export const reqUpdateNote = async (req: Request, res: Response) => {
   const updates: Record<string, unknown> = pickAllowed(req.body, NOTE_WRITABLE)
 
@@ -308,28 +288,14 @@ export const reqUpdateNote = async (req: Request, res: Response) => {
     }
   }
 
+  // An empty year and authors are filled from the URL, and a work with no
+  // URL gets its notes' shared site, by the shared rule (#377)
   const url = typeof updates.url === 'string' ? updates.url : null
-  if (url) {
-    const existing = await Note.findById(req.params.id).lean()
-    // Only infer authors from URL if the caller didn't already set them and
-    // the note had none before. Don't clobber a deliberate choice.
-    const incomingAuthors = Array.isArray(updates.authors) ? updates.authors : null
-    if (existing && !existing.authors?.length && !incomingAuthors?.length) {
-      const { findAuthorByUrl } = await import('../auth/auth.controllers.js')
-      const author = await findAuthorByUrl(url)
-      if (author) updates.authors = [author._id]
-    }
-    if (!updates.year) {
-      const year = guessYearFromUrl(url)
-      if (year) updates.year = year
-    }
-  }
+  if (url) await fillFromUrl(await Note.findById(req.params.id).lean(), updates)
 
   const updated = await updateNote(req.params.id, updates)
 
-  if (url && updated?.work) {
-    await inferWorkUrl(updated.work, url)
-  }
+  if (url && updated?.work) await fillWorkUrl(updated.work)
 
   return updated
 }
