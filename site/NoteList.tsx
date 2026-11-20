@@ -435,14 +435,17 @@ class NoteList extends React.Component<any, any> {
     }
 
     var notes = this.state.notes
-    var numberImages = notes[index].images?.length
+    var noteAtIndex = notes?.[index]
+    if (!noteAtIndex) return
+    var numberImages = noteAtIndex.images?.length
 
     if (numberImages == 0) return
 
+    const noteId = noteAtIndex._id
     const imagePromises: Array<Promise<{ data: Blob } | null>> = []
     for (let i = 1; i <= numberImages; i++) {
       imagePromises.push(
-        db.getImagesForNote(notes[index]._id, i).catch((error: any) => {
+        db.getImagesForNote(noteId, i).catch((error: any) => {
           if (error?.response?.status !== 404) {
             console.error('Error fetching image', error)
           }
@@ -453,20 +456,36 @@ class NoteList extends React.Component<any, any> {
 
     await Promise.all(imagePromises).then((responses: any) => {
       const imagesArray: string[] = []
-      const note = notes[index]
       responses.forEach((response: any) => {
         if (response?.data) {
           imagesArray.push(URL.createObjectURL(response.data))
         }
       })
-      // Revoke the previous batch's URLs before overwriting — blob URLs hold
-      // refs to the underlying Blob forever otherwise.
-      if (Array.isArray(note.imageUrls)) {
-        for (const u of note.imageUrls) URL.revokeObjectURL(u)
-      }
-      note.imageUrls = imagesArray
-      notes[index] = note
-      this.setState({ notes: notes })
+      // Use the updater form: several notes load at once, and each
+      // completion must build on the latest state, not the array this
+      // call captured when it started. Otherwise the last one to
+      // finish wipes the images the earlier ones loaded.
+      this.setState((prevState: any) => {
+        const prevNotes = prevState.notes
+        const prevIndex = prevNotes.findIndex((n: any) => n._id === noteId)
+        if (prevIndex === -1) {
+          for (const u of imagesArray) URL.revokeObjectURL(u)
+          return null
+        }
+        const prevNote = prevNotes[prevIndex]
+        // Revoke the previous batch's URLs before overwriting — blob URLs hold
+        // refs to the underlying Blob forever otherwise.
+        if (Array.isArray(prevNote.imageUrls)) {
+          for (const u of prevNote.imageUrls) URL.revokeObjectURL(u)
+        }
+        // Copy the note and the array: NoteTile is a PureComponent, so
+        // mutating the same note object in the same array never re-renders
+        // and the tile keeps its empty image space.
+        const updatedNote = { ...prevNote, imageUrls: imagesArray }
+        const updatedNotes = [...prevNotes]
+        updatedNotes[prevIndex] = updatedNote
+        return { notes: updatedNotes }
+      })
     })
   }
 
