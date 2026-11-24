@@ -16,6 +16,7 @@ class ResultWork extends React.Component<any, any> {
         (pile: any) =>
           pile.name?.includes('Location: ') ||
           pile.name?.includes('Status: ') ||
+          pile.name?.includes('Piece: ') ||
           pile.name?.includes('Reading: '),
       )
       // On a pile's own page its tag would only repeat the page title.
