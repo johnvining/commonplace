@@ -129,7 +129,12 @@ describe('time', () => {
       expect(daily.readingMinutes).toBe(30)
       expect(daily.writingMinutes).toBe(45)
       expect(daily.byPile).toHaveLength(1)
-      expect(daily.byPile[0]).toMatchObject({ name: 'Essay: Attention', minutes: 30 })
+      expect(daily.byPile[0]).toMatchObject({
+        name: 'Essay: Attention',
+        minutes: 30,
+        readingMinutes: 30,
+        writingMinutes: 0,
+      })
       expect(daily.byTitle).toHaveLength(1)
       expect(daily.byTitle[0]).toMatchObject({ title: 'Morning pages', minutes: 45 })
 
