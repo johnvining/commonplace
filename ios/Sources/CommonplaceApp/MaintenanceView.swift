@@ -162,7 +162,7 @@ struct ImportView: View {
         var out: [String] = []
         var field = ""
         var quoted = false
-        var chars = Array(line)
+        let chars = Array(line)
         var i = 0
         while i < chars.count {
             let c = chars[i]
