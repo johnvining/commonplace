@@ -15,6 +15,8 @@ struct TimeView: View {
     @State private var summary: TimeSummary?
     @State private var error: String?
     @State private var showManual = false
+    @State private var newName = ""
+    @State private var customTitles: [String: String] = [:]
 
     var body: some View {
         NavigationStack {
@@ -37,6 +39,22 @@ struct TimeView: View {
                                 }
                             }
                         }
+                        let named = customTitles
+                            .filter { kv in !subjects.contains { $0.key == kv.key } }
+                            .sorted { $0.value < $1.value }
+                        if !named.isEmpty {
+                            Section("Named") {
+                                ForEach(named, id: \.key) { kv in
+                                    Text(kv.value).tag(kv.key)
+                                }
+                            }
+                        }
+                    }
+                    HStack {
+                        TextField("Name something new…", text: $newName)
+                            .autocorrectionDisabled()
+                        Button("Use name") { useNewName() }
+                            .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty || state.timerIsRunning)
                     }
                     Picker("Kind", selection: $kind) {
                         Text("Reading").tag("reading")
@@ -125,6 +143,10 @@ struct TimeView: View {
     }
 
     private func initialLoad() {
+        if let data = UserDefaults.standard.data(forKey: "time_custom_titles"),
+           let map = try? JSONDecoder().decode([String: String].self, from: data) {
+            customTitles = map
+        }
         Task {
             subjects = (try? await state.client.recentSubjects(limit: 20)) ?? []
             if let first = subjects.first, selection.isEmpty { selection = first.key }
@@ -170,9 +192,22 @@ struct TimeView: View {
         }
     }
 
+    private func useNewName() {
+        let name = newName.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty else { return }
+        let key = TimeSubjectKey.titleKey(title: name)
+        customTitles[key] = name
+        if let data = try? JSONEncoder().encode(customTitles) {
+            UserDefaults.standard.set(data, forKey: "time_custom_titles")
+        }
+        selection = key
+        newName = ""
+    }
+
     /// Original-case title for a subject: recents first, then the pin
     /// label, then the raw key (matching the web resolve order).
     private func displayTitle(forKey key: String) -> String? {
+        if let custom = customTitles[key], !custom.isEmpty { return custom }
         if let recent = subjects.first(where: { $0.key == key }) { return recent.title }
         if let pin = state.pins.first(where: { $0.id == key }),
            let label = pin.label, !label.isEmpty { return label }
