@@ -2350,8 +2350,51 @@ mark.search-highlight {
 }
 
 .time-form {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   max-width: 640px;
+}
+
+// Compact controls for the time page: body-size text, not the big
+// entity-form sizing. Everything here stays time-scoped.
+.top-level.input.compact {
+  font-size: 14px;
+  padding: 6px 8px;
+}
+
+.button.compact {
+  height: auto;
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+.time-timer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.time-subject-select {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.time-elapsed {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  min-width: 64px;
+  text-align: right;
+}
+
+.time-manual {
+  margin: 20px 0 8px;
+  max-width: 640px;
+}
+
+.time-manual > summary {
+  cursor: pointer;
+  margin-bottom: 8px;
 }
 
 .time-form-grid {
@@ -2371,6 +2414,10 @@ mark.search-highlight {
   border-radius: 4px;
   padding: 4px 4px 4px 10px;
   font-size: 20px;
+
+  &.compact {
+    font-size: 14px;
+  }
 }
 
 .time-pile-results {
@@ -2423,7 +2470,7 @@ mark.search-highlight {
 }
 
 .time-total {
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .time-kind {
@@ -2464,7 +2511,6 @@ mark.search-highlight {
 }
 
 .time-table-title {
-  font-size: 18px;
   margin: 16px 0 4px;
 }
 
@@ -2557,12 +2603,6 @@ mark.search-highlight {
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-// Starred and recent subjects above the day view on /time.
-.time-shortcuts {
-  margin-bottom: 20px;
-  max-width: 720px;
 }
 
 // Reading/writing line on a pile page.
