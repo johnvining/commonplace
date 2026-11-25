@@ -7,10 +7,10 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
-            TimeView()
-                .tabItem { Label("Time", systemImage: "timer") }
             NotesView()
                 .tabItem { Label("Notes", systemImage: "note.text") }
+            TimeView()
+                .tabItem { Label("Time", systemImage: "timer") }
             PileListView()
                 .tabItem { Label("Piles", systemImage: "tray.full") }
             SearchView()
