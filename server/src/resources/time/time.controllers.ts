@@ -90,26 +90,53 @@ type PopulatedEntry = {
   minutes: number
 }
 
+type SubjectRow = {
+  minutes: number
+  readingMinutes: number
+  writingMinutes: number
+  entryCount: number
+}
+
+function addKind(row: SubjectRow, kind: string, minutes: number) {
+  if (kind === 'reading') row.readingMinutes += minutes
+  else if (kind === 'writing') row.writingMinutes += minutes
+}
+
 function summarize(entries: PopulatedEntry[]) {
   let readingMinutes = 0
   let writingMinutes = 0
-  const pileMap = new Map<string, { pile: string; name: string; minutes: number; entryCount: number }>()
-  const titleMap = new Map<string, { title: string; minutes: number; entryCount: number }>()
+  const pileMap = new Map<string, SubjectRow & { pile: string; name: string }>()
+  const titleMap = new Map<string, SubjectRow & { title: string }>()
   for (const e of entries) {
     if (e.kind === 'reading') readingMinutes += e.minutes
     else if (e.kind === 'writing') writingMinutes += e.minutes
     const pileId = e.pile?._id ? String(e.pile._id) : null
     if (pileId) {
       const name = e.pile?.name ?? 'Unknown pile'
-      const row = pileMap.get(pileId) ?? { pile: pileId, name, minutes: 0, entryCount: 0 }
+      const row = pileMap.get(pileId) ?? {
+        pile: pileId,
+        name,
+        minutes: 0,
+        readingMinutes: 0,
+        writingMinutes: 0,
+        entryCount: 0,
+      }
       row.minutes += e.minutes
       row.entryCount += 1
+      addKind(row, e.kind, e.minutes)
       pileMap.set(pileId, row)
     } else {
       const title = (e.title ?? '').trim() || 'Untitled'
-      const row = titleMap.get(title) ?? { title, minutes: 0, entryCount: 0 }
+      const row = titleMap.get(title) ?? {
+        title,
+        minutes: 0,
+        readingMinutes: 0,
+        writingMinutes: 0,
+        entryCount: 0,
+      }
       row.minutes += e.minutes
       row.entryCount += 1
+      addKind(row, e.kind, e.minutes)
       titleMap.set(title, row)
     }
   }
