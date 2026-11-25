@@ -2011,6 +2011,155 @@ async function cmdNickGen(args, config) {
   }
 }
 
+function fmtMinutes(minutes) {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h <= 0) return `${m}m`
+  if (m === 0) return `${h}h`
+  return `${h}h ${m}m`
+}
+
+// Minimal CSV parse: commas, quoted fields, doubled quotes. Enough for the
+// time-import format this same command writes about in its header line.
+function parseCsv(text) {
+  const rows = []
+  let row = []
+  let field = ''
+  let quoted = false
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (quoted) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++ }
+        else quoted = false
+      } else field += c
+    } else if (c === '"') quoted = true
+    else if (c === ',') { row.push(field); field = '' }
+    else if (c === '\n') { row.push(field); field = ''; rows.push(row); row = [] }
+    else if (c === '\r') { /* skip */ }
+    else field += c
+  }
+  row.push(field)
+  rows.push(row)
+  return rows.filter((r) => r.some((f) => f.trim() !== ''))
+}
+
+async function cmdTime(args, config) {
+  // `cplace time ...` — log reading/writing time without opening the browser.
+  const sub = args[0]
+  const rest = args.slice(1)
+  const jsonFlag = rest.includes('--json')
+  const positional = rest.filter((a) => a !== '--json')
+  const flag = (name) => {
+    const i = positional.findIndex((a) => a === `--${name}`)
+    return i >= 0 && i + 1 < positional.length ? positional[i + 1] : undefined
+  }
+
+  if (sub === 'log') {
+    const kind = flag('kind')
+    const minutes = parseInt(flag('minutes') || '', 10)
+    const title = flag('title') || ''
+    const pileInput = flag('pile')
+    const date = flag('date')
+    if ((kind !== 'reading' && kind !== 'writing') || !Number.isInteger(minutes) || minutes < 1) {
+      console.error('Usage: cplace time log --kind reading|writing --minutes N [--title T] [--pile P] [--date YYYY-MM-DD]')
+      return
+    }
+    if (!title.trim() && !pileInput) {
+      console.error('Give the entry a --title or a --pile.')
+      return
+    }
+    let pile = null
+    if (pileInput) {
+      const found = await resolveExisting('pile', pileInput, config)
+      if (!found) { console.error(`Could not resolve pile "${pileInput}". Create it first: cplace pile new "${pileInput}"`); return }
+      pile = found.id
+    }
+    const body = { title: title.trim(), pile, kind, minutes }
+    if (date) body.date = date
+    const res = await api('POST', 'time', body, config)
+    const entry = res?.data || res
+    if (!entry?._id) { console.error('Failed to log time.'); return }
+    const subject = entry?.pile?.name || entry.title || entry.pile || ''
+    console.log(`${GREEN}Logged${RESET} ${fmtMinutes(entry.minutes)} ${entry.kind} — ${subject}  ${DIM}${entry.date?.slice(0, 10) ?? ''}${RESET}`)
+    return
+  }
+
+  if (sub === 'summary') {
+    const date = flag('date')
+    const res = await api('GET', `time/summary${date ? `?date=${encodeURIComponent(date)}` : ''}`, null, config)
+    const { daily, weekly } = res?.data || {}
+    if (!daily) { console.error('No summary.'); return }
+    if (jsonFlag) { console.log(JSON.stringify(res.data)); return }
+    console.log(`${BOLD}Daily ${daily.date}${RESET} — ${fmtMinutes(daily.totalMinutes)} total ` +
+      `(${fmtMinutes(daily.readingMinutes)} reading + ${fmtMinutes(daily.writingMinutes)} writing), ` +
+      `${daily.entryCount} ${daily.entryCount === 1 ? 'entry' : 'entries'}`)
+    for (const row of daily.byPile) {
+      console.log(`  ${MAGENTA}${row.name}${RESET} ${fmtMinutes(row.minutes)} ` +
+        `${DIM}(r ${fmtMinutes(row.readingMinutes)} / w ${fmtMinutes(row.writingMinutes)})${RESET}`)
+    }
+    for (const row of daily.byTitle) {
+      console.log(`  ${row.title} ${fmtMinutes(row.minutes)}`)
+    }
+    console.log(`${BOLD}Weekly ${weekly.weekStart} to ${weekly.weekEnd}${RESET} — ${fmtMinutes(weekly.totalMinutes)} total ` +
+      `(${fmtMinutes(weekly.readingMinutes)} reading + ${fmtMinutes(weekly.writingMinutes)} writing)`)
+    for (const d of weekly.byDay) {
+      if (!d.totalMinutes) continue
+      console.log(`  ${d.date} ${fmtMinutes(d.totalMinutes)}`)
+    }
+    return
+  }
+
+  if (sub === 'import') {
+    const file = positional.find((a) => !a.startsWith('--'))
+    if (!file) {
+      console.error('Usage: cplace time import <file.csv>')
+      console.error('  headers: date,kind,minutes,title,pile (pile: name, nick, or id)')
+      return
+    }
+    const rows = parseCsv(readFileSync(file, 'utf8'))
+    if (!rows.length) { console.error('Empty file.'); return }
+    const header = rows[0].map((h) => h.trim().toLowerCase())
+    const need = ['date', 'kind', 'minutes']
+    if (!need.every((h) => header.includes(h))) {
+      console.error(`Header must include ${need.join(',')} (and optionally title,pile).`)
+      return
+    }
+    const idx = (name) => header.indexOf(name)
+    const entries = []
+    for (const r of rows.slice(1)) {
+      const entry = {
+        date: (r[idx('date')] || '').trim(),
+        kind: (r[idx('kind')] || '').trim(),
+        minutes: parseInt((r[idx('minutes')] || '').trim(), 10),
+        title: idx('title') >= 0 ? (r[idx('title')] || '').trim() : '',
+      }
+      const pileInput = idx('pile') >= 0 ? (r[idx('pile')] || '').trim() : ''
+      if (pileInput) {
+        const found = await resolveExisting('pile', pileInput, config)
+        if (!found) {
+          console.error(`Row ${entries.length + 2}: could not resolve pile "${pileInput}" — create it first.`)
+          return
+        }
+        entry.pile = found.id
+      }
+      entries.push(entry)
+    }
+    const result = (await api('POST', 'time/import', { entries }, config))?.data
+    console.log(`${GREEN}Imported${RESET} ${result?.imported ?? '?'} entries` +
+      (result?.failed ? `, ${YELLOW}${result.failed} with problems${RESET}:` : ''))
+    for (const r of (result?.rows ?? []).filter((r) => !r.ok)) {
+      console.log(`  row ${r.row}: ${r.error}`)
+    }
+    return
+  }
+
+  console.error('Usage: cplace time <log|summary|import> ...')
+  console.error('  time log --kind reading|writing --minutes N [--title T] [--pile P] [--date YYYY-MM-DD]')
+  console.error('  time summary [--date YYYY-MM-DD] [--json]')
+  console.error('  time import <file.csv>   (headers: date,kind,minutes,title,pile)')
+}
+
 function cmdHelp() {
   console.log(`
 ${BOLD}cplace${RESET} — Commonplace CLI
@@ -2120,6 +2269,11 @@ ${BOLD}Import${RESET}
   import instapaper <file>
   import work <file> --work=<workId>
 
+${BOLD}Time logging${RESET}
+  time log --kind reading|writing --minutes N [--title T] [--pile P] [--date D]
+  time summary [--date D] [--json]
+  time import <file.csv>   (headers: date,kind,minutes,title,pile)
+
 ${BOLD}Admin${RESET}
   open <id> [type]   Open an item in the browser
   nick-gen <id|nick> [--type T]   Generate / fetch a nick
@@ -2190,6 +2344,7 @@ const commands = {
   import:  cmdImport,
   update:  cmdUpdate,
   'recent-items': cmdRecentItems,
+  time:    cmdTime,
   export:  cmdExport,
   logout:  cmdLogout,
   'backfill-nicks': cmdBackfillNicks,
