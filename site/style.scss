@@ -2456,9 +2456,11 @@ mark.search-highlight {
   margin: 16px 0;
 }
 
-.time-date-input {
+.top-level.input.time-subject-select,
+.time-day-nav .top-level.input {
   width: auto;
-  flex: 0 1 auto;
+  flex: 1 1 140px;
+  min-width: 0;
 }
 
 .time-kind-totals {

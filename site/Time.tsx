@@ -467,6 +467,7 @@ function Time(props: any) {
       <div className="time-day-nav">
         <TopLevelStandardButton
           name="‹ Prev"
+          className="compact"
           onClick={() => setSelectedDate(shiftDay(selectedDate, -1))}
         />
         <input
@@ -478,9 +479,10 @@ function Time(props: any) {
         />
         <TopLevelStandardButton
           name="Next ›"
+          className="compact"
           onClick={() => setSelectedDate(shiftDay(selectedDate, 1))}
         />
-        <TopLevelStandardButton name="Today" onClick={() => setSelectedDate(todayLocal())} />
+        <TopLevelStandardButton name="Today" className="compact" onClick={() => setSelectedDate(todayLocal())} />
       </div>
 
       {loading || !summary ? (
