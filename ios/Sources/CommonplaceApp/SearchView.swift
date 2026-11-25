@@ -15,14 +15,15 @@ struct SearchView: View {
     @State private var nickAuthorId: String?
     @State private var nickInfo: String?
     @State private var error: String?
+    @State private var searchTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
                     TextField("Search or paste a nick", text: $query)
+                        .onChange(of: query) { _ in scheduleRun() }
                         .onSubmit { run() }
-                    Button("Search") { run() }
                 }
                 if let error { Text(error).foregroundStyle(.red) }
                 if let info = nickInfo {
@@ -52,6 +53,17 @@ struct SearchView: View {
                 }
             }
             .navigationTitle("Search")
+        }
+    }
+
+    private func scheduleRun() {
+        searchTask?.cancel()
+        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard q.count >= 2 else { return }
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if Task.isCancelled { return }
+            await MainActor.run { run() }
         }
     }
 
@@ -97,10 +109,10 @@ struct SearchView: View {
     @ViewBuilder
     private func searchRow(_ item: UnifiedSearchItem) -> some View {
         let label = VStack(alignment: .leading) {
-            Text(item.title ?? item.name ?? "(unnamed)").lineLimit(1)
+            Text(item.displayName).lineLimit(1)
             Text(item.type ?? "").font(.caption).foregroundStyle(.secondary)
         }
-        if let id = item._id {
+        if let id = item.itemId {
             switch item.type {
             case "note":
                 NavigationLink { NoteDetailView(noteId: id) } label: { label }
@@ -126,7 +138,7 @@ struct SearchView: View {
 }
 
 private extension UnifiedSearchItem {
-    var stableId: String { "\((type ?? "?")):\((_id ?? title ?? name ?? ""))" }
+    var stableId: String { "\((type ?? "?")):\(itemId ?? displayName)" }
 }
 
 private extension Note {

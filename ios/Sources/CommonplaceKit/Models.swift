@@ -228,12 +228,20 @@ public struct StatsResponse: Codable, Sendable {
 
 // MARK: - Search
 
+/// Wire shape: `{ type, item: { _id, title?, name?, … }, score }`.
 public struct UnifiedSearchItem: Codable, Sendable {
     public var type: String?
     public var score: Double?
-    public var title: String?
-    public var name: String?
-    public var _id: String?
+    public var item: Item?
+
+    public struct Item: Codable, Sendable {
+        public var _id: String?
+        public var title: String?
+        public var name: String?
+    }
+
+    public var itemId: String? { item?._id }
+    public var displayName: String { item?.title ?? item?.name ?? "(unnamed)" }
 }
 
 // MARK: - Time
