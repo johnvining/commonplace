@@ -27,7 +27,7 @@ struct PileListView: View {
             do {
                 piles = try await state.client.allPiles()
             } catch {
-                await MainActor.run { error = "Load failed — retry." }
+                await MainActor.run { self.error = "Load failed — retry." }
             }
         }
     }
