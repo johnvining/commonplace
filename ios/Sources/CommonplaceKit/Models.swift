@@ -137,15 +137,19 @@ public struct NoteUpdate: Codable, Sendable {
     public var url: String?
     public var year: Int?
     public var page: String?
+    /// Author ids — the web edits note authors through the note update.
+    public var authors: [String]?
 
     public init(title: String? = nil, text: String? = nil, take: String? = nil,
-                url: String? = nil, year: Int? = nil, page: String? = nil) {
+                url: String? = nil, year: Int? = nil, page: String? = nil,
+                authors: [String]? = nil) {
         self.title = title
         self.text = text
         self.take = take
         self.url = url
         self.year = year
         self.page = page
+        self.authors = authors
     }
 }
 
