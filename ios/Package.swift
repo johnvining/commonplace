@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "CommonplaceKit",
-    platforms: [.macOS(.v13), .iOS(.v17)],
+    platforms: [.macOS(.v14), .iOS(.v17)],
     products: [
         .library(name: "CommonplaceKit", targets: ["CommonplaceKit"]),
         .executable(name: "CommonplaceApp", targets: ["CommonplaceApp"]),
