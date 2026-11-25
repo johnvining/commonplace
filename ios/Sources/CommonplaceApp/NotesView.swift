@@ -8,8 +8,8 @@ struct NotesView: View {
     @State private var notes: [Note] = []
     @State private var page = 1
     @State private var search = ""
-    @State private var pileFilter = ""
-    @State private var ideaFilter = ""
+    @State private var pileSel: [PickOption] = []
+    @State private var ideaSel: [PickOption] = []
     @State private var error: String?
     @State private var newNoteId: String?
     @State private var showingNewNote = false
@@ -23,12 +23,34 @@ struct NotesView: View {
                 Section("Search & filters") {
                     TextField("Search", text: $search)
                         .onSubmit { applySearch() }
-                    TextField("Pile ids (comma-separated)", text: $pileFilter)
-                    TextField("Idea ids (comma-separated)", text: $ideaFilter)
+                    DSLabel(text: "Piles")
+                    PillEditor(
+                        placeholder: "Add a pile…",
+                        tint: DS.pileSoft,
+                        selected: $pileSel,
+                        load: { q in
+                            ((try? await state.client.autocompletePiles(q)) ?? [])
+                                .compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } }
+                        },
+                        onAdd: { pileSel.append($0); applySearch() },
+                        onRemove: { opt in pileSel.removeAll { $0.id == opt.id }; applySearch() }
+                    )
+                    DSLabel(text: "Ideas")
+                    PillEditor(
+                        placeholder: "Add an idea…",
+                        tint: DS.accentSoft,
+                        selected: $ideaSel,
+                        load: { q in
+                            ((try? await state.client.autocompleteIdeas(q)) ?? [])
+                                .compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } }
+                        },
+                        onAdd: { ideaSel.append($0); applySearch() },
+                        onRemove: { opt in ideaSel.removeAll { $0.id == opt.id }; applySearch() }
+                    )
                     HStack {
                         Button("Apply") { applySearch() }
                         Button("Clear") {
-                            search = ""; pileFilter = ""; ideaFilter = ""
+                            search = ""; pileSel = []; ideaSel = []
                             page = 1; loadRecent()
                         }
                     }
@@ -78,8 +100,8 @@ struct NotesView: View {
     private func applySearch() {
         Task {
             do {
-                let piles = pileFilter.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
-                let ideas = ideaFilter.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+                let piles = pileSel.map(\.id)
+                let ideas = ideaSel.map(\.id)
                 let rows: [Note]
                 if !piles.isEmpty || !ideas.isEmpty {
                     rows = try await state.client.filterNotes(piles: piles, ideas: ideas)
@@ -96,17 +118,38 @@ struct NotesView: View {
     }
 }
 
-/// One-line note row (mirrors the Slim list variant).
+/// Slim note row, web parity: authors + title on one line, one line of
+/// serif preview, then idea/pile tags in their tints.
 struct NoteRow: View {
     let note: Note
 
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(note.title ?? "(untitled)").lineLimit(1)
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 6) {
+                if let authors = note.authors, !authors.isEmpty {
+                    Text(authors.compactMap(\.name).joined(separator: ", ") + ":")
+                        .font(DS.ui(12)).foregroundStyle(DS.muted).lineLimit(1)
+                }
+                Text(note.title ?? "(untitled)")
+                    .font(DS.ui(14, weight: .medium)).lineLimit(1)
+            }
             if let text = note.text, !text.isEmpty {
-                Text(text).lineLimit(1).font(.caption).foregroundStyle(.secondary)
+                Text(text).lineLimit(1).font(DS.serif(13)).foregroundStyle(DS.muted)
+            }
+            if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
+                HStack(spacing: 6) {
+                    ForEach((note.ideas ?? []).prefix(3), id: \.id) { i in
+                        Text(i.name ?? "").font(DS.ui(11)).padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(DS.accentSoft).clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    ForEach((note.piles ?? []).prefix(3), id: \.id) { p in
+                        Text(p.name ?? "").font(DS.ui(11)).padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(DS.pileSoft).clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                }
             }
         }
+        .padding(.vertical, 2)
     }
 }
 
