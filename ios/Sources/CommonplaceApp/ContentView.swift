@@ -42,6 +42,7 @@ struct MoreView: View {
                 NavigationLink("Works") { WorksListView() }
                 NavigationLink("Authors") { AuthorsListView() }
                 NavigationLink("Ideas") { IdeasListView() }
+                NavigationLink("Review (Flip)") { FlipView() }
                 NavigationLink("Starred") { PinsView() }
                 NavigationLink("Settings") { SettingsView() }
             }
