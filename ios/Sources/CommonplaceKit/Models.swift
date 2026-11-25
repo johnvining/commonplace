@@ -47,6 +47,36 @@ public struct PopulatedRef: Codable, Equatable, Sendable {
 
 // MARK: - Note
 
+/// Wrapper that drops array elements which fail to decode (e.g. null
+/// populated refs left behind by deleted entities in old data).
+private struct FailableRef: Decodable {
+    var value: PopulatedRef?
+    init(from decoder: Decoder) throws {
+        value = try? PopulatedRef(from: decoder)
+    }
+}
+
+private func tolerantRefs(_ container: KeyedDecodingContainer<Note.CodingKeys>,
+                          _ key: Note.CodingKeys) -> [PopulatedRef]? {
+    guard let raw = try? container.decodeIfPresent([FailableRef].self, forKey: key) else { return nil }
+    return raw.compactMap(\.value)
+}
+
+private func tolerantInt(_ container: KeyedDecodingContainer<Note.CodingKeys>,
+                         _ key: Note.CodingKeys) -> Int? {
+    if let v = try? container.decodeIfPresent(Int.self, forKey: key) { return v }
+    if let v = try? container.decodeIfPresent(Double.self, forKey: key) { return Int(v) }
+    if let v = try? container.decodeIfPresent(String.self, forKey: key) { return Int(v) }
+    return nil
+}
+
+private func tolerantString(_ container: KeyedDecodingContainer<Note.CodingKeys>,
+                            _ key: Note.CodingKeys) -> String? {
+    if let v = try? container.decodeIfPresent(String.self, forKey: key) { return v }
+    if let v = try? container.decodeIfPresent(Int.self, forKey: key) { return String(v) }
+    return nil
+}
+
 public struct Note: Codable, Sendable {
     public var _id: String?
     public var title: String?
@@ -65,6 +95,37 @@ public struct Note: Codable, Sendable {
     public var reviewState: String?
     public var openCount: Int?
     public var reviewCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case _id, title, text, take, url, year, page, authors, people, work
+        case ideas, piles, images, nick, reviewState, openCount, reviewCount
+        case createdAt, updatedAt
+    }
+
+    public init() {}
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        _id = try? c.decodeIfPresent(String.self, forKey: ._id)
+        title = try? c.decodeIfPresent(String.self, forKey: .title)
+        text = try? c.decodeIfPresent(String.self, forKey: .text)
+        take = try? c.decodeIfPresent(String.self, forKey: .take)
+        url = tolerantString(c, .url)
+        year = tolerantInt(c, .year)
+        page = tolerantString(c, .page)
+        authors = tolerantRefs(c, .authors)
+        people = tolerantRefs(c, .people)
+        work = try? c.decodeIfPresent(PopulatedRef.self, forKey: .work)
+        ideas = tolerantRefs(c, .ideas)
+        piles = tolerantRefs(c, .piles)
+        images = (try? c.decodeIfPresent([String].self, forKey: .images)) ?? nil
+        nick = try? c.decodeIfPresent(String.self, forKey: .nick)
+        reviewState = try? c.decodeIfPresent(String.self, forKey: .reviewState)
+        openCount = tolerantInt(c, .openCount)
+        reviewCount = tolerantInt(c, .reviewCount)
+        createdAt = try? c.decodeIfPresent(Date.self, forKey: .createdAt)
+        updatedAt = try? c.decodeIfPresent(Date.self, forKey: .updatedAt)
+    }
     public var createdAt: Date?
     public var updatedAt: Date?
 }
