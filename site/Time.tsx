@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import * as db from './Database'
-import { getPinnedItems, unpinItem } from './pinned'
+import { getPinnedItems } from './pinned'
 import PinButton from './PinButton'
 import {
   TopLevelStandardButtonContainer,
@@ -33,6 +33,17 @@ export function formatMinutes(minutes: number): string {
   if (h <= 0) return `${m}m`
   if (m === 0) return `${h}h`
   return `${h}h ${m}m`
+}
+
+const TIMER_STORAGE_KEY = 'time_timer_v1'
+
+export function formatElapsed(ms: number): string {
+  const s = Math.max(0, Math.floor(ms / 1000))
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = s % 60
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`
 }
 
 function shiftDay(date: string, delta: number): string {
@@ -120,6 +131,12 @@ function Time(props: any) {
   const [loading, setLoading] = useState(true)
   const [params, setParams] = useSearchParams()
   const subjectApplied = useRef<string | null>(null)
+  const [timerKey, setTimerKey] = useState('')
+  const [timerKind, setTimerKind] = useState('writing')
+  const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null)
+  const [now, setNow] = useState(Date.now())
+  const [manualOpen, setManualOpen] = useState(false)
+  const formRef = useRef<HTMLDivElement | null>(null)
 
   // Log form state
   const [title, setTitle] = useState('')
@@ -161,55 +178,109 @@ function Time(props: any) {
     return () => window.removeEventListener('pinned-items-updated', refresh)
   }, [])
 
-  // Fill the form from a subject: a recent subject, or a starred one
-  // arriving via /time?subject=... from the sidebar.
-  const prefill = (subject: { key: string; title?: string; pile?: { id: string; name: string }; kind: string; minutes: number }) => {
-    setEditingId(null)
-    setError(null)
-    setKind(subject.kind === 'reading' ? 'reading' : 'writing')
-    setMinutes(String(subject.minutes))
-    setDate(selectedDate)
-    if (subject.pile) {
-      setPileId(subject.pile.id)
-      setPileName(subject.pile.name)
-      setTitle(subject.title ?? '')
-      setPileQuery('')
-      setPileResults([])
-    } else {
-      setPileId(null)
-      setPileName('')
-      setTitle(subject.title ?? '')
-    }
-    window.scrollTo({ top: 0 })
-  }
+  // A running timer survives reloads: pick it back up on mount.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(TIMER_STORAGE_KEY)
+      if (!raw) return
+      const t = JSON.parse(raw)
+      if (
+        t &&
+        typeof t.key === 'string' &&
+        t.key &&
+        (t.kind === 'reading' || t.kind === 'writing') &&
+        Number.isFinite(t.startedAt)
+      ) {
+        setTimerKey(t.key)
+        setTimerKind(t.kind)
+        setTimerStartedAt(t.startedAt)
+      }
+    } catch {}
+  }, [])
 
-  const prefillByKey = async (key: string) => {
-    const found = subjects.find((s: any) => s.key === key)
-    if (found) {
-      prefill(found)
-      return
-    }
-    // Starred before anything recent covers it, or aged out: resolve the
-    // key itself so the sidebar star still lands somewhere useful.
+  // Tick the elapsed display while the timer runs.
+  useEffect(() => {
+    if (timerStartedAt === null) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [timerStartedAt])
+
+  // The timer's subject, resolved against recents first (original-case
+  // titles, pile names), then starred pins, then the raw key.
+  const resolveTimerSubject = (
+    key: string
+  ): { key: string; title?: string; pileId?: string } | null => {
+    if (!key) return null
+    const recent = subjects.find((s: any) => s.key === key)
+    if (recent) return { key, title: recent.title, pileId: recent.pile?.id }
     if (key.startsWith('pile:')) {
       const id = key.slice(5)
+      if (!/^[0-9a-f]{24}$/i.test(id)) return null
+      return { key, pileId: id }
+    }
+    if (key.startsWith('title:') && key.length > 6) {
+      const pin = starred.find((p: any) => p.id === key)
+      return { key, title: pin?.label || key.slice(6) }
+    }
+    return null
+  }
+
+  const selectTimerKey = (key: string) => {
+    setTimerKey(key)
+    const recent = subjects.find((s: any) => s.key === key)
+    if (recent) setTimerKind(recent.kind === 'writing' ? 'writing' : 'reading')
+  }
+
+  const startTimer = () => {
+    if (timerStartedAt !== null || !resolveTimerSubject(timerKey)) return
+    const startedAt = Date.now()
+    setTimerStartedAt(startedAt)
+    setNow(startedAt)
+    try {
+      localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify({ key: timerKey, kind: timerKind, startedAt }))
+    } catch {}
+  }
+
+  const stopTimer = async () => {
+    if (timerStartedAt === null) return
+    const subject = resolveTimerSubject(timerKey)
+    const elapsedMin = Math.max(1, Math.round((Date.now() - timerStartedAt) / 60000))
+    setTimerStartedAt(null)
+    try {
+      localStorage.removeItem(TIMER_STORAGE_KEY)
+    } catch {}
+    if (!subject || (!subject.pileId && !subject.title)) {
+      setError('Pick what this time was for first.')
+      return
+    }
+    // A pile star can outlive its pile; check before logging.
+    if (subject.pileId) {
       try {
-        const res = await db.getInfo(db.types.pile, id)
-        prefill({ key, pile: { id, name: res.data.data?.name ?? 'Pile' }, kind: 'writing', minutes: 30 })
+        await db.getInfo(db.types.pile, subject.pileId)
       } catch {
-        setError('That pile is gone; pick a title instead.')
+        setError('That pile is gone; pick something else.')
+        return
       }
-    } else if (key.startsWith('title:')) {
-      const title = key.slice(6)
-      if (title) prefill({ key, title, kind: 'reading', minutes: 30 })
+    }
+    setError(null)
+    const body: any = { kind: timerKind, minutes: elapsedMin, date: todayLocal() }
+    if (subject.pileId) body.pile = subject.pileId
+    if (subject.title) body.title = subject.title
+    try {
+      await db.createTimeEntry(body)
+      load(selectedDate)
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? 'Could not save that entry.')
     }
   }
 
+  // A sidebar star lands here via /time?subject=...: select it in the
+  // timer row once subjects have loaded.
   useEffect(() => {
     const key = params.get('subject')
-    if (key && subjectApplied.current !== key && subjects.length) {
+    if (key && subjectApplied.current !== key && (subjects.length || starred.length)) {
       subjectApplied.current = key
-      prefillByKey(key)
+      selectTimerKey(key)
       setParams({}, { replace: true })
     }
   })
@@ -254,6 +325,7 @@ function Time(props: any) {
     setPileResults([])
     setEditingId(null)
     setError(null)
+    setManualOpen(false)
   }
 
   const save = async () => {
@@ -287,27 +359,6 @@ function Time(props: any) {
     load(selectedDate)
   }
 
-  // One-tap logging for a starred subject: same kind and minutes as
-  // last time, on the selected day. Falls back to prefilling the form
-  // when the subject needs disambiguating (deleted pile, odd title).
-  const logNow = async (subject: { key: string; title?: string; pile?: { id: string; name: string }; kind: string; minutes: number }) => {
-    setError(null)
-    const body: any = { kind: subject.kind, minutes: subject.minutes, date: selectedDate }
-    if (subject.pile) {
-      body.pile = subject.pile.id
-      if (subject.title) body.title = subject.title
-    } else {
-      body.title = subject.title ?? 'Untitled'
-    }
-    try {
-      await db.createTimeEntry(body)
-      load(selectedDate)
-    } catch (e: any) {
-      prefill(subject)
-      setError(e?.response?.data?.message ?? 'Could not log that; adjust the form and save.')
-    }
-  }
-
   const edit = (entry: any) => {
     setEditingId(entry._id)
     setTitle(entry.title ?? '')
@@ -322,7 +373,8 @@ function Time(props: any) {
       setPileName('')
     }
     setError(null)
-    window.scrollTo({ top: 0 })
+    setManualOpen(true)
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }
 
   const remove = async (entry: any) => {
@@ -346,190 +398,71 @@ function Time(props: any) {
         <TopLevelSubTitle>Reading vs writing, logged by day and tallied by piece.</TopLevelSubTitle>
       </TopLevelTitleContainer>
 
-      <div className="time-form">
-        <TopLevelSubTitle>{editingId ? 'Edit entry' : 'Log time'}</TopLevelSubTitle>
-        <div className="time-form-grid">
-          <label className="top-level form-label" htmlFor="time-title">Title</label>
-          <input
-            id="time-title"
-            className="top-level input"
-            placeholder="e.g. Morning pages"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <label className="top-level form-label" htmlFor="time-pile">Pile</label>
-          <div>
-            {pileId ? (
-              <div className="time-pile-pick">
-                <Link to={'/pile/' + pileId}>{pileName}</Link>
-                <button
-                  className="button"
-                  onClick={() => {
-                    setPileId(null)
-                    setPileName('')
-                  }}
-                >
-                  ×
-                </button>
-              </div>
-            ) : (
-              <>
-                <input
-                  id="time-pile"
-                  className="top-level input"
-                  placeholder="Link a pile (optional)"
-                  value={pileQuery}
-                  onChange={(e) => setPileQuery(e.target.value)}
-                />
-                {pileResults.length > 0 || pileQuery.trim().length >= 2 ? (
-                  <ul className="time-pile-results">
-                    {pileResults.map((p: any) => (
-                      <li key={p._id}>
-                        <button className="button" onClick={() => pickPile(p._id, p.name)}>
-                          {p.name}
-                        </button>
-                      </li>
-                    ))}
-                    {pileQuery.trim() ? (
-                      <li>
-                        <button className="button" onClick={createPile}>
-                          New pile: {pileQuery.trim()}
-                        </button>
-                      </li>
-                    ) : null}
-                  </ul>
-                ) : null}
-              </>
-            )}
-          </div>
-          <span className="top-level form-label">Kind</span>
+      <div className="time-card time-timer">
+        <div className="time-timer-row">
+          <select
+            aria-label="What the time is for"
+            className="top-level input compact time-subject-select"
+            value={timerKey}
+            onChange={(e) => selectTimerKey(e.target.value)}
+            disabled={timerStartedAt !== null}
+          >
+            <option value="">Pick something…</option>
+            {starred.length ? (
+              <optgroup label="Starred">
+                {starred.map((pin: any) => {
+                  const s = subjects.find((x: any) => x.key === pin.id)
+                  const label = s
+                    ? s.pile
+                      ? s.pile.name + (s.title ? ` — ${s.title}` : '')
+                      : s.title
+                    : pin.label || pin.id
+                  return (
+                    <option key={pin.id} value={pin.id}>
+                      ★ {label}
+                    </option>
+                  )
+                })}
+              </optgroup>
+            ) : null}
+            {subjects.filter((s: any) => !starred.some((p: any) => p.id === s.key)).length ? (
+              <optgroup label="Recent">
+                {subjects
+                  .filter((s: any) => !starred.some((p: any) => p.id === s.key))
+                  .map((s: any) => (
+                    <option key={s.key} value={s.key}>
+                      {s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.title}
+                    </option>
+                  ))}
+              </optgroup>
+            ) : null}
+          </select>
           <div className="time-kind-toggle" role="group" aria-label="Reading or writing">
             {['reading', 'writing'].map((k) => (
               <button
                 key={k}
-                className={'button' + (kind === k ? ' button-selected' : '')}
-                onClick={() => setKind(k)}
+                className={'button compact' + (timerKind === k ? ' button-selected' : '')}
+                onClick={() => timerStartedAt === null && setTimerKind(k)}
               >
                 {k === 'reading' ? 'Reading' : 'Writing'}
               </button>
             ))}
           </div>
-          <label className="top-level form-label" htmlFor="time-minutes">Minutes</label>
-          <input
-            id="time-minutes"
-            className="top-level input"
-            type="number"
-            min="1"
-            max="1440"
-            placeholder="e.g. 45"
-            value={minutes}
-            onChange={(e) => setMinutes(e.target.value)}
-          />
-          <label className="top-level form-label" htmlFor="time-date">Day</label>
-          <input
-            id="time-date"
-            className="top-level input"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
+          {timerStartedAt !== null ? (
+            <>
+              <span className="time-elapsed">{formatElapsed(now - timerStartedAt)}</span>
+              <TopLevelStandardButton name="Stop" className="compact" onClick={stopTimer} />
+            </>
+          ) : (
+            <TopLevelStandardButton name="Start" className="compact" onClick={startTimer} />
+          )}
         </div>
+        {timerStartedAt !== null ? (
+          <div className="sidebar-muted">Timing {timerKind} — stopping logs it to today.</div>
+        ) : null}
         {error ? <div className="time-error">{error}</div> : null}
-        <TopLevelStandardButtonContainer>
-          <TopLevelStandardButton
-            name={editingId ? 'Save' : 'Log time'}
-            position="left"
-            onClick={save}
-          />
-          {editingId ? (
-            <TopLevelStandardButton name="Cancel" position="right" onClick={resetForm} />
-          ) : null}
-        </TopLevelStandardButtonContainer>
       </div>
 
-      {starred.length || subjects.length ? (
-        <div className="time-shortcuts">
-          {starred.length ? (
-            <>
-              <TopLevelSubTitle>Starred</TopLevelSubTitle>
-              <ul className="time-entry-list">
-                {starred.map((pin: any) => {
-                  const subject = subjects.find((s: any) => s.key === pin.id)
-                  const label = subject
-                    ? subject.pile
-                      ? subject.pile.name + (subject.title ? ` — ${subject.title}` : '')
-                      : subject.title
-                    : pin.label || pin.id
-                  return (
-                    <li key={pin.id} className="time-entry">
-                      <span className="time-subject">
-                        {subject?.pile ? (
-                          <Link to={'/pile/' + subject.pile.id}>{label}</Link>
-                        ) : (
-                          label
-                        )}
-                      </span>
-                      {subject ? (
-                        <>
-                          <span className={'time-kind time-kind-' + subject.kind}>{subject.kind}</span>
-                          <span className="time-minutes">{formatMinutes(subject.minutes)}</span>
-                          <span className="time-entry-actions">
-                            <button className="button" onClick={() => logNow(subject)}>
-                              Log {formatMinutes(subject.minutes)}
-                            </button>
-                            <button className="button" onClick={() => prefill(subject)}>
-                              Fill form
-                            </button>
-                            <button className="button" onClick={() => unpinItem('time', pin.id)}>
-                              Unstar
-                            </button>
-                          </span>
-                        </>
-                      ) : (
-                        <span className="time-entry-actions">
-                          <button className="button" onClick={() => prefillByKey(pin.id)}>
-                            Fill form
-                          </button>
-                          <button className="button" onClick={() => unpinItem('time', pin.id)}>
-                            Unstar
-                          </button>
-                        </span>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            </>
-          ) : null}
-          {subjects.filter((s: any) => !starred.some((p: any) => p.id === s.key)).length ? (
-            <>
-              <TopLevelSubTitle>Recent — tap to log again</TopLevelSubTitle>
-              <ul className="time-entry-list">
-                {subjects
-                  .filter((s: any) => !starred.some((p: any) => p.id === s.key))
-                  .map((s: any) => (
-                    <li key={s.key} className="time-entry">
-                      <span className="time-subject">
-                        {s.pile ? <Link to={'/pile/' + s.pile.id}>{s.pile.name}</Link> : s.title}
-                        {s.pile && s.title ? ` — ${s.title}` : null}
-                      </span>
-                      <span className={'time-kind time-kind-' + s.kind}>{s.kind}</span>
-                      <span className="time-minutes">{formatMinutes(s.minutes)}</span>
-                      <span className="time-entry-actions">
-                        <button className="button" onClick={() => logNow(s)}>
-                          Log {formatMinutes(s.minutes)}
-                        </button>
-                        <button className="button" onClick={() => prefill(s)}>
-                          Fill form
-                        </button>
-                      </span>
-                    </li>
-                  ))}
-              </ul>
-            </>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="time-day-nav">
         <TopLevelStandardButton
@@ -538,7 +471,7 @@ function Time(props: any) {
         />
         <input
           aria-label="Selected day"
-          className="top-level input time-date-input"
+          className="top-level input compact time-date-input"
           type="date"
           value={selectedDate}
           onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
@@ -555,18 +488,18 @@ function Time(props: any) {
       ) : (
         <>
           <div className="time-card">
-            <TopLevelSubTitle>Daily — {daily.date}</TopLevelSubTitle>
+            <div className="top-level form-label">Daily — {daily.date}</div>
             <KindTotals summary={daily} />
             <CrossCheck reading={daily.readingMinutes} writing={daily.writingMinutes} total={daily.totalMinutes} />
             {daily.byPile.length ? (
               <>
-                <div className="time-table-title">By pile</div>
+                <div className="top-level form-label time-table-title">By pile</div>
                 <SubjectTable rows={daily.byPile} pileLink />
               </>
             ) : null}
             {daily.byTitle.length ? (
               <>
-                <div className="time-table-title">By title</div>
+                <div className="top-level form-label time-table-title">By title</div>
                 <SubjectTable rows={daily.byTitle} />
               </>
             ) : null}
@@ -574,7 +507,7 @@ function Time(props: any) {
           </div>
 
           <div className="time-entries">
-            <TopLevelSubTitle>Entries — {selectedDate}</TopLevelSubTitle>
+            <div className="top-level form-label">Entries — {selectedDate}</div>
             {dayEntries.length ? (
               <ul className="time-entry-list">
                 {dayEntries.map((e: any) => {
@@ -601,8 +534,8 @@ function Time(props: any) {
                           href={subject.href}
                           compact
                         />
-                        <button className="button" onClick={() => edit(e)}>Edit</button>
-                        <button className="button" onClick={() => remove(e)}>Delete</button>
+                        <button className="button compact" onClick={() => edit(e)}>Edit</button>
+                        <button className="button compact" onClick={() => remove(e)}>Delete</button>
                       </span>
                     </li>
                   )
@@ -614,9 +547,9 @@ function Time(props: any) {
           </div>
 
           <div className="time-card">
-            <TopLevelSubTitle>
+            <div className="top-level form-label">
               Weekly — {weekly.weekStart} to {weekly.weekEnd}
-            </TopLevelSubTitle>
+            </div>
             <KindTotals summary={weekly} />
             <CrossCheck reading={weekly.readingMinutes} writing={weekly.writingMinutes} total={weekly.totalMinutes} />
             <div
@@ -627,7 +560,7 @@ function Time(props: any) {
               cross-check: 7 days sum to {formatMinutes(weekDaySum)}{' '}
               {weekDaySum === weekly.totalMinutes ? '✓' : `✗ (week total ${formatMinutes(weekly.totalMinutes)})`}
             </div>
-            <div className="time-table-title">By day</div>
+            <div className="top-level form-label time-table-title">By day</div>
             <table className="time-table">
               <thead>
                 <tr>
@@ -654,17 +587,124 @@ function Time(props: any) {
             </table>
             {weekly.byPile.length ? (
               <>
-                <div className="time-table-title">By pile</div>
+                <div className="top-level form-label time-table-title">By pile</div>
                 <SubjectTable rows={weekly.byPile} pileLink />
               </>
             ) : null}
             {weekly.byTitle.length ? (
               <>
-                <div className="time-table-title">By title</div>
+                <div className="top-level form-label time-table-title">By title</div>
                 <SubjectTable rows={weekly.byTitle} />
               </>
             ) : null}
           </div>
+
+          <details
+            className="time-manual"
+            open={manualOpen}
+            onToggle={(e: any) => setManualOpen(e.currentTarget.open)}
+          >
+            <summary className="top-level form-label">Log manually</summary>
+            <div ref={formRef} className="time-form">
+              <div className="time-form-grid">
+                <label className="top-level form-label" htmlFor="time-title">Title</label>
+                <input
+                  id="time-title"
+                  className="top-level input compact"
+                  placeholder="e.g. Morning pages"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+                <label className="top-level form-label" htmlFor="time-pile">Pile</label>
+                <div>
+                  {pileId ? (
+                    <div className="time-pile-pick compact">
+                      <Link to={'/pile/' + pileId}>{pileName}</Link>
+                      <button
+                        className="button compact"
+                        onClick={() => {
+                          setPileId(null)
+                          setPileName('')
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        id="time-pile"
+                        className="top-level input compact"
+                        placeholder="Link a pile (optional)"
+                        value={pileQuery}
+                        onChange={(e) => setPileQuery(e.target.value)}
+                      />
+                      {pileResults.length > 0 || pileQuery.trim().length >= 2 ? (
+                        <ul className="time-pile-results">
+                          {pileResults.map((p: any) => (
+                            <li key={p._id}>
+                              <button className="button compact" onClick={() => pickPile(p._id, p.name)}>
+                                {p.name}
+                              </button>
+                            </li>
+                          ))}
+                          {pileQuery.trim() ? (
+                            <li>
+                              <button className="button compact" onClick={createPile}>
+                                New pile: {pileQuery.trim()}
+                              </button>
+                            </li>
+                          ) : null}
+                        </ul>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+                <span className="top-level form-label">Kind</span>
+                <div className="time-kind-toggle" role="group" aria-label="Reading or writing">
+                  {['reading', 'writing'].map((k) => (
+                    <button
+                      key={k}
+                      className={'button compact' + (kind === k ? ' button-selected' : '')}
+                      onClick={() => setKind(k)}
+                    >
+                      {k === 'reading' ? 'Reading' : 'Writing'}
+                    </button>
+                  ))}
+                </div>
+                <label className="top-level form-label" htmlFor="time-minutes">Minutes</label>
+                <input
+                  id="time-minutes"
+                  className="top-level input compact"
+                  type="number"
+                  min="1"
+                  max="1440"
+                  placeholder="e.g. 45"
+                  value={minutes}
+                  onChange={(e) => setMinutes(e.target.value)}
+                />
+                <label className="top-level form-label" htmlFor="time-date">Day</label>
+                <input
+                  id="time-date"
+                  className="top-level input compact"
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+              {error ? <div className="time-error">{error}</div> : null}
+              <TopLevelStandardButtonContainer>
+                <TopLevelStandardButton
+                  name={editingId ? 'Save' : 'Log time'}
+                  className="compact"
+                  onClick={save}
+                />
+                {editingId ? (
+                  <TopLevelStandardButton name="Cancel" className="compact" onClick={resetForm} />
+                ) : null}
+              </TopLevelStandardButtonContainer>
+            </div>
+          </details>
         </>
       )}
     </div>
