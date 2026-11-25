@@ -17,52 +17,74 @@ struct NotesView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    Button("＋ New Note") { createNote() }
-                }
-                Section("Search & filters") {
-                    TextField("Search", text: $search)
-                        .onSubmit { applySearch() }
-                    DSLabel(text: "Piles")
-                    PillEditor(
-                        placeholder: "Add a pile…",
-                        tint: DS.pileSoft,
-                        selected: $pileSel,
-                        load: { q in
-                            ((try? await state.client.autocompletePiles(q)) ?? [])
-                                .compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } }
-                        },
-                        onAdd: { pileSel.append($0); applySearch() },
-                        onRemove: { opt in pileSel.removeAll { $0.id == opt.id }; applySearch() }
-                    )
-                    DSLabel(text: "Ideas")
-                    PillEditor(
-                        placeholder: "Add an idea…",
-                        tint: DS.accentSoft,
-                        selected: $ideaSel,
-                        load: { q in
-                            ((try? await state.client.autocompleteIdeas(q)) ?? [])
-                                .compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } }
-                        },
-                        onAdd: { ideaSel.append($0); applySearch() },
-                        onRemove: { opt in ideaSel.removeAll { $0.id == opt.id }; applySearch() }
-                    )
+                VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Button("Apply") { applySearch() }
-                        Button("Clear") {
-                            search = ""; pileSel = []; ideaSel = []
-                            page = 1; loadRecent()
-                        }
+                        TextField("Search notes", text: $search)
+                            .font(DS.ui(14))
+                            .onSubmit { applySearch() }
+                        Button("＋ Note") { createNote() }
+                            .font(DS.ui(13, weight: .medium))
                     }
+                    DisclosureGroup("Filter by pile / idea") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            DSLabel(text: "Piles")
+                            PillEditor(
+                                placeholder: "Add a pile…",
+                                tint: DS.pileSoft,
+                                selected: $pileSel,
+                                load: { q in
+                                    ((try? await state.client.autocompletePiles(q)) ?? [])
+                                        .compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } }
+                                },
+                                onAdd: { pileSel.append($0); applySearch() },
+                                onRemove: { opt in pileSel.removeAll { $0.id == opt.id }; applySearch() }
+                            )
+                            DSLabel(text: "Ideas")
+                            PillEditor(
+                                placeholder: "Add an idea…",
+                                tint: DS.accentSoft,
+                                selected: $ideaSel,
+                                load: { q in
+                                    ((try? await state.client.autocompleteIdeas(q)) ?? [])
+                                        .compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } }
+                                },
+                                onAdd: { ideaSel.append($0); applySearch() },
+                                onRemove: { opt in ideaSel.removeAll { $0.id == opt.id }; applySearch() }
+                            )
+                            Button("Clear filters") {
+                                search = ""; pileSel = []; ideaSel = []
+                                page = 1; loadRecent()
+                            }
+                            .font(DS.ui(12))
+                        }
+                        .padding(.top, 6)
+                    }
+                    .font(DS.ui(13))
+                    .foregroundStyle(DS.muted)
                 }
-                if let error { Text(error).foregroundStyle(.red) }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+
+                if let error {
+                    Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
+                        .listRowSeparator(.hidden)
+                }
                 ForEach(notes, id: \.stableId) { n in
                     NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
                         NoteRow(note: n)
                     }
+                    .listRowSeparatorTint(DS.hairline)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                }
+                if notes.isEmpty && error == nil {
+                    Text("No notes yet.").font(DS.ui(13)).foregroundStyle(DS.muted)
+                        .listRowSeparator(.hidden)
                 }
                 Button("Load more") { loadRecent(page: page + 1) }
+                    .font(DS.ui(13))
+                    .listRowSeparator(.hidden)
             }
+            .listStyle(.plain)
             .navigationTitle("Notes")
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "")
@@ -92,7 +114,7 @@ struct NotesView: View {
                     notes = wanted == 1 ? rows : notes + rows
                 }
             } catch {
-                await MainActor.run { self.error = "Load failed — retry." }
+                await MainActor.run { self.error = "Load failed: \(describe(error))" }
             }
         }
     }
@@ -112,10 +134,26 @@ struct NotesView: View {
                 }
                 await MainActor.run { notes = rows }
             } catch {
-                await MainActor.run { self.error = "Search failed — retry." }
+                await MainActor.run { self.error = "Search failed: \(describe(error))" }
             }
         }
     }
+}
+
+/// Human-readable API failure for list footers.
+func describe(_ error: Error) -> String {
+    if let api = error as? APIError {
+        switch api {
+        case .unauthorized(let m): return m ?? "signed out — log in again"
+        case .forbidden(let m): return m ?? "forbidden"
+        case .notFound(let m): return m ?? "not found"
+        case .clientError(_, let m): return m ?? "request failed"
+        case .serverError(let s, let m): return m ?? "server error \(s)"
+        case .decoding(let d): return "bad response (\(d.prefix(90)))"
+        case .transport(let t): return "unreachable (\(t.prefix(60)))"
+        }
+    }
+    return error.localizedDescription
 }
 
 /// Slim note row, web parity: authors + title on one line, one line of
