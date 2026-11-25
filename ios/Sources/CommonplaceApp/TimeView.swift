@@ -18,7 +18,7 @@ struct TimeView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
+            List {
                 Section("Timer") {
                     Picker("Subject", selection: $selection) {
                         Text("Pick something…").tag("")
@@ -118,7 +118,8 @@ struct TimeView: View {
                     }
                 }
             }
-            .navigationTitle("Time")
+            .listStyle(.plain)
+        .navigationTitle("Time")
             .task { initialLoad() }
         }
     }

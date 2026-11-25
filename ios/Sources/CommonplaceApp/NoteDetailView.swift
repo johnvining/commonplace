@@ -31,7 +31,7 @@ struct NoteDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        Form {
+        List {
             if let error { Text(error).foregroundStyle(.red) }
             if let note {
                 Section {
@@ -163,6 +163,7 @@ struct NoteDetailView: View {
                 Text("Loading…")
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Note")
         .task { load() }
     }
