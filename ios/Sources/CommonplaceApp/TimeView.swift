@@ -357,7 +357,7 @@ struct ManualEntryForm: View {
     }
 
     private func save() {
-        guard let m = Int(minutes), m >= 1 else { error = "Minutes must be ≥ 1."; return }
+        guard let m = Int(minutes), m >= 1 else { self.error = "Minutes must be ≥ 1."; return }
         let pileId = pile.trimmingCharacters(in: .whitespaces).isEmpty ? nil : pile
         let body = TimeEntryBody(title: title.isEmpty ? nil : title,
                                  pile: pileId, kind: kind, minutes: m,
@@ -367,7 +367,7 @@ struct ManualEntryForm: View {
                 _ = try await state.client.createTimeEntry(body)
                 await MainActor.run { onSaved() }
             } catch {
-                await MainActor.run { error = "Save failed — retry." }
+                await MainActor.run { self.error = "Save failed — retry." }
             }
         }
     }
