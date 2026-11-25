@@ -152,7 +152,7 @@ final class AppState: ObservableObject {
                 break
             }
         } catch {
-            break
+            // Unknown error: leave auth state untouched.
         }
     }
 }
