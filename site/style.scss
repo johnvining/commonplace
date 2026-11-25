@@ -2380,6 +2380,24 @@ mark.search-highlight {
   min-width: 0;
 }
 
+.time-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.top-level.input.time-name-input {
+  width: auto;
+  flex: 0 1 260px;
+  min-width: 0;
+}
+
+.button.compact:disabled {
+  opacity: 0.45;
+}
+
 .time-elapsed {
   font-size: 20px;
   font-variant-numeric: tabular-nums;

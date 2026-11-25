@@ -133,6 +133,14 @@ function Time(props: any) {
   const subjectApplied = useRef<string | null>(null)
   const [timerKey, setTimerKey] = useState('')
   const [timerKind, setTimerKind] = useState('writing')
+  const [newName, setNewName] = useState('')
+  const [customTitles, setCustomTitles] = useState<Record<string, string>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('time_custom_titles') || '{}')
+    } catch {
+      return {}
+    }
+  })
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null)
   const [now, setNow] = useState(Date.now())
   const [manualOpen, setManualOpen] = useState(false)
@@ -219,10 +227,24 @@ function Time(props: any) {
       return { key, pileId: id }
     }
     if (key.startsWith('title:') && key.length > 6) {
+      if (customTitles[key]) return { key, title: customTitles[key] }
       const pin = starred.find((p: any) => p.id === key)
       return { key, title: pin?.label || key.slice(6) }
     }
     return null
+  }
+
+  const useNewName = () => {
+    const name = newName.trim()
+    if (!name) return
+    const key = `title:${name.toLowerCase()}`
+    const next = { ...customTitles, [key]: name }
+    setCustomTitles(next)
+    try {
+      localStorage.setItem('time_custom_titles', JSON.stringify(next))
+    } catch {}
+    setTimerKey(key)
+    setNewName('')
   }
 
   const selectTimerKey = (key: string) => {
@@ -436,11 +458,23 @@ function Time(props: any) {
                   ))}
               </optgroup>
             ) : null}
+            {Object.keys(customTitles).filter((k) => !subjects.some((s: any) => s.key === k)).length ? (
+              <optgroup label="Named">
+                {Object.entries(customTitles)
+                  .filter(([k]) => !subjects.some((s: any) => s.key === k))
+                  .map(([k, name]) => (
+                    <option key={k} value={k}>
+                      {name}
+                    </option>
+                  ))}
+              </optgroup>
+            ) : null}
           </select>
           <div className="time-kind-toggle" role="group" aria-label="Reading or writing">
             {['reading', 'writing'].map((k) => (
               <button
                 key={k}
+                disabled={timerStartedAt !== null}
                 className={'button compact' + (timerKind === k ? ' button-selected' : '')}
                 onClick={() => timerStartedAt === null && setTimerKind(k)}
               >
@@ -450,12 +484,40 @@ function Time(props: any) {
           </div>
           {timerStartedAt !== null ? (
             <>
-              <span className="time-elapsed">{formatElapsed(now - timerStartedAt)}</span>
+              <span className="time-elapsed" aria-label="Elapsed time">{formatElapsed(now - timerStartedAt)}</span>
               <TopLevelStandardButton name="Stop" className="compact" onClick={stopTimer} />
             </>
           ) : (
-            <TopLevelStandardButton name="Start" className="compact" onClick={startTimer} />
+            <button
+              className="button compact"
+              disabled={!resolveTimerSubject(timerKey)}
+              title={resolveTimerSubject(timerKey) ? 'Start timer' : 'Pick a subject or name something new first'}
+              onClick={startTimer}
+            >
+              Start
+            </button>
           )}
+        </div>
+        <div className="time-name-row">
+          <input
+            aria-label="Name something new"
+            className="top-level input compact time-name-input"
+            placeholder="Name something new…"
+            value={newName}
+            disabled={timerStartedAt !== null}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') useNewName() }}
+          />
+          <button
+            className="button compact"
+            disabled={!newName.trim() || timerStartedAt !== null}
+            onClick={useNewName}
+          >
+            Use name
+          </button>
+          {!timerKey && !timerStartedAt ? (
+            <span className="sidebar-muted">Pick a subject, or name something new, then Start.</span>
+          ) : null}
         </div>
         {timerStartedAt !== null ? (
           <div className="sidebar-muted">Timing {timerKind} — stopping logs it to today.</div>
