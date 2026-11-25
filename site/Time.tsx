@@ -267,10 +267,8 @@ function Time(props: any) {
     if (timerStartedAt === null) return
     const subject = resolveTimerSubject(timerKey)
     const elapsedMin = Math.max(1, Math.round((Date.now() - timerStartedAt) / 60000))
-    setTimerStartedAt(null)
-    try {
-      localStorage.removeItem(TIMER_STORAGE_KEY)
-    } catch {}
+    // Validate before clearing anything: a failed stop must keep the
+    // timer running so the elapsed time is never lost.
     if (!subject || (!subject.pileId && !subject.title)) {
       setError('Pick what this time was for first.')
       return
@@ -290,10 +288,15 @@ function Time(props: any) {
     if (subject.title) body.title = subject.title
     try {
       await db.createTimeEntry(body)
-      load(selectedDate)
     } catch (e: any) {
       setError(e?.response?.data?.message ?? 'Could not save that entry.')
+      return
     }
+    setTimerStartedAt(null)
+    try {
+      localStorage.removeItem(TIMER_STORAGE_KEY)
+    } catch {}
+    load(selectedDate)
   }
 
   // A sidebar star lands here via /time?subject=...: select it in the
@@ -427,7 +430,6 @@ function Time(props: any) {
             className="top-level input compact time-subject-select"
             value={timerKey}
             onChange={(e) => selectTimerKey(e.target.value)}
-            disabled={timerStartedAt !== null}
           >
             <option value="">Pick something…</option>
             {starred.length ? (
@@ -474,7 +476,6 @@ function Time(props: any) {
             {['reading', 'writing'].map((k) => (
               <button
                 key={k}
-                disabled={timerStartedAt !== null}
                 className={'button compact' + (timerKind === k ? ' button-selected' : '')}
                 onClick={() => timerStartedAt === null && setTimerKind(k)}
               >
@@ -504,7 +505,6 @@ function Time(props: any) {
             className="top-level input compact time-name-input"
             placeholder="Name something new…"
             value={newName}
-            disabled={timerStartedAt !== null}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') useNewName() }}
           />
