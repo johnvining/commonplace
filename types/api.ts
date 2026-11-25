@@ -9,7 +9,7 @@
 
 export type EntityId = string
 
-export type EntityType = 'note' | 'work' | 'idea' | 'pile' | 'auth'
+export type EntityType = 'note' | 'work' | 'idea' | 'pile' | 'auth' | 'time'
 
 // --- Entity shapes (as returned by the API after .lean()) ---
 

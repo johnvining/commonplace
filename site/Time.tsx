@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import * as db from './Database'
+import { getPinnedItems, unpinItem } from './pinned'
+import PinButton from './PinButton'
 import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
@@ -37,6 +39,19 @@ function shiftDay(date: string, delta: number): string {
   const d = new Date(date + 'T12:00:00')
   d.setDate(d.getDate() + delta)
   return toLocalDay(d)
+}
+
+// Starred subjects are pins of type 'time' whose id is the subject key:
+// `pile:<pileId>` for pile-linked time, `title:<lowercased title>` otherwise.
+function subjectKeyFor(entry: any): { key: string; label: string; href: string } {
+  const pileId = entry.pile?._id ? String(entry.pile._id) : entry.pile ? String(entry.pile) : null
+  if (pileId && /^[0-9a-f]{24}$/i.test(pileId)) {
+    const label = entry.pile?.name || entry.title?.trim() || 'Pile'
+    return { key: `pile:${pileId}`, label, href: `/time?subject=${encodeURIComponent(`pile:${pileId}`)}` }
+  }
+  const title = (entry.title ?? '').trim() || 'Untitled'
+  const key = `title:${title.toLowerCase()}`
+  return { key, label: title, href: `/time?subject=${encodeURIComponent(key)}` }
 }
 
 // Reading + writing cross-check: the two kinds must sum to the total.
@@ -100,7 +115,11 @@ function Time(props: any) {
   const [selectedDate, setSelectedDate] = useState(todayLocal())
   const [summary, setSummary] = useState<any>(null)
   const [dayEntries, setDayEntries] = useState<any[]>([])
+  const [subjects, setSubjects] = useState<any[]>([])
+  const [starred, setStarred] = useState<any[]>(() => getPinnedItems().filter((p) => p.type === 'time'))
   const [loading, setLoading] = useState(true)
+  const [params, setParams] = useSearchParams()
+  const subjectApplied = useRef<string | null>(null)
 
   // Log form state
   const [title, setTitle] = useState('')
@@ -117,12 +136,14 @@ function Time(props: any) {
   const load = async (day: string) => {
     setLoading(true)
     try {
-      const [summaryRes, entriesRes] = await Promise.all([
+      const [summaryRes, entriesRes, subjectsRes] = await Promise.all([
         db.getTimeSummary(day),
         db.getTimeEntries({ from: day, to: day }),
+        db.getRecentSubjects(20),
       ])
       setSummary(summaryRes.data.data)
       setDayEntries(entriesRes.data.data)
+      setSubjects(subjectsRes.data.data)
     } catch (e: any) {
       console.error(e)
     } finally {
@@ -133,6 +154,65 @@ function Time(props: any) {
   useEffect(() => {
     load(selectedDate)
   }, [selectedDate])
+
+  useEffect(() => {
+    const refresh = () => setStarred(getPinnedItems().filter((p) => p.type === 'time'))
+    window.addEventListener('pinned-items-updated', refresh)
+    return () => window.removeEventListener('pinned-items-updated', refresh)
+  }, [])
+
+  // Fill the form from a subject: a recent subject, or a starred one
+  // arriving via /time?subject=... from the sidebar.
+  const prefill = (subject: { key: string; title?: string; pile?: { id: string; name: string }; kind: string; minutes: number }) => {
+    setEditingId(null)
+    setError(null)
+    setKind(subject.kind === 'reading' ? 'reading' : 'writing')
+    setMinutes(String(subject.minutes))
+    setDate(selectedDate)
+    if (subject.pile) {
+      setPileId(subject.pile.id)
+      setPileName(subject.pile.name)
+      setTitle(subject.title ?? '')
+      setPileQuery('')
+      setPileResults([])
+    } else {
+      setPileId(null)
+      setPileName('')
+      setTitle(subject.title ?? '')
+    }
+    window.scrollTo({ top: 0 })
+  }
+
+  const prefillByKey = async (key: string) => {
+    const found = subjects.find((s: any) => s.key === key)
+    if (found) {
+      prefill(found)
+      return
+    }
+    // Starred before anything recent covers it, or aged out: resolve the
+    // key itself so the sidebar star still lands somewhere useful.
+    if (key.startsWith('pile:')) {
+      const id = key.slice(5)
+      try {
+        const res = await db.getInfo(db.types.pile, id)
+        prefill({ key, pile: { id, name: res.data.data?.name ?? 'Pile' }, kind: 'writing', minutes: 30 })
+      } catch {
+        setError('That pile is gone; pick a title instead.')
+      }
+    } else if (key.startsWith('title:')) {
+      const title = key.slice(6)
+      if (title) prefill({ key, title, kind: 'reading', minutes: 30 })
+    }
+  }
+
+  useEffect(() => {
+    const key = params.get('subject')
+    if (key && subjectApplied.current !== key && subjects.length) {
+      subjectApplied.current = key
+      prefillByKey(key)
+      setParams({}, { replace: true })
+    }
+  })
 
   // Pile picker: search existing piles, or create the typed name.
   useEffect(() => {
@@ -205,6 +285,27 @@ function Time(props: any) {
     }
     resetForm()
     load(selectedDate)
+  }
+
+  // One-tap logging for a starred subject: same kind and minutes as
+  // last time, on the selected day. Falls back to prefilling the form
+  // when the subject needs disambiguating (deleted pile, odd title).
+  const logNow = async (subject: { key: string; title?: string; pile?: { id: string; name: string }; kind: string; minutes: number }) => {
+    setError(null)
+    const body: any = { kind: subject.kind, minutes: subject.minutes, date: selectedDate }
+    if (subject.pile) {
+      body.pile = subject.pile.id
+      if (subject.title) body.title = subject.title
+    } else {
+      body.title = subject.title ?? 'Untitled'
+    }
+    try {
+      await db.createTimeEntry(body)
+      load(selectedDate)
+    } catch (e: any) {
+      prefill(subject)
+      setError(e?.response?.data?.message ?? 'Could not log that; adjust the form and save.')
+    }
   }
 
   const edit = (entry: any) => {
@@ -346,6 +447,90 @@ function Time(props: any) {
         </TopLevelStandardButtonContainer>
       </div>
 
+      {starred.length || subjects.length ? (
+        <div className="time-shortcuts">
+          {starred.length ? (
+            <>
+              <TopLevelSubTitle>Starred</TopLevelSubTitle>
+              <ul className="time-entry-list">
+                {starred.map((pin: any) => {
+                  const subject = subjects.find((s: any) => s.key === pin.id)
+                  const label = subject
+                    ? subject.pile
+                      ? subject.pile.name + (subject.title ? ` — ${subject.title}` : '')
+                      : subject.title
+                    : pin.label || pin.id
+                  return (
+                    <li key={pin.id} className="time-entry">
+                      <span className="time-subject">
+                        {subject?.pile ? (
+                          <Link to={'/pile/' + subject.pile.id}>{label}</Link>
+                        ) : (
+                          label
+                        )}
+                      </span>
+                      {subject ? (
+                        <>
+                          <span className={'time-kind time-kind-' + subject.kind}>{subject.kind}</span>
+                          <span className="time-minutes">{formatMinutes(subject.minutes)}</span>
+                          <span className="time-entry-actions">
+                            <button className="button" onClick={() => logNow(subject)}>
+                              Log {formatMinutes(subject.minutes)}
+                            </button>
+                            <button className="button" onClick={() => prefill(subject)}>
+                              Fill form
+                            </button>
+                            <button className="button" onClick={() => unpinItem('time', pin.id)}>
+                              Unstar
+                            </button>
+                          </span>
+                        </>
+                      ) : (
+                        <span className="time-entry-actions">
+                          <button className="button" onClick={() => prefillByKey(pin.id)}>
+                            Fill form
+                          </button>
+                          <button className="button" onClick={() => unpinItem('time', pin.id)}>
+                            Unstar
+                          </button>
+                        </span>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            </>
+          ) : null}
+          {subjects.filter((s: any) => !starred.some((p: any) => p.id === s.key)).length ? (
+            <>
+              <TopLevelSubTitle>Recent — tap to log again</TopLevelSubTitle>
+              <ul className="time-entry-list">
+                {subjects
+                  .filter((s: any) => !starred.some((p: any) => p.id === s.key))
+                  .map((s: any) => (
+                    <li key={s.key} className="time-entry">
+                      <span className="time-subject">
+                        {s.pile ? <Link to={'/pile/' + s.pile.id}>{s.pile.name}</Link> : s.title}
+                        {s.pile && s.title ? ` — ${s.title}` : null}
+                      </span>
+                      <span className={'time-kind time-kind-' + s.kind}>{s.kind}</span>
+                      <span className="time-minutes">{formatMinutes(s.minutes)}</span>
+                      <span className="time-entry-actions">
+                        <button className="button" onClick={() => logNow(s)}>
+                          Log {formatMinutes(s.minutes)}
+                        </button>
+                        <button className="button" onClick={() => prefill(s)}>
+                          Fill form
+                        </button>
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="time-day-nav">
         <TopLevelStandardButtonContainer>
           <TopLevelStandardButton
@@ -396,26 +581,36 @@ function Time(props: any) {
             <TopLevelSubTitle>Entries — {selectedDate}</TopLevelSubTitle>
             {dayEntries.length ? (
               <ul className="time-entry-list">
-                {dayEntries.map((e: any) => (
-                  <li key={e._id} className="time-entry">
-                    <span className={'time-kind time-kind-' + e.kind}>{e.kind}</span>
-                    <span className="time-minutes">{formatMinutes(e.minutes)}</span>
-                    <span className="time-subject">
-                      {e.pile?._id ? (
-                        <>
-                          <Link to={'/pile/' + (e.pile._id ?? e.pile)}>{e.pile.name ?? 'Pile'}</Link>
-                          {e.title ? ` — ${e.title}` : null}
-                        </>
-                      ) : (
-                        e.title || 'Untitled'
-                      )}
-                    </span>
-                    <span className="time-entry-actions">
-                      <button className="button" onClick={() => edit(e)}>Edit</button>
-                      <button className="button" onClick={() => remove(e)}>Delete</button>
-                    </span>
-                  </li>
-                ))}
+                {dayEntries.map((e: any) => {
+                  const subject = subjectKeyFor(e)
+                  return (
+                    <li key={e._id} className="time-entry">
+                      <span className={'time-kind time-kind-' + e.kind}>{e.kind}</span>
+                      <span className="time-minutes">{formatMinutes(e.minutes)}</span>
+                      <span className="time-subject">
+                        {e.pile?._id ? (
+                          <>
+                            <Link to={'/pile/' + (e.pile._id ?? e.pile)}>{e.pile.name ?? 'Pile'}</Link>
+                            {e.title ? ` — ${e.title}` : null}
+                          </>
+                        ) : (
+                          e.title || 'Untitled'
+                        )}
+                      </span>
+                      <span className="time-entry-actions">
+                        <PinButton
+                          type="time"
+                          id={subject.key}
+                          label={subject.label}
+                          href={subject.href}
+                          compact
+                        />
+                        <button className="button" onClick={() => edit(e)}>Edit</button>
+                        <button className="button" onClick={() => remove(e)}>Delete</button>
+                      </span>
+                    </li>
+                  )
+                })}
               </ul>
             ) : (
               <div className="sidebar-muted">No entries this day.</div>

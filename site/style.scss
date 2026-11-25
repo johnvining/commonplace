@@ -2474,5 +2474,16 @@ mark.search-highlight {
   gap: 8px;
 }
 
+// Starred and recent subjects above the day view on /time.
+.time-shortcuts {
+  margin-bottom: 20px;
+}
+
+// Reading/writing line on a pile page.
+.time-pile-summary {
+  margin: 8px 0 16px;
+  opacity: 0.85;
+}
+
 // Minimal redesign layer; keep last so it overrides the rules above.
 @import '_minimal';
