@@ -38,6 +38,7 @@ export const types = {
   work: 'work',
   idea: 'idea',
   pile: 'pile',
+  time: 'time',
 }
 
 // Parcel reliably inlines NODE_ENV but not arbitrary env vars in this
@@ -436,4 +437,35 @@ export async function getLinkedNotes(noteId: string) {
 // Remove the link between two notes, in either order (#371)
 export async function unlinkNotes(noteId: string, otherId: string) {
   return axios.delete(url_api + 'link/between/' + noteId + '/' + otherId)
+}
+
+// Time logging: minutes spent reading or writing, labelled with a title,
+// a pile, or both. Summaries come from /time/summary for a reference day.
+export async function getTimeEntries(params: {
+  from?: string
+  to?: string
+  kind?: string
+  pile?: string
+  limit?: number
+} = {}) {
+  return axios.get(url_api + 'time/', { params })
+}
+
+export async function getTimeSummary(date?: string) {
+  return axios.get(url_api + 'time/summary', { params: date ? { date } : {} })
+}
+
+export async function createTimeEntry(body: {
+  title?: string
+  pile?: string | null
+  kind: string
+  minutes: number | string
+  date?: string
+  notes?: string
+}) {
+  return axios.post(url_api + 'time/', body)
+}
+
+export async function getTimeEntry(id: string) {
+  return axios.get(url_api + 'time/' + id)
 }

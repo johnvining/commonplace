@@ -121,6 +121,11 @@ function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: () => vo
         </div>
       ) : null}
       <div className="sidebar-section">
+        <Link to="/time" className="sidebar-link sidebar-link-compact">
+          <span className="sidebar-item">Time log</span>
+        </Link>
+      </div>
+      <div className="sidebar-section">
         <div className="sidebar-title">Starred Items</div>
         {pinnedItems.length ? (
           <div className="sidebar-list sidebar-list-compact">

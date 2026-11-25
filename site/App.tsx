@@ -71,6 +71,7 @@ const PileHome    = React.lazy(() => import('./PileHome'))
 const RecentItems = React.lazy(() => import('./RecentItems'))
 const Work        = React.lazy(() => import('./Work'))
 const Read        = React.lazy(() => import('./Read'))
+const Time        = React.lazy(() => import('./Time'))
 
 class App extends React.Component<any, any> {
   // auth: see AuthGate. Starts 'checking', so the login page doesn't
@@ -428,6 +429,10 @@ class App extends React.Component<any, any> {
                     setPageTitle={this.setPageTitle.bind(this)}
                   />
                 }
+              />
+              <Route
+                path="/time"
+                element={<Time setPageTitle={this.setPageTitle.bind(this)} />}
               />
             </Routes>
             </Suspense>
