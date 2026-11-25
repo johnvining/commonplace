@@ -49,6 +49,14 @@ cplace quick "<title>"
 ```
 Creates a note silently and prints the ID. Use this when capturing from within a conversation.
 
+### Time logging
+```bash
+cplace time log --kind reading --minutes 30 --title "Instapaper" --date 2026-11-24
+cplace time summary
+cplace time import time.csv
+```
+Logs reading/writing time with a title, a pile (`--pile`), or both. `summary` shows daily and weekly totals; `import` takes a CSV with headers `date,kind,minutes,title,pile`.
+
 ### Capture with metadata
 ```bash
 cplace capture "<title>" [--text "body"] [--author "Name"] [--work "Title"] [--idea "tag1,tag2"] [--pile "pile name"]
