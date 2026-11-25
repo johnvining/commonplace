@@ -407,7 +407,7 @@ function Time(props: any) {
             {['reading', 'writing'].map((k) => (
               <button
                 key={k}
-                className={'button time-kind-button time-kind-' + k + (kind === k ? ' active' : '')}
+                className={'button' + (kind === k ? ' button-selected' : '')}
                 onClick={() => setKind(k)}
               >
                 {k === 'reading' ? 'Reading' : 'Writing'}
@@ -532,33 +532,29 @@ function Time(props: any) {
       ) : null}
 
       <div className="time-day-nav">
-        <TopLevelStandardButtonContainer>
-          <TopLevelStandardButton
-            name="‹ Prev"
-            position="left"
-            onClick={() => setSelectedDate(shiftDay(selectedDate, -1))}
-          />
-          <input
-            aria-label="Selected day"
-            className="top-level input time-date-input"
-            type="date"
-            value={selectedDate}
-            onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
-          />
-          <TopLevelStandardButton name="Today" position="left" onClick={() => setSelectedDate(todayLocal())} />
-          <TopLevelStandardButton
-            name="Next ›"
-            position="right"
-            onClick={() => setSelectedDate(shiftDay(selectedDate, 1))}
-          />
-        </TopLevelStandardButtonContainer>
+        <TopLevelStandardButton
+          name="‹ Prev"
+          onClick={() => setSelectedDate(shiftDay(selectedDate, -1))}
+        />
+        <input
+          aria-label="Selected day"
+          className="top-level input time-date-input"
+          type="date"
+          value={selectedDate}
+          onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
+        />
+        <TopLevelStandardButton
+          name="Next ›"
+          onClick={() => setSelectedDate(shiftDay(selectedDate, 1))}
+        />
+        <TopLevelStandardButton name="Today" onClick={() => setSelectedDate(todayLocal())} />
       </div>
 
       {loading || !summary ? (
         <div className="search-empty-state">Loading…</div>
       ) : (
         <>
-          <div className="time-summary">
+          <div className="time-card">
             <TopLevelSubTitle>Daily — {daily.date}</TopLevelSubTitle>
             <KindTotals summary={daily} />
             <CrossCheck reading={daily.readingMinutes} writing={daily.writingMinutes} total={daily.totalMinutes} />
@@ -617,7 +613,7 @@ function Time(props: any) {
             )}
           </div>
 
-          <div className="time-summary">
+          <div className="time-card">
             <TopLevelSubTitle>
               Weekly — {weekly.weekStart} to {weekly.weekEnd}
             </TopLevelSubTitle>
@@ -645,7 +641,7 @@ function Time(props: any) {
                 {weekly.byDay.map((d: any) => (
                   <tr key={d.date} className={d.date === selectedDate ? 'time-today' : undefined}>
                     <td>
-                      <button className="button time-day-link" onClick={() => setSelectedDate(d.date)}>
+                      <button className="time-day-link" onClick={() => setSelectedDate(d.date)}>
                         {d.date}
                       </button>
                     </td>
