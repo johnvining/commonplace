@@ -164,22 +164,40 @@ public final class APIClient: Sendable {
 
     // MARK: - Auth (`/api/user`)
 
+    /// User endpoints answer raw `{ message, user: <id> }` (no `{data:}` envelope).
     public struct AuthMessage: Codable {
         public var message: String?
-        public var user: AuthUser?
+        public var user: String?
     }
 
-    public struct AuthUser: Codable {
-        public var _id: String?
-        public var username: String?
+    private func performRaw<T: Decodable>(_ req: URLRequest, as type: T.Type = T.self) async throws -> T {
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await session.data(for: req)
+        } catch {
+            throw APIError.transport(error.localizedDescription)
+        }
+        guard let http = response as? HTTPURLResponse else {
+            throw APIError.transport("Non-HTTP response")
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            throw mapError(status: http.statusCode, body: data)
+        }
+        do {
+            return try Self.makeDecoder().decode(T.self, from: data)
+        } catch {
+            throw APIError.decoding(error.localizedDescription)
+        }
     }
 
     public func register(username: String, password: String) async throws -> AuthMessage {
-        try await put("user", body: ["username": username, "password": password])
+        try await performRaw(try request(path: "user", method: "PUT",
+                                         body: ["username": username, "password": password]))
     }
 
     public func login(username: String, password: String) async throws -> AuthMessage {
-        try await post("user/auth", body: ["username": username, "password": password])
+        try await performRaw(try request(path: "user/auth", method: "POST",
+                                         body: ["username": username, "password": password]))
     }
 
     /// Session check: 200 (empty data) when the `jwt` cookie is valid, 401 otherwise.
@@ -197,8 +215,8 @@ public final class APIClient: Sendable {
 
     public func changePassword(username: String, oldPassword: String,
                                newPassword: String) async throws -> AuthMessage {
-        try await put("user/changepass",
-                      body: ["username": username, "oldPassword": oldPassword, "newPassword": newPassword])
+        try await performRaw(try request(path: "user/changepass", method: "PUT",
+                                         body: ["username": username, "oldPassword": oldPassword, "newPassword": newPassword]))
     }
 
     // MARK: - Notes (`/api/note`)
