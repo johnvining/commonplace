@@ -1,4 +1,5 @@
 import SwiftUI
+import CommonplaceKit
 
 /// Root tab bar. Web parity: Home/Recent (Notes), Time, Piles, Search, More.
 struct ContentView: View {
@@ -24,11 +25,20 @@ struct ContentView: View {
     }
 }
 
-/// Overflow tab: starred pins + settings (mirrors the web sidebar stars).
+/// Overflow tab: counts, entity lists, starred pins + settings.
 struct MoreView: View {
+    @EnvironmentObject var state: AppState
+    @State private var counts: StatsCounts?
+
     var body: some View {
         NavigationStack {
             List {
+                if let c = counts {
+                    Section("Library") {
+                        Text("\(c.notes ?? 0) notes · \(c.authors ?? 0) authors · \(c.ideas ?? 0) ideas · \(c.works ?? 0) works · \(c.piles ?? 0) piles")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
                 NavigationLink("Works") { WorksListView() }
                 NavigationLink("Authors") { AuthorsListView() }
                 NavigationLink("Ideas") { IdeasListView() }
@@ -36,6 +46,7 @@ struct MoreView: View {
                 NavigationLink("Settings") { SettingsView() }
             }
             .navigationTitle("More")
+            .task { counts = try? await state.client.stats() }
         }
     }
 }
