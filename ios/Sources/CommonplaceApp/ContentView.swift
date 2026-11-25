@@ -29,6 +29,9 @@ struct MoreView: View {
     var body: some View {
         NavigationStack {
             List {
+                NavigationLink("Works") { WorksListView() }
+                NavigationLink("Authors") { AuthorsListView() }
+                NavigationLink("Ideas") { IdeasListView() }
                 NavigationLink("Starred") { PinsView() }
                 NavigationLink("Settings") { SettingsView() }
             }

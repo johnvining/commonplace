@@ -10,6 +10,9 @@ struct SearchView: View {
     @State private var items: [UnifiedSearchItem] = []
     @State private var nickNote: [Note] = []
     @State private var nickPileId: String?
+    @State private var nickWorkId: String?
+    @State private var nickIdeaId: String?
+    @State private var nickAuthorId: String?
     @State private var nickInfo: String?
     @State private var error: String?
 
@@ -35,11 +38,17 @@ struct SearchView: View {
                         Text("Open pile").font(.headline)
                     }
                 }
+                if let wid = nickWorkId {
+                    NavigationLink { WorkDetailView(workId: wid) } label: { Text("Open work").font(.headline) }
+                }
+                if let iid = nickIdeaId {
+                    NavigationLink { IdeaDetailView(ideaId: iid) } label: { Text("Open idea").font(.headline) }
+                }
+                if let aid = nickAuthorId {
+                    NavigationLink { AuthorDetailView(authorId: aid) } label: { Text("Open author").font(.headline) }
+                }
                 ForEach(items, id: \.stableId) { item in
-                    VStack(alignment: .leading) {
-                        Text(item.title ?? item.name ?? "(unnamed)").lineLimit(1)
-                        Text(item.type ?? "").font(.caption).foregroundStyle(.secondary)
-                    }
+                    searchRow(item)
                 }
             }
             .navigationTitle("Search")
@@ -67,14 +76,11 @@ struct SearchView: View {
                         }
                         return
                     }
-                    let what: String
-                    if found.work != nil { what = "work" }
-                    else if found.idea != nil { what = "idea" }
-                    else if found.auth != nil { what = "author" }
-                    else { what = "record" }
                     await MainActor.run {
                         nickNote = []; nickPileId = nil; items = []
-                        nickInfo = "Nick resolves to a \(what) — no viewer yet."
+                        nickWorkId = found.work; nickIdeaId = found.idea; nickAuthorId = found.auth
+                        nickInfo = (found.work == nil && found.idea == nil && found.auth == nil)
+                            ? "Nick not found." : nil
                     }
                     return
                 }
@@ -85,6 +91,32 @@ struct SearchView: View {
             } catch {
                 await MainActor.run { self.error = "Search failed — retry." }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func searchRow(_ item: UnifiedSearchItem) -> some View {
+        let label = VStack(alignment: .leading) {
+            Text(item.title ?? item.name ?? "(unnamed)").lineLimit(1)
+            Text(item.type ?? "").font(.caption).foregroundStyle(.secondary)
+        }
+        if let id = item._id {
+            switch item.type {
+            case "note":
+                NavigationLink { NoteDetailView(noteId: id) } label: { label }
+            case "work":
+                NavigationLink { WorkDetailView(workId: id) } label: { label }
+            case "pile":
+                NavigationLink { PileDetailView(pileId: id) } label: { label }
+            case "idea":
+                NavigationLink { IdeaDetailView(ideaId: id) } label: { label }
+            case "auth", "author":
+                NavigationLink { AuthorDetailView(authorId: id) } label: { label }
+            default:
+                label
+            }
+        } else {
+            label
         }
     }
 
