@@ -27,6 +27,7 @@ struct WorksListView: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Works")
         .task { works = (try? await state.client.recentWorks()) ?? [] }
     }
@@ -60,6 +61,7 @@ struct AuthorsListView: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Authors")
         .task { authors = (try? await state.client.recentAuthors()) ?? [] }
     }
@@ -93,6 +95,7 @@ struct IdeasListView: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Ideas")
         .task { ideas = (try? await state.client.recentIdeas()) ?? [] }
     }
@@ -122,7 +125,7 @@ struct WorkDetailView: View {
     @State private var ideaSel: [PickOption] = []
 
     var body: some View {
-        Form {
+        List {
             if let error { Text(error).foregroundStyle(.red) }
             if let w = work {
                 Section {
@@ -176,6 +179,7 @@ struct WorkDetailView: View {
                 Text("Loading…")
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Work")
         .task { await load() }
     }
@@ -227,7 +231,7 @@ struct AuthorDetailView: View {
     @State private var editDeath = ""
 
     var body: some View {
-        Form {
+        List {
             if let error { Text(error).foregroundStyle(.red) }
             if let a = author {
                 Section {
@@ -271,6 +275,7 @@ struct AuthorDetailView: View {
                 Text("Loading…")
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Author")
         .task { await load() }
     }
@@ -314,7 +319,7 @@ struct IdeaDetailView: View {
     @State private var error: String?
 
     var body: some View {
-        Form {
+        List {
             if let error { Text(error).foregroundStyle(.red) }
             if let i = idea {
                 Section {
@@ -339,6 +344,7 @@ struct IdeaDetailView: View {
                 Text("Loading…")
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Idea")
         .task { await load() }
     }

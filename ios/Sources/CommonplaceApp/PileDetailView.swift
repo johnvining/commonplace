@@ -19,7 +19,7 @@ struct PileDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        Form {
+        List {
             if let error { Text(error).foregroundStyle(.red) }
             Section {
                 if editing {
@@ -68,6 +68,7 @@ struct PileDetailView: View {
                 NoteDetailView(noteId: newNoteId ?? "")
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Pile")
         .task { load() }
     }

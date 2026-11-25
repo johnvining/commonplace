@@ -11,7 +11,7 @@ struct FlipView: View {
     @State private var done = false
 
     var body: some View {
-        Form {
+        List {
             if let error { Text(error).foregroundStyle(.red) }
             if done || index >= deck.count {
                 Section { Text(deck.isEmpty ? "Nothing due for review." : "Deck finished — nice work.") }
@@ -38,6 +38,7 @@ struct FlipView: View {
                 }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Review")
         .task { load() }
     }
