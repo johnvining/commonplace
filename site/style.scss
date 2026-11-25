@@ -2338,5 +2338,141 @@ mark.search-highlight {
   margin-bottom: 12px;
 }
 
+// Time logging page (/time): log form, daily/weekly summaries, entries.
+.time-form {
+  margin-bottom: 20px;
+}
+
+.time-form-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  max-width: 560px;
+}
+
+.time-pile-pick {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.time-pile-results {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.time-kind-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.time-kind-button.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.time-error {
+  color: var(--color-error, #a00);
+  margin-bottom: 8px;
+}
+
+.time-day-nav {
+  margin: 16px 0;
+}
+
+.time-date-input {
+  width: auto;
+}
+
+.time-summary {
+  margin-bottom: 24px;
+}
+
+.time-kind-totals {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 4px 0;
+}
+
+.time-total {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.time-crosscheck {
+  font-size: var(--font-size-sm);
+  opacity: 0.75;
+  margin: 2px 0 8px;
+}
+
+.time-crosscheck-bad {
+  opacity: 1;
+  color: var(--color-error, #a00);
+  font-weight: bold;
+}
+
+.time-table-title {
+  font-weight: bold;
+  margin: 12px 0 4px;
+}
+
+.time-table {
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.time-table th,
+.time-table td {
+  text-align: left;
+  padding: 2px 16px 2px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-table td:nth-child(n+2),
+.time-table th:nth-child(n+2) {
+  text-align: right;
+}
+
+.time-today td {
+  font-weight: bold;
+}
+
+.time-day-link {
+  padding: 0;
+}
+
+.time-entry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.time-entry {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 4px 0;
+  flex-wrap: wrap;
+}
+
+.time-entry .time-minutes {
+  font-variant-numeric: tabular-nums;
+  min-width: 4em;
+}
+
+.time-entry-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
 // Minimal redesign layer; keep last so it overrides the rules above.
 @import '_minimal';
