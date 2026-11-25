@@ -22,7 +22,7 @@ struct SearchView: View {
             List {
                 Section {
                     TextField("Search or paste a nick", text: $query)
-                        .onChange(of: query) { _ in scheduleRun() }
+                        .onChange(of: query) { scheduleRun() }
                         .onSubmit { run() }
                 }
                 if let error { Text(error).foregroundStyle(.red) }

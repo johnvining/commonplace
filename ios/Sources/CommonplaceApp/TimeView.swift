@@ -362,7 +362,7 @@ struct ManualEntryForm: View {
                 }
             } else {
                 TextField("Pile (type to search)", text: $pileName)
-                    .onChange(of: pileName) { _ in searchPiles() }
+                    .onChange(of: pileName) { searchPiles() }
                 ForEach(pileSuggestions, id: \.stableId) { p in
                     Button(p.name ?? "") {
                         pile = p._id ?? ""; pileName = p.name ?? ""; pileSuggestions = []

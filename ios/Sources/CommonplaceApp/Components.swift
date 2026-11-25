@@ -27,7 +27,7 @@ struct TypeaheadField: View {
             TextField(placeholder, text: $query)
                 .font(DS.ui(14))
                 .autocorrectionDisabled()
-                .onChange(of: query) { _ in scheduleSearch() }
+                .onChange(of: query) { scheduleSearch() }
             if !filtered.isEmpty || canCreate {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(filtered) { option in

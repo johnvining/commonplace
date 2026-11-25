@@ -119,7 +119,7 @@ struct NoteDetailView: View {
                     PhotosPicker(selection: $photoItem, matching: .images) {
                         Text("Add photo")
                     }
-                    .onChange(of: photoItem) { _ in uploadPhoto() }
+                    .onChange(of: photoItem) { uploadPhoto() }
                     HStack {
                         Button("Run OCR") { runOCR() }
                         Button("Suggest title") { suggestTitle() }
