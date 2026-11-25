@@ -50,7 +50,7 @@ struct NotesView: View {
                     notes = wanted == 1 ? rows : notes + rows
                 }
             } catch {
-                await MainActor.run { error = "Load failed — retry." }
+                await MainActor.run { self.error = "Load failed — retry." }
             }
         }
     }
@@ -70,7 +70,7 @@ struct NotesView: View {
                 }
                 await MainActor.run { notes = rows }
             } catch {
-                await MainActor.run { error = "Search failed — retry." }
+                await MainActor.run { self.error = "Search failed — retry." }
             }
         }
     }

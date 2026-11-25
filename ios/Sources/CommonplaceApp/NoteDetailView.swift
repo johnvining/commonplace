@@ -72,7 +72,7 @@ struct NoteDetailView: View {
                 await MainActor.run { note = rows.first; loaded = true }
                 Task { _ = try? await state.client.recordNoteOpened(id: noteId) }
             } catch {
-                await MainActor.run { error = "Load failed — retry."; loaded = true }
+                await MainActor.run { self.error = "Load failed — retry."; loaded = true }
             }
         }
     }
@@ -84,7 +84,7 @@ struct NoteDetailView: View {
                     id: noteId, NoteUpdate(title: title, text: text, take: take))
                 await MainActor.run { note = updated; editing = false }
             } catch {
-                await MainActor.run { error = "Save failed — still editing." }
+                await MainActor.run { self.error = "Save failed — still editing." }
             }
         }
     }

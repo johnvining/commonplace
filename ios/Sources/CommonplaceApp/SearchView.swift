@@ -83,7 +83,7 @@ struct SearchView: View {
                 let rows = try await state.client.unifiedSearch(query: q)
                 await MainActor.run { items = rows; nickNote = []; nickPileId = nil; nickInfo = nil }
             } catch {
-                await MainActor.run { error = "Search failed — retry." }
+                await MainActor.run { self.error = "Search failed — retry." }
             }
         }
     }

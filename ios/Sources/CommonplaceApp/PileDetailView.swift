@@ -91,7 +91,7 @@ struct PileDetailView: View {
                     timeTotals = (tt.reduce(0) { $0 + ($1.minutes ?? 0) }, r, wr, tt.count)
                 }
             } catch {
-                await MainActor.run { error = "Load failed — retry." }
+                await MainActor.run { self.error = "Load failed — retry." }
             }
         }
     }
@@ -114,7 +114,7 @@ struct PileDetailView: View {
                 try? await state.client.addPileToNote(noteId: id, pileId: pileId)
                 await MainActor.run { newNoteId = id; showingNewNote = true }
             } catch {
-                await MainActor.run { error = "Could not create note — retry." }
+                await MainActor.run { self.error = "Could not create note — retry." }
             }
         }
     }
@@ -125,7 +125,7 @@ struct PileDetailView: View {
                 try await state.client.deletePile(id: pileId)
                 await MainActor.run { dismiss() }
             } catch {
-                await MainActor.run { error = "Delete failed — retry." }
+                await MainActor.run { self.error = "Delete failed — retry." }
             }
         }
     }

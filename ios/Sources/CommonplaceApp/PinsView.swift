@@ -42,7 +42,7 @@ struct PinsView: View {
 
     private func unpin(_ p: PinItem) {
         state.queueUnpin(type: p.type, id: p.id)
-        if let err = state.lastPinError { error = err }
+        if let err = state.lastPinError { self.error = err }
     }
 }
 
