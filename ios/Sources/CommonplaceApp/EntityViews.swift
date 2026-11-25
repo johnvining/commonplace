@@ -114,19 +114,56 @@ struct WorkDetailView: View {
     @State private var notes: [Note] = []
     @State private var loaded = false
     @State private var error: String?
+    @State private var editing = false
+    @State private var editName = ""
+    @State private var editYear = ""
+    @State private var editURL = ""
+    @State private var pileSel: [PickOption] = []
+    @State private var ideaSel: [PickOption] = []
 
     var body: some View {
         Form {
             if let error { Text(error).foregroundStyle(.red) }
             if let w = work {
                 Section {
-                    Text(w.name ?? "(unnamed)").font(.headline)
-                    if let y = w.year { Text(String(y)).foregroundStyle(.secondary) }
-                    if let u = w.url, !u.isEmpty { Text(u).font(.caption) }
+                    if editing {
+                        TextField("Name", text: $editName)
+                        TextField("Year", text: $editYear)
+                        TextField("URL", text: $editURL)
+                        Button("Save") { saveEdit() }
+                    } else {
+                        Text(w.name ?? "(unnamed)").font(.headline)
+                        if let y = w.year { Text(String(y)).foregroundStyle(.secondary) }
+                        if let u = w.url, !u.isEmpty { Text(u).font(.caption) }
+                    }
                     if let authors = w.authors, !authors.isEmpty {
                         Text(authors.compactMap(\.name).joined(separator: ", ")).foregroundStyle(.secondary)
                     }
-                    Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                    HStack {
+                        Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                        Button(editing ? "Cancel" : "Edit") {
+                            editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
+                            editing.toggle()
+                        }
+                    }
+                }
+                Section("Piles") {
+                    PillEditor(
+                        placeholder: "Add a pile…", tint: DS.pileSoft, selected: $pileSel,
+                        load: { q in ((try? await state.client.autocompletePiles(q)) ?? []).compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } } },
+                        onAdd: { opt in pileSel.append(opt); Task { _ = try? await state.client.addPileToWork(workId: workId, pileId: opt.id); await load() } },
+                        onRemove: { opt in pileSel.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removePileFromWork(workId: workId, pileId: opt.id); await load() } },
+                        onCreateNew: { name in Task { _ = try? await state.client.createPileForWork(workId: workId, name: name); await load() } }
+                    )
+                }
+                Section("Ideas") {
+                    PillEditor(
+                        placeholder: "Add an idea…", tint: DS.accentSoft, selected: $ideaSel,
+                        load: { q in ((try? await state.client.autocompleteIdeas(q)) ?? []).compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } } },
+                        onAdd: { opt in ideaSel.append(opt); Task { _ = try? await state.client.addIdeaToWork(workId: workId, ideaId: opt.id); await load() } },
+                        onRemove: { opt in ideaSel.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removeIdeaFromWork(workId: workId, ideaId: opt.id); await load() } },
+                        onCreateNew: { name in Task { _ = try? await state.client.createIdeaForWork(workId: workId, name: name); await load() } }
+                    )
                 }
                 Section("Notes") {
                     ForEach(notes, id: \.stableId) { n in
@@ -145,12 +182,27 @@ struct WorkDetailView: View {
 
     private var starred: Bool { state.pins.contains { $0.type == "work" && $0.id == workId } }
 
+    private func saveEdit() {
+        guard var w = work else { return }
+        w.name = editName
+        w.year = Int(editYear)
+        w.url = editURL.isEmpty ? nil : editURL
+        Task {
+            do {
+                work = try await state.client.updateWork(id: workId, w)
+                editing = false
+            } catch { self.error = "Save failed — retry." }
+        }
+    }
+
     private func load() async {
         do {
             async let w = state.client.work(id: workId)
             async let n = state.client.workNotes(id: workId)
             let (ww, nn) = try await (w, n)
             work = ww; notes = nn; loaded = true
+            pileSel = (ww.piles ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
+            ideaSel = (ww.ideas ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
             _ = try? await state.client.recordWorkOpened(id: workId)
         } catch { self.error = "Load failed — retry."; loaded = true }
     }
@@ -169,18 +221,37 @@ struct AuthorDetailView: View {
     @State private var notes: [Note] = []
     @State private var loaded = false
     @State private var error: String?
+    @State private var editing = false
+    @State private var editName = ""
+    @State private var editBirth = ""
+    @State private var editDeath = ""
 
     var body: some View {
         Form {
             if let error { Text(error).foregroundStyle(.red) }
             if let a = author {
                 Section {
-                    Text(a.name ?? "(unnamed)").font(.headline)
-                    if a.birth_year != nil || a.death_year != nil {
-                        Text("\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")")
-                            .foregroundStyle(.secondary)
+                    if editing {
+                        TextField("Name", text: $editName)
+                        TextField("Birth year", text: $editBirth)
+                        TextField("Death year", text: $editDeath)
+                        Button("Save") { saveEdit() }
+                    } else {
+                        Text(a.name ?? "(unnamed)").font(.headline)
+                        if a.birth_year != nil || a.death_year != nil {
+                            Text("\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")")
+                                .foregroundStyle(.secondary)
+                        }
                     }
-                    Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                    HStack {
+                        Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                        Button(editing ? "Cancel" : "Edit") {
+                            editName = a.name ?? ""
+                            editBirth = a.birth_year.map(String.init) ?? ""
+                            editDeath = a.death_year.map(String.init) ?? ""
+                            editing.toggle()
+                        }
+                    }
                 }
                 Section("Works") {
                     ForEach(works, id: \.stableId) { w in
@@ -205,6 +276,17 @@ struct AuthorDetailView: View {
     }
 
     private var starred: Bool { state.pins.contains { $0.type == "auth" && $0.id == authorId } }
+
+    private func saveEdit() {
+        guard var a = author else { return }
+        a.name = editName
+        a.birth_year = Int(editBirth)
+        a.death_year = Int(editDeath)
+        Task {
+            do { author = try await state.client.updateAuthor(id: authorId, a); editing = false }
+            catch { self.error = "Save failed — retry." }
+        }
+    }
 
     private func load() async {
         do {

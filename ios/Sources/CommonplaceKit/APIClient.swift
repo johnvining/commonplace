@@ -443,6 +443,30 @@ public final class APIClient: Sendable {
                       query: ["skip": String(skip), "limit": String(limit)])
     }
 
+    public func addPileToWork(workId: String, pileId: String) async throws -> Work {
+        try await put("work/\(workId)/pile", body: ["id": pileId])
+    }
+
+    public func createPileForWork(workId: String, name: String) async throws -> Work {
+        try await put("work/\(workId)/pile/create", body: ["name": name])
+    }
+
+    public func removePileFromWork(workId: String, pileId: String) async throws -> Work {
+        try await delete("work/\(workId)/pile/\(pileId)")
+    }
+
+    public func addIdeaToWork(workId: String, ideaId: String) async throws -> Work {
+        try await put("work/\(workId)/idea", body: ["id": ideaId])
+    }
+
+    public func createIdeaForWork(workId: String, name: String) async throws -> Work {
+        try await put("work/\(workId)/idea/create", body: ["name": name])
+    }
+
+    public func removeIdeaFromWork(workId: String, ideaId: String) async throws -> Work {
+        try await delete("work/\(workId)/idea/\(ideaId)")
+    }
+
     public func recordWorkOpened(id: String) async throws -> OpenCount {
         try await post("work/\(id)/opened", body: EmptyBody())
     }
