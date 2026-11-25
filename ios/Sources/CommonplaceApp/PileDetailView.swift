@@ -111,7 +111,7 @@ struct PileDetailView: View {
             do {
                 let created = try await state.client.createNote()
                 guard let id = created._id else { return }
-                try? await state.client.addPileToNote(noteId: id, pileId: pileId)
+                _ = try? await state.client.addPileToNote(noteId: id, pileId: pileId)
                 await MainActor.run { newNoteId = id; showingNewNote = true }
             } catch {
                 await MainActor.run { self.error = "Could not create note — retry." }
