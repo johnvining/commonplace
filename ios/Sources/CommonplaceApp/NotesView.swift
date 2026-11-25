@@ -11,10 +11,15 @@ struct NotesView: View {
     @State private var pileFilter = ""
     @State private var ideaFilter = ""
     @State private var error: String?
+    @State private var newNoteId: String?
+    @State private var showingNewNote = false
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    Button("＋ New Note") { createNote() }
+                }
                 Section("Search & filters") {
                     TextField("Search", text: $search)
                         .onSubmit { applySearch() }
@@ -37,7 +42,22 @@ struct NotesView: View {
                 Button("Load more") { loadRecent(page: page + 1) }
             }
             .navigationTitle("Notes")
+            .navigationDestination(isPresented: $showingNewNote) {
+                NoteDetailView(noteId: newNoteId ?? "")
+            }
             .task { loadRecent() }
+        }
+    }
+
+    private func createNote() {
+        Task {
+            do {
+                let created = try await state.client.createNote()
+                guard let id = created._id else { return }
+                await MainActor.run { newNoteId = id; showingNewNote = true }
+            } catch {
+                await MainActor.run { self.error = "Could not create note — retry." }
+            }
         }
     }
 
