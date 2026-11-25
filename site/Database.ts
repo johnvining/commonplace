@@ -455,6 +455,10 @@ export async function getTimeSummary(date?: string) {
   return axios.get(url_api + 'time/summary', { params: date ? { date } : {} })
 }
 
+export async function getRecentSubjects(limit = 20) {
+  return axios.get(url_api + 'time/recent-subjects', { params: { limit } })
+}
+
 export async function createTimeEntry(body: {
   title?: string
   pile?: string | null

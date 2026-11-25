@@ -8,6 +8,8 @@ import NoteList from './NoteList'
 import WorkList from './WorkList'
 import YearSpan from './YearSpan'
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { formatMinutes } from './Time'
 import { useEntityKeyboardShortcuts } from './useEntityKeyboardShortcuts'
 import { useEntityEditor } from './useEntityEditor'
 import EntityOverview from './EntityOverview'
@@ -38,6 +40,12 @@ function Pile(props: any) {
   const [nick, setNick] = useState('')
   // Set when the pile doesn't exist (#387)
   const [missing, setMissing] = useState<{ name?: string | null } | null>(null)
+  const [timeTotals, setTimeTotals] = useState<{
+    reading: number
+    writing: number
+    total: number
+    count: number
+  } | null>(null)
   const navigate = useNavigate()
 
   const fetchPileInfo = (pileId: any) => {
@@ -66,6 +74,27 @@ function Pile(props: any) {
 
   useEffect(() => {
     fetchPileInfo(id)
+  }, [id])
+
+  // Reading vs writing time logged against this pile, across all days.
+  useEffect(() => {
+    setTimeTotals(null)
+    db.getTimeEntries({ pile: id, limit: 1000 })
+      .then((res: any) => {
+        let reading = 0
+        let writing = 0
+        for (const e of res.data.data ?? []) {
+          if (e.kind === 'reading') reading += e.minutes
+          else if (e.kind === 'writing') writing += e.minutes
+        }
+        setTimeTotals({
+          reading,
+          writing,
+          total: reading + writing,
+          count: (res.data.data ?? []).length,
+        })
+      })
+      .catch(() => setTimeTotals(null))
   }, [id])
 
   const handleDeletePile = async () => {
@@ -264,6 +293,15 @@ function Pile(props: any) {
       </div>
 
       {edit ? null : <EntityOverview text={pending.text} />}
+      {edit || !timeTotals || !timeTotals.count ? null : (
+        <div className="time-pile-summary">
+          Time on this pile: {formatMinutes(timeTotals.reading)} reading +{' '}
+          {formatMinutes(timeTotals.writing)} writing = {formatMinutes(timeTotals.total)} total
+          {' '}({timeTotals.count} {timeTotals.count === 1 ? 'entry' : 'entries'})
+          {' '}·{' '}
+          <Link to={'/time?subject=' + encodeURIComponent('pile:' + id)}>Open in Time log</Link>
+        </div>
+      )}
       {/* Note and Work List */}
       {props.showNotes ? (
         <NoteList
