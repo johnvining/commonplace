@@ -19,6 +19,7 @@ import linkRouter from './resources/link/link.router'
 import maintenanceRouter from './resources/maintenance/maintenance.router'
 import userRouter from './resources/user/user.router'
 import statsRouter from './resources/stats/stats.router'
+import timeRouter from './resources/time/time.router'
 import { reqAuthenticate } from './resources/user/user.controllers.js'
 import cookieParser from 'cookie-parser'
 import fileUpload from 'express-fileupload'
@@ -85,6 +86,7 @@ app.use('/api/nick', nickRouter)
 app.use('/api/pin', pinRouter)
 app.use('/api/link', linkRouter)
 app.use('/api/stats', statsRouter)
+app.use('/api/time', timeRouter)
 app.use('/api/maintenance', maintenanceRouter)
 
 export const start = async () => {
