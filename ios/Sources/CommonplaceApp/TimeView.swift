@@ -60,10 +60,10 @@ struct TimeView: View {
                 }
                 Section("Day") {
                     HStack {
-                        Button("Prev") { shift(-1) }
-                        TextField("YYYY-MM-DD", text: $day)
-                        Button("Go") { reload() }
-                        Button("Next") { shift(1) }
+                        Button("‹ Prev") { shift(-1) }
+                        DatePicker("", selection: dayBinding, displayedComponents: .date)
+                            .labelsHidden()
+                        Button("Next ›") { shift(1) }
                         Button("Today") { day = dayString(Date()); reload() }
                     }
                 }
@@ -140,6 +140,13 @@ struct TimeView: View {
                 self.error = "Load failed — retry."
             }
         }
+    }
+
+    private var dayBinding: Binding<Date> {
+        Binding(
+            get: { parseDay(day) ?? Date() },
+            set: { day = dayString($0); reload() }
+        )
     }
 
     private func shift(_ delta: Int) {
@@ -299,8 +306,10 @@ struct TimeEntryRow: View {
                 TextField("Title", text: $title)
                 HStack {
                     TextField("Minutes", text: $minutes)
-                    TextField("Day", text: $date)
-                        .autocorrectionDisabled()
+                    DatePicker("Day", selection: Binding(
+                        get: { parseDay(date) ?? Date() },
+                        set: { date = dayString($0) }
+                    ), displayedComponents: .date)
                 }
                 Picker("Kind", selection: $kind) {
                     Text("Reading").tag("reading")
@@ -368,8 +377,10 @@ struct ManualEntryForm: View {
                 Text("Writing").tag("writing")
             }.pickerStyle(.segmented)
             TextField("Minutes", text: $minutes)
-            TextField("Date", text: $date)
-                .onAppear { if date.isEmpty { date = defaultDay } }
+            DatePicker("Day", selection: Binding(
+                get: { parseDay(date.isEmpty ? defaultDay : date) ?? Date() },
+                set: { date = dayString($0) }
+            ), displayedComponents: .date)
             Button("Save") { save() }
             if let error { Text(error).foregroundStyle(.red).font(.caption) }
         }
