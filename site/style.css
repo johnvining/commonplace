@@ -2910,6 +2910,236 @@ mark.search-highlight {
   margin-bottom: 12px;
 }
 
+.time-card {
+  background: var(--note-background);
+  border: 1px solid var(--note-border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.time-form {
+  margin-bottom: 20px;
+  max-width: 640px;
+}
+
+.time-form-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 10px 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.time-pile-pick {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--input-background);
+  border: 1px solid var(--low-intensity-border);
+  border-radius: 4px;
+  padding: 4px 4px 4px 10px;
+  font-size: 20px;
+}
+
+.time-pile-results {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.time-pile-results .button {
+  width: 100%;
+  justify-content: flex-start;
+  height: auto;
+  min-height: 42px;
+  white-space: normal;
+  text-align: left;
+}
+
+.time-kind-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.time-error {
+  color: #a00;
+  margin-bottom: 8px;
+}
+
+.time-day-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.time-date-input {
+  width: auto;
+  flex: 0 1 auto;
+}
+
+.time-kind-totals {
+  display: flex;
+  gap: 8px 20px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin: 8px 0 4px;
+}
+
+.time-total {
+  font-size: 24px;
+}
+
+.time-kind {
+  display: inline-block;
+  font-size: var(--font-size-sm);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--note-border);
+  border-radius: 10px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
+.time-kind-reading {
+  background: var(--semantic-idea);
+}
+
+.time-kind-writing {
+  background: var(--semantic-pile);
+}
+
+.time-count {
+  opacity: 0.6;
+  font-size: var(--font-size-sm);
+}
+
+.time-crosscheck {
+  font-size: var(--font-size-sm);
+  opacity: 0.6;
+  margin: 2px 0 8px;
+}
+
+.time-crosscheck-bad {
+  opacity: 1;
+  color: #a00;
+  font-weight: bold;
+}
+
+.time-table-title {
+  font-size: 18px;
+  margin: 16px 0 4px;
+}
+
+.time-table {
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  width: 100%;
+  max-width: 640px;
+}
+
+.time-table th {
+  font-size: var(--font-size-sm);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: darkgray;
+  font-weight: normal;
+  text-align: left;
+  padding: 4px 16px 4px 0;
+}
+
+.time-table td {
+  text-align: left;
+  padding: 6px 16px 6px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-table tbody tr + tr td {
+  border-top: 1px solid var(--note-border);
+}
+
+.time-table td:nth-child(n+2),
+.time-table th:nth-child(n+2) {
+  text-align: right;
+  padding-right: 0;
+  padding-left: 16px;
+}
+
+.time-table td:last-child,
+.time-table th:last-child {
+  font-weight: bold;
+}
+
+.time-today td {
+  font-weight: bold;
+}
+
+.time-day-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--link-color);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.time-entry-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 720px;
+}
+
+.time-entry {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  flex-wrap: wrap;
+}
+
+.time-entry-list .time-entry + .time-entry {
+  border-top: 1px solid var(--note-border);
+}
+
+.time-entry .time-subject {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.time-entry .time-minutes {
+  font-variant-numeric: tabular-nums;
+  font-weight: bold;
+  min-width: 4em;
+}
+
+.time-entry-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.time-shortcuts {
+  margin-bottom: 20px;
+  max-width: 720px;
+}
+
+.time-pile-summary {
+  background: var(--note-background);
+  border: 1px solid var(--note-border);
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin: 8px 0 16px;
+}
+
 :root {
   --font-size-xs: 11px;
   --font-size-sm: 12px;
