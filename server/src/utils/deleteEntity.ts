@@ -50,6 +50,7 @@ export const CASCADE: Record<EntityType, (id: string) => Step[]> = {
     ['works', () => Work.updateMany({ piles: id }, { $pull: { piles: id } }).exec()],
     ['nick', () => retireNick('pile', id)],
     ['star', () => unpin('pile', id)],
+    ['time-star', () => Pin.deleteMany({ type: 'time', target: `pile:${id}` }).exec()],
   ],
   auth: (id) => [
     ['note authors', () => Note.updateMany({ authors: id }, { $pull: { authors: id } }).exec()],
