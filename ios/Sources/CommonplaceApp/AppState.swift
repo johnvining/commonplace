@@ -1,0 +1,158 @@
+import Combine
+import Foundation
+import CommonplaceKit
+
+/// Shared session state: server URL, auth flag, pins cache, timer persistence.
+/// Timer persistence mirrors the web client's `time_timer_v1` localStorage
+/// record `{key, kind, startedAt}` so a running timer survives relaunch.
+@MainActor
+final class AppState: ObservableObject {
+    @Published var serverURLString: String {
+        didSet { UserDefaults.standard.set(serverURLString, forKey: "serverURL") }
+    }
+    @Published var username: String {
+        didSet { UserDefaults.standard.set(username, forKey: "username") }
+    }
+    @Published var isSignedIn = false
+    @Published var authError: String?
+    @Published var unreachable = false
+    @Published var pins: [PinItem] = []
+    @Published var lastPinError: String?
+
+    private let pinQueueKey = "pin_queue_v1"
+    private var pinQueue: [PinSyncOp] = []
+
+    @Published var timerSubjectKey: String?
+    @Published var timerKind = "reading"
+    @Published var timerStartedAt: Date?
+
+    var timerIsRunning: Bool { timerStartedAt != nil }
+
+    init() {
+        let stored = UserDefaults.standard.string(forKey: "serverURL")
+        serverURLString = stored ?? "http://localhost:3000/api"
+        username = UserDefaults.standard.string(forKey: "username") ?? "commonplace"
+        if let data = UserDefaults.standard.data(forKey: "time_timer_v1"),
+           let obj = try? JSONDecoder().decode([String: String].self, from: data),
+           let key = obj["key"], let kind = obj["kind"],
+           let at = obj["startedAt"], let date = ISO8601DateFormatter().date(from: at) {
+            timerSubjectKey = key
+            timerKind = kind
+            timerStartedAt = date
+        }
+        if let data = UserDefaults.standard.data(forKey: pinQueueKey),
+           let queue = try? JSONDecoder().decode([PinSyncOp].self, from: data) {
+            pinQueue = queue
+        }
+    }
+
+    var client: APIClient {
+        let url = URL(string: serverURLString) ?? URL(string: "http://localhost:3000/api")!
+        return APIClient(baseURL: url)
+    }
+
+    func persistTimer() {
+        guard let key = timerSubjectKey, let at = timerStartedAt else { return }
+        let s = ISO8601DateFormatter().string(from: at)
+        let obj = ["key": key, "kind": timerKind, "startedAt": s]
+        if let data = try? JSONEncoder().encode(obj) {
+            UserDefaults.standard.set(data, forKey: "time_timer_v1")
+        }
+    }
+
+    func clearTimer() {
+        timerSubjectKey = nil
+        timerStartedAt = nil
+        UserDefaults.standard.removeObject(forKey: "time_timer_v1")
+    }
+
+    func startTimer(key: String, kind: String) {
+        timerSubjectKey = key
+        timerKind = kind
+        timerStartedAt = Date()
+        persistTimer()
+    }
+
+    // Stars sync like the web client: the queued star/unstar shows at once
+    // and is sent now; failures stay queued and ride along next time, so an
+    // offline star is never silently dropped.
+    func queuePin(type: String, id: String, label: String?, href: String?) {
+        pinQueue.removeAll { $0.type == type && $0.id == id }
+        pinQueue.append(PinSyncOp(op: "pin", type: type, id: id, label: label, href: href,
+                                 at: Date().timeIntervalSince1970 * 1000))
+        persistPinQueue()
+        pins = applyPins(over: pins)
+        Task { await syncPinQueue() }
+    }
+
+    func queueUnpin(type: String, id: String) {
+        pinQueue.removeAll { $0.type == type && $0.id == id }
+        pinQueue.append(PinSyncOp(op: "unpin", type: type, id: id,
+                                 at: Date().timeIntervalSince1970 * 1000))
+        persistPinQueue()
+        pins = applyPins(over: pins)
+        Task { await syncPinQueue() }
+    }
+
+    private func persistPinQueue() {
+        if let data = try? JSONEncoder().encode(pinQueue) {
+            UserDefaults.standard.set(data, forKey: pinQueueKey)
+        }
+    }
+
+    private func applyPins(over confirmed: [PinItem]) -> [PinItem] {
+        var items = confirmed
+        for op in pinQueue {
+            items.removeAll { $0.type == op.type && $0.id == op.id }
+            if op.op == "pin" {
+                items.insert(PinItem(type: op.type, id: op.id, label: op.label, href: op.href,
+                                     pinnedAt: op.at), at: 0)
+            }
+        }
+        return items
+    }
+
+    func syncPinQueue() async {
+        do {
+            let confirmed = try await client.syncPins(pinQueue)
+            pinQueue = []
+            persistPinQueue()
+            pins = confirmed
+            unreachable = false
+            lastPinError = nil
+        } catch let error as APIError {
+            if case .transport = error {
+                unreachable = true
+            } else {
+                lastPinError = "Star sync failed — will retry."
+            }
+        } catch {
+            lastPinError = "Star sync failed — will retry."
+        }
+    }
+
+    func refreshPins() async {
+        await syncPinQueue()
+    }
+
+    func validateSession() async {
+        do {
+            try await client.validateSession()
+            isSignedIn = true
+            authError = nil
+            unreachable = false
+        } catch let error as APIError {
+            switch error {
+            case .transport:
+                // Server down or offline: keep the session, flag it.
+                unreachable = true
+            case .unauthorized, .forbidden:
+                isSignedIn = false
+            default:
+                break
+            }
+        } catch {
+            break
+        }
+    }
+}

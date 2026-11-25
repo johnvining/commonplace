@@ -192,7 +192,8 @@ struct TimeView: View {
 
     private func star(_ e: TimeEntry) {
         let key = subjectKey(of: e)
-        Task { _ = try? await state.client.pin(type: "time", id: key, label: subjectTitle(of: e)) }
+        state.queuePin(type: "time", id: key, label: subjectTitle(of: e),
+                       href: "/time?subject=\(key)")
     }
 
     private func delete(_ e: TimeEntry) {
