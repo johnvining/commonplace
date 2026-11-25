@@ -329,6 +329,54 @@ public final class APIClient: Sendable {
         try await get("note/\(noteId)/ideas/suggest")
     }
 
+    // MARK: Images & OCR
+
+    /// Raw bytes of a note's nth image (1-based), session cookie attached.
+    public func noteImageData(noteId: String, index: Int) async throws -> Data {
+        let req = try request(path: "note/\(noteId)/images/\(index)", method: "GET")
+        let (data, response): (Data, URLResponse)
+        do { (data, response) = try await session.data(for: req) }
+        catch { throw APIError.transport(error.localizedDescription) }
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+            throw mapError(status: (response as? HTTPURLResponse)?.statusCode ?? 0, body: data)
+        }
+        return data
+    }
+
+    /// Authorized URL for a note's nth image (for AsyncImage), with the
+    /// session cookie stored in the shared cookie storage.
+    public func noteImageURL(noteId: String, index: Int) -> URL {
+        baseURL.appendingPathComponent("note/\(noteId)/images/\(index)")
+    }
+
+    public func uploadNoteImage(noteId: String, data: Data, filename: String = "photo.jpg") async throws {
+        var req = try request(path: "note/\(noteId)/image", method: "PUT")
+        let boundary = "Boundary-\(UUID().uuidString)"
+        req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        var body = Data()
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"\(filename)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(data)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+        let (respData, response): (Data, URLResponse)
+        do { (respData, response) = try await session.upload(for: req, from: body) }
+        catch { throw APIError.transport(error.localizedDescription) }
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+            throw mapError(status: (response as? HTTPURLResponse)?.statusCode ?? 0, body: respData)
+        }
+    }
+
+    public func deleteNoteImage(noteId: String, filename: String) async throws {
+        try await performEmpty(try request(path: "note/\(noteId)/image/", method: "DELETE",
+                                           body: ["filename": filename]))
+    }
+
+    /// OCR text for all of a note's images ('' when none has text).
+    public func ocrText(noteId: String) async throws -> String {
+        try await get("note/\(noteId)/ocr")
+    }
+
     public func importNotesForWork(workId: String, notesText: String) async throws {
         let _: EmptyResponse = try await put("note/import/work/\(workId)", body: ["notesText": notesText])
     }
