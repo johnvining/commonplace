@@ -335,6 +335,8 @@ struct ManualEntryForm: View {
     let onSaved: () -> Void
     @State private var title = ""
     @State private var pile = ""
+    @State private var pileName = ""
+    @State private var pileSuggestions: [Pile] = []
     @State private var kind = "reading"
     @State private var minutes = ""
     @State private var date = ""
@@ -343,7 +345,24 @@ struct ManualEntryForm: View {
     var body: some View {
         VStack {
             TextField("Title", text: $title)
-            TextField("Pile id (optional)", text: $pile)
+            if !pile.isEmpty {
+                HStack {
+                    Text(pileName.isEmpty ? pile : pileName)
+                    Spacer()
+                    Button("Clear") { pile = ""; pileName = "" }
+                }
+            } else {
+                TextField("Pile (type to search)", text: $pileName)
+                    .onChange(of: pileName) { _ in searchPiles() }
+                ForEach(pileSuggestions, id: \.stableId) { p in
+                    Button(p.name ?? "") {
+                        pile = p._id ?? ""; pileName = p.name ?? ""; pileSuggestions = []
+                    }
+                }
+                if pileName.trimmingCharacters(in: .whitespaces).count >= 2 {
+                    Button("Create pile “\(pileName)”") { createPile() }
+                }
+            }
             Picker("Kind", selection: $kind) {
                 Text("Reading").tag("reading")
                 Text("Writing").tag("writing")
@@ -353,6 +372,22 @@ struct ManualEntryForm: View {
                 .onAppear { if date.isEmpty { date = defaultDay } }
             Button("Save") { save() }
             if let error { Text(error).foregroundStyle(.red).font(.caption) }
+        }
+    }
+
+    private func searchPiles() {
+        let q = pileName.trimmingCharacters(in: .whitespaces)
+        guard q.count >= 2, pile.isEmpty else { pileSuggestions = []; return }
+        Task { pileSuggestions = (try? await state.client.autocompletePiles(q)) ?? [] }
+    }
+
+    private func createPile() {
+        let name = pileName.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty else { return }
+        Task {
+            if let p = try? await state.client.createPile(name: name), let id = p._id {
+                await MainActor.run { pile = id; pileName = p.name ?? name; pileSuggestions = [] }
+            }
         }
     }
 
@@ -371,4 +406,8 @@ struct ManualEntryForm: View {
             }
         }
     }
+}
+
+private extension Pile {
+    var stableId: String { _id ?? ["p", name].compactMap { $0 }.joined(separator: "|") }
 }
