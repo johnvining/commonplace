@@ -15,10 +15,9 @@ struct NoteDetailView: View {
     @State private var title = ""
     @State private var text = ""
     @State private var take = ""
-    @State private var pileQuery = ""
-    @State private var pileSuggestions: [Pile] = []
-    @State private var ideaQuery = ""
-    @State private var ideaSuggestions: [Idea] = []
+    @State private var authorOptions: [PickOption] = []
+    @State private var pileOptions: [PickOption] = []
+    @State private var ideaOptions: [PickOption] = []
     @State private var linked: [Note] = []
     @State private var linkNick = ""
     @State private var imageDatas: [Data] = []
@@ -47,42 +46,45 @@ struct NoteDetailView: View {
                         if let nick = note.nick { Text("nick: \(nick)").font(.caption) }
                     }
                 }
-                Section("Tags") {
-                    Text("Authors: \(note.authors?.compactMap(\.name).joined(separator: ", ") ?? "")")
+                Section("Authors") {
+                    PillEditor(
+                        placeholder: "Add an author…", tint: DS.accentSoft, selected: $authorOptions,
+                        load: { q in ((try? await state.client.autocompleteAuthors(q)) ?? []).compactMap { a in a._id.map { PickOption(id: $0, name: a.name ?? "") } } },
+                        onAdd: { opt in authorOptions.append(opt); saveAuthors() },
+                        onRemove: { opt in authorOptions.removeAll { $0.id == opt.id }; saveAuthors() },
+                        onCreateNew: { name in createAuthorNamed(name) }
+                    )
+                }
+                Section("Work") {
+                    if let w = note.work {
+                        Text(w.name ?? w.id).font(DS.ui(14))
+                    } else {
+                        Text("No work linked").font(DS.ui(12)).foregroundStyle(DS.muted)
+                    }
+                    TypeaheadField(
+                        placeholder: "Link a work…",
+                        load: { q in ((try? await state.client.autocompleteWorks(q)) ?? []).compactMap { w in w._id.map { PickOption(id: $0, name: w.name ?? "") } } },
+                        onPick: { opt in Task { _ = try? await state.client.addWorkToNote(noteId: noteId, workId: opt.id); reloadNote() } },
+                        onCreate: { name in Task { _ = try? await state.client.createWorkForNote(noteId: noteId, name: name); reloadNote() } }
+                    )
                 }
                 Section("Piles") {
-                    ForEach(note.piles ?? [], id: \.id) { p in
-                        HStack {
-                            Text(p.name ?? p.id)
-                            Spacer()
-                            Button("Remove") { removePile(p) }
-                        }
-                    }
-                    TextField("Add pile…", text: $pileQuery)
-                        .onSubmit { searchPiles() }
-                    ForEach(pileSuggestions, id: \.stableId) { p in
-                        Button(p.name ?? "") { addPile(p) }
-                    }
-                    if !pileQuery.trimmingCharacters(in: .whitespaces).isEmpty {
-                        Button("Create pile “\(pileQuery)”") { createPile() }
-                    }
+                    PillEditor(
+                        placeholder: "Add a pile…", tint: DS.pileSoft, selected: $pileOptions,
+                        load: { q in ((try? await state.client.autocompletePiles(q)) ?? []).compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } } },
+                        onAdd: { opt in pileOptions.append(opt); Task { _ = try? await state.client.addPileToNote(noteId: noteId, pileId: opt.id); reloadNote() } },
+                        onRemove: { opt in pileOptions.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removePileFromNote(noteId: noteId, pileId: opt.id); reloadNote() } },
+                        onCreateNew: { name in Task { _ = try? await state.client.createPileForNote(noteId: noteId, name: name); reloadNote() } }
+                    )
                 }
                 Section("Ideas") {
-                    ForEach(note.ideas ?? [], id: \.id) { i in
-                        HStack {
-                            Text(i.name ?? i.id)
-                            Spacer()
-                            Button("Remove") { removeIdea(i) }
-                        }
-                    }
-                    TextField("Add idea…", text: $ideaQuery)
-                        .onSubmit { searchIdeas() }
-                    ForEach(ideaSuggestions, id: \.stableId) { i in
-                        Button(i.name ?? "") { addIdea(i) }
-                    }
-                    if !ideaQuery.trimmingCharacters(in: .whitespaces).isEmpty {
-                        Button("Create idea “\(ideaQuery)”") { createIdea() }
-                    }
+                    PillEditor(
+                        placeholder: "Add an idea…", tint: DS.accentSoft, selected: $ideaOptions,
+                        load: { q in ((try? await state.client.autocompleteIdeas(q)) ?? []).compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } } },
+                        onAdd: { opt in ideaOptions.append(opt); Task { _ = try? await state.client.addIdeaToNote(noteId: noteId, ideaId: opt.id); reloadNote() } },
+                        onRemove: { opt in ideaOptions.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removeIdeaFromNote(noteId: noteId, ideaId: opt.id); reloadNote() } },
+                        onCreateNew: { name in Task { _ = try? await state.client.createIdeaForNote(noteId: noteId, name: name); reloadNote() } }
+                    )
                 }
                 Section {
                     HStack {
@@ -176,7 +178,7 @@ struct NoteDetailView: View {
         Task {
             do {
                 let rows = try await state.client.note(id: noteId)
-                await MainActor.run { note = rows.first; loaded = true }
+                await MainActor.run { note = rows.first; loaded = true; syncOptions(from: rows.first) }
                 Task { _ = try? await state.client.recordNoteOpened(id: noteId) }
                 if let links = try? await state.client.linkedNotes(noteId: noteId) {
                     await MainActor.run { linked = links }
@@ -313,74 +315,39 @@ struct NoteDetailView: View {
     private func reloadNote() {
         Task {
             if let rows = try? await state.client.note(id: noteId) {
-                await MainActor.run { note = rows.first }
+                await MainActor.run { note = rows.first; syncOptions(from: rows.first) }
             }
         }
     }
 
-    private func searchPiles() {
-        let q = pileQuery.trimmingCharacters(in: .whitespaces)
-        guard q.count >= 2 else { return }
-        Task { pileSuggestions = (try? await state.client.autocompletePiles(q)) ?? [] }
+    private func syncOptions(from n: Note?) {
+        guard let n else { return }
+        authorOptions = (n.authors ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
+        pileOptions = (n.piles ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
+        ideaOptions = (n.ideas ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
     }
 
-    private func addPile(_ p: Pile) {
-        guard let pid = p._id else { return }
+    private func saveAuthors() {
+        let ids = authorOptions.map(\.id)
         Task {
-            _ = try? await state.client.addPileToNote(noteId: noteId, pileId: pid)
-            await MainActor.run { pileQuery = ""; pileSuggestions = [] }
-            reloadNote()
+            do {
+                let updated = try await state.client.updateNote(id: noteId, NoteUpdate(authors: ids))
+                await MainActor.run { note = updated; syncOptions(from: updated) }
+            } catch {
+                await MainActor.run { self.error = "Author save failed — retry." }
+            }
         }
     }
 
-    private func createPile() {
-        let name = pileQuery.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { return }
+    private func createAuthorNamed(_ name: String) {
         Task {
-            _ = try? await state.client.createPileForNote(noteId: noteId, name: name)
-            await MainActor.run { pileQuery = ""; pileSuggestions = [] }
-            reloadNote()
+            if let a = try? await state.client.createAuthor(name: name), let id = a._id {
+                await MainActor.run { authorOptions.append(PickOption(id: id, name: a.name ?? name)) }
+                saveAuthors()
+            }
         }
     }
 
-    private func removePile(_ p: PopulatedRef) {
-        Task {
-            _ = try? await state.client.removePileFromNote(noteId: noteId, pileId: p.id)
-            reloadNote()
-        }
-    }
-
-    private func searchIdeas() {
-        let q = ideaQuery.trimmingCharacters(in: .whitespaces)
-        guard q.count >= 2 else { return }
-        Task { ideaSuggestions = (try? await state.client.autocompleteIdeas(q)) ?? [] }
-    }
-
-    private func addIdea(_ i: Idea) {
-        guard let iid = i._id else { return }
-        Task {
-            _ = try? await state.client.addIdeaToNote(noteId: noteId, ideaId: iid)
-            await MainActor.run { ideaQuery = ""; ideaSuggestions = [] }
-            reloadNote()
-        }
-    }
-
-    private func createIdea() {
-        let name = ideaQuery.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { return }
-        Task {
-            _ = try? await state.client.createIdeaForNote(noteId: noteId, name: name)
-            await MainActor.run { ideaQuery = ""; ideaSuggestions = [] }
-            reloadNote()
-        }
-    }
-
-    private func removeIdea(_ i: PopulatedRef) {
-        Task {
-            _ = try? await state.client.removeIdeaFromNote(noteId: noteId, ideaId: i.id)
-            reloadNote()
-        }
-    }
 
     private func toggleStar() {
         if starred {
