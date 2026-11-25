@@ -1,5 +1,9 @@
 import SwiftUI
 import CommonplaceKit
+import PhotosUI
+#if os(iOS)
+import UIKit
+#endif
 
 /// Single note: full card, star, edit, delete (mirrors NoteView).
 struct NoteDetailView: View {
@@ -17,6 +21,11 @@ struct NoteDetailView: View {
     @State private var ideaSuggestions: [Idea] = []
     @State private var linked: [Note] = []
     @State private var linkNick = ""
+    @State private var imageDatas: [Data] = []
+    @State private var photoItem: PhotosPickerItem?
+    @State private var ocrResult: String?
+    @State private var suggestedTitle: String?
+    @State private var suggestedIdeas: [String] = []
     @State private var error: String?
     @State private var confirming = false
     @Environment(\.dismiss) private var dismiss
@@ -88,6 +97,51 @@ struct NoteDetailView: View {
                             }
                     }
                 }
+                Section("Images") {
+                    #if os(iOS)
+                    ScrollView(.horizontal) {
+                        HStack {
+                            ForEach(Array(imageDatas.enumerated()), id: \.offset) { idx, data in
+                                if let ui = UIImage(data: data) {
+                                    VStack {
+                                        Image(uiImage: ui).resizable().scaledToFill()
+                                            .frame(width: 90, height: 90).clipped()
+                                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        Button("Delete") { deleteImage(idx) }.font(DS.ui(11))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    #else
+                    Text("\(imageDatas.count) image(s)").font(DS.ui(12)).foregroundStyle(DS.muted)
+                    #endif
+                    PhotosPicker(selection: $photoItem, matching: .images) {
+                        Text("Add photo")
+                    }
+                    .onChange(of: photoItem) { _ in uploadPhoto() }
+                    HStack {
+                        Button("Run OCR") { runOCR() }
+                        Button("Suggest title") { suggestTitle() }
+                        Button("Suggest ideas") { suggestIdeas() }
+                    }
+                    if let t = suggestedTitle {
+                        Button("Use title: \(t)") {
+                            title = t
+                            if !editing { editing = true }
+                        }
+                    }
+                    ForEach(suggestedIdeas, id: \.self) { idea in
+                        Button("Add idea: \(idea)") { addSuggestedIdea(idea) }
+                    }
+                    if let ocr = ocrResult {
+                        Text(ocr).font(DS.serif(13))
+                        Button("Append OCR to text") {
+                            text = (text.isEmpty ? ocr : text + "\n\n" + ocr)
+                            if !editing { editing = true }
+                        }
+                    }
+                }
                 Section("Linked notes") {
                     ForEach(linked, id: \.stableId) { n in
                         HStack {
@@ -126,6 +180,7 @@ struct NoteDetailView: View {
                 if let links = try? await state.client.linkedNotes(noteId: noteId) {
                     await MainActor.run { linked = links }
                 }
+                loadImages()
             } catch {
                 await MainActor.run { self.error = "Load failed — retry."; loaded = true }
             }
@@ -148,6 +203,74 @@ struct NoteDetailView: View {
         Task {
             try? await state.client.deleteNote(id: noteId)
             await MainActor.run { dismiss() }
+        }
+    }
+
+    private func loadImages() {
+        Task {
+            guard let count = note?.images?.count, count > 0 else { return }
+            var datas: [Data] = []
+            for i in 1...count {
+                if let d = try? await state.client.noteImageData(noteId: noteId, index: i) {
+                    datas.append(d)
+                }
+            }
+            await MainActor.run { imageDatas = datas }
+        }
+    }
+
+    private func uploadPhoto() {
+        guard let item = photoItem else { return }
+        Task {
+            if let data = try? await item.loadTransferable(type: Data.self), !data.isEmpty {
+                try? await state.client.uploadNoteImage(noteId: noteId, data: data)
+                reloadNote()
+                // refresh image list after the note reloads
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { loadImages() }
+            }
+            await MainActor.run { photoItem = nil }
+        }
+    }
+
+    private func deleteImage(_ idx: Int) {
+        guard let filename = note?.images?[idx] else { return }
+        Task {
+            try? await state.client.deleteNoteImage(noteId: noteId, filename: filename)
+            reloadNote()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { loadImages() }
+        }
+    }
+
+    private func runOCR() {
+        Task {
+            if let result = try? await state.client.ocrText(noteId: noteId) {
+                await MainActor.run { ocrResult = result.isEmpty ? "(no text found)" : result }
+            } else {
+                await MainActor.run { self.error = "OCR failed — retry." }
+            }
+        }
+    }
+
+    private func suggestTitle() {
+        Task {
+            if let s = try? await state.client.suggestTitle(noteId: noteId) {
+                await MainActor.run { suggestedTitle = s.suggested_title }
+            }
+        }
+    }
+
+    private func suggestIdeas() {
+        Task {
+            if let s = try? await state.client.suggestIdeas(noteId: noteId) {
+                await MainActor.run { suggestedIdeas = s.suggested_ideas ?? [] }
+            }
+        }
+    }
+
+    private func addSuggestedIdea(_ name: String) {
+        Task {
+            _ = try? await state.client.createIdeaForNote(noteId: noteId, name: name)
+            reloadNote()
         }
     }
 
