@@ -501,6 +501,12 @@ public final class APIClient: Sendable {
 
     // MARK: - Stats (`/api/stats`)
 
+    // Recent items per type (`GET /api/stats/recent/:type`, envelope-wrapped).
+    public func recentAuthors() async throws -> [Author] { try await get("stats/recent/authors") }
+    public func recentWorks() async throws -> [Work] { try await get("stats/recent/works") }
+    public func recentIdeas() async throws -> [Idea] { try await get("stats/recent/ideas") }
+    public func recentPilesList() async throws -> [Pile] { try await get("stats/recent/piles") }
+
     /// `GET /api/stats` answers `{success, data}` directly (no `{data:}` envelope).
     public func stats() async throws -> StatsCounts {
         let req = try request(path: "stats", method: "GET")
