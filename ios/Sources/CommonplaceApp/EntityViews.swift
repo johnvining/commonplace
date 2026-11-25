@@ -9,14 +9,15 @@ struct WorksListView: View {
     @EnvironmentObject var state: AppState
     @State private var works: [Work] = []
     @State private var query = ""
+    @State private var searchTask: Task<Void, Never>?
     @State private var error: String?
 
     var body: some View {
         List {
             if let error { Text(error).foregroundStyle(.red) }
             Section {
-                TextField("Search works", text: $query).onSubmit { search() }
-                Button("Search") { search() }
+                TextField("Search works", text: $query)
+                    .onChange(of: query) { scheduleSearch() }
             }
             ForEach(works, id: \.stableId) { w in
                 NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
@@ -30,6 +31,17 @@ struct WorksListView: View {
         .listStyle(.plain)
         .navigationTitle("Works")
         .task { works = (try? await state.client.recentWorks()) ?? [] }
+    }
+
+    private func scheduleSearch() {
+        searchTask?.cancel()
+        let q = query.trimmingCharacters(in: .whitespaces)
+        guard q.count >= 2 else { return }
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if Task.isCancelled { return }
+            await MainActor.run { search() }
+        }
     }
 
     private func search() {
@@ -46,14 +58,15 @@ struct AuthorsListView: View {
     @EnvironmentObject var state: AppState
     @State private var authors: [Author] = []
     @State private var query = ""
+    @State private var searchTask: Task<Void, Never>?
     @State private var error: String?
 
     var body: some View {
         List {
             if let error { Text(error).foregroundStyle(.red) }
             Section {
-                TextField("Search authors", text: $query).onSubmit { search() }
-                Button("Search") { search() }
+                TextField("Search authors", text: $query)
+                    .onChange(of: query) { scheduleSearch() }
             }
             ForEach(authors, id: \.stableId) { a in
                 NavigationLink { AuthorDetailView(authorId: a._id ?? "") } label: {
@@ -64,6 +77,17 @@ struct AuthorsListView: View {
         .listStyle(.plain)
         .navigationTitle("Authors")
         .task { authors = (try? await state.client.recentAuthors()) ?? [] }
+    }
+
+    private func scheduleSearch() {
+        searchTask?.cancel()
+        let q = query.trimmingCharacters(in: .whitespaces)
+        guard q.count >= 2 else { return }
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if Task.isCancelled { return }
+            await MainActor.run { search() }
+        }
     }
 
     private func search() {
@@ -80,14 +104,15 @@ struct IdeasListView: View {
     @EnvironmentObject var state: AppState
     @State private var ideas: [Idea] = []
     @State private var query = ""
+    @State private var searchTask: Task<Void, Never>?
     @State private var error: String?
 
     var body: some View {
         List {
             if let error { Text(error).foregroundStyle(.red) }
             Section {
-                TextField("Search ideas", text: $query).onSubmit { search() }
-                Button("Search") { search() }
+                TextField("Search ideas", text: $query)
+                    .onChange(of: query) { scheduleSearch() }
             }
             ForEach(ideas, id: \.stableId) { i in
                 NavigationLink { IdeaDetailView(ideaId: i._id ?? "") } label: {
@@ -98,6 +123,17 @@ struct IdeasListView: View {
         .listStyle(.plain)
         .navigationTitle("Ideas")
         .task { ideas = (try? await state.client.recentIdeas()) ?? [] }
+    }
+
+    private func scheduleSearch() {
+        searchTask?.cancel()
+        let q = query.trimmingCharacters(in: .whitespaces)
+        guard q.count >= 2 else { return }
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if Task.isCancelled { return }
+            await MainActor.run { search() }
+        }
     }
 
     private func search() {
