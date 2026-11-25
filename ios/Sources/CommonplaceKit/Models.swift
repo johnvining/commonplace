@@ -407,5 +407,6 @@ public struct MaintenanceJobRef: Codable, Sendable {
 
 public struct MaintenanceJob: Codable, Sendable {
     public var status: String?
-    public var output: String?
+    public var dryRun: Bool?
+    public var output: [String]?
 }

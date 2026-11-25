@@ -4,6 +4,8 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var state: AppState
     @State private var message: String?
+    @State private var oldPassword = ""
+    @State private var newPassword = ""
 
     var body: some View {
         Form {
@@ -26,6 +28,24 @@ struct SettingsView: View {
                         }
                     }
                 }
+            }
+            Section("Change password") {
+                SecureField("Current password", text: $oldPassword)
+                SecureField("New password", text: $newPassword)
+                Button("Change password") {
+                    Task {
+                        do {
+                            _ = try await state.client.changePassword(
+                                username: state.username, oldPassword: oldPassword, newPassword: newPassword)
+                            await MainActor.run {
+                                message = "Password changed."
+                                oldPassword = ""; newPassword = ""
+                            }
+                        } catch {
+                            await MainActor.run { message = "Change failed — check the current password." }
+                        }
+                    }
+                }.disabled(oldPassword.isEmpty || newPassword.isEmpty)
             }
             Section("Account") {
                 Button("Log out") {

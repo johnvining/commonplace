@@ -377,6 +377,14 @@ public final class APIClient: Sendable {
         try await get("note/\(noteId)/ocr")
     }
 
+    public func importNotesCsv(_ importList: String) async throws -> TimeImportResult {
+        try await put("note/import/csv", body: ["importList": importList])
+    }
+
+    public func importNotesInstapaper(_ importList: String) async throws -> TimeImportResult {
+        try await put("note/import/instapaper", body: ["importList": importList])
+    }
+
     public func importNotesForWork(workId: String, notesText: String) async throws {
         let _: EmptyResponse = try await put("note/import/work/\(workId)", body: ["notesText": notesText])
     }
