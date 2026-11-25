@@ -15,6 +15,8 @@ struct NoteDetailView: View {
     @State private var pileSuggestions: [Pile] = []
     @State private var ideaQuery = ""
     @State private var ideaSuggestions: [Idea] = []
+    @State private var linked: [Note] = []
+    @State private var linkNick = ""
     @State private var error: String?
     @State private var confirming = false
     @Environment(\.dismiss) private var dismiss
@@ -86,6 +88,20 @@ struct NoteDetailView: View {
                             }
                     }
                 }
+                Section("Linked notes") {
+                    ForEach(linked, id: \.stableId) { n in
+                        HStack {
+                            NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
+                                NoteRow(note: n)
+                            }
+                            Button("Unlink") { unlink(n) }
+                        }
+                    }
+                    HStack {
+                        TextField("Link by nick (e.g. n123456)", text: $linkNick)
+                        Button("Link") { linkByNick() }.disabled(linkNick.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                }
             } else if loaded {
                 Text("Note not found — it may have been deleted.")
                     .foregroundStyle(.secondary)
@@ -107,6 +123,9 @@ struct NoteDetailView: View {
                 let rows = try await state.client.note(id: noteId)
                 await MainActor.run { note = rows.first; loaded = true }
                 Task { _ = try? await state.client.recordNoteOpened(id: noteId) }
+                if let links = try? await state.client.linkedNotes(noteId: noteId) {
+                    await MainActor.run { linked = links }
+                }
             } catch {
                 await MainActor.run { self.error = "Load failed — retry."; loaded = true }
             }
@@ -129,6 +148,41 @@ struct NoteDetailView: View {
         Task {
             try? await state.client.deleteNote(id: noteId)
             await MainActor.run { dismiss() }
+        }
+    }
+
+    private func reloadLinked() {
+        Task {
+            if let links = try? await state.client.linkedNotes(noteId: noteId) {
+                await MainActor.run { linked = links }
+            }
+        }
+    }
+
+    private func linkByNick() {
+        let nick = linkNick.trimmingCharacters(in: .whitespaces)
+        guard !nick.isEmpty else { return }
+        Task {
+            do {
+                let own = try await state.client.nickFor(type: "note", id: noteId)
+                guard let ownKey = own.key, !ownKey.isEmpty else {
+                    await MainActor.run { self.error = "Could not resolve this note's nick." }
+                    return
+                }
+                _ = try await state.client.linkNotes(leftNick: ownKey, rightNick: nick)
+                await MainActor.run { linkNick = "" }
+                reloadLinked()
+            } catch {
+                await MainActor.run { self.error = "Link failed — check the nick." }
+            }
+        }
+    }
+
+    private func unlink(_ n: Note) {
+        guard let other = n._id else { return }
+        Task {
+            try? await state.client.unlinkNotes(a: noteId, b: other)
+            reloadLinked()
         }
     }
 
@@ -219,4 +273,8 @@ private extension Pile {
 }
 private extension Idea {
     var stableId: String { _id ?? ["i", name].compactMap { $0 }.joined(separator: "|") }
+}
+
+private extension Note {
+    var stableId: String { _id ?? ["n", title, text].compactMap { $0 }.joined(separator: "|") }
 }
