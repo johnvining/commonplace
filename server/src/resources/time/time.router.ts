@@ -4,7 +4,9 @@ import {
   reqDeleteTimeEntry,
   reqGetTimeEntry,
   reqGetTimeSummary,
+  reqImportTimeEntries,
   reqListTimeEntries,
+  reqRecentSubjects,
   reqUpdateTimeEntry,
 } from './time.controllers'
 import { asyncWrapper } from '../../utils/requests.js'
@@ -12,8 +14,10 @@ import { requireObjectIdParam } from '../../utils/validateObjectId.js'
 
 const router = Router()
 
-// /summary before /:id so 'summary' isn't read as an entry id.
+// Named routes before /:id so 'summary' etc. aren't read as entry ids.
 router.route('/summary').get(asyncWrapper(reqGetTimeSummary, 200))
+router.route('/recent-subjects').get(asyncWrapper(reqRecentSubjects, 200))
+router.route('/import').post(asyncWrapper(reqImportTimeEntries, 201))
 router
   .route('/')
   .post(asyncWrapper(reqCreateTimeEntry, 201))

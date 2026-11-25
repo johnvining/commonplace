@@ -1,7 +1,18 @@
 import type { Request, Response } from 'express'
 import Pin from './pin.model.js'
 
-const TYPES = new Set(['note', 'work', 'auth', 'idea', 'pile'])
+const TYPES = new Set(['note', 'work', 'auth', 'idea', 'pile', 'time'])
+
+// A starred time-logging subject: `pile:<pileId>` or `title:<lowercased title>`.
+// Unlike entity stars, these name no record, so the id isn't an ObjectId.
+function isTimeTarget(id: string): boolean {
+  if (id.startsWith('pile:')) return /^[0-9a-f]{24}$/i.test(id.slice(5))
+  if (id.startsWith('title:')) {
+    const title = id.slice(6)
+    return title.length >= 1 && title.length <= 200 && !/[\0-\x1f\x7f]/.test(title)
+  }
+  return false
+}
 
 interface PinInput {
   type?: unknown
@@ -24,7 +35,9 @@ const toItem = (pin: any) => ({
 function parse(input: PinInput) {
   const type = typeof input.type === 'string' ? input.type : ''
   const id = typeof input.id === 'string' ? input.id : ''
-  if (!TYPES.has(type) || !/^[0-9a-f]{24}$/i.test(id)) return null
+  if (!TYPES.has(type)) return null
+  const idOk = type === 'time' ? isTimeTarget(id) : /^[0-9a-f]{24}$/i.test(id)
+  if (!idOk) return null
   const text = (v: unknown, max: number) => (typeof v === 'string' ? v.slice(0, max) : undefined)
   const at = typeof input.pinnedAt === 'number' ? new Date(input.pinnedAt) : new Date()
   return {
@@ -49,7 +62,11 @@ export const reqListPins = async () => {
 async function danglingPins(pins: { _id: unknown; type: string; target: string }[]) {
   const { default: mongoose } = await import('mongoose')
   const gone: unknown[] = []
-  for (const type of TYPES) {
+  // Time stars name subjects, not records, so there is nothing to check
+  // them against; they stay until unstarred (or their pile is deleted,
+  // which removes them via the delete cascade).
+  const checkable = [...TYPES].filter((t) => t !== 'time')
+  for (const type of checkable) {
     const ofType = pins.filter((p) => p.type === type)
     if (!ofType.length) continue
     const model = mongoose.model(type === 'auth' ? 'author' : type)

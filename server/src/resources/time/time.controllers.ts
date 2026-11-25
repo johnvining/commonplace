@@ -1,5 +1,6 @@
 import { isValidObjectId } from 'mongoose'
 import TimeEntry, { TIME_KINDS } from './time.model.js'
+import Pile from '../pile/pile.model.js'
 import type { Request } from 'express'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -232,6 +233,84 @@ export const reqUpdateTimeEntry = async (req: Request) => {
 
 export const reqDeleteTimeEntry = async (req: Request) => {
   await TimeEntry.findByIdAndDelete(req.params.id).exec()
+}
+
+// Bulk import: an array of entry bodies, each validated like a create.
+// A pile may be an ObjectId or an exact pile name. Every row is reported
+// (#374 pattern), so one bad row doesn't fail the batch.
+export const reqImportTimeEntries = async (req: Request) => {
+  const entries = req.body?.entries
+  if (!Array.isArray(entries) || !entries.length) {
+    throw invalid('Provide a non-empty entries array')
+  }
+  if (entries.length > 2000) throw invalid('At most 2000 entries per import')
+  const rows: Array<{ row: number; ok: boolean; error?: string; id?: string }> = []
+  let imported = 0
+  for (let i = 0; i < entries.length; i++) {
+    const raw = entries[i] ?? {}
+    try {
+      const body: Record<string, unknown> = { ...raw }
+      if (typeof body.pile === 'string' && body.pile && !isValidObjectId(body.pile)) {
+        const pile = await Pile.findOne({ name: body.pile }).lean().exec()
+        if (!pile) throw invalid(`Pile not found: ${body.pile}`)
+        body.pile = String(pile._id)
+      }
+      const doc = await TimeEntry.create(toEntryBody(body, true))
+      imported++
+      rows.push({ row: i + 1, ok: true, id: String(doc._id) })
+    } catch (e: any) {
+      const message = e?.status === 400 && e?.message ? e.message : 'Invalid entry'
+      rows.push({ row: i + 1, ok: false, error: message })
+    }
+  }
+  return { imported, failed: rows.length - imported, rows }
+}
+
+// Recently logged subjects for quick re-logging: distinct titles and piles
+// ordered by most recent use, each with the kind/minutes last logged.
+export const reqRecentSubjects = async (req: Request) => {
+  const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 100)
+  const entries = await TimeEntry.find({})
+    .sort({ date: -1, createdAt: -1 })
+    .limit(500)
+    .populate('pile', 'name')
+    .lean()
+    .exec()
+  const seen = new Set<string>()
+  const subjects: Array<{
+    key: string
+    title?: string
+    pile?: { id: string; name: string }
+    kind: string
+    minutes: number
+    lastDate: string
+  }> = []
+  for (const e of entries as any[]) {
+    const pileId = e.pile?._id ? String(e.pile._id) : null
+    const key = pileId ? `pile:${pileId}` : `title:${((e.title ?? '').trim() || 'Untitled').toLowerCase()}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    if (pileId) {
+      subjects.push({
+        key,
+        pile: { id: pileId, name: e.pile?.name ?? 'Unknown pile' },
+        ...(e.title?.trim() ? { title: e.title.trim() } : {}),
+        kind: e.kind,
+        minutes: e.minutes,
+        lastDate: dayString(new Date(e.date)),
+      })
+    } else {
+      subjects.push({
+        key,
+        title: (e.title ?? '').trim() || 'Untitled',
+        kind: e.kind,
+        minutes: e.minutes,
+        lastDate: dayString(new Date(e.date)),
+      })
+    }
+    if (subjects.length >= limit) break
+  }
+  return subjects
 }
 
 export const reqGetTimeSummary = async (req: Request) => {

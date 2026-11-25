@@ -161,4 +161,87 @@ describe('time', () => {
       await agent.get('/api/time/summary').query({ date: 'yesterday' }).expect(400)
     })
   })
+
+  describe('POST /api/time/import', () => {
+    it('imports rows, reports bad ones, resolves pile names', async () => {
+      const agent = await authedAgent()
+      const pile = await createPile(agent, 'Essay: Attention')
+      const res = await agent
+        .post('/api/time/import')
+        .send({
+          entries: [
+            { title: 'Morning pages', kind: 'writing', minutes: 45, date: '2026-11-20' },
+            { pile: 'Essay: Attention', kind: 'reading', minutes: 30, date: '2026-11-20' },
+            { pile: String(pile._id), kind: 'writing', minutes: 60, date: '2026-11-21' },
+            { title: 'Bad kind', kind: 'skimming', minutes: 10, date: '2026-11-20' },
+            { title: 'No pile here', pile: 'Missing Pile', kind: 'reading', minutes: 10, date: '2026-11-20' },
+            { kind: 'reading', minutes: 10, date: '2026-11-20' },
+          ],
+        })
+        .expect(201)
+      expect(res.body.data.imported).toBe(3)
+      expect(res.body.data.failed).toBe(3)
+      expect(res.body.data.rows.filter((r) => r.ok)).toHaveLength(3)
+      expect(res.body.data.rows.filter((r) => !r.ok).map((r) => r.row)).toEqual([4, 5, 6])
+
+      const all = await agent.get('/api/time/').expect(200)
+      expect(all.body.data).toHaveLength(3)
+    })
+
+    it('400s on an empty or oversized batch', async () => {
+      const agent = await authedAgent()
+      await agent.post('/api/time/import').send({ entries: [] }).expect(400)
+      await agent.post('/api/time/import').send({}).expect(400)
+    })
+  })
+
+  describe('GET /api/time/recent-subjects', () => {
+    it('returns distinct subjects newest first with last kind/minutes', async () => {
+      const agent = await authedAgent()
+      const pile = await createPile(agent, 'Essay: Attention')
+      await createEntry(agent, { title: 'Morning pages', kind: 'writing', minutes: 45, date: '2026-11-20' }).expect(201)
+      await createEntry(agent, { pile: pile._id, kind: 'reading', minutes: 30, date: '2026-11-21' }).expect(201)
+      await createEntry(agent, { title: 'morning PAGES', kind: 'writing', minutes: 15, date: '2026-11-22' }).expect(201)
+
+      const res = await agent.get('/api/time/recent-subjects').expect(200)
+      const subjects = res.body.data
+      // Same title, different case, collapses to the newest use.
+      expect(subjects).toHaveLength(2)
+      expect(subjects[0]).toMatchObject({ title: 'morning PAGES', kind: 'writing', minutes: 15, lastDate: '2026-11-22' })
+      expect(subjects[1]).toMatchObject({
+        key: `pile:${pile._id}`,
+        kind: 'reading',
+        minutes: 30,
+        pile: { id: String(pile._id), name: 'Essay: Attention' },
+      })
+    })
+  })
+
+  describe('time stars (pins)', () => {
+    it('stars pile and title subjects, keeps them on list, rejects bad ones', async () => {
+      const agent = await authedAgent()
+      const pile = await createPile(agent, 'Essay: Attention')
+      await agent
+        .put('/api/pin/')
+        .send({ type: 'time', id: `pile:${pile._id}`, label: 'Essay: Attention', href: `/time?subject=pile:${pile._id}` })
+        .expect(200)
+      await agent
+        .put('/api/pin/')
+        .send({ type: 'time', id: 'title:instapaper', label: 'Instapaper', href: '/time?subject=title:instapaper' })
+        .expect(200)
+      await agent.put('/api/pin/').send({ type: 'time', id: 'bogus' }).expect(400)
+      await agent.put('/api/pin/').send({ type: 'time', id: 'title:' }).expect(400)
+
+      const list = (await agent.get('/api/pin/').expect(200)).body.data
+      expect(list.filter((p) => p.type === 'time').map((p) => p.id).sort()).toEqual([
+        `pile:${pile._id}`,
+        'title:instapaper',
+      ])
+
+      // Deleting the pile removes its time star but keeps the title star.
+      await agent.delete(`/api/pile/${pile._id}`).expect(204)
+      const after = (await agent.get('/api/pin/').expect(200)).body.data
+      expect(after.filter((p) => p.type === 'time').map((p) => p.id)).toEqual(['title:instapaper'])
+    })
+  })
 })
