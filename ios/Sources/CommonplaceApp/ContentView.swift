@@ -4,6 +4,7 @@ import CommonplaceKit
 /// Root tab bar. Web parity: Home/Recent (Notes), Time, Piles, Search, More.
 struct ContentView: View {
     @EnvironmentObject var state: AppState
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @State private var tab = 0
     @State private var timePreselect: String?
 
@@ -28,6 +29,10 @@ struct ContentView: View {
     }
 
     private var tabView: some View {
+        Group {
+        if sizeClass == .regular {
+            MacRootView()
+        } else {
         TabView(selection: $tab) {
             NotesView()
                 .tabItem { Label("Notes", systemImage: "note.text") }
@@ -44,6 +49,8 @@ struct ContentView: View {
             MoreView()
                 .tabItem { Label("More", systemImage: "ellipsis.circle") }
                 .tag(4)
+        }
+        }
         }
         .task {
             await state.validateSession()
