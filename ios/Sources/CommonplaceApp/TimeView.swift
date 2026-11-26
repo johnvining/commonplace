@@ -265,6 +265,7 @@ struct TimeView: View {
                 try await log(key: key, kind: logKind, minutes: max(1, minutes), date: localDayString(),
                               startedAt: iso.string(from: at), endedAt: iso.string(from: Date()))
                 await MainActor.run { state.clearTimer(); reload() }
+                await state.refreshTodayTotal()
             } catch {
                 await MainActor.run { self.error = "Stop failed: \(describe(error))" }
             }

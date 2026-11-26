@@ -2,8 +2,8 @@ import SwiftUI
 import CommonplaceKit
 
 #if os(macOS)
-/// Menu bar timer: the label always shows the running timer (elapsed +
-/// kind) or a plain timer icon when idle. The popover can stop & log it.
+/// Menu bar timer: running timer (elapsed + kind) plus today's total,
+/// or just today's total when idle. The popover can stop & log it.
 struct MenuTimerLabel: View {
     @EnvironmentObject var state: AppState
     @State private var now = Date()
@@ -14,17 +14,26 @@ struct MenuTimerLabel: View {
     // the elapsed text without that feedback cycle.
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
+    private var todayText: String {
+        state.todayTotalMinutes > 0 ? formatMinutes(state.todayTotalMinutes) : ""
+    }
+
     var body: some View {
         Group {
             if let at = state.timerStartedAt {
                 Label(
-                    formatElapsed(now.timeIntervalSince(at) * 1000) + (state.timerKind == "reading" ? " R" : " W"),
+                    formatElapsed(now.timeIntervalSince(at) * 1000)
+                        + (state.timerKind == "reading" ? " R" : " W")
+                        + (todayText.isEmpty ? "" : " · \(todayText) today"),
                     systemImage: "timer"
                 )
+            } else if !todayText.isEmpty {
+                Label("\(todayText) today", systemImage: "timer")
             } else {
                 Label("Timer", systemImage: "timer")
             }
         }
+        .task { await state.refreshTodayTotal() }
         .onReceive(ticker) { tick in
             if state.timerStartedAt != nil { now = tick }
         }
@@ -45,6 +54,15 @@ struct MenuTimerView: View {
                     .monospacedDigit()
                     .onReceive(ticker) { now = $0 }
                 KindSubjectLine(kind: state.timerKind, subject: subjectName)
+                if state.todayTotalMinutes > 0 {
+                    HStack(spacing: 6) {
+                        Text("TODAY")
+                            .font(DS.ui(10, weight: .semibold)).tracking(0.8)
+                            .foregroundStyle(DS.muted)
+                        Text(formatMinutes(state.todayTotalMinutes))
+                            .font(DS.ui(13, weight: .semibold)).monospacedDigit()
+                    }
+                }
                 Button("Stop & log") {
                     Task { await state.stopAndLogTimer() }
                 }
@@ -57,6 +75,15 @@ struct MenuTimerView: View {
                 }
             } else {
                 Text("No timer running.").font(DS.ui(13)).foregroundStyle(DS.muted)
+                if state.todayTotalMinutes > 0 {
+                    HStack(spacing: 6) {
+                        Text("TODAY")
+                            .font(DS.ui(10, weight: .semibold)).tracking(0.8)
+                            .foregroundStyle(DS.muted)
+                        Text(formatMinutes(state.todayTotalMinutes))
+                            .font(DS.ui(13, weight: .semibold)).monospacedDigit()
+                    }
+                }
                 Button("Open Time…") {
                     NotificationCenter.default.post(name: .macSection, object: "time")
                     NSApp.activate(ignoringOtherApps: true)

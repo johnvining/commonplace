@@ -32,6 +32,8 @@ final class AppState: ObservableObject {
     @Published var timerSubjectKey: String?
     @Published var timerKind = "writing"
     @Published var timerStartedAt: Date?
+    /// Minutes logged today (all kinds), shown next to the timer.
+    @Published var todayTotalMinutes: Int = 0
 
     var timerIsRunning: Bool { timerStartedAt != nil }
 
@@ -96,6 +98,7 @@ final class AppState: ObservableObject {
         do {
             _ = try await client.createTimeEntry(body)
             clearTimer()
+            await refreshTodayTotal()
         } catch {
             // Keep the timer running so no time is lost.
         }
@@ -185,6 +188,18 @@ final class AppState: ObservableObject {
 
     func refreshPins() async {
         await syncPinQueue()
+    }
+
+    /// Today's logged total for the menu bar / timer displays.
+    func refreshTodayTotal() async {
+        guard isSignedIn else { return }
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd"
+        if let summary = try? await client.timeSummary(date: f.string(from: Date())) {
+            todayTotalMinutes = summary.daily?.totalMinutes ?? 0
+        }
     }
 
     func validateSession() async {
