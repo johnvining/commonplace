@@ -41,6 +41,13 @@ enum DS {
     }
 }
 
+/// The standard content padding: every list/content row uses these
+/// insets so pages line up (16pt sides, 6pt vertical).
+extension EdgeInsets {
+    static let standardRow = EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16)
+    static let standardRowWide = EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
+}
+
 /// Small uppercase section label, like the web's form labels.
 struct DSLabel: View {
     let text: String
@@ -63,13 +70,15 @@ struct HairlineRow<Content: View>: View {
     }
 }
 
-/// Quiet bordered button in the web style.
+/// Quiet bordered button in the web style. Plain style is load-bearing:
+/// without it macOS draws its own grey capsule inside the border.
 struct DSButton: View {
     let title: String
     var selected = false
     var action: () -> Void
     var body: some View {
         Button(title, action: action)
+            .buttonStyle(.plain)
             .font(DS.ui(13))
             .padding(.horizontal, 10)
             .padding(.vertical, 5)

@@ -208,6 +208,45 @@ extension Note {
     }
 }
 
+/// The web's flowing note paragraph at one size: authors, work in
+/// italics, bold title, then the text — all the same serif size, so
+/// rows never mix 12pt labels with 15pt titles.
+struct NoteFlowText: View {
+    let note: Note
+    var size: CGFloat = 14.5
+    var lines: Int? = nil
+
+    var body: some View {
+        Text(flow)
+            .font(DS.serif(size))
+            .foregroundStyle(DS.ink)
+            .lineSpacing(3)
+            .lineLimit(lines)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var flow: AttributedString {
+        var md = ""
+        var cite: [String] = []
+        if !note.displayAuthors.isEmpty {
+            cite.append(note.displayAuthors.compactMap(\.name).joined(separator: ", "))
+        }
+        if let w = note.work?.name, !w.isEmpty {
+            cite.append("*\(w)*")
+        }
+        if !cite.isEmpty { md += cite.joined(separator: ", ") + ": " }
+        let hasTitle = !(note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        if hasTitle {
+            md += "**\(note.displayTitle).** "
+        }
+        md += note.displayText
+        if let attributed = try? AttributedString(markdown: md, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
+            return attributed
+        }
+        return AttributedString(md)
+    }
+}
+
 /// One note image rendered from API data on both platforms.
 struct NoteImageView: View {
     let data: Data?

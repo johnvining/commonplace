@@ -331,12 +331,7 @@ struct NoteFlowRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(flow)
-                .font(DS.serif(14.5))
-                .foregroundStyle(DS.ink)
-                .lineSpacing(3)
-                .lineLimit(4)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            NoteFlowText(note: note, lines: 4)
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
                 HStack(spacing: 4) {
                     ForEach((note.ideas ?? []).prefix(3), id: \.id) { i in
@@ -395,24 +390,15 @@ struct NoteRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 6) {
-                if !note.displayAuthors.isEmpty {
-                    Text(note.displayAuthors.compactMap(\.name).joined(separator: ", ") + ":")
-                        .font(DS.ui(12)).foregroundStyle(DS.muted).lineLimit(1)
-                }
-                Text(note.displayTitle)
-                    .font(DS.serif(15, weight: .semibold)).foregroundStyle(DS.ink).lineLimit(1)
+            HStack(alignment: .top, spacing: 6) {
+                // One flowing serif paragraph, one size (web pattern).
+                NoteFlowText(note: note, lines: full ? 6 : 2)
                 if let imgs = note.images, !imgs.isEmpty {
                     HStack(spacing: 3) { Image(systemName: "photo").font(DS.ui(10)); Text("\(imgs.count)") }.font(DS.ui(11)).foregroundStyle(DS.muted)
                 }
                 if (note.reviewCount ?? 0) > 0 {
                     Text("worn").font(DS.ui(10)).foregroundStyle(DS.muted)
                 }
-            }
-            if (note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false) {
-                NoteText(text: note.displayText, size: 13)
-                    .lineLimit(full ? nil : 1)
-                    .foregroundStyle(DS.muted)
             }
             if full { NoteStatusLine(note: note) }
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
