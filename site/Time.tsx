@@ -312,7 +312,7 @@ function Time(props: any) {
     for (const s of subjects.filter(
       (x: any): boolean =>
         !starred.some((p: any) => p.id === x.key) &&
-        (!q || (s.pile?.name ?? s.title ?? '').toLowerCase().includes(q))
+        (!q || (x.pile?.name ?? x.title ?? '').toLowerCase().includes(q))
     ) as any[]) {
       out.push({
         key: s.key,
