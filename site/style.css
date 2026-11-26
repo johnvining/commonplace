@@ -4351,44 +4351,6 @@ a.grid-link > a {
   color: inherit;
 }
 
-.time-subject-list {
-  list-style: none;
-  margin: 4px 0 0;
-  padding: 4px;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  background: var(--note-background, #fff);
-  border: 1px solid var(--note-border);
-  border-radius: 8px;
-  z-index: 30;
-  max-height: 260px;
-  overflow: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-}
-
-.time-subject-list button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 7px 9px;
-  border-radius: 5px;
-  color: inherit;
-  font: inherit;
-}
-
-.time-subject-list button:hover {
-  background: var(--hover);
-}
-
-.time-subject-list button.highlighted {
-  background: var(--accent-soft, #eef3fd);
-}
-
 .time-subject-empty {
   padding: 7px 9px;
   opacity: 0.65;

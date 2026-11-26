@@ -164,6 +164,22 @@ final class AppState: ObservableObject {
         }
     }
 
+    private var timerPollTask: Task<Void, Never>?
+
+    /// Poll the shared timer every 5s so a timer started/stopped on
+    /// another client (web, phone, Mac) shows up here without a relaunch.
+    func startTimerPolling() {
+        guard timerPollTask == nil else { return }
+        timerPollTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+                if Task.isCancelled { break }
+                await syncRunningTimer()
+                await refreshTodayTotal()
+            }
+        }
+    }
+
     /// Reconcile with the server's running timer: the server copy wins
     /// when it exists (another client started it); a local-only timer
     /// is pushed up so the web sees it too.

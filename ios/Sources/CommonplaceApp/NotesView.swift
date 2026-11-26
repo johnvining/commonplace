@@ -90,18 +90,19 @@ struct NotesView: View {
                         // On Mac the app menu owns Cmd+N (it posts
                         // .macNewNote); a second shortcut here would
                         // create two notes per press.
+                        // Borderless: in a List row, a default button
+                        // can swallow taps meant for the filter
+                        // controls sharing the row (#399).
                         #if os(macOS)
                         Button("＋ Note") { createNote() }
                             .font(DS.ui(13, weight: .medium))
+                            .buttonStyle(.borderless)
                         #else
                         Button("＋ Note") { createNote() }
                             .keyboardShortcut("n", modifiers: .command)
                             .font(DS.ui(13, weight: .medium))
-                        #endif
-                            // Borderless: in a List row, a default button
-                            // can swallow taps meant for the filter
-                            // controls sharing the row (#399).
                             .buttonStyle(.borderless)
+                        #endif
                     }
                     DisclosureGroup("Filter by pile / idea") {
                         VStack(alignment: .leading, spacing: 8) {

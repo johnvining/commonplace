@@ -24,6 +24,7 @@ struct CommonplaceApp: App {
                     await state.refreshCounts()
                     await state.refreshMaintenancePending()
                     await state.syncRunningTimer()
+                    state.startTimerPolling()
                 }
             }
         }
