@@ -25,10 +25,10 @@
 10. [ ] Commonplace (Mac) and iOS: what work is it doing with a running
         timer? Give the user at least a top-5 profile before calling
         the performance pass (item 3) done.
-11. [ ] Note page: a real Edit mode matching the web edit form (one
+11. [x] Note page: a real Edit mode matching the web edit form (one
         form, labeled fields, save/cancel) instead of edit controls
         scattered through the read view.
-12. [ ] Note display cleaned up to match online: one reading card,
+12. [x] Note display cleaned up to match online: one reading card,
         tags inline after the text, no per-link rows, no edit tools
         (photos/OCR/link-by-nick) showing in read mode.
 
