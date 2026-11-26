@@ -3,7 +3,8 @@ import CommonplaceKit
 
 /// Unified search (mirrors the overlay SearchBar → /find/:search):
 /// keyword search across notes/works/authors/ideas/piles plus direct
-/// nick resolution (`[nwipa]nnnnnn`).
+/// nick resolution (`[nwipa]nnnnnn`) and typed modifiers
+/// (`auth:`/`find:`/`idea:`/`list:`/`note:`/`pile:`/`work:`/`read:`).
 struct SearchView: View {
     @EnvironmentObject var state: AppState
     @State private var query = ""
@@ -15,6 +16,10 @@ struct SearchView: View {
     @State private var nickAuthorId: String?
     @State private var nickInfo: String?
     @State private var error: String?
+    @State private var searching = false
+    @State private var hasSearched = false
+    @State private var newNoteId: String?
+    @State private var showingNewNote = false
     @State private var searchTask: Task<Void, Never>?
 
     var body: some View {
@@ -24,10 +29,18 @@ struct SearchView: View {
                     TextField("Search or paste a nick", text: $query)
                         .onChange(of: query) { scheduleRun() }
                         .onSubmit { run() }
+                    Text("Prefixes: auth: find: idea: list: note: pile: work: read:")
+                        .font(DS.ui(11)).foregroundStyle(DS.muted)
+                    Button("Create note from search") { createNoteFromSearch() }
+                        .font(DS.ui(12))
                 }
+                if searching { LoadStateView(state: .loading) }
                 if let error { Text(error).foregroundStyle(.red) }
                 if let info = nickInfo {
                     Text(info).font(.caption).foregroundStyle(.secondary)
+                }
+                if hasSearched && !searching && items.isEmpty && nickNote.isEmpty && nickPileId == nil && nickWorkId == nil && nickIdeaId == nil && nickAuthorId == nil && nickInfo == nil {
+                    Text("No results.").font(DS.ui(13)).foregroundStyle(DS.muted)
                 }
                 ForEach(nickNote, id: \.stableId) { n in
                     NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
@@ -35,12 +48,11 @@ struct SearchView: View {
                     }
                 }
                 if let pid = nickPileId {
-                    NavigationLink { PileDetailView(pileId: pid) } label: {
-                        Text("Open pile").font(.headline)
-                    }
+                    NavigationLink { PileDetailView(pileId: pid) } label: { Text("Open pile").font(.headline) }
                 }
                 if let wid = nickWorkId {
                     NavigationLink { WorkDetailView(workId: wid) } label: { Text("Open work").font(.headline) }
+                    NavigationLink { ReadView(workId: wid, title: "Read") } label: { Text("Read work").font(DS.ui(13)) }
                 }
                 if let iid = nickIdeaId {
                     NavigationLink { IdeaDetailView(ideaId: iid) } label: { Text("Open idea").font(.headline) }
@@ -51,8 +63,25 @@ struct SearchView: View {
                 ForEach(items, id: \.stableId) { item in
                     searchRow(item)
                 }
+                if items.count >= 20 {
+                    Button("Load more results") { run(loadMore: true) }.font(DS.ui(13))
+                }
             }
             .navigationTitle("Search")
+            .navigationDestination(isPresented: $showingNewNote) {
+                NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
+            }
+        }
+    }
+
+    private func createNoteFromSearch() {
+        let title = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        Task {
+            do {
+                let created = try await state.client.createNote(title: title.isEmpty ? nil : title)
+                guard let id = created._id else { self.error = "Create returned no id."; return }
+                newNoteId = id; showingNewNote = true
+            } catch { self.error = "Create note failed: \(describe(error))" }
         }
     }
 
@@ -67,69 +96,131 @@ struct SearchView: View {
         }
     }
 
-    private func run() {
-        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !q.isEmpty else { return }
+    /// Split a leading `auth:`/`note:`/… modifier off the query.
+    private func parseModifier(_ q: String) -> (type: String?, term: String) {
+        let known = ["auth", "find", "idea", "list", "note", "pile", "work", "read"]
+        for k in known where q.lowercased().hasPrefix("\(k):") {
+            return (k, String(q.dropFirst(k.count + 1)).trimmingCharacters(in: .whitespaces))
+        }
+        return (nil, q)
+    }
+
+    private func run(loadMore: Bool = false) {
+        let raw = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !raw.isEmpty else { return }
+        let (modifier, term) = parseModifier(raw)
+        searching = true; hasSearched = true
         Task {
-            if isNick(q) {
-                if let found = try? await state.client.nickLookup(q) {
-                    // Route note and pile nicks to their views; other
-                    // entity types show as info until they get views.
-                    if found.note != nil {
-                        let rows = (try? await state.client.noteByNick(q)) ?? []
-                        await MainActor.run {
-                            nickNote = rows; nickPileId = nil; nickInfo = nil; items = []
+            defer { Task { @MainActor in searching = false } }
+            if !loadMore, isNick(term) {
+                do {
+                    if let found = try await state.client.nickLookup(term) {
+                        await MainActor.run { applyNick(found) }
+                        if nickNote.isEmpty && nickPileId == nil && nickWorkId == nil && nickIdeaId == nil && nickAuthorId == nil {
+                            Task { await self.loadNickNotes(term) }
                         }
                         return
-                    }
-                    if let pid = found.pile {
-                        await MainActor.run {
-                            nickNote = []; nickPileId = pid; nickInfo = nil; items = []
-                        }
+                    } else {
+                        await MainActor.run { nickInfo = "Nick not found."; items = [] }
                         return
                     }
-                    await MainActor.run {
-                        nickNote = []; nickPileId = nil; items = []
-                        nickWorkId = found.work; nickIdeaId = found.idea; nickAuthorId = found.auth
-                        nickInfo = (found.work == nil && found.idea == nil && found.auth == nil)
-                            ? "Nick not found." : nil
-                    }
+                } catch {
+                    await MainActor.run { self.error = "Nick lookup failed: \(describe(error))" }
                     return
                 }
             }
             do {
-                let rows = try await state.client.unifiedSearch(query: q)
-                await MainActor.run { items = rows; nickNote = []; nickPileId = nil; nickInfo = nil }
+                let limit = loadMore ? items.count + 20 : 20
+                var rows = try await state.client.unifiedSearch(query: term, limit: limit)
+                if let modifier, modifier != "find" {
+                    let wanted = modifier == "auth" ? ["auth", "author"] : [modifier]
+                    rows = rows.filter { wanted.contains($0.type ?? "") }
+                    // Exact-name open: jump straight to the entity when a
+                    // row's name matches the term exactly.
+                    if let exact = rows.first(where: { $0.displayName.lowercased() == term.lowercased() }) {
+                        rows = [exact]
+                    }
+                }
+                await MainActor.run { items = rows; nickNote = []; nickPileId = nil; nickInfo = nil; error = nil }
             } catch {
-                await MainActor.run { self.error = "Search failed — retry." }
+                await MainActor.run { self.error = "Search failed: \(describe(error))" }
             }
+        }
+    }
+
+    private func loadNickNotes(_ nick: String) async {
+        do {
+            let rows = try await state.client.noteByNick(nick)
+            await MainActor.run { nickNote = rows }
+        } catch { await MainActor.run { self.error = "Nick notes failed: \(describe(error))" } }
+    }
+
+    private func applyNick(_ found: NickLookup) {
+        nickNote = []; nickPileId = nil; nickWorkId = nil; nickIdeaId = nil; nickAuthorId = nil; items = []
+        if found.retired == true || found.state == "retired" {
+            nickInfo = found.name.map { "This nick was retired — “\($0)” was deleted." } ?? "This nick was retired."
+            return
+        }
+        if found.state == "alias", let from = found.mergedFrom {
+            nickInfo = "Merged — forwarded from \(from)."
+        } else { nickInfo = nil }
+        nickPileId = found.pile; nickWorkId = found.work; nickIdeaId = found.idea; nickAuthorId = found.auth
+        if found.note != nil {
+            // Note nicks resolve through noteByNick in loadNickNotes.
+            nickInfo = nickInfo ?? nil
+        } else if found.pile == nil && found.work == nil && found.idea == nil && found.auth == nil && found.note == nil {
+            nickInfo = "Nick not found."
         }
     }
 
     @ViewBuilder
     private func searchRow(_ item: UnifiedSearchItem) -> some View {
-        let label = VStack(alignment: .leading) {
+        let label = VStack(alignment: .leading, spacing: 2) {
             Text(item.displayName).lineLimit(1)
-            Text(item.type ?? "").font(.caption).foregroundStyle(.secondary)
+            HStack(spacing: 6) {
+                Text(item.type ?? "").font(.caption).foregroundStyle(.secondary)
+                if item.type == "note" { Text("note").font(DS.ui(10)).foregroundStyle(DS.accent) }
+            }
+            if let snippet = snippet(for: item) {
+                Text(snippet).font(DS.serif(12)).foregroundStyle(DS.muted).lineLimit(2)
+            }
         }
         if let id = item.itemId {
-            switch item.type {
-            case "note":
-                NavigationLink { NoteDetailView(noteId: id) } label: { label }
-            case "work":
-                NavigationLink { WorkDetailView(workId: id) } label: { label }
-            case "pile":
-                NavigationLink { PileDetailView(pileId: id) } label: { label }
-            case "idea":
-                NavigationLink { IdeaDetailView(ideaId: id) } label: { label }
-            case "auth", "author":
-                NavigationLink { AuthorDetailView(authorId: id) } label: { label }
-            default:
-                label
+            HStack {
+                Group {
+                    switch item.type {
+                    case "note": NavigationLink { NoteDetailView(noteId: id) } label: { label }
+                    case "work": NavigationLink { WorkDetailView(workId: id) } label: { label }
+                    case "pile": NavigationLink { PileDetailView(pileId: id) } label: { label }
+                    case "idea": NavigationLink { IdeaDetailView(ideaId: id) } label: { label }
+                    case "auth", "author": NavigationLink { AuthorDetailView(authorId: id) } label: { label }
+                    default: label
+                    }
+                }
+                Spacer()
+                if let type = item.type {
+                    Button(state.pins.contains { $0.type == type && $0.id == id } ? "★" : "☆") {
+                        if state.pins.contains(where: { $0.type == type && $0.id == id }) {
+                            state.queueUnpin(type: type, id: id)
+                        } else {
+                            state.queuePin(type: type, id: id, label: item.displayName, href: nil)
+                        }
+                    }
+                }
             }
-        } else {
-            label
+        } else { label }
+    }
+
+    private func snippet(for item: UnifiedSearchItem) -> String? {
+        let body = item.item?.text ?? item.item?.take
+        guard let body, !body.isEmpty else { return item.displayName.isEmpty ? "(empty note)" : nil }
+        let term = parseModifier(query.trimmingCharacters(in: .whitespacesAndNewlines)).term
+        if let range = body.lowercased().range(of: term.lowercased()), !term.isEmpty {
+            let start = body.index(range.lowerBound, offsetBy: -40, limitedBy: body.startIndex) ?? body.startIndex
+            let end = body.index(range.upperBound, offsetBy: 60, limitedBy: body.endIndex) ?? body.endIndex
+            return "…\(body[start..<end])…"
         }
+        return String(body.prefix(120))
     }
 
     private func isNick(_ s: String) -> Bool {

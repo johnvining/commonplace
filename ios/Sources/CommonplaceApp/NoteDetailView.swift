@@ -9,25 +9,41 @@ import UIKit
 struct NoteDetailView: View {
     @EnvironmentObject var state: AppState
     let noteId: String
+    var editFirst: Bool = false
     @State private var note: Note?
     @State private var loaded = false
     @State private var editing = false
     @State private var title = ""
     @State private var text = ""
     @State private var take = ""
+    @State private var urlField = ""
+    @State private var yearField = ""
+    @State private var pageField = ""
     @State private var authorOptions: [PickOption] = []
+    @State private var peopleOptions: [PickOption] = []
     @State private var pileOptions: [PickOption] = []
     @State private var ideaOptions: [PickOption] = []
     @State private var linked: [Note] = []
     @State private var linkNick = ""
     @State private var imageDatas: [Data] = []
-    @State private var photoItem: PhotosPickerItem?
+    @State private var photoItems: [PhotosPickerItem] = []
+    @State private var uploading = false
+    @State private var lightboxIndex: Int?
     @State private var ocrResult: String?
     @State private var suggestedTitle: String?
     @State private var suggestedIdeas: [String] = []
+    @State private var suggestBusy = false
     @State private var error: String?
+    @State private var toast: String?
     @State private var confirming = false
+    @State private var confirmingDismiss = false
     @Environment(\.dismiss) private var dismiss
+
+    private var dirty: Bool {
+        guard let n = note else { return false }
+        return editing && (title != (n.title ?? "") || text != (n.text ?? "") || take != (n.take ?? "")
+            || urlField != (n.url ?? "") || yearField != (n.year.map(String.init) ?? "") || pageField != (n.page ?? ""))
+    }
 
     var body: some View {
         List {
@@ -38,12 +54,28 @@ struct NoteDetailView: View {
                         TextField("Title", text: $title)
                         TextField("Text", text: $text, axis: .vertical)
                         TextField("Take", text: $take, axis: .vertical)
-                        Button("Save") { save() }
+                        TextField("URL", text: $urlField).autocorrectionDisabled()
+                        TextField("Year", text: $yearField)
+                        TextField("Page", text: $pageField)
+                        HStack {
+                            Button("Save") { save() }
+                            Button("Format text") { formatText() }
+                        }
+                        if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
                     } else {
                         Text(note.title ?? "(untitled)").font(.headline)
+                        if let ts = note.titleSource, !ts.isEmpty {
+                            Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                        }
                         if let t = note.text, !t.isEmpty { Text(t) }
                         if let k = note.take, !k.isEmpty { Text(k).italic() }
-                        if let nick = note.nick { Text("nick: \(nick)").font(.caption) }
+                        if let u = note.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
+                        if note.year != nil || (note.page?.isEmpty == false) {
+                            Text([note.year.map(String.init), note.page].compactMap { $0 }.joined(separator: " · "))
+                                .font(DS.ui(11)).foregroundStyle(DS.muted)
+                        }
+                        if let nick = note.nick { CopyNickButton(nick: nick) }
+                        NoteStatusLine(note: note)
                     }
                 }
                 Section("Authors") {
@@ -55,6 +87,15 @@ struct NoteDetailView: View {
                         onCreateNew: { name in createAuthorNamed(name) }
                     )
                 }
+                Section("About (people)") {
+                    PillEditor(
+                        placeholder: "Add a person this is about…", tint: DS.accentSoft, selected: $peopleOptions,
+                        load: { q in ((try? await state.client.autocompleteAuthors(q)) ?? []).compactMap { a in a._id.map { PickOption(id: $0, name: a.name ?? "", subtitle: yearsLabel(a)) } } },
+                        onAdd: { opt in peopleOptions.append(opt); savePeople() },
+                        onRemove: { opt in peopleOptions.removeAll { $0.id == opt.id }; savePeople() },
+                        onCreateNew: { name in createPersonNamed(name) }
+                    )
+                }
                 Section("Work") {
                     if let w = note.work {
                         Text(w.name ?? w.id).font(DS.ui(14))
@@ -64,8 +105,8 @@ struct NoteDetailView: View {
                     TypeaheadField(
                         placeholder: "Link a work…",
                         load: { q in ((try? await state.client.autocompleteWorks(q)) ?? []).compactMap { w in w._id.map { PickOption(id: $0, name: w.name ?? "") } } },
-                        onPick: { opt in Task { _ = try? await state.client.addWorkToNote(noteId: noteId, workId: opt.id); reloadNote() } },
-                        onCreate: { name in Task { _ = try? await state.client.createWorkForNote(noteId: noteId, name: name); reloadNote() } }
+                        onPick: { opt in Task { do { _ = try await state.client.addWorkToNote(noteId: noteId, workId: opt.id); reloadNote() } catch { self.error = "Work link failed: \(describe(error))" } } },
+                        onCreate: { name in Task { do { _ = try await state.client.createWorkForNote(noteId: noteId, name: name); reloadNote() } catch { self.error = "Work create failed: \(describe(error))" } } }
                     )
                 }
                 Section("Piles") {
@@ -91,6 +132,7 @@ struct NoteDetailView: View {
                         Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
                         Button(editing ? "Cancel" : "Edit") {
                             title = note.title ?? ""; text = note.text ?? ""; take = note.take ?? ""
+                            urlField = note.url ?? ""; yearField = note.year.map(String.init) ?? ""; pageField = note.page ?? ""
                             editing.toggle()
                         }
                         Button("Delete") { confirming = true }
@@ -109,24 +151,38 @@ struct NoteDetailView: View {
                                         Image(uiImage: ui).resizable().scaledToFill()
                                             .frame(width: 90, height: 90).clipped()
                                             .clipShape(RoundedRectangle(cornerRadius: 6))
+                                            .onTapGesture { lightboxIndex = idx }
                                         Button("Delete") { deleteImage(idx) }.font(DS.ui(11))
                                     }
                                 }
                             }
                         }
                     }
+                    if let idx = lightboxIndex, imageDatas.indices.contains(idx), let ui = UIImage(data: imageDatas[idx]) {
+                        VStack {
+                            Image(uiImage: ui).resizable().scaledToFit()
+                            HStack {
+                                Button("‹ Prev") { lightboxIndex = max(0, idx - 1) }.disabled(idx == 0)
+                                Text("\(idx + 1) / \(imageDatas.count)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                                Button("Next ›") { lightboxIndex = min(imageDatas.count - 1, idx + 1) }.disabled(idx >= imageDatas.count - 1)
+                                Button("Close") { lightboxIndex = nil }
+                            }
+                        }
+                    }
                     #else
                     Text("\(imageDatas.count) image(s)").font(DS.ui(12)).foregroundStyle(DS.muted)
                     #endif
-                    PhotosPicker(selection: $photoItem, matching: .images) {
-                        Text("Add photo")
+                    PhotosPicker(selection: $photoItems, matching: .images) {
+                        Text(uploading ? "Uploading…" : "Add photos")
                     }
-                    .onChange(of: photoItem) { uploadPhoto() }
+                    .onChange(of: photoItems) { uploadPhotos() }
+                    if uploading { ProgressView() }
                     HStack {
                         Button("Run OCR") { runOCR() }
                         Button("Suggest title") { suggestTitle() }
-                        Button("Suggest ideas") { suggestIdeas() }
+                        Button(suggestBusy ? "Suggesting…" : "Suggest ideas") { suggestIdeas() }.disabled(suggestBusy)
                     }
+                    if let toast { Text(toast).font(DS.ui(12)).foregroundStyle(DS.muted) }
                     if let t = suggestedTitle {
                         Button("Use title: \(t)") {
                             title = t
@@ -167,7 +223,31 @@ struct NoteDetailView: View {
         }
         .listStyle(.plain)
         .navigationTitle("Note")
+        .interactiveDismissDisabled(dirty)
+        .confirmationDialog("Discard unsaved changes?", isPresented: $confirmingDismiss) {
+            Button("Discard", role: .destructive) { dismiss() }
+            Button("Keep editing", role: .cancel) {}
+        }
+        .toolbar {
+            if dirty {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Back") { confirmingDismiss = true }
+                }
+            }
+        }
         .task { load() }
+    }
+
+    private func formatText() {
+        // Web Format-text: trim trailing space, collapse 3+ blank lines.
+        text = text.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+            .joined(separator: "\n")
+            .replacingOccurrences(of: "\n\n\n+", with: "\n\n", options: .regularExpression)
+    }
+
+    private func yearsLabel(_ a: Author) -> String? {
+        if a.birth_year == nil && a.death_year == nil { return nil }
+        return "\(a.birth_year.map(String.init) ?? "?")–\(a.death_year.map(String.init) ?? "")"
     }
 
     private var starred: Bool {
@@ -178,14 +258,21 @@ struct NoteDetailView: View {
         Task {
             do {
                 let rows = try await state.client.note(id: noteId)
-                await MainActor.run { note = rows.first; loaded = true; syncOptions(from: rows.first) }
-                Task { _ = try? await state.client.recordNoteOpened(id: noteId) }
-                if let links = try? await state.client.linkedNotes(noteId: noteId) {
-                    await MainActor.run { linked = links }
+                await MainActor.run {
+                    note = rows.first; loaded = true; syncOptions(from: rows.first)
+                    if editFirst, let n = rows.first {
+                        title = n.title ?? ""; text = n.text ?? ""; take = n.take ?? ""
+                        urlField = n.url ?? ""; yearField = n.year.map(String.init) ?? ""; pageField = n.page ?? ""
+                        editing = true
+                    }
                 }
+                do { _ = try await state.client.recordNoteOpened(id: noteId) }
+                catch { await MainActor.run { self.toast = "Opened-count failed: \(describe(error))" } }
+                do { let links = try await state.client.linkedNotes(noteId: noteId); await MainActor.run { linked = links } }
+                catch { await MainActor.run { self.error = "Linked notes failed: \(describe(error))" } }
                 loadImages()
             } catch {
-                await MainActor.run { self.error = "Load failed — retry."; loaded = true }
+                await MainActor.run { self.error = "Load failed: \(describe(error))"; loaded = true }
             }
         }
     }
@@ -194,18 +281,20 @@ struct NoteDetailView: View {
         Task {
             do {
                 let updated = try await state.client.updateNote(
-                    id: noteId, NoteUpdate(title: title, text: text, take: take))
-                await MainActor.run { note = updated; editing = false }
+                    id: noteId, NoteUpdate(title: title, text: text, take: take,
+                                           url: urlField.isEmpty ? nil : urlField,
+                                           year: Int(yearField), page: pageField.isEmpty ? nil : pageField))
+                await MainActor.run { note = updated; editing = false; syncOptions(from: updated) }
             } catch {
-                await MainActor.run { self.error = "Save failed — still editing." }
+                await MainActor.run { self.error = "Save failed — still editing: \(describe(error))" }
             }
         }
     }
 
     private func remove() {
         Task {
-            try? await state.client.deleteNote(id: noteId)
-            await MainActor.run { dismiss() }
+            do { try await state.client.deleteNote(id: noteId); await MainActor.run { dismiss() } }
+            catch { await MainActor.run { self.error = "Delete failed: \(describe(error))" } }
         }
     }
 
@@ -213,75 +302,86 @@ struct NoteDetailView: View {
         Task {
             guard let count = note?.images?.count, count > 0 else { return }
             var datas: [Data] = []
-            for i in 1...count {
-                if let d = try? await state.client.noteImageData(noteId: noteId, index: i) {
-                    datas.append(d)
-                }
-            }
-            await MainActor.run { imageDatas = datas }
+            do {
+                for i in 1...count { datas.append(try await state.client.noteImageData(noteId: noteId, index: i)) }
+                await MainActor.run { imageDatas = datas }
+            } catch { await MainActor.run { self.error = "Images failed: \(describe(error))" } }
         }
     }
 
-    private func uploadPhoto() {
-        guard let item = photoItem else { return }
+    private func uploadPhotos() {
+        let items = photoItems
+        guard !items.isEmpty else { return }
+        uploading = true
         Task {
-            if let data = try? await item.loadTransferable(type: Data.self), !data.isEmpty {
-                try? await state.client.uploadNoteImage(noteId: noteId, data: data)
+            do {
+                for item in items {
+                    guard let data = try await item.loadTransferable(type: Data.self), !data.isEmpty else { continue }
+                    try await state.client.uploadNoteImage(noteId: noteId, data: data)
+                    // Merge OCR text like the web multi-upload auto-OCR.
+                    do {
+                        let ocr = try await state.client.ocrText(noteId: noteId)
+                        if !ocr.isEmpty { await MainActor.run { ocrResult = ocr } }
+                    } catch { await MainActor.run { self.toast = "OCR after upload failed: \(describe(error))" } }
+                }
                 reloadNote()
-                // refresh image list after the note reloads
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { loadImages() }
-            }
-            await MainActor.run { photoItem = nil }
+            } catch { await MainActor.run { self.error = "Photo upload failed: \(describe(error))" } }
+            await MainActor.run { photoItems = []; uploading = false }
         }
     }
 
     private func deleteImage(_ idx: Int) {
         guard let filename = note?.images?[idx] else { return }
         Task {
-            try? await state.client.deleteNoteImage(noteId: noteId, filename: filename)
-            reloadNote()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { loadImages() }
+            do { try await state.client.deleteNoteImage(noteId: noteId, filename: filename); reloadNote(); DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { loadImages() } }
+            catch { await MainActor.run { self.error = "Image delete failed: \(describe(error))" } }
         }
     }
 
     private func runOCR() {
         Task {
-            if let result = try? await state.client.ocrText(noteId: noteId) {
-                await MainActor.run { ocrResult = result.isEmpty ? "(no text found)" : result }
-            } else {
-                await MainActor.run { self.error = "OCR failed — retry." }
-            }
+            do {
+                let result = try await state.client.ocrText(noteId: noteId)
+                await MainActor.run {
+                    if result.isEmpty { toast = "No text found in images."; ocrResult = nil }
+                    else { ocrResult = result }
+                }
+            } catch { await MainActor.run { self.error = "OCR failed: \(describe(error))" } }
         }
     }
 
     private func suggestTitle() {
         Task {
-            if let s = try? await state.client.suggestTitle(noteId: noteId) {
-                await MainActor.run { suggestedTitle = s.suggested_title }
-            }
+            do { let s = try await state.client.suggestTitle(noteId: noteId); await MainActor.run { suggestedTitle = s.suggested_title } }
+            catch { await MainActor.run { self.error = "Title suggestion failed: \(describe(error))" } }
         }
     }
 
     private func suggestIdeas() {
+        suggestBusy = true
         Task {
-            if let s = try? await state.client.suggestIdeas(noteId: noteId) {
-                await MainActor.run { suggestedIdeas = s.suggested_ideas ?? [] }
-            }
+            do {
+                let s = try await state.client.suggestIdeas(noteId: noteId)
+                await MainActor.run {
+                    suggestedIdeas = (s.suggested_ideas ?? []).filter { name in !ideaOptions.contains { $0.name.lowercased() == name.lowercased() } }
+                }
+            } catch { await MainActor.run { self.error = "Idea suggestions failed: \(describe(error))" } }
+            await MainActor.run { suggestBusy = false }
         }
     }
 
     private func addSuggestedIdea(_ name: String) {
         Task {
-            _ = try? await state.client.createIdeaForNote(noteId: noteId, name: name)
-            reloadNote()
+            do { _ = try await state.client.createIdeaForNote(noteId: noteId, name: name); reloadNote() }
+            catch { await MainActor.run { self.error = "Add idea failed: \(describe(error))" } }
         }
     }
 
     private func reloadLinked() {
         Task {
-            if let links = try? await state.client.linkedNotes(noteId: noteId) {
-                await MainActor.run { linked = links }
-            }
+            do { let links = try await state.client.linkedNotes(noteId: noteId); await MainActor.run { linked = links } }
+            catch { await MainActor.run { self.error = "Linked notes failed: \(describe(error))" } }
         }
     }
 
@@ -307,24 +407,45 @@ struct NoteDetailView: View {
     private func unlink(_ n: Note) {
         guard let other = n._id else { return }
         Task {
-            try? await state.client.unlinkNotes(a: noteId, b: other)
-            reloadLinked()
+            do { try await state.client.unlinkNotes(a: noteId, b: other); reloadLinked() }
+            catch { await MainActor.run { self.error = "Unlink failed: \(describe(error))" } }
         }
     }
 
     private func reloadNote() {
         Task {
-            if let rows = try? await state.client.note(id: noteId) {
-                await MainActor.run { note = rows.first; syncOptions(from: rows.first) }
-            }
+            do { let rows = try await state.client.note(id: noteId); await MainActor.run { note = rows.first; syncOptions(from: rows.first) } }
+            catch { await MainActor.run { self.error = "Reload failed: \(describe(error))" } }
         }
     }
 
     private func syncOptions(from n: Note?) {
         guard let n else { return }
         authorOptions = (n.authors ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
+        peopleOptions = (n.people ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
         pileOptions = (n.piles ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
         ideaOptions = (n.ideas ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
+    }
+
+    private func savePeople() {
+        let ids = peopleOptions.map(\.id)
+        Task {
+            do {
+                let updated = try await state.client.updateNote(id: noteId, NoteUpdate(people: ids))
+                await MainActor.run { note = updated; syncOptions(from: updated) }
+            } catch { await MainActor.run { self.error = "About save failed: \(describe(error))" } }
+        }
+    }
+
+    private func createPersonNamed(_ name: String) {
+        Task {
+            do {
+                let a = try await state.client.createAuthor(name: name)
+                guard let id = a._id else { await MainActor.run { self.error = "Person create returned no id." }; return }
+                await MainActor.run { peopleOptions.append(PickOption(id: id, name: a.name ?? name)) }
+                savePeople()
+            } catch { await MainActor.run { self.error = "Person create failed: \(describe(error))" } }
+        }
     }
 
     private func saveAuthors() {
@@ -341,10 +462,12 @@ struct NoteDetailView: View {
 
     private func createAuthorNamed(_ name: String) {
         Task {
-            if let a = try? await state.client.createAuthor(name: name), let id = a._id {
+            do {
+                let a = try await state.client.createAuthor(name: name)
+                guard let id = a._id else { await MainActor.run { self.error = "Author create returned no id." }; return }
                 await MainActor.run { authorOptions.append(PickOption(id: id, name: a.name ?? name)) }
                 saveAuthors()
-            }
+            } catch { await MainActor.run { self.error = "Author create failed: \(describe(error))" } }
         }
     }
 
