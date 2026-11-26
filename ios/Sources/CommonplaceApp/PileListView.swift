@@ -22,10 +22,17 @@ struct PileListView: View {
                 }
                 ForEach(piles, id: \.stableId) { p in
                     NavigationLink { PileDetailView(pileId: p._id ?? "") } label: {
-                        Text(p.name ?? "(unnamed)")
+                        VStack(alignment: .leading) {
+                            Text(p.name ?? "(unnamed)")
+                            HStack(spacing: 6) {
+                                if let c = p.note_count { Text("\(c) notes") }
+                                if let w = p.work_count { Text("\(w) works") }
+                            }.font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
+            .refreshable { load() }
             .navigationTitle("Piles")
             .navigationDestination(isPresented: $showingNew) {
                 PileDetailView(pileId: newPileId ?? "")

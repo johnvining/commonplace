@@ -23,14 +23,17 @@ struct WorksListView: View {
                 NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
                     VStack(alignment: .leading) {
                         Text(w.name ?? "(unnamed)")
-                        if let y = w.year { Text(String(y)).font(.caption).foregroundStyle(.secondary) }
+                        HStack(spacing: 6) {
+                            if let y = w.year { Text(String(y)) }
+                            if let c = w.note_count { Text("\(c) notes") }
+                        }.font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
         }
         .listStyle(.plain)
         .navigationTitle("Works")
-        .task { works = (try? await state.client.recentWorks()) ?? [] }
+        .task { do { works = try await state.client.recentWorks() } catch { self.error = "Load failed: \(describe(error))" } }
     }
 
     private func scheduleSearch() {
@@ -70,13 +73,19 @@ struct AuthorsListView: View {
             }
             ForEach(authors, id: \.stableId) { a in
                 NavigationLink { AuthorDetailView(authorId: a._id ?? "") } label: {
-                    Text(a.name ?? "(unnamed)")
+                    VStack(alignment: .leading) {
+                        Text(a.name ?? "(unnamed)")
+                        HStack(spacing: 6) {
+                            if let c = a.note_count { Text("\(c) notes") }
+                            if let w = a.work_count { Text("\(w) works") }
+                        }.font(.caption).foregroundStyle(.secondary)
+                    }
                 }
             }
         }
         .listStyle(.plain)
         .navigationTitle("Authors")
-        .task { authors = (try? await state.client.recentAuthors()) ?? [] }
+        .task { do { authors = try await state.client.recentAuthors() } catch { self.error = "Load failed: \(describe(error))" } }
     }
 
     private func scheduleSearch() {
@@ -116,13 +125,16 @@ struct IdeasListView: View {
             }
             ForEach(ideas, id: \.stableId) { i in
                 NavigationLink { IdeaDetailView(ideaId: i._id ?? "") } label: {
-                    Text(i.name ?? "(unnamed)")
+                    VStack(alignment: .leading) {
+                        Text(i.name ?? "(unnamed)")
+                        if let c = i.note_count { Text("\(c) notes").font(.caption).foregroundStyle(.secondary) }
+                    }
                 }
             }
         }
         .listStyle(.plain)
         .navigationTitle("Ideas")
-        .task { ideas = (try? await state.client.recentIdeas()) ?? [] }
+        .task { do { ideas = try await state.client.recentIdeas() } catch { self.error = "Load failed: \(describe(error))" } }
     }
 
     private func scheduleSearch() {
@@ -159,6 +171,11 @@ struct WorkDetailView: View {
     @State private var editURL = ""
     @State private var pileSel: [PickOption] = []
     @State private var ideaSel: [PickOption] = []
+    @State private var confirmingDelete = false
+    @State private var importText = ""
+    @State private var newNoteId: String?
+    @State private var showingNewNote = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
@@ -174,6 +191,14 @@ struct WorkDetailView: View {
                         Text(w.name ?? "(unnamed)").font(.headline)
                         if let y = w.year { Text(String(y)).foregroundStyle(.secondary) }
                         if let u = w.url, !u.isEmpty { Text(u).font(.caption) }
+                        if let eds = w.editors, !eds.isEmpty {
+                            Text("Edited by \(eds.compactMap(\.name).joined(separator: ", "))").font(DS.ui(12)).foregroundStyle(DS.muted)
+                        }
+                        if let trs = w.translators, !trs.isEmpty {
+                            Text("Translated by \(trs.compactMap(\.name).joined(separator: ", "))").font(DS.ui(12)).foregroundStyle(DS.muted)
+                        }
+                        if let cit = w.citation_information, !cit.isEmpty { Text(cit).font(DS.ui(12)) }
+                        if let sum = w.summary, !sum.isEmpty { Text(sum).font(DS.serif(13)) }
                     }
                     if let authors = w.authors, !authors.isEmpty {
                         Text(authors.compactMap(\.name).joined(separator: ", ")).foregroundStyle(.secondary)
@@ -184,6 +209,10 @@ struct WorkDetailView: View {
                             editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
                             editing.toggle()
                         }
+                        Button("Delete") { confirmingDelete = true }.foregroundStyle(DS.danger)
+                            .confirmationDialog("Delete this work?", isPresented: $confirmingDelete) {
+                                Button("Delete", role: .destructive) { deleteWork() }
+                            }
                     }
                 }
                 Section("Piles") {
@@ -208,6 +237,16 @@ struct WorkDetailView: View {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
                     }
+                    if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
+                    HStack {
+                        Button("Add Note") { addNoteForWork() }
+                        NavigationLink { ReadView(workId: workId, title: w.name ?? "Read") } label: { Text("Read") }
+                    }
+                    TextField("Import notes for this work…", text: $importText, axis: .vertical)
+                    Button("Import notes") { importForWork() }.disabled(importText.isEmpty)
+                }
+                .navigationDestination(isPresented: $showingNewNote) {
+                    NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
                 }
             } else if loaded {
                 Text("Work not found.").foregroundStyle(.secondary)
@@ -218,6 +257,35 @@ struct WorkDetailView: View {
         .listStyle(.plain)
         .navigationTitle("Work")
         .task { await load() }
+    }
+
+    private func loadMoreNotes() async {
+        do { notes += try await state.client.workNotes(id: workId, skip: notes.count, limit: 500) }
+        catch { self.error = "Load more failed: \(describe(error))" }
+    }
+
+    private func deleteWork() {
+        Task {
+            do { try await state.client.deleteWork(id: workId); dismiss() }
+            catch { self.error = "Delete failed: \(describe(error))" }
+        }
+    }
+
+    private func addNoteForWork() {
+        Task {
+            do {
+                let created = try await state.client.createNote(work: workId)
+                guard let id = created._id else { self.error = "Create returned no id."; return }
+                newNoteId = id; showingNewNote = true
+            } catch { self.error = "Add note failed: \(describe(error))" }
+        }
+    }
+
+    private func importForWork() {
+        Task {
+            do { try await state.client.importNotesForWork(workId: workId, notesText: importText); importText = ""; await load() }
+            catch { self.error = "Import failed: \(describe(error))" }
+        }
     }
 
     private var starred: Bool { state.pins.contains { $0.type == "work" && $0.id == workId } }
@@ -243,8 +311,9 @@ struct WorkDetailView: View {
             work = ww; notes = nn; loaded = true
             pileSel = (ww.piles ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
             ideaSel = (ww.ideas ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
-            _ = try? await state.client.recordWorkOpened(id: workId)
-        } catch { self.error = "Load failed — retry."; loaded = true }
+            do { _ = try await state.client.recordWorkOpened(id: workId) }
+            catch { self.error = "Opened-count failed: \(describe(error))" }
+        } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 
     private func toggleStar() {
@@ -265,6 +334,8 @@ struct AuthorDetailView: View {
     @State private var editName = ""
     @State private var editBirth = ""
     @State private var editDeath = ""
+    @State private var confirmingDelete = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
@@ -291,6 +362,10 @@ struct AuthorDetailView: View {
                             editDeath = a.death_year.map(String.init) ?? ""
                             editing.toggle()
                         }
+                        Button("Delete") { confirmingDelete = true }.foregroundStyle(DS.danger)
+                            .confirmationDialog("Delete this author?", isPresented: $confirmingDelete) {
+                                Button("Delete", role: .destructive) { deleteAuthor() }
+                            }
                     }
                 }
                 Section("Works") {
@@ -300,10 +375,11 @@ struct AuthorDetailView: View {
                         }
                     }
                 }
-                Section("Notes") {
+                Section(header: Text("Notes — showing \(notes.count) of \(a.note_count ?? notes.count)")) {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
                     }
+                    if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
                 }
             } else if loaded {
                 Text("Author not found.").foregroundStyle(.secondary)
@@ -329,6 +405,18 @@ struct AuthorDetailView: View {
         }
     }
 
+    private func loadMoreNotes() async {
+        do { notes += try await state.client.authorNotes(id: authorId, skip: notes.count, limit: 500) }
+        catch { self.error = "Load more failed: \(describe(error))" }
+    }
+
+    private func deleteAuthor() {
+        Task {
+            do { try await state.client.deleteAuthor(id: authorId); dismiss() }
+            catch { self.error = "Delete failed: \(describe(error))" }
+        }
+    }
+
     private func load() async {
         do {
             async let a = state.client.author(id: authorId)
@@ -336,7 +424,7 @@ struct AuthorDetailView: View {
             async let n = state.client.authorNotes(id: authorId)
             let (aa, ww, nn) = try await (a, w, n)
             author = aa; works = ww; notes = nn; loaded = true
-        } catch { self.error = "Load failed — retry."; loaded = true }
+        } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 
     private func toggleStar() {
@@ -353,14 +441,48 @@ struct IdeaDetailView: View {
     @State private var notes: [Note] = []
     @State private var loaded = false
     @State private var error: String?
+    @State private var editing = false
+    @State private var editName = ""
+    @State private var editStart = ""
+    @State private var editEnd = ""
+    @State private var editPerson = false
+    @State private var confirmingDelete = false
+    @State private var newNoteId: String?
+    @State private var showingNewNote = false
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
             if let error { Text(error).foregroundStyle(.red) }
             if let i = idea {
                 Section {
-                    Text(i.name ?? "(unnamed)").font(.headline)
-                    Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                    if editing {
+                        TextField("Name", text: $editName)
+                        TextField("Start year", text: $editStart)
+                        TextField("End year", text: $editEnd)
+                        Toggle("This idea is a person", isOn: $editPerson)
+                        Button("Save") { saveEdit() }
+                    } else {
+                        Text(i.name ?? "(unnamed)").font(.headline)
+                        if i.person == true || i.start_year != nil || i.end_year != nil {
+                            Text([i.person == true ? "Person" : nil,
+                                  i.start_year.map(String.init), i.end_year.map(String.init)]
+                                .compactMap { $0 }.joined(separator: " • "))
+                                .font(DS.ui(12)).foregroundStyle(DS.muted)
+                        }
+                    }
+                    HStack {
+                        Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                        Button(editing ? "Cancel" : "Edit") {
+                            editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
+                            editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false
+                            editing.toggle()
+                        }
+                        Button("Delete") { confirmingDelete = true }.foregroundStyle(DS.danger)
+                            .confirmationDialog("Delete this idea?", isPresented: $confirmingDelete) {
+                                Button("Delete", role: .destructive) { deleteIdea() }
+                            }
+                    }
                 }
                 Section("Works") {
                     ForEach(works, id: \.stableId) { w in
@@ -373,6 +495,11 @@ struct IdeaDetailView: View {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
                     }
+                    if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
+                    Button("Add Note") { addNoteForIdea() }
+                }
+                .navigationDestination(isPresented: $showingNewNote) {
+                    NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
                 }
             } else if loaded {
                 Text("Idea not found.").foregroundStyle(.secondary)
@@ -387,6 +514,35 @@ struct IdeaDetailView: View {
 
     private var starred: Bool { state.pins.contains { $0.type == "idea" && $0.id == ideaId } }
 
+    private func saveEdit() {
+        guard var i = idea else { return }
+        i.name = editName; i.start_year = Int(editStart); i.end_year = Int(editEnd); i.person = editPerson
+        Task {
+            do { idea = try await state.client.updateIdea(id: ideaId, i); editing = false }
+            catch { self.error = "Save failed: \(describe(error))" }
+        }
+    }
+
+    private func deleteIdea() {
+        Task { do { try await state.client.deleteIdea(id: ideaId); dismiss() } catch { self.error = "Delete failed: \(describe(error))" } }
+    }
+
+    private func loadMoreNotes() async {
+        do { notes += try await state.client.ideaNotes(id: ideaId, skip: notes.count, limit: 500) }
+        catch { self.error = "Load more failed: \(describe(error))" }
+    }
+
+    private func addNoteForIdea() {
+        Task {
+            do {
+                let created = try await state.client.createNote()
+                guard let id = created._id else { self.error = "Create returned no id."; return }
+                _ = try await state.client.addIdeaToNote(noteId: id, ideaId: ideaId)
+                newNoteId = id; showingNewNote = true
+            } catch { self.error = "Add note failed: \(describe(error))" }
+        }
+    }
+
     private func load() async {
         do {
             async let i = state.client.idea(id: ideaId)
@@ -394,7 +550,7 @@ struct IdeaDetailView: View {
             async let n = state.client.ideaNotes(id: ideaId)
             let (ii, ww, nn) = try await (i, w, n)
             idea = ii; works = ww; notes = nn; loaded = true
-        } catch { self.error = "Load failed — retry."; loaded = true }
+        } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 
     private func toggleStar() {

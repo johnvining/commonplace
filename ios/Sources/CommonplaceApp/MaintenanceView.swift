@@ -95,7 +95,12 @@ struct ImportView: View {
                 Text("Time CSV").tag("time")
                 Text("Notes CSV").tag("notes")
                 Text("Instapaper").tag("instapaper")
+                Text("URLs").tag("urls")
             }.pickerStyle(.segmented)
+            if kind == "urls" {
+                Text("One URL per line. Each creates a note with Title and URL set, filed under “Status: URL to Review”.")
+                    .font(DS.ui(11)).foregroundStyle(DS.muted)
+            }
             Section(kind == "time" ? "date,kind,minutes,title,pile" : "Paste the file contents") {
                 TextEditor(text: $text).frame(minHeight: 160).font(DS.mono(12))
             }
@@ -115,20 +120,57 @@ struct ImportView: View {
                 switch kind {
                 case "time":
                     let result = try await state.client.importTimeEntries(parseTimeCsv(text))
-                    message = describe(result)
+                    message = describeResult(result)
                 case "notes":
-                    message = describe(try await state.client.importNotesCsv(text))
+                    message = describeResult(try await state.client.importNotesCsv(text))
+                case "urls":
+                    message = try await importUrls(text)
                 default:
-                    message = describe(try await state.client.importNotesInstapaper(text))
+                    message = describeResult(try await state.client.importNotesInstapaper(text))
                 }
                 await MainActor.run { report = message; busy = false }
+            } catch let error as APIError {
+                await MainActor.run {
+                    if case .clientError(let status, _) = error, status == 413 {
+                        report = "The import text is too large. Try splitting it into smaller batches."
+                    } else {
+                        report = "Import failed: \(describe(error))"
+                    }
+                    busy = false
+                }
             } catch {
-                await MainActor.run { report = "Import failed — retry."; busy = false }
+                await MainActor.run { report = "Import failed: \(describe(error))"; busy = false }
             }
         }
     }
 
-    private func describe(_ r: TimeImportResult) -> String {
+    /// Client-side URL list import (web Load.tsx importUrlsAsNotes):
+    /// one note per URL, filed under the "Status: URL to Review" pile.
+    private func importUrls(_ list: String) async throws -> String {
+        let urls = list.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        var pileId: String?
+        if let found = try await state.client.autocompletePiles("Status: URL to Review").first(where: { $0.name == "Status: URL to Review" }), let id = found._id {
+            pileId = id
+        } else {
+            pileId = try await state.client.createPile(name: "Status: URL to Review")._id
+        }
+        var imported = 0
+        var failures: [String] = []
+        for (idx, url) in urls.enumerated() {
+            do {
+                let note = try await state.client.createNote(title: url, work: nil)
+                guard let nid = note._id else { failures.append("row \(idx + 1): no id returned"); continue }
+                _ = try await state.client.updateNote(id: nid, NoteUpdate(url: url))
+                if let pileId { _ = try await state.client.addPileToNote(noteId: nid, pileId: pileId) }
+                imported += 1
+            } catch { failures.append("row \(idx + 1): \(describe(error))") }
+        }
+        var s = "Imported \(imported) / \(urls.count)"
+        if !failures.isEmpty { s += "\n" + failures.joined(separator: "\n") }
+        return s
+    }
+
+    private func describeResult(_ r: TimeImportResult) -> String {
         var s = "Imported \(r.imported ?? 0)"
         if let f = r.failed, f > 0 {
             s += ", \(f) with problems:"

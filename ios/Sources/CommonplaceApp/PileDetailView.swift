@@ -38,14 +38,17 @@ struct PileDetailView: View {
             }
             Section("Time on this pile") {
                 if let t = timeTotals {
-                    Text("\(formatMinutes(t.reading)) + \(formatMinutes(t.writing)) = \(formatMinutes(t.total)) (\(t.count) entries)")
+                    Text("Reading \(formatMinutes(t.reading)) + Writing \(formatMinutes(t.writing)) = \(formatMinutes(t.total)) (\(t.count) entries)")
+                    NavigationLink { TimeView(preselectSubject: TimeSubjectKey.pileKey(pileId: pileId)) } label: { Text("Time log") }
                 } else {
                     Text("Loading…")
                 }
             }
             Section("Works") {
                 ForEach(works, id: \.stableId) { w in
-                    Text(w.name ?? "(unnamed)")
+                    NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
+                        Text(w.name ?? "(unnamed)")
+                    }
                 }
             }
             Section("Notes") {
@@ -54,6 +57,8 @@ struct PileDetailView: View {
                         NoteRow(note: n)
                     }
                 }
+                if notes.count >= 500 { Button("Load more") { loadMoreNotes() } }
+                NavigationLink { NotesView(initialPile: PickOption(id: pileId, name: pile?.name ?? "Pile")) } label: { Text("Narrow — filter by this pile") }
                 HStack {
                     Button("Add Note") { addNote() }
                     Spacer()
@@ -101,9 +106,19 @@ struct PileDetailView: View {
         Task {
             var update = Pile()
             update.name = newName
-            if let saved = try? await state.client.updatePile(id: pileId, update) {
+            do {
+                let saved = try await state.client.updatePile(id: pileId, update)
                 await MainActor.run { pile = saved; editing = false }
+            } catch {
+                await MainActor.run { self.error = "Save failed — still editing: \(describe(error))" }
             }
+        }
+    }
+
+    private func loadMoreNotes() {
+        Task {
+            do { let more = try await state.client.pileNotes(id: pileId, skip: notes.count, limit: 500); await MainActor.run { notes += more } }
+            catch { await MainActor.run { self.error = "Load more failed: \(describe(error))" } }
         }
     }
 
@@ -112,7 +127,7 @@ struct PileDetailView: View {
             do {
                 let created = try await state.client.createNote()
                 guard let id = created._id else { return }
-                _ = try? await state.client.addPileToNote(noteId: id, pileId: pileId)
+                _ = try await state.client.addPileToNote(noteId: id, pileId: pileId)
                 await MainActor.run { newNoteId = id; showingNewNote = true }
             } catch {
                 await MainActor.run { self.error = "Could not create note — retry." }
