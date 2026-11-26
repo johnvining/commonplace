@@ -4619,4 +4619,25 @@ a.grid-link > a {
   opacity: 0.65;
 }
 
+.time-pile-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: var(--semantic-pile);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.time-table td:first-child,
+.time-subject-chip span,
+.time-entry .time-subject {
+  font-family: "Iowan Old Style", Charter, "Source Serif Pro", Georgia, serif;
+}
+
+.time-pile-pill {
+  font-family: "Iowan Old Style", Charter, "Source Serif Pro", Georgia, serif;
+}
+
 /*# sourceMappingURL=style.css.map */

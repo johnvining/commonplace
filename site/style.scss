@@ -2647,3 +2647,20 @@ mark.search-highlight {
 
 .time-subject-list button.highlighted { background: var(--accent-soft, #eef3fd); }
 .time-subject-empty { padding: 7px 9px; opacity: 0.65; }
+
+// Actual pile pills (same tokens as .pill-input.piles .pill): purple
+// tint, no border, for pile subjects on the time page.
+.time-pile-pill {
+  display: inline-flex; align-items: center; padding: 1px 6px;
+  border: 1px solid transparent; border-radius: 3px;
+  background: var(--semantic-pile); font-size: 13px; line-height: 1.4;
+}
+
+// Serif for names and content on the time page (reading font); only
+// small controls stay sans.
+.time-table td:first-child,
+.time-subject-chip span,
+.time-entry .time-subject {
+  font-family: $reading_font;
+}
+.time-pile-pill { font-family: $reading_font; }

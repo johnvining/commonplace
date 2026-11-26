@@ -109,7 +109,7 @@ function SubjectTable({
           <tr key={i}>
             <td>
               {pileLink && row.pile ? (
-                <Link to={'/pile/' + row.pile}>{row.name}</Link>
+                <Link to={'/pile/' + row.pile}><span className="time-pile-pill">{row.name}</span></Link>
               ) : workLink && row.work ? (
                 <Link to={'/work/' + row.work}>
                   <em>{row.name}</em>
@@ -588,7 +588,7 @@ function Time(props: any) {
         <div className="time-timer-row">
           <div className="time-subject-picker">
             {timerKey ? (
-              <div className="time-subject-chip">
+              <div className={'time-subject-chip' + (timerKey.startsWith('pile:') ? ' time-pile-pill' : '')}>
                 <span>{timerLabel || subjectLabelForKey(timerKey)}</span>
                 <button
                   aria-label="Clear subject"
@@ -760,7 +760,7 @@ function Time(props: any) {
                       <span className="time-subject">
                         {e.pile?._id ? (
                           <>
-                            <Link to={'/pile/' + (e.pile._id ?? e.pile)}>{e.pile.name ?? 'Pile'}</Link>
+                            <Link to={'/pile/' + (e.pile._id ?? e.pile)}><span className="time-pile-pill">{e.pile.name ?? 'Pile'}</span></Link>
                             {e.work?._id ? (
                               <>
                                 {' · '}
