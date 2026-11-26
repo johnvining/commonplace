@@ -2473,24 +2473,30 @@ mark.search-highlight {
   font-size: 20px;
 }
 
+// Kind tags reuse the site's note-label treatment (idea/pile labels in
+// _minimal.scss): small square tags, main font, coloured by kind —
+// reading takes the idea tint, writing the pile tint.
 .time-kind {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  height: 19px;
+  padding: 0 6px;
+  font-family: $main_font;
   font-size: var(--font-size-sm);
-  font-family: $sans_font;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border: 1px solid $note_border;
-  border-radius: 10px;
-  padding: 1px 8px;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: 2px;
   white-space: nowrap;
 }
 
 .time-kind-reading {
-  background: $semantic_idea;
+  color: var(--idea);
+  background: var(--accent-soft);
 }
 
 .time-kind-writing {
-  background: $semantic_pile;
+  color: var(--pile);
+  background: var(--semantic-pile);
 }
 
 .time-count {
@@ -2630,9 +2636,9 @@ mark.search-highlight {
 
 .time-subject-picker { flex: 1 1 200px; min-width: 0; position: relative; }
 .time-subject-chip {
-  display: inline-flex; align-items: center; gap: 8px; padding: 6px 6px 6px 12px;
-  border: 1px solid var(--note-border); border-radius: 16px; background: var(--hover);
-  max-width: 100%;
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 6px 5px 10px;
+  border: 1px solid var(--hairline); border-radius: 2px; background: var(--hover);
+  font-size: var(--font-size-md); max-width: 100%;
 }
 .time-subject-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .time-subject-chip button { background: none; border: none; cursor: pointer; font-size: 16px; color: inherit; }

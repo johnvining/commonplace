@@ -3039,22 +3039,25 @@ mark.search-highlight {
 }
 
 .time-kind {
-  display: inline-block;
-  font-size: var(--font-size-sm);
+  display: inline-flex;
+  align-items: center;
+  height: 19px;
+  padding: 0 6px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border: 1px solid var(--note-border);
-  border-radius: 10px;
-  padding: 1px 8px;
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: 2px;
   white-space: nowrap;
 }
 
 .time-kind-reading {
-  background: var(--semantic-idea);
+  color: var(--idea);
+  background: var(--accent-soft);
 }
 
 .time-kind-writing {
+  color: var(--pile);
   background: var(--semantic-pile);
 }
 
@@ -4559,10 +4562,11 @@ a.grid-link > a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 6px 6px 12px;
-  border: 1px solid var(--note-border);
-  border-radius: 16px;
+  padding: 5px 6px 5px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
   background: var(--hover);
+  font-size: var(--font-size-md);
   max-width: 100%;
 }
 
