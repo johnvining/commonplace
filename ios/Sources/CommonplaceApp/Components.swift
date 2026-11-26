@@ -91,9 +91,16 @@ extension Note {
         return t.isEmpty ? nil : t
     }
 
-    /// What to call the note: title, else its first content.
+    /// What to call the note: title, else its first content (with
+    /// newlines collapsed, so a three-line text makes a one-line title).
     var displayTitle: String {
-        nonEmpty(title) ?? nonEmpty(text) ?? nonEmpty(take) ?? nonEmpty(url) ?? "No Text"
+        if let t = nonEmpty(title) { return t }
+        let collapsed = [text, take, url]
+            .compactMap { nonEmpty($0) }
+            .first?
+            .split(whereSeparator: { $0.isWhitespace })
+            .joined(separator: " ")
+        return collapsed ?? "No Text"
     }
 
     /// Preview/body cascade: text → take → URL → "No Text", so a note

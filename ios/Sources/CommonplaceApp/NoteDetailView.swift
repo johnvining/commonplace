@@ -54,56 +54,96 @@ struct NoteDetailView: View {
             if let note {
                 Section {
                     if editing {
-                        TextField("Title", text: $title)
-                        TextField("Text", text: $text, axis: .vertical)
-                        TextField("Take", text: $take, axis: .vertical)
-                        TextField("URL", text: $urlField).autocorrectionDisabled()
-                        TextField("Year", text: $yearField)
-                        TextField("Page", text: $pageField)
+                        editField("Title") {
+                            TextField("Title", text: $title)
+                                .textFieldStyle(.roundedBorder)
+                                .font(DS.serif(15))
+                        }
+                        editField("Text") {
+                            TextField("Text", text: $text, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                                .font(DS.serif(15))
+                        }
+                        editField("Take") {
+                            TextField("Take", text: $take, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                                .font(DS.serif(15))
+                        }
+                        editField("URL") {
+                            TextField("URL", text: $urlField)
+                                .textFieldStyle(.roundedBorder)
+                                .autocorrectionDisabled()
+                        }
+                        HStack(spacing: 12) {
+                            editField("Year") {
+                                TextField("Year", text: $yearField).textFieldStyle(.roundedBorder)
+                            }
+                            editField("Page") {
+                                TextField("Page", text: $pageField).textFieldStyle(.roundedBorder)
+                            }
+                        }
                         HStack {
-                            Button("Save") { save() }
-                            Button("Format text") { formatText() }
+                            DSButton(title: "Save") { save() }
+                            DSButton(title: "Format text") { formatText() }
+                            Spacer()
                         }
                         if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
                     } else {
-                        Text(note.displayTitle)
-                            .font(DS.serif(21, weight: .semibold))
-                            .foregroundStyle(DS.ink)
-                        if (note.authors?.isEmpty == false) || note.work != nil {
-                            HStack(spacing: 6) {
-                                if let authors = note.authors, !authors.isEmpty {
-                                    Text(authors.compactMap(\.name).joined(separator: ", "))
-                                }
-                                if let w = note.work?.name, !w.isEmpty {
-                                    Text(w).italic()
-                                }
-                            }
-                            .font(DS.serif(13))
-                            .foregroundStyle(DS.muted)
-                        }
-                        if let ts = note.titleSource, !ts.isEmpty {
-                            Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
-                        }
-                        if let t = note.text, !t.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            NoteText(text: t)
-                            if let k = note.take, !k.isEmpty {
-                                Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.ink)
-                            }
-                        } else {
-                            // No text: fall back take → URL → "No Text".
-                            Text(note.displayText)
-                                .font(DS.serif(15))
-                                .foregroundStyle(DS.muted)
-                        }
-                        if let u = note.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
-                        if note.year != nil || (note.page?.isEmpty == false) {
-                            Text([note.year.map(String.init), note.page].compactMap { $0 }.joined(separator: " · "))
-                                .font(DS.ui(11)).foregroundStyle(DS.muted)
-                        }
-                        if let nick = note.nick { CopyNickButton(nick: nick) }
                         NoteStatusLine(note: note)
+                        // Reading card like the web note: accent edge,
+                        // image on top, serif title, take in italics.
+                        HStack(alignment: .top, spacing: 12) {
+                            Rectangle().fill(DS.accent).frame(width: 3)
+                            VStack(alignment: .leading, spacing: 8) {
+                                if let first = imageDatas.first {
+                                    NoteImageView(data: first)
+                                        .frame(maxWidth: .infinity)
+                                        .frame(height: 190)
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                }
+                                Text(note.displayTitle)
+                                    .font(DS.serif(20, weight: .semibold))
+                                    .foregroundStyle(DS.ink)
+                                if (note.authors?.isEmpty == false) || note.work != nil {
+                                    HStack(spacing: 6) {
+                                        if let authors = note.authors, !authors.isEmpty {
+                                            Text(authors.compactMap(\.name).joined(separator: ", "))
+                                        }
+                                        if let w = note.work?.name, !w.isEmpty {
+                                            Text(w).italic()
+                                        }
+                                    }
+                                    .font(DS.serif(13))
+                                    .foregroundStyle(DS.muted)
+                                }
+                                if let ts = note.titleSource, !ts.isEmpty {
+                                    Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                                }
+                                if (note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false),
+                                   let t = note.text, !t.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    NoteText(text: t)
+                                }
+                                if let k = note.take, !k.isEmpty {
+                                    Text(k).font(DS.serif(14.5)).italic().foregroundStyle(DS.ink)
+                                } else if (note.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) {
+                                    Text(note.displayText)
+                                        .font(DS.serif(15))
+                                        .foregroundStyle(DS.muted)
+                                }
+                                if let u = note.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
+                                if note.year != nil || (note.page?.isEmpty == false) {
+                                    Text([note.year.map(String.init), note.page].compactMap { $0 }.joined(separator: " · "))
+                                        .font(DS.ui(11)).foregroundStyle(DS.muted)
+                                }
+                                if let nick = note.nick { CopyNickButton(nick: nick) }
+                            }
+                            .padding(.vertical, 6)
+                        }
+                        .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 12))
+                        .listRowBackground(DS.surface)
                     }
                 }
+                .listRowSeparator(.hidden)
                 Section("Authors") {
                     PillEditor(
                         placeholder: "Add an author…", tint: DS.accentSoft, selected: $authorOptions,
@@ -154,19 +194,21 @@ struct NoteDetailView: View {
                     )
                 }
                 Section {
-                    HStack {
-                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
-                        Button(editing ? "Cancel" : "Edit") {
+                    HStack(spacing: 6) {
+                        DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                        DSButton(title: editing ? "Cancel" : "Edit") {
                             title = note.title ?? ""; text = note.text ?? ""; take = note.take ?? ""
                             urlField = note.url ?? ""; yearField = note.year.map(String.init) ?? ""; pageField = note.page ?? ""
                             editing.toggle()
                         }
-                        Button("Delete") { confirming = true }
-                            .confirmationDialog("Delete note?", isPresented: $confirming) {
-                                Button("Delete", role: .destructive) { remove() }
-                            }
+                        DSButton(title: "Delete") { confirming = true }
+                        Spacer()
+                    }
+                    .confirmationDialog("Delete note?", isPresented: $confirming) {
+                        Button("Delete", role: .destructive) { remove() }
                     }
                 }
+                .listRowSeparator(.hidden)
                 Section("Images") {
                     ScrollView(.horizontal) {
                         HStack {
@@ -267,6 +309,15 @@ struct NoteDetailView: View {
             #endif
         }
         .task { load() }
+    }
+
+    /// Edit-form field: small-caps label above a bordered input,
+    /// like the web edit form (TITLE / TEXT / AUTHORS …).
+    private func editField<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            DSLabel(text: label)
+            content()
+        }
     }
 
     private func formatText() {
