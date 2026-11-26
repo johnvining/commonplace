@@ -462,9 +462,12 @@ export async function getRecentSubjects(limit = 20) {
 export async function createTimeEntry(body: {
   title?: string
   pile?: string | null
+  work?: string | null
   kind: string
   minutes: number | string
   date?: string
+  startedAt?: string
+  endedAt?: string
   notes?: string
 }) {
   return axios.post(url_api + 'time/', body)

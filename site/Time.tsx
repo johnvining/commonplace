@@ -53,12 +53,17 @@ function shiftDay(date: string, delta: number): string {
 }
 
 // Starred subjects are pins of type 'time' whose id is the subject key:
-// `pile:<pileId>` for pile-linked time, `title:<lowercased title>` otherwise.
+// `pile:<pileId>`, `work:<workId>`, or `title:<lowercased title>`.
 function subjectKeyFor(entry: any): { key: string; label: string; href: string } {
   const pileId = entry.pile?._id ? String(entry.pile._id) : entry.pile ? String(entry.pile) : null
   if (pileId && /^[0-9a-f]{24}$/i.test(pileId)) {
     const label = entry.pile?.name || entry.title?.trim() || 'Pile'
     return { key: `pile:${pileId}`, label, href: `/time?subject=${encodeURIComponent(`pile:${pileId}`)}` }
+  }
+  const workId = entry.work?._id ? String(entry.work._id) : entry.work ? String(entry.work) : null
+  if (workId && /^[0-9a-f]{24}$/i.test(workId)) {
+    const label = entry.work?.name || entry.title?.trim() || 'Work'
+    return { key: `work:${workId}`, label, href: `/time?subject=${encodeURIComponent(`work:${workId}`)}` }
   }
   const title = (entry.title ?? '').trim() || 'Untitled'
   const key = `title:${title.toLowerCase()}`
@@ -90,13 +95,21 @@ function KindTotals({ summary }: { summary: any }) {
   )
 }
 
-function SubjectTable({ rows, pileLink }: { rows: any[]; pileLink?: boolean }) {
+function SubjectTable({
+  rows,
+  pileLink,
+  workLink,
+}: {
+  rows: any[]
+  pileLink?: boolean
+  workLink?: boolean
+}) {
   if (!rows.length) return null
   return (
     <table className="time-table">
       <thead>
         <tr>
-          <th>{pileLink ? 'Pile' : 'Title'}</th>
+          <th>{pileLink ? 'Pile' : workLink ? 'Work' : 'Title'}</th>
           <th>Reading</th>
           <th>Writing</th>
           <th>Total</th>
@@ -108,6 +121,10 @@ function SubjectTable({ rows, pileLink }: { rows: any[]; pileLink?: boolean }) {
             <td>
               {pileLink && row.pile ? (
                 <Link to={'/pile/' + row.pile}>{row.name}</Link>
+              ) : workLink && row.work ? (
+                <Link to={'/work/' + row.work}>
+                  <em>{row.name}</em>
+                </Link>
               ) : (
                 row.name ?? row.title
               )}
@@ -136,6 +153,8 @@ function Time(props: any) {
   const [timerLabel, setTimerLabel] = useState('')
   const [timerOpen, setTimerOpen] = useState(false)
   const [timerPiles, setTimerPiles] = useState<any[]>([])
+  const [timerWorks, setTimerWorks] = useState<any[]>([])
+  const [timerHighlight, setTimerHighlight] = useState(0)
   const [timerKind, setTimerKind] = useState('writing')
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null)
   const [now, setNow] = useState(Date.now())
@@ -148,6 +167,10 @@ function Time(props: any) {
   const [minutes, setMinutes] = useState('')
   const [date, setDate] = useState(todayLocal())
   const [pileId, setPileId] = useState<string | null>(null)
+  const [workId, setWorkId] = useState<string | null>(null)
+  const [workName, setWorkName] = useState('')
+  const [workQuery, setWorkQuery] = useState('')
+  const [workResults, setWorkResults] = useState<any[]>([])
   const [pileName, setPileName] = useState('')
   const [pileQuery, setPileQuery] = useState('')
   const [pileResults, setPileResults] = useState<any[]>([])
@@ -213,10 +236,15 @@ function Time(props: any) {
   // titles, pile names), then starred pins, then the raw key.
   const resolveTimerSubject = (
     key: string
-  ): { key: string; title?: string; pileId?: string } | null => {
+  ): { key: string; title?: string; pileId?: string; workId?: string } | null => {
     if (!key) return null
     const recent = subjects.find((s: any) => s.key === key)
-    if (recent) return { key, title: recent.title, pileId: recent.pile?.id }
+    if (recent) return { key, title: recent.title, pileId: recent.pile?.id, workId: recent.work?.id }
+    if (key.startsWith('work:')) {
+      const id = key.slice(5)
+      if (!/^[0-9a-f]{24}$/i.test(id)) return null
+      return { key, workId: id }
+    }
     if (key.startsWith('pile:')) {
       const id = key.slice(5)
       if (!/^[0-9a-f]{24}$/i.test(id)) return null
@@ -238,7 +266,7 @@ function Time(props: any) {
 
   const subjectLabelForKey = (key: string): string => {
     const s = subjects.find((x: any) => x.key === key)
-    if (s) return s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.title ?? key
+    if (s) return s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.work ? s.work.name + (s.title ? ` — ${s.title}` : '') : s.title ?? key
     const pin = starred.find((p: any) => p.id === key)
     if (pin?.label) return pin.label
     if (key.startsWith('title:')) return key.slice(6)
@@ -260,6 +288,15 @@ function Time(props: any) {
         })
         .catch(() => {})
     }
+    if (timerKey.startsWith('work:') && (!timerLabel || timerLabel === timerKey)) {
+      const id = timerKey.slice(5)
+      db.getInfo(db.types.work, id)
+        .then((res: any) => {
+          const name = res.data.data?.name
+          if (name) setTimerLabel(name)
+        })
+        .catch(() => {})
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subjects, timerKey])
 
@@ -268,6 +305,35 @@ function Time(props: any) {
     setTimerQuery(label)
     setTimerLabel(label)
     setTimerOpen(false)
+  }
+
+  // Flat option list shared by rendering and keyboard navigation.
+  const timerOptions = (): { key: string; label: string }[] => {
+    const out: { key: string; label: string }[] = []
+    for (const pin of starred) {
+      const s = subjects.find((x: any) => x.key === pin.id)
+      const label = s
+        ? s.pile
+          ? s.pile.name + (s.title ? ` — ${s.title}` : '')
+          : s.title
+        : pin.label || pin.id
+      out.push({ key: pin.id, label: `★ ${label}` })
+    }
+    const q = timerQuery.trim().toLowerCase()
+    for (const s of subjects.filter(
+      (x: any): boolean =>
+        !starred.some((p: any) => p.id === x.key) &&
+        (!q || (s.pile?.name ?? s.title ?? '').toLowerCase().includes(q))
+    ) as any[]) {
+      out.push({
+        key: s.key,
+        label: s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.title,
+      })
+    }
+    for (const p of timerPiles) out.push({ key: `pile:${p._id}`, label: `Pile: ${p.name}` })
+    for (const w of timerWorks) out.push({ key: `work:${w._id}`, label: `Work: ${w.name}` })
+    if (timerQuery.trim()) out.push({ key: `title:${timerQuery.trim().toLowerCase()}`, label: `Use “${timerQuery.trim()}” as a name` })
+    return out
   }
 
   const useTypedTimerName = () => {
@@ -281,39 +347,51 @@ function Time(props: any) {
     const q = timerQuery.trim()
     if (!timerOpen || q.length < 2 || timerKey) {
       setTimerPiles([])
+      setTimerWorks([])
       return
     }
     const t = setTimeout(() => {
       db.getSuggestions('pile', q)
         .then((res: any) => setTimerPiles(res.data.data ?? []))
         .catch(() => setTimerPiles([]))
+      db.getSuggestions('work', q)
+        .then((res: any) => setTimerWorks(res.data.data ?? []))
+        .catch(() => setTimerWorks([]))
     }, 250)
     return () => clearTimeout(t)
   }, [timerQuery, timerOpen, timerKey])
 
-  const startTimer = () => {
-    if (timerStartedAt !== null || !resolveTimerSubject(timerKey)) return
+  const startTimerFor = (key: string, kind: string) => {
+    if (timerStartedAt !== null || !resolveTimerSubject(key)) return
     const startedAt = Date.now()
+    setTimerKey(key)
+    setTimerKind(kind)
     setTimerStartedAt(startedAt)
     setNow(startedAt)
     try {
-      localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify({ key: timerKey, kind: timerKind, startedAt }))
+      localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify({ key, kind, startedAt }))
     } catch {}
+  }
+
+  const startTimer = () => startTimerFor(timerKey, timerKind)
+
+  const startAgain = (entry: any) => {
+    const { key, label } = subjectKeyFor(entry)
+    pickTimerSubject(key, label)
+    startTimerFor(key, entry.kind === 'reading' ? 'reading' : 'writing')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const stopTimer = async () => {
     if (timerStartedAt === null) return
     const subject = resolveTimerSubject(timerKey)
     const elapsedMin = Math.max(1, Math.round((Date.now() - timerStartedAt) / 60000))
-    setTimerStartedAt(null)
-    try {
-      localStorage.removeItem(TIMER_STORAGE_KEY)
-    } catch {}
-    if (!subject || (!subject.pileId && !subject.title)) {
+    // Validate before clearing: a failed stop keeps the timer running.
+    if (!subject || (!subject.pileId && !subject.workId && !subject.title)) {
       setError('Pick what this time was for first.')
       return
     }
-    // A pile star can outlive its pile; check before logging.
+    // A pile/work star can outlive its record; check before logging.
     if (subject.pileId) {
       try {
         await db.getInfo(db.types.pile, subject.pileId)
@@ -322,16 +400,36 @@ function Time(props: any) {
         return
       }
     }
+    if (subject.workId) {
+      try {
+        await db.getInfo(db.types.work, subject.workId)
+      } catch {
+        setError('That work is gone; pick something else.')
+        return
+      }
+    }
     setError(null)
-    const body: any = { kind: timerKind, minutes: elapsedMin, date: todayLocal() }
+    const body: any = {
+      kind: timerKind,
+      minutes: elapsedMin,
+      date: todayLocal(),
+      startedAt: new Date(timerStartedAt).toISOString(),
+      endedAt: new Date().toISOString(),
+    }
     if (subject.pileId) body.pile = subject.pileId
+    if (subject.workId) body.work = subject.workId
     if (subject.title) body.title = subject.title
     try {
       await db.createTimeEntry(body)
-      load(selectedDate)
     } catch (e: any) {
       setError(e?.response?.data?.message ?? 'Could not save that entry.')
+      return
     }
+    setTimerStartedAt(null)
+    try {
+      localStorage.removeItem(TIMER_STORAGE_KEY)
+    } catch {}
+    load(selectedDate)
   }
 
   // A sidebar star lands here via /time?subject=...: select it in the
@@ -374,6 +472,34 @@ function Time(props: any) {
     pickPile(res.data.data._id, res.data.data.name)
   }
 
+  useEffect(() => {
+    const q = workQuery.trim()
+    if (q.length < 2) {
+      setWorkResults([])
+      return
+    }
+    const timer = setTimeout(() => {
+      db.getSuggestions('work', q)
+        .then((res: any) => setWorkResults(res.data.data ?? []))
+        .catch(() => setWorkResults([]))
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [workQuery])
+
+  const pickWork = (id: string, name: string) => {
+    setWorkId(id)
+    setWorkName(name)
+    setWorkQuery('')
+    setWorkResults([])
+  }
+
+  const createWork = async () => {
+    const name = workQuery.trim()
+    if (!name) return
+    const res = await db.createRecord('work', name)
+    pickWork(res.data.data._id, res.data.data.name)
+  }
+
   const resetForm = () => {
     setTitle('')
     setKind('writing')
@@ -383,6 +509,10 @@ function Time(props: any) {
     setPileName('')
     setPileQuery('')
     setPileResults([])
+    setWorkId(null)
+    setWorkName('')
+    setWorkQuery('')
+    setWorkResults([])
     setEditingId(null)
     setError(null)
     setManualOpen(false)
@@ -390,8 +520,8 @@ function Time(props: any) {
 
   const save = async () => {
     const mins = Number(minutes)
-    if (!title.trim() && !pileId) {
-      setError('Give the entry a title or a pile.')
+    if (!title.trim() && !pileId && !workId) {
+      setError('Give the entry a title, a pile, or a work.')
       return
     }
     if (!Number.isInteger(mins) || mins < 1) {
@@ -406,6 +536,7 @@ function Time(props: any) {
     const body = {
       title: title.trim(),
       pile: pileId,
+      work: workId,
       kind,
       minutes: mins,
       date,
@@ -431,6 +562,13 @@ function Time(props: any) {
     } else {
       setPileId(null)
       setPileName('')
+    }
+    if (entry.work?._id) {
+      setWorkId(entry.work._id)
+      setWorkName(entry.work.name ?? '')
+    } else {
+      setWorkId(null)
+      setWorkName('')
     }
     setError(null)
     setManualOpen(true)
@@ -486,54 +624,52 @@ function Time(props: any) {
                   onChange={(e) => {
                     setTimerQuery(e.target.value)
                     setTimerOpen(true)
+                    setTimerHighlight(0)
                   }}
                   onFocus={() => setTimerOpen(true)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') useTypedTimerName()
-                    if (e.key === 'Escape') setTimerOpen(false)
+                    const opts = timerOptions()
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault()
+                      setTimerOpen(true)
+                      setTimerHighlight((h) => Math.min(Math.max(opts.length - 1, 0), h + 1))
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault()
+                      setTimerHighlight((h) => Math.max(0, h - 1))
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault()
+                      const opt = opts[timerHighlight]
+                      if (opt && timerOpen) {
+                        if (opt.label.startsWith('Use ')) useTypedTimerName()
+                        else pickTimerSubject(opt.key, opt.label.replace(/^★ /, '').replace(/^Pile: /, '').replace(/^Work: /, ''))
+                      } else {
+                        useTypedTimerName()
+                      }
+                    } else if (e.key === 'Escape') {
+                      setTimerOpen(false)
+                    }
                   }}
                 />
                 {timerOpen ? (
-                  <ul className="time-subject-list">
-                    {starred.map((pin: any) => {
-                      const s = subjects.find((x: any) => x.key === pin.id)
-                      const label = s
-                        ? s.pile
-                          ? s.pile.name + (s.title ? ` — ${s.title}` : '')
-                          : s.title
-                        : pin.label || pin.id
-                      return (
-                        <li key={'star-' + pin.id}>
-                          <button onClick={() => pickTimerSubject(pin.id, label)}>★ {label}</button>
-                        </li>
-                      )
-                    })}
-                    {subjects
-                      .filter((s: any) => !starred.some((p: any) => p.id === s.key))
-                      .filter(
-                        (s: any) =>
-                          !timerQuery.trim() ||
-                          (s.pile?.name ?? s.title ?? '').toLowerCase().includes(timerQuery.trim().toLowerCase())
-                      )
-                      .map((s: any) => {
-                        const label = s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.title
-                        return (
-                          <li key={'recent-' + s.key}>
-                            <button onClick={() => pickTimerSubject(s.key, label)}>{label}</button>
-                          </li>
-                        )
-                      })}
-                    {timerPiles.map((p: any) => (
-                      <li key={'pile-' + p._id}>
-                        <button onClick={() => pickTimerSubject(`pile:${p._id}`, p.name)}>
-                          Pile: {p.name}
+                  <ul className="time-subject-list" role="listbox">
+                    {timerOptions().map((opt, i) => (
+                      <li key={opt.key + '-' + i}>
+                        <button
+                          role="option"
+                          aria-selected={i === timerHighlight}
+                          className={i === timerHighlight ? 'highlighted' : ''}
+                          onMouseEnter={() => setTimerHighlight(i)}
+                          onClick={() => {
+                            if (opt.label.startsWith('Use ')) useTypedTimerName()
+                            else pickTimerSubject(opt.key, opt.label.replace(/^★ /, '').replace(/^Pile: /, '').replace(/^Work: /, ''))
+                          }}
+                        >
+                          {opt.label}
                         </button>
                       </li>
                     ))}
-                    {timerQuery.trim() ? (
-                      <li>
-                        <button onClick={useTypedTimerName}>Use “{timerQuery.trim()}” as a name</button>
-                      </li>
+                    {!timerOptions().length ? (
+                      <li className="time-subject-empty">No matches — type a name and press Enter.</li>
                     ) : null}
                   </ul>
                 ) : null}
@@ -607,6 +743,12 @@ function Time(props: any) {
                 <SubjectTable rows={daily.byPile} pileLink />
               </>
             ) : null}
+            {daily.byWork?.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By work</div>
+                <SubjectTable rows={daily.byWork} workLink />
+              </>
+            ) : null}
             {daily.byTitle.length ? (
               <>
                 <div className="top-level form-label time-table-title">By title</div>
@@ -630,6 +772,21 @@ function Time(props: any) {
                         {e.pile?._id ? (
                           <>
                             <Link to={'/pile/' + (e.pile._id ?? e.pile)}>{e.pile.name ?? 'Pile'}</Link>
+                            {e.work?._id ? (
+                              <>
+                                {' · '}
+                                <Link to={'/work/' + e.work._id}>
+                                  <em>{e.work.name ?? 'Work'}</em>
+                                </Link>
+                              </>
+                            ) : null}
+                            {e.title ? ` — ${e.title}` : null}
+                          </>
+                        ) : e.work?._id ? (
+                          <>
+                            <Link to={'/work/' + e.work._id}>
+                              <em>{e.work.name ?? 'Work'}</em>
+                            </Link>
                             {e.title ? ` — ${e.title}` : null}
                           </>
                         ) : (
@@ -644,6 +801,14 @@ function Time(props: any) {
                           href={subject.href}
                           compact
                         />
+                        <button
+                          className="button compact"
+                          disabled={timerStartedAt !== null}
+                          title={timerStartedAt !== null ? 'Stop the running timer first' : 'Start this again'}
+                          onClick={() => startAgain(e)}
+                        >
+                          Start again
+                        </button>
                         <button className="button compact" onClick={() => edit(e)}>Edit</button>
                         <button className="button compact" onClick={() => remove(e)}>Delete</button>
                       </span>
@@ -699,6 +864,12 @@ function Time(props: any) {
               <>
                 <div className="top-level form-label time-table-title">By pile</div>
                 <SubjectTable rows={weekly.byPile} pileLink />
+              </>
+            ) : null}
+            {weekly.byWork?.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By work</div>
+                <SubjectTable rows={weekly.byWork} workLink />
               </>
             ) : null}
             {weekly.byTitle.length ? (
@@ -762,6 +933,53 @@ function Time(props: any) {
                             <li>
                               <button className="button compact" onClick={createPile}>
                                 New pile: {pileQuery.trim()}
+                              </button>
+                            </li>
+                          ) : null}
+                        </ul>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+                <label className="top-level form-label" htmlFor="time-work">Work</label>
+                <div>
+                  {workId ? (
+                    <div className="time-pile-pick compact">
+                      <Link to={'/work/' + workId}>
+                        <em>{workName}</em>
+                      </Link>
+                      <button
+                        className="button compact"
+                        onClick={() => {
+                          setWorkId(null)
+                          setWorkName('')
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        id="time-work"
+                        className="top-level input compact"
+                        placeholder="Link a work (optional)"
+                        value={workQuery}
+                        onChange={(e) => setWorkQuery(e.target.value)}
+                      />
+                      {workResults.length > 0 || workQuery.trim().length >= 2 ? (
+                        <ul className="time-pile-results">
+                          {workResults.map((w: any) => (
+                            <li key={w._id}>
+                              <button className="button compact" onClick={() => pickWork(w._id, w.name)}>
+                                <em>{w.name}</em>
+                              </button>
+                            </li>
+                          ))}
+                          {workQuery.trim() ? (
+                            <li>
+                              <button className="button compact" onClick={createWork}>
+                                New work: {workQuery.trim()}
                               </button>
                             </li>
                           ) : null}
