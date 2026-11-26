@@ -18,9 +18,70 @@ struct NotesView: View {
     @State private var showingNewNote = false
     @AppStorage("notesViewMode") private var viewMode = "slim"
 
+    private var isCardMode: Bool { viewMode == "grid" || viewMode == "tile" }
+
     var body: some View {
         NavigationStack {
-            List {
+            Group {
+                if isCardMode {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 12) {
+                            headerControls
+                            viewPicker
+                            if let error {
+                                Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
+                            }
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: viewMode == "tile" ? 240 : 180), spacing: 12)],
+                                alignment: .leading, spacing: 12
+                            ) {
+                                ForEach(notes, id: \.stableId) { n in
+                                    NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
+                                        NoteCard(note: n, large: viewMode == "tile")
+                                    }
+                                    .buttonStyle(.plain)
+                                    .contextMenu {
+                                        #if os(macOS)
+                                        Button("Open in New Window") {
+                                            if let id = n._id { openWindow(value: id) }
+                                        }
+                                        #endif
+                                    }
+                                }
+                            }
+                            if notes.isEmpty && error == nil {
+                                Text("No notes yet.").font(DS.ui(13)).foregroundStyle(DS.muted)
+                            }
+                            Button("Load more") { loadRecent(page: page + 1) }
+                                .font(DS.ui(13))
+                        }
+                        .padding(16)
+                    }
+                    .refreshable { loadRecent() }
+                } else {
+                    listBody
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .macNewNote)) { _ in
+                createNote()
+            }
+            .navigationTitle("Notes")
+            .navigationDestination(isPresented: $showingNewNote) {
+                NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
+            }
+            .task {
+                if let initialPile, pileSel.isEmpty { pileSel = [initialPile]; applySearch() } else { loadRecent() }
+            }
+        }
+    }
+
+    private var viewPicker: some View {
+        Picker("View", selection: $viewMode) {
+            Text("Slim").tag("slim"); Text("Full").tag("full"); Text("Grid").tag("grid"); Text("Tile").tag("tile")
+        }.pickerStyle(.segmented)
+    }
+
+    private var headerControls: some View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         TextField("Search notes", text: $search)
@@ -68,59 +129,43 @@ struct NotesView: View {
                     .font(DS.ui(13))
                     .foregroundStyle(DS.muted)
                 }
+    }
+
+    private var listBody: some View {
+        List {
+            headerControls
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
 
-                if let error {
-                    Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
-                        .listRowSeparator(.hidden)
-                }
-                Picker("View", selection: $viewMode) {
-                    Text("Slim").tag("slim"); Text("Full").tag("full"); Text("Grid").tag("grid"); Text("Tile").tag("tile")
-                }.pickerStyle(.segmented).listRowSeparator(.hidden)
-                if viewMode == "grid" || viewMode == "tile" {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: viewMode == "grid" ? 150 : 110))], spacing: 8) {
-                        ForEach(notes, id: \.stableId) { n in
-                            NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
-                        }
-                    }.listRowSeparator(.hidden)
-                } else {
-                    ForEach(notes, id: \.stableId) { n in
-                        NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
-                            NoteRow(note: n, full: viewMode == "full")
-                        }
-                        .contextMenu {
-                            #if os(macOS)
-                            Button("Open in New Window") {
-                                if let id = n._id { openWindow(value: id) }
-                            }
-                            #endif
-                        }
-                        .listRowSeparatorTint(DS.hairline)
-                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                    }
-                }
-                if notes.isEmpty && error == nil {
-                    Text("No notes yet.").font(DS.ui(13)).foregroundStyle(DS.muted)
-                        .listRowSeparator(.hidden)
-                }
-                Button("Load more") { loadRecent(page: page + 1) }
-                    .font(DS.ui(13))
+            if let error {
+                Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
                     .listRowSeparator(.hidden)
             }
-            .listStyle(.plain)
-            .refreshable { loadRecent() }
-            .onReceive(NotificationCenter.default.publisher(for: .macNewNote)) { _ in
-                createNote()
+            viewPicker.listRowSeparator(.hidden)
+            ForEach(notes, id: \.stableId) { n in
+                NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
+                    NoteRow(note: n, full: viewMode == "full")
+                }
+                .contextMenu {
+                    #if os(macOS)
+                    Button("Open in New Window") {
+                        if let id = n._id { openWindow(value: id) }
+                    }
+                    #endif
+                }
+                .listRowSeparatorTint(DS.hairline)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             }
-            .navigationTitle("Notes")
-            .navigationDestination(isPresented: $showingNewNote) {
-                NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
+            if notes.isEmpty && error == nil {
+                Text("No notes yet.").font(DS.ui(13)).foregroundStyle(DS.muted)
+                    .listRowSeparator(.hidden)
             }
-            .task {
-                if let initialPile, pileSel.isEmpty { pileSel = [initialPile]; applySearch() } else { loadRecent() }
-            }
+            Button("Load more") { loadRecent(page: page + 1) }
+                .font(DS.ui(13))
+                .listRowSeparator(.hidden)
         }
+        .listStyle(.plain)
+        .refreshable { loadRecent() }
     }
 
     private func createNote() {
@@ -195,6 +240,73 @@ func describe(_ error: Error) -> String {
     return error.localizedDescription
 }
 
+/// Card for Grid/Tile modes, web NoteTile parity: bounded card with a
+/// title header, serif text preview, and tag pills that truncate on one
+/// line instead of wrapping into one-letter columns.
+struct NoteCard: View {
+    let note: Note
+    var large: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 6) {
+                Text(note.title ?? "(untitled)")
+                    .font(DS.ui(14, weight: .semibold))
+                    .foregroundStyle(DS.ink)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                if let imgs = note.images, !imgs.isEmpty {
+                    HStack(spacing: 3) {
+                        Image(systemName: "photo").font(DS.ui(10))
+                        Text("\(imgs.count)")
+                    }
+                    .font(DS.ui(11)).foregroundStyle(DS.muted)
+                }
+            }
+            if let authors = note.authors, !authors.isEmpty {
+                Text(authors.compactMap(\.name).joined(separator: ", "))
+                    .font(DS.ui(11)).foregroundStyle(DS.muted).lineLimit(1)
+            }
+            if let text = note.text, !text.isEmpty {
+                Text(text)
+                    .font(DS.serif(13))
+                    .foregroundStyle(DS.muted)
+                    .lineLimit(large ? 6 : 3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            Spacer(minLength: 0)
+            if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
+                HStack(spacing: 6) {
+                    ForEach((note.ideas ?? []).prefix(2), id: \.id) { i in
+                        Text(i.name ?? "")
+                            .font(DS.ui(11)).lineLimit(1)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(DS.accentSoft)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    ForEach((note.piles ?? []).prefix(2), id: \.id) { p in
+                        Text(p.name ?? "")
+                            .font(DS.ui(11)).lineLimit(1)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(DS.pileSoft)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    let extra = max(0, (note.ideas?.count ?? 0) - 2) + max(0, (note.piles?.count ?? 0) - 2)
+                    if extra > 0 {
+                        Text("+\(extra)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                    }
+                }
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: large ? 150 : 110, alignment: .topLeading)
+        .background(DS.surface)
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(DS.hairline, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .contentShape(Rectangle())
+    }
+}
+
 /// Slim note row, web parity: authors + title on one line, one line of
 /// serif preview, then idea/pile tags in their tints.
 struct NoteRow: View {
@@ -224,11 +336,11 @@ struct NoteRow: View {
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
                 HStack(spacing: 6) {
                     ForEach((note.ideas ?? []).prefix(3), id: \.id) { i in
-                        Text(i.name ?? "").font(DS.ui(11)).padding(.horizontal, 6).padding(.vertical, 2)
+                        Text(i.name ?? "").font(DS.ui(11)).lineLimit(1).padding(.horizontal, 6).padding(.vertical, 2)
                             .background(DS.accentSoft).clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     ForEach((note.piles ?? []).prefix(3), id: \.id) { p in
-                        Text(p.name ?? "").font(DS.ui(11)).padding(.horizontal, 6).padding(.vertical, 2)
+                        Text(p.name ?? "").font(DS.ui(11)).lineLimit(1).padding(.horizontal, 6).padding(.vertical, 2)
                             .background(DS.pileSoft).clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
