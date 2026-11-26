@@ -23,6 +23,7 @@ struct CommonplaceApp: App {
                     await state.refreshPins()
                     await state.refreshCounts()
                     await state.refreshMaintenancePending()
+                    await state.syncRunningTimer()
                 }
             }
         }

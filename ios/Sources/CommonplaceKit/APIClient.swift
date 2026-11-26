@@ -659,6 +659,19 @@ public final class APIClient: Sendable {
         try await deleteEmpty("time/\(id)")
     }
 
+    public func runningTimer() async throws -> RunningTimerState? {
+        let res: RunningTimerResponse = try await get("time/timer")
+        return res.timer
+    }
+
+    public func setRunningTimer(_ timer: RunningTimerState) async throws {
+        let _: RunningTimerResponse = try await put("time/timer", body: timer)
+    }
+
+    public func clearRunningTimer() async throws {
+        let _: RunningTimerResponse = try await delete("time/timer")
+    }
+
     public func timeSummary(date: String? = nil) async throws -> TimeSummary {
         var q: [String: String] = [:]
         if let date { q["date"] = date }

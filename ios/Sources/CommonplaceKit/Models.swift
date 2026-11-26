@@ -535,6 +535,25 @@ public struct ScopeSummary: Codable, Sendable {
     public var byDay: [DaySummary]?
 }
 
+/// The shared running timer (server state, one per account).
+public struct RunningTimerState: Codable, Sendable {
+    public var key: String
+    public var kind: String
+    public var label: String?
+    public var startedAt: String
+
+    public init(key: String, kind: String, label: String? = nil, startedAt: String) {
+        self.key = key
+        self.kind = kind
+        self.label = label
+        self.startedAt = startedAt
+    }
+}
+
+public struct RunningTimerResponse: Codable, Sendable {
+    public var timer: RunningTimerState?
+}
+
 public struct TimeSummary: Codable, Sendable {
     public var daily: DaySummary?
     public var weekly: WeeklySummary?

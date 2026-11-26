@@ -476,3 +476,17 @@ export async function createTimeEntry(body: {
 export async function getTimeEntry(id: string) {
   return axios.get(url_api + 'time/' + id)
 }
+
+// The shared running timer: server state so every client (web, iOS,
+// Mac) sees the same timer running, not per-device local copies.
+export async function getRunningTimer() {
+  return axios.get(url_api + 'time/timer')
+}
+
+export async function setRunningTimer(timer: { key: string; kind: string; label?: string; startedAt: string }) {
+  return axios.put(url_api + 'time/timer', timer)
+}
+
+export async function clearRunningTimer() {
+  return axios.delete(url_api + 'time/timer')
+}

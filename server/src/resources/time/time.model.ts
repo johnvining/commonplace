@@ -47,3 +47,29 @@ timeEntrySchema.index({ work: 1 })
 timeEntrySchema.index({ kind: 1 })
 
 export default mongoose.model<TimeEntryDoc>('timeentry', timeEntrySchema)
+
+export interface RunningTimerDoc {
+  _id: string
+  /** Subject key: pile:<id>, work:<id>, or title:<slug>. */
+  key: string
+  kind: TimeKind
+  label?: string
+  startedAt: Date
+  updatedAt: Date
+}
+
+// The one running timer, shared by every client (web/iOS/Mac) so a
+// timer started in the app shows as running on the web too. Single
+// document (_id 'current'); starting replaces, stopping deletes.
+const runningTimerSchema = new Schema<RunningTimerDoc>(
+  {
+    _id: { type: String, required: true },
+    key: { type: String, required: true },
+    kind: { type: String, enum: TIME_KINDS, required: true },
+    label: { type: String, default: '' },
+    startedAt: { type: Date, required: true },
+  },
+  { timestamps: true }
+)
+
+export const RunningTimer = mongoose.model<RunningTimerDoc>('runningtimer', runningTimerSchema)

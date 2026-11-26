@@ -293,3 +293,39 @@ describe('time', () => {
     })
   })
 })
+
+describe('shared running timer', () => {
+  it('sets, reads, replaces and clears the one running timer', async () => {
+    const agent = await authedAgent()
+    const empty = await agent.get('/api/time/timer').expect(200)
+    expect(empty.body.data.timer).toBeNull()
+
+    const started = await agent
+      .put('/api/time/timer')
+      .send({ key: 'title:instapaper', kind: 'reading', label: 'Instapaper', startedAt: '2026-11-26T10:00:00.000Z' })
+      .expect(200)
+    expect(started.body.data.timer).toMatchObject({ key: 'title:instapaper', kind: 'reading' })
+
+    const got = await agent.get('/api/time/timer').expect(200)
+    expect(got.body.data.timer.startedAt).toBe('2026-11-26T10:00:00.000Z')
+
+    await agent
+      .put('/api/time/timer')
+      .send({ key: 'title:draft', kind: 'writing', startedAt: '2026-11-26T11:00:00.000Z' })
+      .expect(200)
+    const replaced = await agent.get('/api/time/timer').expect(200)
+    expect(replaced.body.data.timer.key).toBe('title:draft')
+
+    await agent.delete('/api/time/timer').expect(200)
+    const cleared = await agent.get('/api/time/timer').expect(200)
+    expect(cleared.body.data.timer).toBeNull()
+  })
+
+  it('rejects a bad kind', async () => {
+    const agent = await authedAgent()
+    await agent
+      .put('/api/time/timer')
+      .send({ key: 'title:x', kind: 'napping', startedAt: '2026-11-26T10:00:00.000Z' })
+      .expect(400)
+  })
+})

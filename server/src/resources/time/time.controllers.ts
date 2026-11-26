@@ -1,5 +1,5 @@
 import { isValidObjectId } from 'mongoose'
-import TimeEntry, { TIME_KINDS } from './time.model.js'
+import TimeEntry, { RunningTimer, TIME_KINDS } from './time.model.js'
 import Pile from '../pile/pile.model.js'
 import type { Request } from 'express'
 
@@ -452,4 +452,49 @@ export const reqGetTimeSummary = async (req: Request) => {
     last7: rolling7,
     monthly,
   }
+}
+
+// ── Shared running timer ──────────────────────────────────────────
+// One timer for the whole account, so every client (web/iOS/Mac)
+// sees the same running state instead of per-device local copies.
+
+function timerShape(doc: any) {
+  if (!doc) return null
+  return {
+    key: doc.key,
+    kind: doc.kind,
+    label: doc.label ?? '',
+    startedAt: new Date(doc.startedAt).toISOString(),
+  }
+}
+
+export const reqGetRunningTimer = async () => {
+  const doc = await RunningTimer.findById('current').lean().exec()
+  return { timer: timerShape(doc) }
+}
+
+export const reqSetRunningTimer = async (req: Request) => {
+  const body = (req.body ?? {}) as Record<string, unknown>
+  const key = String(body.key ?? '').trim()
+  const kind = String(body.kind ?? '')
+  if (!key) throw invalid('Timer needs a subject key')
+  if (!(TIME_KINDS as readonly string[]).includes(kind)) throw invalid('Kind must be reading or writing')
+  const startedAt = new Date(String(body.startedAt ?? ''))
+  if (Number.isNaN(startedAt.getTime())) throw invalid('startedAt must be an ISO timestamp')
+  const doc = await RunningTimer.findByIdAndUpdate(
+    'current',
+    {
+      key,
+      kind,
+      label: typeof body.label === 'string' ? body.label : '',
+      startedAt,
+    },
+    { upsert: true, new: true }
+  ).lean().exec()
+  return { timer: timerShape(doc) }
+}
+
+export const reqClearRunningTimer = async () => {
+  await RunningTimer.findByIdAndDelete('current').exec()
+  return { timer: null }
 }

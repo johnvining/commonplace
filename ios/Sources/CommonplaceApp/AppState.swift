@@ -148,6 +148,7 @@ final class AppState: ObservableObject {
         timerSubjectLabel = nil
         timerStartedAt = nil
         UserDefaults.standard.removeObject(forKey: "time_timer_v1")
+        Task { try? await client.clearRunningTimer() }
     }
 
     func startTimer(key: String, kind: String, label: String? = nil) {
@@ -156,6 +157,31 @@ final class AppState: ObservableObject {
         timerKind = kind
         timerStartedAt = Date()
         persistTimer()
+        let iso = ISO8601DateFormatter().string(from: timerStartedAt!)
+        Task {
+            try? await client.setRunningTimer(
+                RunningTimerState(key: key, kind: kind, label: label, startedAt: iso))
+        }
+    }
+
+    /// Reconcile with the server's running timer: the server copy wins
+    /// when it exists (another client started it); a local-only timer
+    /// is pushed up so the web sees it too.
+    func syncRunningTimer() async {
+        guard isSignedIn else { return }
+        if let remote = try? await client.runningTimer(),
+           let at = ISO8601DateFormatter().date(from: remote.startedAt) {
+            timerSubjectKey = remote.key
+            timerSubjectLabel = remote.label
+            timerKind = remote.kind
+            timerStartedAt = at
+            persistTimer()
+        } else if let key = timerSubjectKey, let at = timerStartedAt {
+            try? await client.setRunningTimer(
+                RunningTimerState(key: key, kind: timerKind,
+                                  label: timerSubjectLabel,
+                                  startedAt: ISO8601DateFormatter().string(from: at)))
+        }
     }
 
     // Stars sync like the web client: the queued star/unstar shows at once

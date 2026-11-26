@@ -23,7 +23,7 @@ struct MenuTimerLabel: View {
         // itself; totals live in the popover.
         HStack(spacing: 5) {
             Text("C")
-                .font(DS.serif(15, weight: .semibold))
+                .font(.custom("Georgia", size: 15).weight(.bold))
             if let at = state.timerStartedAt {
                 Text(shortSubject)
                     .lineLimit(1)

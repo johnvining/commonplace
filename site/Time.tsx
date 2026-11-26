@@ -199,12 +199,14 @@ function Time(props: any) {
     return () => window.removeEventListener('pinned-items-updated', refresh)
   }, [])
 
-  // A running timer survives reloads: pick it back up on mount.
+  // A running timer survives reloads: pick it back up on mount, then
+  // reconcile with the server's shared timer (a timer started in the
+  // app shows here too; a local-only one is pushed up).
   useEffect(() => {
+    let local: { key: string; kind: string; startedAt: number } | null = null
     try {
       const raw = localStorage.getItem(TIMER_STORAGE_KEY)
-      if (!raw) return
-      const t = JSON.parse(raw)
+      const t = raw ? JSON.parse(raw) : null
       if (
         t &&
         typeof t.key === 'string' &&
@@ -212,11 +214,38 @@ function Time(props: any) {
         (t.kind === 'reading' || t.kind === 'writing') &&
         Number.isFinite(t.startedAt)
       ) {
+        local = t
         setTimerKey(t.key)
         setTimerKind(t.kind)
         setTimerStartedAt(t.startedAt)
+        if (t.label) setTimerLabel(t.label)
       }
     } catch {}
+    db.getRunningTimer()
+      .then((res: any) => {
+        const remote = res.data?.data?.timer
+        if (remote && remote.key && Number.isFinite(Date.parse(remote.startedAt))) {
+          const startedAt = Date.parse(remote.startedAt)
+          setTimerKey(remote.key)
+          setTimerKind(remote.kind)
+          setTimerStartedAt(startedAt)
+          if (remote.label) setTimerLabel(remote.label)
+          try {
+            localStorage.setItem(
+              TIMER_STORAGE_KEY,
+              JSON.stringify({ key: remote.key, kind: remote.kind, startedAt, label: remote.label ?? '' })
+            )
+          } catch {}
+        } else if (local) {
+          db.setRunningTimer({
+            key: local.key,
+            kind: local.kind,
+            startedAt: new Date(local.startedAt).toISOString(),
+          }).catch(() => {})
+        }
+      })
+      .catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Tick the elapsed display while the timer runs.
@@ -365,6 +394,13 @@ function Time(props: any) {
     try {
       localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify({ key, kind, startedAt }))
     } catch {}
+    // Share it: every client sees this timer running.
+    db.setRunningTimer({
+      key,
+      kind,
+      label: subjectLabelForKey(key),
+      startedAt: new Date(startedAt).toISOString(),
+    }).catch(() => {})
   }
 
   const startTimer = () => startTimerFor(timerKey, timerKind)
@@ -423,6 +459,7 @@ function Time(props: any) {
     try {
       localStorage.removeItem(TIMER_STORAGE_KEY)
     } catch {}
+    db.clearRunningTimer().catch(() => {})
     load(selectedDate)
   }
 
