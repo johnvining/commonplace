@@ -116,25 +116,42 @@ struct SidebarTimerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
-                Image(systemName: "timer")
-                    .font(DS.ui(12)).foregroundStyle(DS.accent)
-                if let at = state.timerStartedAt {
-                    TimelineView(.periodic(from: Date(), by: 1)) { ctx in
-                        Text(formatElapsed(ctx.date.timeIntervalSince(at) * 1000))
-                            .font(DS.ui(17, weight: .semibold))
-                            .monospacedDigit()
+                // Clicking the display jumps to the Time section to
+                // modify the running entry. Stop stays separate.
+                Button {
+                    NotificationCenter.default.post(name: .macSection, object: "time")
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "timer")
+                            .font(DS.ui(12)).foregroundStyle(DS.accent)
+                        if let at = state.timerStartedAt {
+                            TimelineView(.periodic(from: Date(), by: 1)) { ctx in
+                                Text(formatElapsed(ctx.date.timeIntervalSince(at) * 1000))
+                                    .font(DS.ui(17, weight: .semibold))
+                                    .monospacedDigit()
+                            }
+                        }
                     }
                 }
+                .buttonStyle(.plain)
+                .help("Open the Time section")
                 Spacer()
                 Button("Stop") {
                     Task { await state.stopAndLogTimer() }
                 }
                 .controlSize(.small)
             }
-            Text("\(state.timerKind.capitalized) · \(subjectName.isEmpty ? (state.timerSubjectKey ?? "") : subjectName)")
-                .font(DS.serif(12))
-                .foregroundStyle(DS.muted)
-                .lineLimit(1)
+            Button {
+                NotificationCenter.default.post(name: .macSection, object: "time")
+            } label: {
+                KindSubjectLine(
+                    kind: state.timerKind,
+                    subject: subjectName.isEmpty ? (state.timerSubjectKey ?? "") : subjectName
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+            .help("Open the Time section")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)

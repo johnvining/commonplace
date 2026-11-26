@@ -370,9 +370,14 @@ struct TimeEntryRow: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("\(entry.kind ?? "") · \(formatMinutes(entry.minutes ?? 0))")
-                Text(entry.pile?.name ?? entry.title ?? "")
-                    .foregroundStyle(.secondary)
+                KindSubjectLine(
+                    kind: entry.kind ?? "",
+                    subject: entry.pile?.name ?? entry.work?.name ?? entry.title ?? ""
+                )
+                Text(formatMinutes(entry.minutes ?? 0))
+                    .font(DS.ui(12))
+                    .monospacedDigit()
+                    .foregroundStyle(DS.muted)
                 Spacer()
                 Button { onStar() } label: { Image(systemName: "star") }
                 Button("Edit") {

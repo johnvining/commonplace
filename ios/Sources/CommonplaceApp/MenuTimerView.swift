@@ -44,17 +44,23 @@ struct MenuTimerView: View {
                     .font(DS.ui(22, weight: .semibold))
                     .monospacedDigit()
                     .onReceive(ticker) { now = $0 }
-                Text("\(state.timerKind.capitalized) · \(subjectName)")
-                    .font(DS.ui(12)).foregroundStyle(DS.muted)
+                KindSubjectLine(kind: state.timerKind, subject: subjectName)
                 Button("Stop & log") {
                     Task { await state.stopAndLogTimer() }
+                }
+                Button("Open Time to modify…") {
+                    NotificationCenter.default.post(name: .macSection, object: "time")
+                    NSApp.activate(ignoringOtherApps: true)
                 }
                 Button("Discard timer", role: .destructive) {
                     state.clearTimer()
                 }
             } else {
                 Text("No timer running.").font(DS.ui(13)).foregroundStyle(DS.muted)
-                Text("Start one from the Time section.").font(DS.ui(11)).foregroundStyle(DS.muted)
+                Button("Open Time…") {
+                    NotificationCenter.default.post(name: .macSection, object: "time")
+                    NSApp.activate(ignoringOtherApps: true)
+                }
             }
         }
         .padding(12)
