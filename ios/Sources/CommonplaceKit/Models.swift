@@ -95,11 +95,18 @@ public struct Note: Codable, Sendable {
     public var reviewState: String?
     public var openCount: Int?
     public var reviewCount: Int?
+    public var reviewedAt: Date?
+    public var reviewDueAt: Date?
+    public var lastOpenedAt: Date?
+    public var titleSource: String?
+    public var embeddingHash: String?
+    public var embeddingStale: Bool?
 
     enum CodingKeys: String, CodingKey {
         case _id, title, text, take, url, year, page, authors, people, work
         case ideas, piles, images, nick, reviewState, openCount, reviewCount
-        case createdAt, updatedAt
+        case createdAt, updatedAt, reviewedAt, reviewDueAt, lastOpenedAt
+        case titleSource, embeddingHash, embeddingStale
     }
 
     public init() {}
@@ -123,6 +130,12 @@ public struct Note: Codable, Sendable {
         reviewState = try? c.decodeIfPresent(String.self, forKey: .reviewState)
         openCount = tolerantInt(c, .openCount)
         reviewCount = tolerantInt(c, .reviewCount)
+        reviewedAt = try? c.decodeIfPresent(Date.self, forKey: .reviewedAt)
+        reviewDueAt = try? c.decodeIfPresent(Date.self, forKey: .reviewDueAt)
+        lastOpenedAt = try? c.decodeIfPresent(Date.self, forKey: .lastOpenedAt)
+        titleSource = try? c.decodeIfPresent(String.self, forKey: .titleSource)
+        embeddingHash = try? c.decodeIfPresent(String.self, forKey: .embeddingHash)
+        embeddingStale = try? c.decodeIfPresent(Bool.self, forKey: .embeddingStale)
         createdAt = try? c.decodeIfPresent(Date.self, forKey: .createdAt)
         updatedAt = try? c.decodeIfPresent(Date.self, forKey: .updatedAt)
     }
@@ -139,10 +152,12 @@ public struct NoteUpdate: Codable, Sendable {
     public var page: String?
     /// Author ids — the web edits note authors through the note update.
     public var authors: [String]?
+    /// People (about) ids — saved through the same note update as authors.
+    public var people: [String]?
 
     public init(title: String? = nil, text: String? = nil, take: String? = nil,
                 url: String? = nil, year: Int? = nil, page: String? = nil,
-                authors: [String]? = nil) {
+                authors: [String]? = nil, people: [String]? = nil) {
         self.title = title
         self.text = text
         self.take = take
@@ -150,6 +165,7 @@ public struct NoteUpdate: Codable, Sendable {
         self.year = year
         self.page = page
         self.authors = authors
+        self.people = people
     }
 }
 
@@ -180,9 +196,13 @@ public struct Work: Codable, Sendable {
     public var url: String?
     public var year: Int?
     public var authors: [PopulatedRef]?
+    public var editors: [PopulatedRef]?
+    public var translators: [PopulatedRef]?
     public var piles: [PopulatedRef]?
     public var ideas: [PopulatedRef]?
     public var note_count: Int?
+    public var summary: String?
+    public var citation_information: String?
     public var createdAt: Date?
     public var updatedAt: Date?
 }
@@ -191,6 +211,9 @@ public struct Idea: Codable, Sendable {
     public var _id: String?
     public var name: String?
     public var note_count: Int?
+    public var start_year: Int?
+    public var end_year: Int?
+    public var person: Bool?
     public var createdAt: Date?
     public var updatedAt: Date?
 }
@@ -200,6 +223,8 @@ public struct Pile: Codable, Sendable {
     public var name: String?
     public var note_count: Int?
     public var work_count: Int?
+    public var start_year: Int?
+    public var end_year: Int?
     public var createdAt: Date?
     public var updatedAt: Date?
 
@@ -238,14 +263,17 @@ public struct PinItem: Codable, Sendable {
     public var label: String?
     public var href: String?
     public var pinnedAt: Double?
+    /// Local-only: queued but not yet confirmed by the server.
+    public var pending: Bool?
 
     public init(type: String, id: String, label: String? = nil,
-                href: String? = nil, pinnedAt: Double? = nil) {
+                href: String? = nil, pinnedAt: Double? = nil, pending: Bool? = nil) {
         self.type = type
         self.id = id
         self.label = label
         self.href = href
         self.pinnedAt = pinnedAt
+        self.pending = pending
     }
 }
 
@@ -303,6 +331,8 @@ public struct UnifiedSearchItem: Codable, Sendable {
         public var _id: String?
         public var title: String?
         public var name: String?
+        public var text: String?
+        public var take: String?
     }
 
     public var itemId: String? { item?._id }

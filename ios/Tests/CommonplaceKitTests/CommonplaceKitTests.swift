@@ -92,6 +92,36 @@ final class SubjectKeyTests: XCTestCase {
     }
 }
 
+final class NoteStatusDecodingTests: XCTestCase {
+    func testNoteReviewFieldsDecodeTolerantly() throws {
+        let json = """
+        {"_id":"n1","title":"T","reviewedAt":"2026-11-20T10:00:00Z","reviewDueAt":"2026-11-27T10:00:00Z","lastOpenedAt":"2026-11-24T10:00:00Z","titleSource":"ai","embeddingHash":"abc","embeddingStale":true,"people":[{"_id":"a1","name":"Ada"}]}
+        """
+        let note = try APIClient.makeDecoder().decode(Note.self, from: Data(json.utf8))
+        XCTAssertEqual(note.titleSource, "ai")
+        XCTAssertEqual(note.embeddingHash, "abc")
+        XCTAssertEqual(note.embeddingStale, true)
+        XCTAssertNotNil(note.reviewedAt)
+        XCTAssertNotNil(note.reviewDueAt)
+        XCTAssertEqual(note.people?.first?.name, "Ada")
+    }
+
+    func testLocalDayStringRoundTrips() {
+        let s = localDayString(Date())
+        XCTAssertEqual(s.count, 10)
+        XCTAssertNotNil(parseDay(s))
+    }
+
+    func testWorkEntityFieldsDecode() throws {
+        let json = """
+        {"_id":"w1","name":"W","summary":"S","citation_information":"C","editors":[{"_id":"a1","name":"Ed"}],"translators":[]}
+        """
+        let work = try APIClient.makeDecoder().decode(Work.self, from: Data(json.utf8))
+        XCTAssertEqual(work.summary, "S")
+        XCTAssertEqual(work.editors?.first?.name, "Ed")
+    }
+}
+
 final class TimerStateTests: XCTestCase {
     func testStartStopRoundTrip() {
         var timer = TimerState()
