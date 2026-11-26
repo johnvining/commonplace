@@ -449,6 +449,15 @@ public struct TitleSubjectRow: Codable, Sendable {
     public var entryCount: Int?
 }
 
+public struct WorkSubjectRow: Codable, Sendable {
+    public var work: String?
+    public var name: String?
+    public var minutes: Int?
+    public var readingMinutes: Int?
+    public var writingMinutes: Int?
+    public var entryCount: Int?
+}
+
 public struct DaySummary: Codable, Sendable {
     public var date: String?
     public var totalMinutes: Int?
@@ -456,6 +465,7 @@ public struct DaySummary: Codable, Sendable {
     public var writingMinutes: Int?
     public var entryCount: Int?
     public var byPile: [PileSubjectRow]?
+    public var byWork: [WorkSubjectRow]?
     public var byTitle: [TitleSubjectRow]?
 }
 
@@ -467,6 +477,21 @@ public struct WeeklySummary: Codable, Sendable {
     public var writingMinutes: Int?
     public var entryCount: Int?
     public var byPile: [PileSubjectRow]?
+    public var byWork: [WorkSubjectRow]?
+    public var byTitle: [TitleSubjectRow]?
+    public var byDay: [DaySummary]?
+}
+
+/// One analysis scope (last 7 days / this month) from the summary API.
+public struct ScopeSummary: Codable, Sendable {
+    public var start: String?
+    public var end: String?
+    public var totalMinutes: Int?
+    public var readingMinutes: Int?
+    public var writingMinutes: Int?
+    public var entryCount: Int?
+    public var byPile: [PileSubjectRow]?
+    public var byWork: [WorkSubjectRow]?
     public var byTitle: [TitleSubjectRow]?
     public var byDay: [DaySummary]?
 }
@@ -474,6 +499,8 @@ public struct WeeklySummary: Codable, Sendable {
 public struct TimeSummary: Codable, Sendable {
     public var daily: DaySummary?
     public var weekly: WeeklySummary?
+    public var last7: ScopeSummary?
+    public var monthly: ScopeSummary?
 }
 
 public struct RecentSubjectPile: Codable, Sendable {

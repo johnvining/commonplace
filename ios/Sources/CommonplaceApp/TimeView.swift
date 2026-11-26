@@ -18,11 +18,12 @@ struct TimeView: View {
     @State private var showManual = false
     @State private var newName = ""
     @State private var customTitles: [String: String] = [:]
+    @State private var scope = "today"
 
     var body: some View {
         NavigationStack {
             List {
-                Section("Timer") {
+                Section {
                     Picker("Subject", selection: $selection) {
                         Text("Pick something…").tag("")
                         let starred = state.pins.filter { $0.type == "time" }
@@ -63,70 +64,108 @@ struct TimeView: View {
                         Text("Writing").tag("writing")
                     }
                     .pickerStyle(.segmented)
-                    if state.timerIsRunning, let at = state.timerStartedAt {
-                        TimelineView(.periodic(from: Date(), by: 1.0)) { ctx in
-                            Text(formatElapsed(ctx.date.timeIntervalSince(at) * 1000))
-                                .font(.title.monospacedDigit())
+                    HStack(spacing: 12) {
+                        if state.timerIsRunning, let at = state.timerStartedAt {
+                            TimelineView(.periodic(from: Date(), by: 1.0)) { ctx in
+                                Text(formatElapsed(ctx.date.timeIntervalSince(at) * 1000))
+                                    .font(DS.ui(22, weight: .semibold))
+                                    .monospacedDigit()
+                                    .foregroundStyle(DS.ink)
+                            }
+                            DSButton(title: "Stop") { stopTimer() }
+                        } else {
+                            DSButton(title: "Start") {
+                                state.startTimer(key: selection, kind: kind)
+                            }
+                            .disabled(selection.isEmpty)
+                            .opacity(selection.isEmpty ? 0.5 : 1)
                         }
-                        Button("Stop") { stopTimer() }
-                            .disabled(selection.isEmpty && state.timerSubjectKey == nil)
-                    } else {
-                        Button("Start") {
-                            state.startTimer(key: selection, kind: kind)
-                        }
-                        .disabled(selection.isEmpty)
+                        Spacer()
                     }
-                    if let error { Text(error).foregroundStyle(.red) }
+                    if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
                 }
-                Section("Day") {
-                    HStack {
-                        Button("‹ Prev") { shift(-1) }
-                        DatePicker("", selection: dayBinding, displayedComponents: .date)
-                            .labelsHidden()
-                        Button("Next ›") { shift(1) }
-                        Button("Today") { day = dayString(Date()); reload() }
+                .listRowSeparator(.hidden)
+
+                Section {
+                    if entries.isEmpty {
+                        Text("No entries this day.").font(DS.ui(13)).foregroundStyle(DS.muted)
                     }
-                }
-                if let d = summary?.daily {
-                    Section("Daily — \(d.date ?? day)") {
-                        Text("Total \(formatMinutes(d.totalMinutes ?? 0)) · R \(formatMinutes(d.readingMinutes ?? 0)) · W \(formatMinutes(d.writingMinutes ?? 0)) · \(d.entryCount ?? 0) entries")
-                        Text(crossCheck(reading: d.readingMinutes ?? 0,
-                                        writing: d.writingMinutes ?? 0,
-                                        total: d.totalMinutes ?? 0))
-                            .font(.caption).foregroundStyle(.secondary)
-                        pileRows(d.byPile)
-                        titleRows(d.byTitle)
-                    }
-                }
-                Section("Entries") {
                     ForEach(entries, id: \.stableId) { e in
                         TimeEntryRow(entry: e, onStar: { star(e) },
                                     onSave: { reload() },
                                     onDelete: { delete(e) },
                                     onError: { self.error = $0 })
                     }
+                } header: {
+                    HStack(spacing: 8) {
+                        Text(day == localDayString() ? "Today" : day)
+                            .font(DS.ui(15, weight: .semibold))
+                            .foregroundStyle(DS.ink)
+                            .textCase(nil)
+                        Spacer()
+                        Button("‹") { shift(-1) }.font(DS.ui(13))
+                        DatePicker("", selection: dayBinding, displayedComponents: .date)
+                            .labelsHidden()
+                        Button("›") { shift(1) }.font(DS.ui(13))
+                        DSButton(title: "Today") { day = dayString(Date()); reload() }
+                    }
                 }
-                if let w = summary?.weekly {
-                    Section("Week of \(w.weekStart ?? "")") {
-                        Text("Total \(formatMinutes(w.totalMinutes ?? 0)) · R \(formatMinutes(w.readingMinutes ?? 0)) · W \(formatMinutes(w.writingMinutes ?? 0))")
-                        Text(crossCheck(reading: w.readingMinutes ?? 0,
-                                        writing: w.writingMinutes ?? 0,
-                                        total: w.totalMinutes ?? 0))
-                            .font(.caption).foregroundStyle(.secondary)
-                        if let days = w.byDay {
-                            let sum = days.reduce(0) { $0 + ($1.totalMinutes ?? 0) }
-                            Text(sum == (w.totalMinutes ?? 0)
-                                 ? "Cross-check OK: 7 days sum to total"
-                                 : "Cross-check MISMATCH: days sum to \(formatMinutes(sum))")
-                                .font(.caption).foregroundStyle(.secondary)
+
+                if summary != nil {
+                    Section {
+                        Picker("Scope", selection: $scope) {
+                            Text("Today").tag("today")
+                            Text("This week").tag("week")
+                            Text("Last 7 days").tag("last7")
+                            Text("This month").tag("month")
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+
+                        HStack(spacing: 10) {
+                            Text(formatMinutes(analysis.total) + " total")
+                                .font(DS.serif(18, weight: .semibold))
+                                .foregroundStyle(DS.ink)
+                            KindMinutes(kind: "reading", minutes: analysis.reading)
+                            KindMinutes(kind: "writing", minutes: analysis.writing)
+                            Text("\(analysis.count) \(analysis.count == 1 ? "entry" : "entries")")
+                                .font(DS.ui(11)).foregroundStyle(DS.faint)
+                            Spacer()
+                        }
+
+                        if scope != "today", let days = analysis.byDay {
+                            DSLabel(text: "By day")
                             ForEach(days, id: \.date) { d in
-                                Button("\(d.date ?? "") — \(formatMinutes(d.totalMinutes ?? 0))") {
-                                    if let dt = d.date { day = dt; reload() }
-                                }
+                                tableRow(name: d.date ?? "", reading: d.readingMinutes ?? 0,
+                                         writing: d.writingMinutes ?? 0, total: d.totalMinutes ?? 0)
                             }
                         }
-                        pileRows(w.byPile)
-                        titleRows(w.byTitle)
+                        if let rows = analysis.byPile, !rows.isEmpty {
+                            DSLabel(text: "By pile")
+                            ForEach(rows, id: \.pile) { r in
+                                tableRow(name: r.name ?? r.pile ?? "", reading: r.readingMinutes ?? 0,
+                                         writing: r.writingMinutes ?? 0, total: r.minutes ?? 0)
+                            }
+                        }
+                        if let rows = analysis.byWork, !rows.isEmpty {
+                            DSLabel(text: "By work")
+                            ForEach(rows, id: \.work) { r in
+                                tableRow(name: r.name ?? r.work ?? "", reading: r.readingMinutes ?? 0,
+                                         writing: r.writingMinutes ?? 0, total: r.minutes ?? 0, italicName: true)
+                            }
+                        }
+                        if let rows = analysis.byTitle, !rows.isEmpty {
+                            DSLabel(text: "By title")
+                            ForEach(rows, id: \.title) { r in
+                                tableRow(name: r.title ?? "", reading: r.readingMinutes ?? 0,
+                                         writing: r.writingMinutes ?? 0, total: r.minutes ?? 0)
+                            }
+                        }
+                    } header: {
+                        Text("Analysis")
+                            .font(DS.ui(15, weight: .semibold))
+                            .foregroundStyle(DS.ink)
+                            .textCase(nil)
                     }
                 }
                 Section {
@@ -313,31 +352,69 @@ struct TimeView: View {
         s.pile?.name ?? s.work?.name ?? s.title ?? s.key
     }
 
-    private func crossCheck(reading: Int, writing: Int, total: Int) -> String {
-        reading + writing == total
-            ? "Cross-check OK: R + W = total"
-            : "Cross-check MISMATCH: R(\(reading)) + W(\(writing)) ≠ total(\(total))"
-    }
-
-    private func pileRows(_ rows: [PileSubjectRow]?) -> some View {
-        Group {
-            if let rows {
-                ForEach(rows, id: \.pile) { r in
-                    Text("\(r.name ?? r.pile ?? "") — \(formatMinutes(r.minutes ?? 0)) (R \(formatMinutes(r.readingMinutes ?? 0)) W \(formatMinutes(r.writingMinutes ?? 0)))")
-                        .font(.caption)
-                }
-            }
+    /// Normalised view over the four summary scopes.
+    private var analysis: (total: Int, reading: Int, writing: Int, count: Int,
+                           byDay: [DaySummary]?, byPile: [PileSubjectRow]?,
+                           byWork: [WorkSubjectRow]?, byTitle: [TitleSubjectRow]?) {
+        switch scope {
+        case "week":
+            let w = summary?.weekly
+            return (w?.totalMinutes ?? 0, w?.readingMinutes ?? 0, w?.writingMinutes ?? 0,
+                    w?.entryCount ?? 0, w?.byDay, w?.byPile, w?.byWork, w?.byTitle)
+        case "last7":
+            let s = summary?.last7
+            return (s?.totalMinutes ?? 0, s?.readingMinutes ?? 0, s?.writingMinutes ?? 0,
+                    s?.entryCount ?? 0, s?.byDay, s?.byPile, s?.byWork, s?.byTitle)
+        case "month":
+            let s = summary?.monthly
+            return (s?.totalMinutes ?? 0, s?.readingMinutes ?? 0, s?.writingMinutes ?? 0,
+                    s?.entryCount ?? 0, s?.byDay, s?.byPile, s?.byWork, s?.byTitle)
+        default:
+            let d = summary?.daily
+            return (d?.totalMinutes ?? 0, d?.readingMinutes ?? 0, d?.writingMinutes ?? 0,
+                    d?.entryCount ?? 0, nil, d?.byPile, d?.byWork, d?.byTitle)
         }
     }
 
-    private func titleRows(_ rows: [TitleSubjectRow]?) -> some View {
-        Group {
-            if let rows {
-                ForEach(rows, id: \.title) { r in
-                    Text("\(r.title ?? "") — \(formatMinutes(r.minutes ?? 0))")
-                        .font(.caption)
-                }
-            }
+    /// One quiet table row: serif name, then R/W/total as plain
+    /// tabular text — never buttons.
+    private func tableRow(name: String, reading: Int, writing: Int, total: Int, italicName: Bool = false) -> some View {
+        HStack(spacing: 8) {
+            Text(name)
+                .font(DS.serif(13.5))
+                .italic(italicName)
+                .foregroundStyle(DS.ink)
+                .lineLimit(1)
+            Spacer()
+            Text(formatMinutes(reading))
+                .frame(width: 52, alignment: .trailing)
+            Text(formatMinutes(writing))
+                .frame(width: 52, alignment: .trailing)
+            Text(formatMinutes(total))
+                .frame(width: 52, alignment: .trailing)
+                .foregroundStyle(DS.ink)
+        }
+        .font(DS.ui(12))
+        .monospacedDigit()
+        .foregroundStyle(DS.muted)
+    }
+}
+
+/// Minutes beside a small-caps kind label (Reading/Writing never serif).
+private struct KindMinutes: View {
+    let kind: String
+    let minutes: Int
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text(kind.uppercased())
+                .font(DS.ui(10, weight: .semibold))
+                .tracking(0.8)
+                .foregroundStyle(DS.muted)
+            Text(formatMinutes(minutes))
+                .font(DS.ui(12))
+                .monospacedDigit()
+                .foregroundStyle(DS.ink)
         }
     }
 }
