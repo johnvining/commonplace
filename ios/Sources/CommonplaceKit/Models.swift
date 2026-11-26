@@ -555,6 +555,18 @@ public struct RecentSubject: Codable, Sendable {
     public var kind: String?
     public var minutes: Int?
     public var lastDate: String?
+
+    public init(key: String, title: String? = nil, pile: RecentSubjectPile? = nil,
+                work: RecentSubjectPile? = nil, kind: String? = nil,
+                minutes: Int? = nil, lastDate: String? = nil) {
+        self.key = key
+        self.title = title
+        self.pile = pile
+        self.work = work
+        self.kind = kind
+        self.minutes = minutes
+        self.lastDate = lastDate
+    }
 }
 
 public struct TimeImportRow: Codable, Sendable {

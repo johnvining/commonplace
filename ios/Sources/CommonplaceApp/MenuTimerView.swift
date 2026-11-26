@@ -43,6 +43,8 @@ struct MenuTimerLabel: View {
 struct MenuTimerView: View {
     @EnvironmentObject var state: AppState
     @State private var now = Date()
+    @State private var subjects: [RecentSubject] = []
+    @State private var filter = ""
 
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -89,9 +91,98 @@ struct MenuTimerView: View {
                     NSApp.activate(ignoringOtherApps: true)
                 }
             }
+
+            // Start a recent timer, Tyme-style: tap ▶ on a recent or
+            // starred subject and it starts (switching logs the current
+            // one first).
+            Divider()
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass").font(DS.ui(11)).foregroundStyle(DS.faint)
+                TextField("Start a recent timer", text: $filter)
+                    .textFieldStyle(.plain)
+                    .font(DS.ui(12))
+            }
+            recentGroup("Starred", rows: starredRows)
+            recentGroup("Reading", rows: kindRows("reading"))
+            recentGroup("Writing", rows: kindRows("writing"))
+            recentGroup("Recent", rows: otherRows)
         }
         .padding(12)
-        .frame(width: 230)
+        .frame(width: 260)
+        .task { await loadRecents() }
+    }
+
+    private func loadRecents() async {
+        subjects = (try? await state.client.recentSubjects(limit: 20)) ?? []
+    }
+
+    private var starredRows: [RecentSubject] {
+        state.pins.filter { $0.type == "time" }.compactMap { pin in
+            subjects.first { $0.key == pin.id }
+                ?? RecentSubject(key: pin.id, title: pin.label, pile: nil, work: nil,
+                                 kind: nil, minutes: nil, lastDate: nil)
+        }
+        .filter(matchesFilter)
+    }
+
+    private func kindRows(_ kind: String) -> [RecentSubject] {
+        subjects.filter { $0.kind == kind && !isStarred($0) }.filter(matchesFilter)
+    }
+
+    private var otherRows: [RecentSubject] {
+        subjects.filter { $0.kind != "reading" && $0.kind != "writing" && !isStarred($0) }
+            .filter(matchesFilter)
+    }
+
+    private func isStarred(_ s: RecentSubject) -> Bool {
+        state.pins.contains { $0.type == "time" && $0.id == s.key }
+    }
+
+    private func matchesFilter(_ s: RecentSubject) -> Bool {
+        let q = filter.trimmingCharacters(in: .whitespaces).lowercased()
+        return q.isEmpty || subjectLabel(s).lowercased().contains(q)
+    }
+
+    private func subjectLabel(_ s: RecentSubject) -> String {
+        s.pile?.name ?? s.work?.name ?? s.title ?? s.key
+    }
+
+    @ViewBuilder
+    private func recentGroup(_ title: String, rows: [RecentSubject]) -> some View {
+        if !rows.isEmpty {
+            DSLabel(text: title)
+            ForEach(rows.prefix(6), id: \.key) { s in
+                Button {
+                    startRecent(s)
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "play.circle.fill")
+                            .font(DS.ui(15))
+                            .foregroundStyle(DS.accent)
+                        Text(subjectLabel(s))
+                            .font(DS.serif(13.5))
+                            .foregroundStyle(DS.ink)
+                            .lineLimit(1)
+                        Spacer()
+                    }
+                }
+                .buttonStyle(.plain)
+                .help(state.timerIsRunning ? "Log current timer and start this one" : "Start timer")
+            }
+        }
+    }
+
+    private func startRecent(_ s: RecentSubject) {
+        let kind = s.kind ?? state.timerKind
+        if state.timerIsRunning {
+            // Switching subjects logs the running timer first.
+            Task {
+                await state.stopAndLogTimer()
+                state.startTimer(key: s.key, kind: kind)
+            }
+        } else {
+            state.startTimer(key: s.key, kind: kind)
+        }
     }
 
     private var subjectName: String {
