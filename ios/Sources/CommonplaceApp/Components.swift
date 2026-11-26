@@ -14,6 +14,9 @@ struct CopyNickButton: View {
         Button {
             #if os(iOS)
             UIPasteboard.general.string = nick
+            #elseif os(macOS)
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(nick, forType: .string)
             #endif
             copied = true
             Task { try? await Task.sleep(nanoseconds: 2_000_000_000); copied = false }
