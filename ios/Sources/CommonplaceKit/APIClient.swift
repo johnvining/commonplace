@@ -237,7 +237,7 @@ public final class APIClient: Sendable {
     }
 
     public func filterNotes(piles: [String] = [], ideas: [String] = [],
-                            skip: Int = 0, limit: Int = 40) async throws -> [Note] {
+                            skip: Int = 0, limit: Int = 500) async throws -> [Note] {
         var q: [String: String] = ["skip": String(skip), "limit": String(limit)]
         if !piles.isEmpty { q["piles"] = piles.joined(separator: ",") }
         if !ideas.isEmpty { q["ideas"] = ideas.joined(separator: ",") }
@@ -415,7 +415,7 @@ public final class APIClient: Sendable {
         try await deleteEmpty("auth/\(id)")
     }
 
-    public func authorNotes(id: String, skip: Int = 0, limit: Int = 40) async throws -> [Note] {
+    public func authorNotes(id: String, skip: Int = 0, limit: Int = 500) async throws -> [Note] {
         try await get("auth/\(id)/notes",
                       query: ["skip": String(skip), "limit": String(limit)])
     }
@@ -446,7 +446,7 @@ public final class APIClient: Sendable {
         try await post("work/autocomplete", body: ["string": string])
     }
 
-    public func workNotes(id: String, skip: Int = 0, limit: Int = 40) async throws -> [Note] {
+    public func workNotes(id: String, skip: Int = 0, limit: Int = 500) async throws -> [Note] {
         try await get("work/\(id)/notes",
                       query: ["skip": String(skip), "limit": String(limit)])
     }
@@ -501,7 +501,7 @@ public final class APIClient: Sendable {
         try await post("idea/autocomplete", body: ["string": string])
     }
 
-    public func ideaNotes(id: String, skip: Int = 0, limit: Int = 40) async throws -> [Note] {
+    public func ideaNotes(id: String, skip: Int = 0, limit: Int = 500) async throws -> [Note] {
         try await get("idea/\(id)/notes",
                       query: ["skip": String(skip), "limit": String(limit)])
     }
@@ -536,7 +536,7 @@ public final class APIClient: Sendable {
         try await post("pile/autocomplete", body: ["string": string])
     }
 
-    public func pileNotes(id: String, skip: Int = 0, limit: Int = 40) async throws -> [Note] {
+    public func pileNotes(id: String, skip: Int = 0, limit: Int = 500) async throws -> [Note] {
         try await get("pile/\(id)/notes",
                       query: ["skip": String(skip), "limit": String(limit)])
     }
@@ -554,6 +554,11 @@ public final class APIClient: Sendable {
 
     public func nickLookup(_ nick: String) async throws -> NickLookup? {
         try await get("nick/\(nick)")
+    }
+
+    /// What became of a deleted/merged entity (`GET nick/former/:type/:id`).
+    public func formerLookup(type: String, id: String) async throws -> NickLookup? {
+        try await get("nick/former/\(type)/\(id)")
     }
 
     // MARK: - Pins (`/api/pin`)

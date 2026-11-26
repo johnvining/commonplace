@@ -47,6 +47,14 @@ public func dayString(_ date: Date) -> String {
     utcDateFormatter().string(from: date)
 }
 
+/// Local-calendar `YYYY-MM-DD` for today (web uses the local day for new logs).
+public func localDayString(_ date: Date = Date()) -> String {
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = .current
+    let c = cal.dateComponents([.year, .month, .day], from: date)
+    return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
+}
+
 /// Parse a `YYYY-MM-DD` day to its UTC midnight, or nil when unparseable.
 public func parseDay(_ value: String) -> Date? {
     guard value.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil else {
