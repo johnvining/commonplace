@@ -22,6 +22,25 @@ struct CommonplaceApp: App {
                 if state.isSignedIn { await state.refreshPins() }
             }
         }
+        .commands {
+            #if os(macOS)
+            CommandGroup(replacing: .newItem) {
+                Button("New Note") {
+                    NotificationCenter.default.post(name: .macNewNote, object: nil)
+                }
+                .keyboardShortcut("n", modifiers: .command)
+            }
+            CommandMenu("Time") {
+                Button(state.timerIsRunning ? "Stop Timer" : "Start from Time section") {
+                    if state.timerIsRunning {
+                        Task { await state.stopAndLogTimer() }
+                    }
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
+                .disabled(!state.timerIsRunning)
+            }
+            #endif
+        }
         #if os(macOS)
         MenuBarExtra {
             MenuTimerView()
@@ -34,6 +53,13 @@ struct CommonplaceApp: App {
         #endif
         // Mac: each note can live in its own window (Window > Merge All
         // Windows turns them into tabs, like document tabs).
+        #if os(macOS)
+        Settings {
+            SettingsView()
+                .environmentObject(state)
+                .frame(width: 460)
+        }
+        #endif
         WindowGroup("Note", for: String.self) { $noteId in
             if let noteId, !noteId.isEmpty {
                 NavigationStack {

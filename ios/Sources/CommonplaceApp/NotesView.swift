@@ -108,6 +108,9 @@ struct NotesView: View {
             }
             .listStyle(.plain)
             .refreshable { loadRecent() }
+            .onReceive(NotificationCenter.default.publisher(for: .macNewNote)) { _ in
+                createNote()
+            }
             .navigationTitle("Notes")
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "", editFirst: true)

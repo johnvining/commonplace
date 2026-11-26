@@ -212,3 +212,7 @@ final class AppState: ObservableObject {
         }
     }
 }
+
+extension Notification.Name {
+    static let macNewNote = Notification.Name("macNewNote")
+}
