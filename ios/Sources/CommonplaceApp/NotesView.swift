@@ -4,6 +4,7 @@ import CommonplaceKit
 /// Recent notes list with keyword search + pile/idea filters
 /// (mirrors RecentList + Filter AND semantics).
 struct NotesView: View {
+    var initialPile: PickOption? = nil
     @EnvironmentObject var state: AppState
     @State private var notes: [Note] = []
     @State private var page = 1
@@ -13,6 +14,7 @@ struct NotesView: View {
     @State private var error: String?
     @State private var newNoteId: String?
     @State private var showingNewNote = false
+    @AppStorage("notesViewMode") private var viewMode = "slim"
 
     var body: some View {
         NavigationStack {
@@ -69,12 +71,23 @@ struct NotesView: View {
                     Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
                         .listRowSeparator(.hidden)
                 }
-                ForEach(notes, id: \.stableId) { n in
-                    NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
-                        NoteRow(note: n)
+                Picker("View", selection: $viewMode) {
+                    Text("Slim").tag("slim"); Text("Full").tag("full"); Text("Grid").tag("grid"); Text("Tile").tag("tile")
+                }.pickerStyle(.segmented).listRowSeparator(.hidden)
+                if viewMode == "grid" || viewMode == "tile" {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: viewMode == "grid" ? 150 : 110))], spacing: 8) {
+                        ForEach(notes, id: \.stableId) { n in
+                            NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
+                        }
+                    }.listRowSeparator(.hidden)
+                } else {
+                    ForEach(notes, id: \.stableId) { n in
+                        NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
+                            NoteRow(note: n, full: viewMode == "full")
+                        }
+                        .listRowSeparatorTint(DS.hairline)
+                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                     }
-                    .listRowSeparatorTint(DS.hairline)
-                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                 }
                 if notes.isEmpty && error == nil {
                     Text("No notes yet.").font(DS.ui(13)).foregroundStyle(DS.muted)
@@ -85,11 +98,14 @@ struct NotesView: View {
                     .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
+            .refreshable { loadRecent() }
             .navigationTitle("Notes")
             .navigationDestination(isPresented: $showingNewNote) {
-                NoteDetailView(noteId: newNoteId ?? "")
+                NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
             }
-            .task { loadRecent() }
+            .task {
+                if let initialPile, pileSel.isEmpty { pileSel = [initialPile]; applySearch() } else { loadRecent() }
+            }
         }
     }
 
@@ -160,6 +176,7 @@ func describe(_ error: Error) -> String {
 /// serif preview, then idea/pile tags in their tints.
 struct NoteRow: View {
     let note: Note
+    var full: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
@@ -170,10 +187,17 @@ struct NoteRow: View {
                 }
                 Text(note.title ?? "(untitled)")
                     .font(DS.ui(14, weight: .medium)).lineLimit(1)
+                if let imgs = note.images, !imgs.isEmpty {
+                    Text("🖼 \(imgs.count)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                }
+                if (note.reviewCount ?? 0) > 0 {
+                    Text("worn").font(DS.ui(10)).foregroundStyle(DS.muted)
+                }
             }
             if let text = note.text, !text.isEmpty {
-                Text(text).lineLimit(1).font(DS.serif(13)).foregroundStyle(DS.muted)
+                Text(text).lineLimit(full ? nil : 1).font(DS.serif(13)).foregroundStyle(DS.muted)
             }
+            if full { NoteStatusLine(note: note) }
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
                 HStack(spacing: 6) {
                     ForEach((note.ideas ?? []).prefix(3), id: \.id) { i in
