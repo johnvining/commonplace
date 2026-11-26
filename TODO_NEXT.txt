@@ -1,8 +1,8 @@
 # Next round — work top to bottom, small local commits, no push
 
-1. [ ] Menu bar icon serif — menu-bar extra shows the Georgia serif C
+1. [x] Menu bar icon serif — menu-bar extra shows the Georgia serif C
        (like the app icon), verified in the running Mac app.
-2. [ ] Web shows the active timer like iOS + Mac (shared /api/time/timer) —
+2. [x] Web shows the active timer like iOS + Mac (shared /api/time/timer) —
        verify end to end: start in app → appears on web; start on web →
        appears in app menu bar.
 3. [ ] Performance pass, Mac + iOS — no animations anywhere, instant
@@ -18,7 +18,7 @@
        on entity/note pages, opening that specific page.
 8. [ ] Ctrl+O quick bar fully implemented on macOS and iOS — a quick
        search overlay like the web's, not just jumping to Search.
-9. [ ] Cmd+N / New Note fails with "Could not create note — retry."
+9. [x] Cmd+N / New Note fails with "Could not create note — retry."
        in the Mac app (and check iOS) — find why createNote() throws
        and fix it; also stop the menu shortcut and the Notes button
        both firing for one Cmd+N.
