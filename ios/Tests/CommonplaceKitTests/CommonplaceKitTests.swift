@@ -171,3 +171,18 @@ final class TimerStateTests: XCTestCase {
         XCTAssertNil(timer.minutesToLog())
     }
 }
+
+final class MaintenanceDecodingTests: XCTestCase {
+    /// The server sends `issue` as a number; decoding it as a string
+    /// failed the whole maintenance list (#398).
+    func testMaintenanceItemDecodesNumericIssue() throws {
+        let json = """
+        {"id":"trim-names","title":"Trim names","issue":51,\
+        "description":"Trim whitespace","pending":true,"lastRun":null}
+        """
+        let item = try JSONDecoder().decode(MaintenanceItem.self, from: Data(json.utf8))
+        XCTAssertEqual(item.issue, 51)
+        XCTAssertEqual(item.title, "Trim names")
+        XCTAssertEqual(item.pending, true)
+    }
+}

@@ -575,7 +575,8 @@ public struct TimeImportResult: Codable, Sendable {
 public struct MaintenanceItem: Codable, Sendable {
     public var id: String?
     public var title: String?
-    public var issue: String?
+    /// GitHub issue number (the API sends a number, not a string).
+    public var issue: Int?
     public var description: String?
     public var pending: Bool?
 }
