@@ -345,6 +345,9 @@ public struct TimeEntry: Codable, Sendable {
     public var _id: String?
     public var title: String?
     public var pile: PopulatedRef?
+    public var work: PopulatedRef?
+    public var startedAt: Date?
+    public var endedAt: Date?
     public var kind: String?
     public var minutes: Int?
     public var date: Date?
@@ -356,34 +359,44 @@ public struct TimeEntry: Codable, Sendable {
 public struct TimeEntryBody: Codable, Sendable {
     public var title: String?
     public var pile: String?
+    public var work: String?
     public var pileIsNull: Bool
     public var kind: String?
     public var minutes: Int?
     public var date: String?
+    public var startedAt: String?
+    public var endedAt: String?
     public var notes: String?
 
-    public init(title: String? = nil, pile: String? = nil, pileIsNull: Bool = false,
+    public init(title: String? = nil, pile: String? = nil, work: String? = nil, pileIsNull: Bool = false,
                 kind: String? = nil, minutes: Int? = nil, date: String? = nil,
+                startedAt: String? = nil, endedAt: String? = nil,
                 notes: String? = nil) {
         self.title = title
         self.pile = pile
+        self.work = work
         self.pileIsNull = pileIsNull
         self.kind = kind
         self.minutes = minutes
         self.date = date
+        self.startedAt = startedAt
+        self.endedAt = endedAt
         self.notes = notes
     }
 
     enum CodingKeys: String, CodingKey {
-        case title, pile, kind, minutes, date, notes
+        case title, pile, work, kind, minutes, date, startedAt, endedAt, notes
     }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         title = try c.decodeIfPresent(String.self, forKey: .title)
+        work = try c.decodeIfPresent(String.self, forKey: .work)
         minutes = try c.decodeIfPresent(Int.self, forKey: .minutes)
         kind = try c.decodeIfPresent(String.self, forKey: .kind)
         date = try c.decodeIfPresent(String.self, forKey: .date)
+        startedAt = try c.decodeIfPresent(String.self, forKey: .startedAt)
+        endedAt = try c.decodeIfPresent(String.self, forKey: .endedAt)
         notes = try c.decodeIfPresent(String.self, forKey: .notes)
         if let p = try? c.decodeIfPresent(String.self, forKey: .pile) {
             pile = p
@@ -401,9 +414,12 @@ public struct TimeEntryBody: Codable, Sendable {
         } else {
             try c.encodeIfPresent(pile, forKey: .pile)
         }
+        try c.encodeIfPresent(work, forKey: .work)
         try c.encodeIfPresent(kind, forKey: .kind)
         try c.encodeIfPresent(minutes, forKey: .minutes)
         try c.encodeIfPresent(date, forKey: .date)
+        try c.encodeIfPresent(startedAt, forKey: .startedAt)
+        try c.encodeIfPresent(endedAt, forKey: .endedAt)
         try c.encodeIfPresent(notes, forKey: .notes)
     }
 }
@@ -468,6 +484,7 @@ public struct RecentSubject: Codable, Sendable {
     public var key: String
     public var title: String?
     public var pile: RecentSubjectPile?
+    public var work: RecentSubjectPile?
     public var kind: String?
     public var minutes: Int?
     public var lastDate: String?

@@ -98,17 +98,23 @@ public func weekDayStrings(containing day: Date) -> [String] {
 /// `pile:<pileId>` for pile-linked time, `title:<lowercased title>` otherwise.
 public enum TimeSubjectKey: Equatable, Sendable {
     case pile(id: String)
+    case work(id: String)
     case title(slug: String)
 
     public var key: String {
         switch self {
         case .pile(let id): return "pile:\(id)"
+        case .work(let id): return "work:\(id)"
         case .title(let slug): return "title:\(slug)"
         }
     }
 
     public static func pileKey(pileId: String) -> String {
         "pile:\(pileId)"
+    }
+
+    public static func workKey(workId: String) -> String {
+        "work:\(workId)"
     }
 
     public static func titleKey(title: String) -> String {
@@ -121,6 +127,11 @@ public enum TimeSubjectKey: Equatable, Sendable {
             let id = String(key.dropFirst(5))
             guard !id.isEmpty else { return nil }
             return .pile(id: id)
+        }
+        if key.hasPrefix("work:") {
+            let id = String(key.dropFirst(5))
+            guard !id.isEmpty else { return nil }
+            return .work(id: id)
         }
         if key.hasPrefix("title:") {
             let slug = String(key.dropFirst(6))

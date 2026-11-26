@@ -222,7 +222,9 @@ struct TimeView: View {
         guard let minutes = t.stop(at: Date()), minutes >= 1 else { self.error = "Nothing to log yet."; return }
         Task {
             do {
-                try await log(key: key, kind: logKind, minutes: max(1, minutes), date: localDayString())
+                let iso = ISO8601DateFormatter()
+                try await log(key: key, kind: logKind, minutes: max(1, minutes), date: localDayString(),
+                              startedAt: iso.string(from: at), endedAt: iso.string(from: Date()))
                 await MainActor.run { state.clearTimer(); reload() }
             } catch {
                 await MainActor.run { self.error = "Stop failed: \(describe(error))" }
@@ -253,20 +255,28 @@ struct TimeView: View {
         return nil
     }
 
-    func log(key: String, kind: String, minutes: Int, date: String) async throws {
+    func log(key: String, kind: String, minutes: Int, date: String,
+             startedAt: String? = nil, endedAt: String? = nil) async throws {
         let recent = subjects.first(where: { $0.key == key })
         let body: TimeEntryBody
         if let sub = TimeSubjectKey.parse(key) {
             switch sub {
             case .pile(let id):
                 body = TimeEntryBody(title: recent?.title, pile: id,
-                                     kind: kind, minutes: minutes, date: date)
+                                     kind: kind, minutes: minutes, date: date,
+                                     startedAt: startedAt, endedAt: endedAt)
+            case .work(let id):
+                body = TimeEntryBody(title: recent?.title, work: id,
+                                     kind: kind, minutes: minutes, date: date,
+                                     startedAt: startedAt, endedAt: endedAt)
             case .title:
                 body = TimeEntryBody(title: displayTitle(forKey: key) ?? key,
-                                     kind: kind, minutes: minutes, date: date)
+                                     kind: kind, minutes: minutes, date: date,
+                                     startedAt: startedAt, endedAt: endedAt)
             }
         } else {
-            body = TimeEntryBody(title: key, kind: kind, minutes: minutes, date: date)
+            body = TimeEntryBody(title: key, kind: kind, minutes: minutes, date: date,
+                                 startedAt: startedAt, endedAt: endedAt)
         }
         _ = try await state.client.createTimeEntry(body)
     }
@@ -291,15 +301,16 @@ struct TimeView: View {
 
     private func subjectKey(of e: TimeEntry) -> String {
         if let pid = e.pile?.id { return TimeSubjectKey.pileKey(pileId: pid) }
+        if let wid = e.work?.id { return TimeSubjectKey.workKey(workId: wid) }
         return TimeSubjectKey.titleKey(title: e.title ?? "")
     }
 
     private func subjectTitle(of e: TimeEntry) -> String {
-        e.pile?.name ?? e.title ?? ""
+        e.pile?.name ?? e.work?.name ?? e.title ?? ""
     }
 
     private func subjectLabel(_ s: RecentSubject) -> String {
-        s.pile?.name ?? s.title ?? s.key
+        s.pile?.name ?? s.work?.name ?? s.title ?? s.key
     }
 
     private func crossCheck(reading: Int, writing: Int, total: Int) -> String {
