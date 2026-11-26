@@ -76,9 +76,10 @@ struct NotesView: View {
     }
 
     private var viewPicker: some View {
-        Picker("View", selection: $viewMode) {
-            Text("Slim").tag("slim"); Text("Full").tag("full"); Text("Grid").tag("grid"); Text("Tile").tag("tile")
-        }.pickerStyle(.segmented)
+        HStack {
+            Spacer()
+            UnifiedViewSelector(mode: $viewMode)
+        }
     }
 
     private var headerControls: some View {
@@ -251,7 +252,7 @@ struct NoteCard: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top, spacing: 6) {
                 Text(note.title ?? "(untitled)")
-                    .font(DS.ui(14, weight: .semibold))
+                    .font(DS.serif(15, weight: .semibold))
                     .foregroundStyle(DS.ink)
                     .lineLimit(2)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -321,7 +322,7 @@ struct NoteRow: View {
                         .font(DS.ui(12)).foregroundStyle(DS.muted).lineLimit(1)
                 }
                 Text(note.title ?? "(untitled)")
-                    .font(DS.ui(14, weight: .medium)).lineLimit(1)
+                    .font(DS.serif(15, weight: .semibold)).foregroundStyle(DS.ink).lineLimit(1)
                 if let imgs = note.images, !imgs.isEmpty {
                     HStack(spacing: 3) { Image(systemName: "photo").font(DS.ui(10)); Text("\(imgs.count)") }.font(DS.ui(11)).foregroundStyle(DS.muted)
                 }

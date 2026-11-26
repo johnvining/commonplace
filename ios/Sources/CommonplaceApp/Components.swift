@@ -55,6 +55,71 @@ struct NoteStatusLine: View {
     }
 }
 
+/// Kind + subject line for time displays: the Reading/Writing kind is
+/// a small-caps sans label (never serif); what is being read/written —
+/// the subject — is serif.
+struct KindSubjectLine: View {
+    let kind: String
+    let subject: String
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(kind.uppercased())
+                .font(DS.ui(10, weight: .semibold))
+                .tracking(0.8)
+                .foregroundStyle(DS.muted)
+            Text(subject)
+                .font(DS.serif(13))
+                .foregroundStyle(DS.ink)
+                .lineLimit(1)
+        }
+    }
+}
+
+/// Unified view selector, web ViewSelector parity: one joined icon
+/// group (Full · Slim · Grid · Tile, in web order), icon-only with
+/// help tooltips and the web's Ctrl+Shift+1…4 shortcuts. Shared by
+/// every note list so the control looks and behaves the same
+/// everywhere; `mode` keeps the persisted string values
+/// ("full"/"slim"/"grid"/"tile").
+struct UnifiedViewSelector: View {
+    @Binding var mode: String
+
+    private let views: [(mode: String, icon: String, label: String, key: Character)] = [
+        ("full", "doc.text", "Full view", "1"),
+        ("slim", "list.bullet", "Slim view", "2"),
+        ("grid", "square.grid.2x2", "Grid view", "3"),
+        ("tile", "square.grid.3x3", "Tile view", "4"),
+    ]
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(views.enumerated()), id: \.element.mode) { idx, v in
+                Button {
+                    mode = v.mode
+                } label: {
+                    Image(systemName: v.icon)
+                        .font(DS.ui(13, weight: mode == v.mode ? .semibold : .regular))
+                        .foregroundStyle(mode == v.mode ? DS.ink : DS.muted)
+                        .frame(width: 34, height: 26)
+                        .background(mode == v.mode ? DS.hover : Color.clear)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 4)
+                        )
+                }
+                .buttonStyle(.plain)
+                .help("\(v.label) (Ctrl+Shift+\(v.key))")
+                .keyboardShortcut(KeyEquivalent(v.key), modifiers: [.control, .shift])
+                if idx < views.count - 1 {
+                    Rectangle().fill(DS.hairline).frame(width: 1, height: 18)
+                }
+            }
+        }
+        .overlay(RoundedRectangle(cornerRadius: 5).stroke(DS.hairline, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+    }
+}
+
 /// One selectable thing, by name — never by raw ID in the UI.
 struct PickOption: Identifiable, Equatable {
     var id: String
