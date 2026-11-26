@@ -268,6 +268,20 @@ struct NoteCard: View {
                 Text(authors.compactMap(\.name).joined(separator: ", "))
                     .font(DS.ui(11)).foregroundStyle(DS.muted).lineLimit(1)
             }
+            if let imgs = note.images, !imgs.isEmpty, let noteId = note._id {
+                HStack(spacing: 4) {
+                    ForEach(1 ... min(imgs.count, 3), id: \.self) { i in
+                        NoteImageThumb(noteId: noteId, index: i)
+                            .frame(height: large ? 110 : 70)
+                            .frame(maxWidth: .infinity)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
+                    if imgs.count > 3 {
+                        Text("+\(imgs.count - 3)")
+                            .font(DS.ui(11)).foregroundStyle(DS.muted)
+                    }
+                }
+            }
             if let text = note.text, !text.isEmpty {
                 Text(text)
                     .font(DS.serif(13))

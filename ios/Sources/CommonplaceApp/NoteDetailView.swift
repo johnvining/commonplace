@@ -161,25 +161,23 @@ struct NoteDetailView: View {
                     }
                 }
                 Section("Images") {
-                    #if os(iOS)
                     ScrollView(.horizontal) {
                         HStack {
                             ForEach(Array(imageDatas.enumerated()), id: \.offset) { idx, data in
-                                if let ui = UIImage(data: data) {
-                                    VStack {
-                                        Image(uiImage: ui).resizable().scaledToFill()
-                                            .frame(width: 90, height: 90).clipped()
-                                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                                            .onTapGesture { lightboxIndex = idx }
-                                        Button("Delete") { deleteImage(idx) }.font(DS.ui(11))
-                                    }
+                                VStack {
+                                    NoteImageView(data: data)
+                                        .frame(width: 90, height: 90)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        .onTapGesture { lightboxIndex = idx }
+                                    Button("Delete") { deleteImage(idx) }.font(DS.ui(11))
                                 }
                             }
                         }
                     }
-                    if let idx = lightboxIndex, imageDatas.indices.contains(idx), let ui = UIImage(data: imageDatas[idx]) {
+                    if let idx = lightboxIndex, imageDatas.indices.contains(idx) {
                         VStack {
-                            Image(uiImage: ui).resizable().scaledToFit()
+                            NoteImageView(data: imageDatas[idx], contentMode: .fit)
+                                .frame(maxHeight: 420)
                             HStack {
                                 Button("‹ Prev") { lightboxIndex = max(0, idx - 1) }.disabled(idx == 0)
                                 Text("\(idx + 1) / \(imageDatas.count)").font(DS.ui(11)).foregroundStyle(DS.muted)
@@ -188,9 +186,6 @@ struct NoteDetailView: View {
                             }
                         }
                     }
-                    #else
-                    Text("\(imageDatas.count) image(s)").font(DS.ui(12)).foregroundStyle(DS.muted)
-                    #endif
                     PhotosPicker(selection: $photoItems, matching: .images) {
                         Text(uploading ? "Uploading…" : "Add photos")
                     }

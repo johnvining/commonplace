@@ -2,6 +2,8 @@ import SwiftUI
 import CommonplaceKit
 #if os(iOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
 #endif
 
 /// Tap-to-copy nick with a 2s check (web ClickToCopyNick, tap-only on iOS).
@@ -52,6 +54,49 @@ struct NoteStatusLine: View {
                 }
             }.foregroundStyle(DS.muted)
         }
+    }
+}
+
+/// One note image rendered from API data on both platforms.
+struct NoteImageView: View {
+    let data: Data?
+    var contentMode: ContentMode = .fill
+
+    var body: some View {
+        #if os(macOS)
+        if let data, let img = NSImage(data: data) {
+            Image(nsImage: img).resizable().aspectRatio(contentMode: contentMode)
+        } else {
+            placeholder
+        }
+        #else
+        if let data, let img = UIImage(data: data) {
+            Image(uiImage: img).resizable().aspectRatio(contentMode: contentMode)
+        } else {
+            placeholder
+        }
+        #endif
+    }
+
+    private var placeholder: some View {
+        Rectangle().fill(DS.hover)
+            .overlay(Image(systemName: "photo").foregroundStyle(DS.faint))
+    }
+}
+
+/// Thumbnail that fetches one of a note's images (1-based, API order).
+struct NoteImageThumb: View {
+    @EnvironmentObject var state: AppState
+    let noteId: String
+    let index: Int
+
+    @State private var data: Data?
+
+    var body: some View {
+        NoteImageView(data: data)
+            .task(id: "\(noteId)-\(index)") {
+                data = try? await state.client.noteImageData(noteId: noteId, index: index)
+            }
     }
 }
 
