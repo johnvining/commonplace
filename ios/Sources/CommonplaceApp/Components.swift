@@ -109,6 +109,13 @@ extension Note {
     var displayText: String {
         nonEmpty(text) ?? nonEmpty(take) ?? nonEmpty(url) ?? "No Text"
     }
+
+    /// Authors for display: the note's own, else its work's (web
+    /// authorsWithWorkFallback).
+    var displayAuthors: [PopulatedRef] {
+        if let authors, !authors.isEmpty { return authors }
+        return work?.authors ?? []
+    }
 }
 
 /// One note image rendered from API data on both platforms.

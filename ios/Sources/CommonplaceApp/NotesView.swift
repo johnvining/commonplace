@@ -261,8 +261,8 @@ struct NoteCard: View {
                     .font(DS.ui(11)).foregroundStyle(DS.muted)
                 }
             }
-            if let authors = note.authors, !authors.isEmpty {
-                Text(authors.compactMap(\.name).joined(separator: ", "))
+            if !note.displayAuthors.isEmpty {
+                Text(note.displayAuthors.compactMap(\.name).joined(separator: ", "))
                     .font(DS.ui(11)).foregroundStyle(DS.muted).lineLimit(1)
             }
             if let imgs = note.images, !imgs.isEmpty, let noteId = note._id {
@@ -364,8 +364,8 @@ struct NoteFlowRow: View {
     private var flow: AttributedString {
         var md = ""
         var cite: [String] = []
-        if let authors = note.authors, !authors.isEmpty {
-            cite.append(authors.compactMap(\.name).joined(separator: ", "))
+        if !note.displayAuthors.isEmpty {
+            cite.append(note.displayAuthors.compactMap(\.name).joined(separator: ", "))
         }
         if let w = note.work?.name, !w.isEmpty {
             cite.append("*\(w)*")
@@ -392,8 +392,8 @@ struct NoteRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 6) {
-                if let authors = note.authors, !authors.isEmpty {
-                    Text(authors.compactMap(\.name).joined(separator: ", ") + ":")
+                if !note.displayAuthors.isEmpty {
+                    Text(note.displayAuthors.compactMap(\.name).joined(separator: ", ") + ":")
                         .font(DS.ui(12)).foregroundStyle(DS.muted).lineLimit(1)
                 }
                 Text(note.displayTitle)

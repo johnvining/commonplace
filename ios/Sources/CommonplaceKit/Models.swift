@@ -77,6 +77,45 @@ private func tolerantString(_ container: KeyedDecodingContainer<Note.CodingKeys>
     return nil
 }
 
+/// A note's populated work, including its authors (the API populates
+/// `work.authors` so a note with no authors of its own can inherit
+/// them for display, like the web's authorsWithWorkFallback).
+public struct WorkRef: Codable, Equatable, Sendable {
+    public var id: String
+    public var name: String?
+    public var authors: [PopulatedRef]?
+
+    public init(id: String, name: String? = nil, authors: [PopulatedRef]? = nil) {
+        self.id = id
+        self.name = name
+        self.authors = authors
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let id = try? container.decode(String.self) {
+            self.id = id
+            self.name = nil
+            self.authors = nil
+            return
+        }
+        struct Obj: Decodable {
+            var _id: String
+            var name: String?
+            var authors: [PopulatedRef]?
+        }
+        let obj = try container.decode(Obj.self)
+        self.id = obj._id
+        self.name = obj.name
+        self.authors = obj.authors
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(id)
+    }
+}
+
 public struct Note: Codable, Sendable {
     public var _id: String?
     public var title: String?
@@ -87,7 +126,7 @@ public struct Note: Codable, Sendable {
     public var page: String?
     public var authors: [PopulatedRef]?
     public var people: [PopulatedRef]?
-    public var work: PopulatedRef?
+    public var work: WorkRef?
     public var ideas: [PopulatedRef]?
     public var piles: [PopulatedRef]?
     public var images: [String]?
@@ -122,7 +161,7 @@ public struct Note: Codable, Sendable {
         page = tolerantString(c, .page)
         authors = tolerantRefs(c, .authors)
         people = tolerantRefs(c, .people)
-        work = try? c.decodeIfPresent(PopulatedRef.self, forKey: .work)
+        work = try? c.decodeIfPresent(WorkRef.self, forKey: .work)
         ideas = tolerantRefs(c, .ideas)
         piles = tolerantRefs(c, .piles)
         images = (try? c.decodeIfPresent([String].self, forKey: .images)) ?? nil
