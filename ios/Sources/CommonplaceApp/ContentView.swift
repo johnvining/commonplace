@@ -26,6 +26,8 @@ struct ContentView: View {
             }
         tabView
         }
+        // No animations anywhere: instant state changes.
+        .transaction { $0.animation = nil }
     }
 
     private var tabView: some View {

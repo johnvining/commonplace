@@ -221,6 +221,17 @@ extension Note {
     }
 }
 
+/// Parsed flow paragraphs by content key, so scrolling and view-mode
+/// switches never re-parse markdown for the same note text.
+final class FlowTextCache {
+    static let shared = NSCache<NSString, AnyObject>()
+}
+
+final class FlowTextBox {
+    let value: AttributedString
+    init(_ value: AttributedString) { self.value = value }
+}
+
 /// The web's flowing note paragraph at one size: authors, work in
 /// italics, bold title, then the text — all the same serif size, so
 /// rows never mix 12pt labels with 15pt titles.
@@ -253,10 +264,14 @@ struct NoteFlowText: View {
             md += "**\(note.displayTitle).** "
         }
         md += note.displayText
-        if let attributed = try? AttributedString(markdown: md, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
-            return attributed
+        let key = md as NSString
+        if let hit = FlowTextCache.shared.object(forKey: key) as? FlowTextBox {
+            return hit.value
         }
-        return AttributedString(md)
+        let parsed = (try? AttributedString(markdown: md, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
+            ?? AttributedString(md)
+        FlowTextCache.shared.setObject(FlowTextBox(parsed), forKey: key)
+        return parsed
     }
 }
 
@@ -551,13 +566,19 @@ struct NoteText: View {
     let text: String
     var size: CGFloat = 15
     var body: some View {
-        if let attributed = try? AttributedString(
+        Text(parsed).font(DS.serif(size))
+    }
+
+    private var parsed: AttributedString {
+        let key = text as NSString
+        if let hit = FlowTextCache.shared.object(forKey: key) as? FlowTextBox {
+            return hit.value
+        }
+        let value = (try? AttributedString(
             markdown: text,
             options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
-        ) {
-            Text(attributed).font(DS.serif(size))
-        } else {
-            Text(text).font(DS.serif(size))
-        }
+        )) ?? AttributedString(text)
+        FlowTextCache.shared.setObject(FlowTextBox(value), forKey: key)
+        return value
     }
 }

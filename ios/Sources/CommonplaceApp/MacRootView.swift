@@ -108,6 +108,8 @@ struct MacRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .macSection)) { note in
             if let s = note.object as? String { section = s; routedType = nil; routedId = nil }
         }
+        // No animations anywhere: instant state changes.
+        .transaction { $0.animation = nil }
         // Ctrl+O navigates to Time (Cmd+K keeps Search).
         .background {
             Button("") { section = "time"; routedType = nil; routedId = nil }
