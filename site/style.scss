@@ -2690,3 +2690,11 @@ mark.search-highlight {
 .time-table th { font-size: var(--font-size-xs); }
 .time-table td { font-size: var(--font-size-md); }
 .time-table td:nth-child(n+2) { font-family: $sans_font; }
+
+.time-section-head { margin: 18px 0 8px; }
+.time-section-head:first-child { margin-top: 4px; }
+
+.time-section-head {
+  text-transform: none; letter-spacing: 0; font-size: 15px;
+  font-weight: 600; color: var(--ink);
+}

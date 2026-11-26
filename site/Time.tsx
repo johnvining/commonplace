@@ -7,12 +7,6 @@ import {
   TopLevelStandardButtonContainer,
   TopLevelStandardButton,
 } from './TopLevelStandardButton'
-import {
-  TopLevelTitleContainer,
-  TopLevelTitle,
-  TopLevelSubTitle,
-} from './TopLevelHeadings'
-
 // Time logging: minutes spent reading or writing each day, labelled with a
 // free-text title, a pile (the piece being read/written), or both. Daily and
 // weekly summaries break the time down by kind and by subject, so a pile
@@ -604,11 +598,7 @@ function Time(props: any) {
 
   return (
     <div>
-      <TopLevelTitleContainer>
-        <TopLevelTitle>Time</TopLevelTitle>
-        <TopLevelSubTitle>Reading vs writing, logged by day and tallied by piece.</TopLevelSubTitle>
-      </TopLevelTitleContainer>
-
+      <div className="top-level form-label time-section-head">Start Entry</div>
       <div className="time-card time-timer">
         <div className="time-timer-row">
           <div className="time-subject-picker">
@@ -748,7 +738,9 @@ function Time(props: any) {
       ) : (
         <>
           <div className="time-entries">
-            <div className="top-level form-label">Entries — {selectedDate}</div>
+            <div className="top-level form-label time-section-head">
+              {selectedDate === todayLocal() ? 'Today' : selectedDate}
+            </div>
             {dayEntries.length ? (
               <ul className="time-entry-list">
                 {dayEntries.map((e: any) => {
@@ -813,6 +805,7 @@ function Time(props: any) {
           </div>
 
 
+          <div className="top-level form-label time-section-head">Analysis</div>
           <div className="time-card time-analysis">
             <div className="time-scope-tabs" role="tablist" aria-label="Analysis range">
               {(
@@ -836,6 +829,24 @@ function Time(props: any) {
               <span className="time-scope-when">{scopeWhen}</span>
             </div>
             <KindTotals summary={scoped} />
+            {scoped.byPile?.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By pile</div>
+                <SubjectTable rows={scoped.byPile} pileLink />
+              </>
+            ) : null}
+            {scoped.byWork?.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By work</div>
+                <SubjectTable rows={scoped.byWork} workLink />
+              </>
+            ) : null}
+            {scoped.byTitle?.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By title</div>
+                <SubjectTable rows={scoped.byTitle} />
+              </>
+            ) : null}
             {scoped.byDay?.length ? (
               <>
                 <div className="top-level form-label time-table-title">By day</div>
@@ -863,24 +874,6 @@ function Time(props: any) {
                     ))}
                   </tbody>
                 </table>
-              </>
-            ) : null}
-            {scoped.byPile?.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By pile</div>
-                <SubjectTable rows={scoped.byPile} pileLink />
-              </>
-            ) : null}
-            {scoped.byWork?.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By work</div>
-                <SubjectTable rows={scoped.byWork} workLink />
-              </>
-            ) : null}
-            {scoped.byTitle?.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By title</div>
-                <SubjectTable rows={scoped.byTitle} />
               </>
             ) : null}
             {!scoped.entryCount ? <div className="sidebar-muted">Nothing logged in this range.</div> : null}
