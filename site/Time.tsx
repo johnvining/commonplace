@@ -132,6 +132,9 @@ function Time(props: any) {
   const [params, setParams] = useSearchParams()
   const subjectApplied = useRef<string | null>(null)
   const [timerKey, setTimerKey] = useState('')
+  const [timerQuery, setTimerQuery] = useState('')
+  const [timerOpen, setTimerOpen] = useState(false)
+  const [timerPiles, setTimerPiles] = useState<any[]>([])
   const [timerKind, setTimerKind] = useState('writing')
   const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null)
   const [now, setNow] = useState(Date.now())
@@ -227,9 +230,46 @@ function Time(props: any) {
 
   const selectTimerKey = (key: string) => {
     setTimerKey(key)
+    if (key) setTimerQuery(subjectLabelForKey(key))
     const recent = subjects.find((s: any) => s.key === key)
     if (recent) setTimerKind(recent.kind === 'writing' ? 'writing' : 'reading')
   }
+
+  const subjectLabelForKey = (key: string): string => {
+    const s = subjects.find((x: any) => x.key === key)
+    if (s) return s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.title ?? key
+    const pin = starred.find((p: any) => p.id === key)
+    if (pin?.label) return pin.label
+    if (key.startsWith('title:')) return key.slice(6)
+    return key
+  }
+
+  const pickTimerSubject = (key: string, label: string) => {
+    selectTimerKey(key)
+    setTimerQuery(label)
+    setTimerOpen(false)
+  }
+
+  const useTypedTimerName = () => {
+    const name = timerQuery.trim()
+    if (!name) return
+    pickTimerSubject(`title:${name.toLowerCase()}`, name)
+  }
+
+  // Pile matches for the timer picker, debounced like the other pickers.
+  useEffect(() => {
+    const q = timerQuery.trim()
+    if (!timerOpen || q.length < 2 || timerKey) {
+      setTimerPiles([])
+      return
+    }
+    const t = setTimeout(() => {
+      db.getSuggestions('pile', q)
+        .then((res: any) => setTimerPiles(res.data.data ?? []))
+        .catch(() => setTimerPiles([]))
+    }, 250)
+    return () => clearTimeout(t)
+  }, [timerQuery, timerOpen, timerKey])
 
   const startTimer = () => {
     if (timerStartedAt !== null || !resolveTimerSubject(timerKey)) return
@@ -400,43 +440,85 @@ function Time(props: any) {
 
       <div className="time-card time-timer">
         <div className="time-timer-row">
-          <select
-            aria-label="What the time is for"
-            className="top-level input compact time-subject-select"
-            value={timerKey}
-            onChange={(e) => selectTimerKey(e.target.value)}
-            disabled={timerStartedAt !== null}
-          >
-            <option value="">Pick something…</option>
-            {starred.length ? (
-              <optgroup label="Starred">
-                {starred.map((pin: any) => {
-                  const s = subjects.find((x: any) => x.key === pin.id)
-                  const label = s
-                    ? s.pile
-                      ? s.pile.name + (s.title ? ` — ${s.title}` : '')
-                      : s.title
-                    : pin.label || pin.id
-                  return (
-                    <option key={pin.id} value={pin.id}>
-                      ★ {label}
-                    </option>
-                  )
-                })}
-              </optgroup>
-            ) : null}
-            {subjects.filter((s: any) => !starred.some((p: any) => p.id === s.key)).length ? (
-              <optgroup label="Recent">
-                {subjects
-                  .filter((s: any) => !starred.some((p: any) => p.id === s.key))
-                  .map((s: any) => (
-                    <option key={s.key} value={s.key}>
-                      {s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.title}
-                    </option>
-                  ))}
-              </optgroup>
-            ) : null}
-          </select>
+          <div className="time-subject-picker">
+            {timerKey ? (
+              <div className="time-subject-chip">
+                <span>{subjectLabelForKey(timerKey)}</span>
+                <button
+                  aria-label="Clear subject"
+                  onClick={() => {
+                    setTimerKey('')
+                    setTimerQuery('')
+                    setTimerOpen(true)
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              <>
+                <input
+                  aria-label="What the time is for — type a name, a recent subject, or a pile"
+                  className="top-level input compact time-subject-select"
+                  placeholder="Type a name, pick a recent, or search a pile…"
+                  value={timerQuery}
+                  onChange={(e) => {
+                    setTimerQuery(e.target.value)
+                    setTimerOpen(true)
+                  }}
+                  onFocus={() => setTimerOpen(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') useTypedTimerName()
+                    if (e.key === 'Escape') setTimerOpen(false)
+                  }}
+                />
+                {timerOpen ? (
+                  <ul className="time-subject-list">
+                    {starred.map((pin: any) => {
+                      const s = subjects.find((x: any) => x.key === pin.id)
+                      const label = s
+                        ? s.pile
+                          ? s.pile.name + (s.title ? ` — ${s.title}` : '')
+                          : s.title
+                        : pin.label || pin.id
+                      return (
+                        <li key={'star-' + pin.id}>
+                          <button onClick={() => pickTimerSubject(pin.id, label)}>★ {label}</button>
+                        </li>
+                      )
+                    })}
+                    {subjects
+                      .filter((s: any) => !starred.some((p: any) => p.id === s.key))
+                      .filter(
+                        (s: any) =>
+                          !timerQuery.trim() ||
+                          (s.pile?.name ?? s.title ?? '').toLowerCase().includes(timerQuery.trim().toLowerCase())
+                      )
+                      .map((s: any) => {
+                        const label = s.pile ? s.pile.name + (s.title ? ` — ${s.title}` : '') : s.title
+                        return (
+                          <li key={'recent-' + s.key}>
+                            <button onClick={() => pickTimerSubject(s.key, label)}>{label}</button>
+                          </li>
+                        )
+                      })}
+                    {timerPiles.map((p: any) => (
+                      <li key={'pile-' + p._id}>
+                        <button onClick={() => pickTimerSubject(`pile:${p._id}`, p.name)}>
+                          Pile: {p.name}
+                        </button>
+                      </li>
+                    ))}
+                    {timerQuery.trim() ? (
+                      <li>
+                        <button onClick={useTypedTimerName}>Use “{timerQuery.trim()}” as a name</button>
+                      </li>
+                    ) : null}
+                  </ul>
+                ) : null}
+              </>
+            )}
+          </div>
           <div className="time-kind-toggle" role="group" aria-label="Reading or writing">
             {['reading', 'writing'].map((k) => (
               <button
@@ -454,7 +536,14 @@ function Time(props: any) {
               <TopLevelStandardButton name="Stop" className="compact" onClick={stopTimer} />
             </>
           ) : (
-            <TopLevelStandardButton name="Start" className="compact" onClick={startTimer} />
+            <button
+              className="button compact"
+              disabled={!resolveTimerSubject(timerKey)}
+              title={resolveTimerSubject(timerKey) ? 'Start timer' : 'Pick or type a subject first'}
+              onClick={startTimer}
+            >
+              Start
+            </button>
           )}
         </div>
         {timerStartedAt !== null ? (
