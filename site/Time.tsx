@@ -624,13 +624,14 @@ function Time(props: any) {
                     } else if (e.key === 'ArrowUp') {
                       e.preventDefault()
                       setTimerHighlight((h) => Math.max(0, h - 1))
-                    } else if (e.key === 'Enter') {
-                      e.preventDefault()
+                    } else if (e.key === 'Enter' || e.key === 'Tab') {
                       const opt = opts[timerHighlight]
                       if (opt && timerOpen) {
+                        e.preventDefault()
                         if (opt.label.startsWith('Use ')) useTypedTimerName()
                         else pickTimerSubject(opt.key, opt.label.replace(/^★ /, '').replace(/^Pile: /, '').replace(/^Work: /, ''))
-                      } else {
+                      } else if (e.key === 'Enter') {
+                        e.preventDefault()
                         useTypedTimerName()
                       }
                     } else if (e.key === 'Escape') {
