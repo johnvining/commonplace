@@ -64,8 +64,12 @@ struct LoginView: View {
             switch api {
             case .unauthorized, .forbidden: return "Incorrect password."
             case .transport: return "Unreachable — check the server URL and retry."
-            case .serverError: return "Server error — retry."
-            case .clientError(_, let m): return m ?? "Sign-in failed."
+            case .serverError(let status, _):
+                return status >= 500 ? "Server unavailable — try again in a moment." : "Server error — retry."
+            case .clientError(let status, let m):
+                if status == 429 { return "Too many tries — wait a bit and retry." }
+                if (400...403).contains(status) { return "Incorrect password." }
+                return m ?? "Sign-in failed."
             case .notFound(let m): return m ?? "Not found."
             case .decoding: return "Bad response — retry."
             }
