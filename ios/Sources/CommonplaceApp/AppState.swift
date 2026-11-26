@@ -68,6 +68,39 @@ final class AppState: ObservableObject {
         }
     }
 
+    /// Stop the running timer and log it (menu-bar / any scene). Uses the
+    /// persisted subject key: pile:<id>, work:<id>, or title:<slug>.
+    func stopAndLogTimer() async {
+        guard let key = timerSubjectKey, let at = timerStartedAt else { return }
+        let minutes = max(1, Int((Date().timeIntervalSince(at) / 60).rounded()))
+        let day = {
+            let f = DateFormatter()
+            f.calendar = Calendar(identifier: .gregorian)
+            f.locale = Locale(identifier: "en_US_POSIX")
+            f.timeZone = TimeZone(secondsFromGMT: 0)
+            f.dateFormat = "yyyy-MM-dd"
+            return f.string(from: Date())
+        }()
+        let iso = ISO8601DateFormatter()
+        var body = TimeEntryBody(kind: timerKind, minutes: minutes, date: day,
+                                 startedAt: iso.string(from: at), endedAt: iso.string(from: Date()))
+        if key.hasPrefix("pile:") {
+            body.pile = String(key.dropFirst(5))
+        } else if key.hasPrefix("work:") {
+            body.work = String(key.dropFirst(5))
+        } else if key.hasPrefix("title:") {
+            body.title = String(key.dropFirst(6))
+        } else {
+            body.title = key
+        }
+        do {
+            _ = try await client.createTimeEntry(body)
+            clearTimer()
+        } catch {
+            // Keep the timer running so no time is lost.
+        }
+    }
+
     func clearTimer() {
         timerSubjectKey = nil
         timerStartedAt = nil

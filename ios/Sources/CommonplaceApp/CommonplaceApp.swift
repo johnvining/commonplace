@@ -6,16 +6,32 @@ struct CommonplaceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if state.authChecking && !state.isSignedIn {
-                ProgressView("Checking session…").environmentObject(state)
-            } else if state.isSignedIn {
-                ContentView()
-                    .environmentObject(state)
-            } else {
-                LoginView()
-                    .environmentObject(state)
+            Group {
+                if state.authChecking && !state.isSignedIn {
+                    ProgressView("Checking session…").environmentObject(state)
+                } else if state.isSignedIn {
+                    ContentView()
+                        .environmentObject(state)
+                } else {
+                    LoginView()
+                        .environmentObject(state)
+                }
+            }
+            .task {
+                await state.validateSession()
+                if state.isSignedIn { await state.refreshPins() }
             }
         }
+        #if os(macOS)
+        MenuBarExtra {
+            MenuTimerView()
+                .environmentObject(state)
+        } label: {
+            MenuTimerLabel()
+                .environmentObject(state)
+        }
+        .menuBarExtraStyle(.window)
+        #endif
         // Mac: each note can live in its own window (Window > Merge All
         // Windows turns them into tabs, like document tabs).
         WindowGroup("Note", for: String.self) { $noteId in
