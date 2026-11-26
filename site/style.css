@@ -3075,6 +3075,20 @@ div .top-bar {
   width: 16px;
   height: 16px;
 }
+.top-bar .button.left {
+  border: 1px solid var(--hairline);
+  border-right: none;
+  border-radius: 5px 0 0 5px;
+}
+.top-bar .button.middle {
+  border: 1px solid var(--hairline);
+  border-right: none;
+  border-radius: 0;
+}
+.top-bar .button.right {
+  border: 1px solid var(--hairline);
+  border-radius: 0 5px 5px 0;
+}
 
 .stats-display {
   font-size: var(--font-size-xs);
@@ -3234,6 +3248,16 @@ div .top-bar {
   font-size: var(--font-size-md);
   height: 28px;
   padding: 0 10px;
+}
+
+.top-level-button-container .button.left {
+  border-radius: 5px 0 0 5px;
+}
+.top-level-button-container .button.middle {
+  border-radius: 0;
+}
+.top-level-button-container .button.right {
+  border-radius: 0 5px 5px 0;
 }
 
 .clickable-label-button {

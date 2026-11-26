@@ -182,6 +182,24 @@ div .top-bar {
       height: 16px;
     }
   }
+
+  // Positioned groups (the view selector) are one 4-way toggler in
+  // the top bar too: shared hairline, square inside corners, rounded
+  // only on the outside ends.
+  .button.left {
+    border: 1px solid var(--hairline);
+    border-right: none;
+    border-radius: 5px 0 0 5px;
+  }
+  .button.middle {
+    border: 1px solid var(--hairline);
+    border-right: none;
+    border-radius: 0;
+  }
+  .button.right {
+    border: 1px solid var(--hairline);
+    border-radius: 0 5px 5px 0;
+  }
 }
 
 .stats-display {
@@ -359,6 +377,15 @@ div .top-bar {
   font-size: var(--font-size-md);
   height: 28px;
   padding: 0 10px;
+}
+
+// A joined group is one toggler: square inside corners, rounded only
+// on the outside ends (the base .button radius rounds every corner,
+// which made each segment look like its own outlined pill).
+.top-level-button-container {
+  .button.left { border-radius: 5px 0 0 5px; }
+  .button.middle { border-radius: 0; }
+  .button.right { border-radius: 0 5px 5px 0; }
 }
 
 .clickable-label-button {
