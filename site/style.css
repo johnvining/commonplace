@@ -4565,7 +4565,13 @@ a.grid-link > a {
   position: relative;
 }
 
-.top-level.input.time-subject-select,
+.top-level.input.time-subject-select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
 .time-day-nav .top-level.input {
   width: auto;
   flex: 1 1 140px;
