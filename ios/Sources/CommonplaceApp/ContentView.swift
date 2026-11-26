@@ -60,6 +60,12 @@ struct ContentView: View {
                 .keyboardShortcut("o", modifiers: .control)
                 .hidden()
         }
+        // Cmd+K opens the quick bar (hardware keyboards).
+        .background {
+            Button("") { state.quickBarOpen = true }
+                .keyboardShortcut("k", modifiers: .command)
+                .hidden()
+        }
         .task {
             await state.validateSession()
             await state.refreshPins()

@@ -39,6 +39,8 @@ final class AppState: ObservableObject {
     @Published var maintenancePending: Int = 0
     /// Library totals shown grey beside sidebar sections.
     @Published var counts: StatsCounts?
+    /// Quick-bar overlay visibility (Cmd+K).
+    @Published var quickBarOpen = false
     /// Last unfiltered recent-notes page, so returning to the Notes
     /// section shows instantly instead of re-querying from scratch.
     var recentNotesCache: [Note] = []

@@ -17,6 +17,9 @@ struct CommonplaceApp: App {
                         .environmentObject(state)
                 }
             }
+            .sheet(isPresented: $state.quickBarOpen) {
+                QuickBarView().environmentObject(state)
+            }
             .task {
                 await state.validateSession()
                 if state.isSignedIn {
@@ -43,7 +46,7 @@ struct CommonplaceApp: App {
                     .keyboardShortcut("2", modifiers: .command)
                 Button("Piles") { NotificationCenter.default.post(name: .macSection, object: "piles") }
                     .keyboardShortcut("3", modifiers: .command)
-                Button("Search") { NotificationCenter.default.post(name: .macSection, object: "search") }
+                Button("Quick Search…") { state.quickBarOpen = true }
                     .keyboardShortcut("k", modifiers: .command)
             }
             CommandMenu("Time") {
