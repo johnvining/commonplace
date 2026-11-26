@@ -72,14 +72,24 @@ function subjectKeyFor(entry: any): { key: string; label: string; href: string }
 
 
 function KindTotals({ summary }: { summary: any }) {
+  const total = summary.totalMinutes || 0
+  const readingPct = total ? Math.round((summary.readingMinutes / total) * 100) : 0
   return (
-    <div className="time-kind-totals">
-      <span className="time-total">{formatMinutes(summary.totalMinutes)} total</span>
-      <span className="time-kind time-kind-reading">{formatMinutes(summary.readingMinutes)} Reading</span>
-      <span className="time-kind time-kind-writing">{formatMinutes(summary.writingMinutes)} Writing</span>
-      <span className="time-count">
-        {summary.entryCount} {summary.entryCount === 1 ? 'entry' : 'entries'}
-      </span>
+    <div className="time-kind-block">
+      <div className="time-kind-totals">
+        <span className="time-total">{formatMinutes(summary.totalMinutes)} total</span>
+        <span className="time-kind time-kind-reading">{formatMinutes(summary.readingMinutes)} Reading</span>
+        <span className="time-kind time-kind-writing">{formatMinutes(summary.writingMinutes)} Writing</span>
+        <span className="time-count">
+          {summary.entryCount} {summary.entryCount === 1 ? 'entry' : 'entries'}
+        </span>
+      </div>
+      {total ? (
+        <div className="time-split" role="img" aria-label={`${readingPct}% reading, ${100 - readingPct}% writing`}>
+          <span className="time-split-reading" style={{ width: `${readingPct}%` }} />
+          <span className="time-split-writing" style={{ width: `${100 - readingPct}%` }} />
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -722,30 +732,6 @@ function Time(props: any) {
         <div className="search-empty-state">Loading…</div>
       ) : (
         <>
-          <div className="time-card">
-            <div className="top-level form-label">Daily — {daily.date}</div>
-            <KindTotals summary={daily} />
-            {daily.byPile.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By pile</div>
-                <SubjectTable rows={daily.byPile} pileLink />
-              </>
-            ) : null}
-            {daily.byWork?.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By work</div>
-                <SubjectTable rows={daily.byWork} workLink />
-              </>
-            ) : null}
-            {daily.byTitle.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By title</div>
-                <SubjectTable rows={daily.byTitle} />
-              </>
-            ) : null}
-            {!daily.entryCount ? <div className="sidebar-muted">Nothing logged this day.</div> : null}
-          </div>
-
           <div className="time-entries">
             <div className="top-level form-label">Entries — {selectedDate}</div>
             {dayEntries.length ? (
@@ -811,11 +797,39 @@ function Time(props: any) {
             )}
           </div>
 
-          <div className="time-card">
-            <div className="top-level form-label">
-              Weekly — {weekly.weekStart} to {weekly.weekEnd}
+
+          <div className="time-card time-analysis">
+            <div className="top-level form-label">Analysis</div>
+            <div className="time-analysis-head">
+              <span className="time-analysis-when">Today — {daily.date}</span>
+              <KindTotals summary={daily} />
             </div>
-            <KindTotals summary={weekly} />
+            {daily.byPile.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By pile</div>
+                <SubjectTable rows={daily.byPile} pileLink />
+              </>
+            ) : null}
+            {daily.byWork?.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By work</div>
+                <SubjectTable rows={daily.byWork} workLink />
+              </>
+            ) : null}
+            {daily.byTitle.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By title</div>
+                <SubjectTable rows={daily.byTitle} />
+              </>
+            ) : null}
+            {!daily.entryCount ? <div className="sidebar-muted">Nothing logged this day.</div> : null}
+            <div className="time-analysis-divider" />
+            <div className="time-analysis-head">
+              <span className="time-analysis-when">
+                This week — {weekly.weekStart} to {weekly.weekEnd}
+              </span>
+              <KindTotals summary={weekly} />
+            </div>
             <div className="top-level form-label time-table-title">By day</div>
             <table className="time-table">
               <thead>

@@ -2664,3 +2664,20 @@ mark.search-highlight {
   font-family: $reading_font;
 }
 .time-pile-pill { font-family: $reading_font; }
+
+.time-analysis-head {
+  display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+  margin-top: 10px;
+}
+.time-analysis-when { font-weight: 600; }
+.time-analysis-divider {
+  border-top: 1px solid var(--hairline); margin: 18px 0 4px;
+}
+.time-analysis .time-kind-totals { margin: 0; }
+
+.time-split {
+  display: flex; height: 4px; max-width: 420px; border-radius: 2px;
+  overflow: hidden; background: var(--hairline); margin: 2px 0 6px;
+}
+.time-split-reading { background: var(--accent); }
+.time-split-writing { background: var(--faint); }
