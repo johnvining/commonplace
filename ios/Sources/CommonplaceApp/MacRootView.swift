@@ -10,6 +10,10 @@ struct MacRootView: View {
     @State private var section: String? = "notes"
     @State private var query = ""
     @State private var timePreselect: String?
+    /// A starred item opened in this window: (type, id). Selecting a
+    /// sidebar section clears it and returns to that section's list.
+    @State private var routedType: String?
+    @State private var routedId: String?
 
     private let sections: [(id: String, label: String, icon: String)] = [
         ("notes", "Notes", "note.text"),
@@ -29,7 +33,10 @@ struct MacRootView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $section) {
+            List(selection: Binding(
+                get: { section },
+                set: { section = $0; routedType = nil; routedId = nil }
+            )) {
                 Section {
                     ForEach(sections, id: \.id) { s in
                         Label(s.label, systemImage: s.icon).tag(s.id)
@@ -67,7 +74,7 @@ struct MacRootView: View {
                 .frame(minWidth: 560, minHeight: 480)
         }
         .onReceive(NotificationCenter.default.publisher(for: .macSection)) { note in
-            if let s = note.object as? String { section = s }
+            if let s = note.object as? String { section = s; routedType = nil; routedId = nil }
         }
         // Ctrl+O opens Search, like the web's search shortcut.
         .background {
@@ -77,24 +84,61 @@ struct MacRootView: View {
         }
     }
 
+    /// Starred clicks open the item itself, in this window — not a new
+    /// window, and not just the section's list.
     private func openPin(_ pin: PinItem) {
         switch pin.type {
-        case "note":
-            openWindow(value: pin.id)
-        case "pile":
-            section = "piles"
+        case "note", "pile", "work", "idea":
+            routedType = pin.type
+            routedId = pin.id
+        case "auth", "author":
+            routedType = "auth"
+            routedId = pin.id
         case "time":
+            routedType = nil; routedId = nil
             timePreselect = pin.id
             section = "time"
-        case "work", "auth", "idea":
-            section = pin.type == "work" ? "works" : pin.type == "auth" ? "authors" : "ideas"
         default:
+            routedType = nil; routedId = nil
             section = "starred"
         }
     }
 
     @ViewBuilder
     private var detail: some View {
+        if let routedType, let routedId {
+            VStack(spacing: 0) {
+                HStack {
+                    Button {
+                        self.routedType = nil; self.routedId = nil
+                    } label: {
+                        Label("Back", systemImage: "chevron.left")
+                            .font(DS.ui(12, weight: .medium))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(DS.muted)
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                NavigationStack {
+                    switch routedType {
+                    case "note": NoteDetailView(noteId: routedId)
+                    case "pile": PileDetailView(pileId: routedId)
+                    case "work": WorkDetailView(workId: routedId)
+                    case "idea": IdeaDetailView(ideaId: routedId)
+                    case "auth": AuthorDetailView(authorId: routedId)
+                    default: PinsView()
+                    }
+                }
+            }
+        } else {
+            sectionDetail
+        }
+    }
+
+    @ViewBuilder
+    private var sectionDetail: some View {
         switch section ?? "notes" {
         case "time": TimeView(preselectSubject: timePreselect)
         case "piles": PileListView()
