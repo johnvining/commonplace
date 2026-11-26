@@ -4726,4 +4726,50 @@ a.grid-link > a {
   color: var(--ink);
 }
 
+.top-level.form-label.time-section-head {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 18px 0 8px;
+}
+
+.time-entries {
+  background: var(--note-background);
+  border: 1px solid var(--note-border);
+  border-radius: 6px;
+  padding: 6px 16px 10px;
+  margin-bottom: 20px;
+}
+
+.time-entries .time-entry {
+  padding: 6px 0;
+  gap: 10px;
+}
+
+.time-entries .time-kind {
+  width: 64px;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.time-entries .time-entry .time-minutes {
+  min-width: 44px;
+}
+
+.time-entries .time-entry-actions .button.compact {
+  min-height: 28px;
+  padding: 2px 10px;
+  font-size: 12px;
+}
+
+.time-entries .time-entry-actions {
+  gap: 6px;
+}
+
+.time-entries .time-section-head {
+  margin: 8px 0 4px;
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -2698,3 +2698,23 @@ mark.search-highlight {
   text-transform: none; letter-spacing: 0; font-size: 15px;
   font-weight: 600; color: var(--ink);
 }
+
+// Section headers beat the base form-label caps (two-class selector).
+.top-level.form-label.time-section-head {
+  text-transform: none; letter-spacing: 0; font-size: 15px;
+  font-weight: 600; color: var(--ink); margin: 18px 0 8px;
+}
+
+// Today entries as one coherent card, compact rows.
+.time-entries {
+  background: $note_background; border: 1px solid $note_border;
+  border-radius: 6px; padding: 6px 16px 10px; margin-bottom: 20px;
+}
+.time-entries .time-entry { padding: 6px 0; gap: 10px; }
+.time-entries .time-kind { width: 64px; justify-content: center; flex: 0 0 auto; }
+.time-entries .time-entry .time-minutes { min-width: 44px; }
+.time-entries .time-entry-actions .button.compact {
+  min-height: 28px; padding: 2px 10px; font-size: 12px;
+}
+.time-entries .time-entry-actions { gap: 6px; }
+.time-entries .time-section-head { margin: 8px 0 4px; }
