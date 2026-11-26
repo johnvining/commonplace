@@ -14,16 +14,23 @@ final class AppState: ObservableObject {
         didSet { UserDefaults.standard.set(username, forKey: "username") }
     }
     @Published var isSignedIn = false
+    @Published var authChecking = true
     @Published var authError: String?
     @Published var unreachable = false
     @Published var pins: [PinItem] = []
     @Published var lastPinError: String?
+    /// Route hint saved on 401 so sign-in can restore it (web redirect-restore).
+    @Published var pendingRoute: String? {
+        didSet { UserDefaults.standard.set(pendingRoute, forKey: "pending_route") }
+    }
 
     private let pinQueueKey = "pin_queue_v1"
     private var pinQueue: [PinSyncOp] = []
+    private var pinSyncInFlight = false
+    private var pinSyncAgain = false
 
     @Published var timerSubjectKey: String?
-    @Published var timerKind = "reading"
+    @Published var timerKind = "writing"
     @Published var timerStartedAt: Date?
 
     var timerIsRunning: Bool { timerStartedAt != nil }
@@ -32,6 +39,7 @@ final class AppState: ObservableObject {
         let stored = UserDefaults.standard.string(forKey: "serverURL")
         serverURLString = stored ?? "http://localhost:3000/api"
         username = UserDefaults.standard.string(forKey: "username") ?? "commonplace"
+        pendingRoute = UserDefaults.standard.string(forKey: "pending_route")
         if let data = UserDefaults.standard.data(forKey: "time_timer_v1"),
            let obj = try? JSONDecoder().decode([String: String].self, from: data),
            let key = obj["key"], let kind = obj["kind"],
@@ -106,29 +114,40 @@ final class AppState: ObservableObject {
             items.removeAll { $0.type == op.type && $0.id == op.id }
             if op.op == "pin" {
                 items.insert(PinItem(type: op.type, id: op.id, label: op.label, href: op.href,
-                                     pinnedAt: op.at), at: 0)
+                                     pinnedAt: op.at, pending: true), at: 0)
             }
         }
         return items
     }
 
     func syncPinQueue() async {
-        do {
-            let confirmed = try await client.syncPins(pinQueue)
-            pinQueue = []
-            persistPinQueue()
-            pins = confirmed
-            unreachable = false
-            lastPinError = nil
-        } catch let error as APIError {
-            if case .transport = error {
-                unreachable = true
-            } else {
+        if pinSyncInFlight { pinSyncAgain = true; return }
+        pinSyncInFlight = true
+        defer { pinSyncInFlight = false }
+        repeat {
+            pinSyncAgain = false
+            let sent = pinQueue
+            do {
+                let confirmed = try await client.syncPins(sent)
+                // Drop exactly the ops sent; ops queued during the flight stay.
+                let sentKeys = Set(sent.map { "\($0.op)|\($0.type)|\($0.id)|\($0.at ?? 0)" })
+                pinQueue.removeAll { sentKeys.contains("\($0.op)|\($0.type)|\($0.id)|\($0.at ?? 0)") }
+                persistPinQueue()
+                pins = applyPins(over: confirmed)
+                unreachable = false
+                lastPinError = nil
+            } catch let error as APIError {
+                if case .transport = error {
+                    unreachable = true
+                } else {
+                    lastPinError = "Star sync failed — will retry."
+                }
+                break
+            } catch {
                 lastPinError = "Star sync failed — will retry."
+                break
             }
-        } catch {
-            lastPinError = "Star sync failed — will retry."
-        }
+        } while pinSyncAgain
     }
 
     func refreshPins() async {
@@ -136,6 +155,8 @@ final class AppState: ObservableObject {
     }
 
     func validateSession() async {
+        authChecking = true
+        defer { authChecking = false }
         do {
             try await client.validateSession()
             isSignedIn = true
@@ -147,7 +168,9 @@ final class AppState: ObservableObject {
                 // Server down or offline: keep the session, flag it.
                 unreachable = true
             case .unauthorized, .forbidden:
+                if isSignedIn { pendingRoute = pendingRoute ?? "notes" }
                 isSignedIn = false
+                authError = "Signed out — log in again."
             default:
                 break
             }

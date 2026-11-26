@@ -6,7 +6,9 @@ struct CommonplaceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if state.isSignedIn {
+            if state.authChecking && !state.isSignedIn {
+                ProgressView("Checking session…").environmentObject(state)
+            } else if state.isSignedIn {
                 ContentView()
                     .environmentObject(state)
             } else {

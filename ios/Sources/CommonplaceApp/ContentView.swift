@@ -6,6 +6,26 @@ struct ContentView: View {
     @EnvironmentObject var state: AppState
 
     var body: some View {
+        VStack(spacing: 0) {
+            if state.unreachable {
+                HStack {
+                    Text("Server unreachable — showing last known data.")
+                        .font(DS.ui(12)).foregroundStyle(DS.danger)
+                    Spacer()
+                    Button("Retry") { Task { await state.validateSession(); await state.refreshPins() } }
+                        .font(DS.ui(12, weight: .medium))
+                }
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(DS.hover)
+            }
+            if state.authChecking {
+                Text("Checking session…").font(DS.ui(11)).foregroundStyle(DS.muted)
+            }
+        tabView
+        }
+    }
+
+    private var tabView: some View {
         TabView {
             NotesView()
                 .tabItem { Label("Notes", systemImage: "note.text") }
@@ -29,27 +49,36 @@ struct ContentView: View {
 struct MoreView: View {
     @EnvironmentObject var state: AppState
     @State private var counts: StatsCounts?
+    @State private var countsError: String?
 
     var body: some View {
         NavigationStack {
             List {
+                if let countsError { Text(countsError).font(DS.ui(12)).foregroundStyle(DS.danger) }
                 if let c = counts {
                     Section("Library") {
-                        Text("\(c.notes ?? 0) notes · \(c.authors ?? 0) authors · \(c.ideas ?? 0) ideas · \(c.works ?? 0) works · \(c.piles ?? 0) piles")
-                            .font(.caption).foregroundStyle(.secondary)
+                        NavigationLink { NotesView() } label: { Text("Notes: \(c.notes ?? 0)") }
+                        NavigationLink { AuthorsListView() } label: { Text("Authors: \(c.authors ?? 0)") }
+                        NavigationLink { IdeasListView() } label: { Text("Ideas: \(c.ideas ?? 0)") }
+                        NavigationLink { WorksListView() } label: { Text("Works: \(c.works ?? 0)") }
+                        NavigationLink { PileListView() } label: { Text("Piles: \(c.piles ?? 0)") }
                     }
                 }
                 NavigationLink("Works") { WorksListView() }
                 NavigationLink("Authors") { AuthorsListView() }
                 NavigationLink("Ideas") { IdeasListView() }
                 NavigationLink("Review (Flip)") { FlipView() }
-                NavigationLink("Import") { ImportView() }
+                NavigationLink("Notes to file") { FileListView() }
+                NavigationLink("Import / Load") { ImportView() }
                 NavigationLink("Maintenance") { MaintenanceView() }
                 NavigationLink("Starred") { PinsView() }
                 NavigationLink("Settings") { SettingsView() }
             }
             .navigationTitle("More")
-            .task { counts = try? await state.client.stats() }
+            .task {
+                do { counts = try await state.client.stats() }
+                catch { countsError = "Stats failed: \(describe(error))" }
+            }
         }
     }
 }
