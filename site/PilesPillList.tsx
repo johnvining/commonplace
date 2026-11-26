@@ -31,7 +31,7 @@ function splitPileName(name: string | null | undefined): { pre: string | null; l
   return { pre: name.slice(0, idx).trim(), label: name.slice(idx + 1).trim() }
 }
 
-function PileLabel({ name }: { name?: string | null }) {
+export function PileLabel({ name }: { name?: string | null }) {
   const { pre, label } = splitPileName(name)
   return (
     <>
