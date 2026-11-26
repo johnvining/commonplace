@@ -133,6 +133,7 @@ function Time(props: any) {
   const subjectApplied = useRef<string | null>(null)
   const [timerKey, setTimerKey] = useState('')
   const [timerQuery, setTimerQuery] = useState('')
+  const [timerLabel, setTimerLabel] = useState('')
   const [timerOpen, setTimerOpen] = useState(false)
   const [timerPiles, setTimerPiles] = useState<any[]>([])
   const [timerKind, setTimerKind] = useState('writing')
@@ -244,9 +245,28 @@ function Time(props: any) {
     return key
   }
 
+  // Once recents arrive, replace a raw key label with the real name.
+  useEffect(() => {
+    if (timerKey && subjects.length && (!timerLabel || timerLabel === timerKey)) {
+      setTimerLabel(subjectLabelForKey(timerKey))
+    }
+    // A pile picked by deep link may not be in recents: fetch its name.
+    if (timerKey.startsWith('pile:') && (!timerLabel || timerLabel === timerKey)) {
+      const id = timerKey.slice(5)
+      db.getInfo(db.types.pile, id)
+        .then((res: any) => {
+          const name = res.data.data?.name
+          if (name) setTimerLabel(name)
+        })
+        .catch(() => {})
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subjects, timerKey])
+
   const pickTimerSubject = (key: string, label: string) => {
     selectTimerKey(key)
     setTimerQuery(label)
+    setTimerLabel(label)
     setTimerOpen(false)
   }
 
@@ -443,12 +463,13 @@ function Time(props: any) {
           <div className="time-subject-picker">
             {timerKey ? (
               <div className="time-subject-chip">
-                <span>{subjectLabelForKey(timerKey)}</span>
+                <span>{timerLabel || subjectLabelForKey(timerKey)}</span>
                 <button
                   aria-label="Clear subject"
                   onClick={() => {
                     setTimerKey('')
                     setTimerQuery('')
+                    setTimerLabel('')
                     setTimerOpen(true)
                   }}
                 >
