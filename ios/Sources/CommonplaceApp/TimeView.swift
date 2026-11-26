@@ -24,7 +24,10 @@ struct TimeView: View {
         NavigationStack {
             List {
                 Section {
-                    Picker("Subject", selection: $selection) {
+                    // One left-to-right row like the web timer:
+                    // subject, kind, elapsed/Start — nothing right-aligned.
+                    HStack(spacing: 10) {
+                        Picker("Subject", selection: $selection) {
                         Text("Pick something…").tag("")
                         let starred = state.pins.filter { $0.type == "time" }
                         if !starred.isEmpty {
@@ -52,34 +55,42 @@ struct TimeView: View {
                                 }
                             }
                         }
-                    }
-                    HStack {
-                        TextField("Name something new…", text: $newName)
-                            .autocorrectionDisabled()
-                        Button("Use name") { useNewName() }
-                            .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty || state.timerIsRunning)
-                    }
-                    Picker("Kind", selection: $kind) {
-                        Text("Reading").tag("reading")
-                        Text("Writing").tag("writing")
-                    }
-                    .pickerStyle(.segmented)
-                    HStack(spacing: 12) {
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .fixedSize()
+                        Picker("Kind", selection: $kind) {
+                            Text("Reading").tag("reading")
+                            Text("Writing").tag("writing")
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.segmented)
+                        .frame(width: 170)
                         if state.timerIsRunning, let at = state.timerStartedAt {
                             TimelineView(.periodic(from: Date(), by: 1.0)) { ctx in
                                 Text(formatElapsed(ctx.date.timeIntervalSince(at) * 1000))
-                                    .font(DS.ui(22, weight: .semibold))
+                                    .font(DS.ui(19, weight: .semibold))
                                     .monospacedDigit()
                                     .foregroundStyle(DS.ink)
                             }
                             DSButton(title: "Stop") { stopTimer() }
                         } else {
                             DSButton(title: "Start") {
-                                state.startTimer(key: selection, kind: kind)
+                                state.startTimer(key: selection, kind: kind,
+                                             label: displayTitle(forKey: selection) ?? subjects.first(where: { $0.key == selection }).map(subjectLabel))
                             }
                             .disabled(selection.isEmpty)
                             .opacity(selection.isEmpty ? 0.5 : 1)
                         }
+                        Spacer()
+                    }
+                    HStack(spacing: 8) {
+                        TextField("Name something new…", text: $newName)
+                            .textFieldStyle(.roundedBorder)
+                            .autocorrectionDisabled()
+                        DSButton(title: "Use name") { useNewName() }
+                            .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty || state.timerIsRunning)
+                            .opacity(newName.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
                         Spacer()
                     }
                     if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
@@ -103,11 +114,11 @@ struct TimeView: View {
                             .foregroundStyle(DS.ink)
                             .textCase(nil)
                         Spacer()
-                        Button("‹") { shift(-1) }.font(DS.ui(13))
+                        DSButton(title: "‹") { shift(-1) }
                         DatePicker("", selection: dayBinding, displayedComponents: .date)
                             .labelsHidden()
-                        Button("›") { shift(1) }.font(DS.ui(13))
-                        DSButton(title: "Today") { day = dayString(Date()); reload() }
+                        DSButton(title: "›") { shift(1) }
+                        DSButton(title: "Today", selected: day == localDayString()) { day = dayString(Date()); reload() }
                     }
                 }
 
@@ -458,14 +469,16 @@ struct TimeEntryRow: View {
                     .foregroundStyle(DS.muted)
                 Spacer()
                 Button { onStar() } label: { Image(systemName: "star") }
-                Button("Edit") {
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(DS.muted)
+                DSButton(title: "Edit") {
                     title = entry.title ?? ""
                     minutes = String(entry.minutes ?? 0)
                     kind = entry.kind ?? "reading"
                     date = entry.date.map(dayString) ?? ""
                     editing.toggle()
                 }
-                Button("Delete") { confirming = true }
+                DSButton(title: "Delete") { confirming = true }
                     .confirmationDialog("Delete entry?", isPresented: $confirming) {
                         Button("Delete", role: .destructive, action: onDelete)
                     }

@@ -19,24 +19,32 @@ struct MenuTimerLabel: View {
     }
 
     var body: some View {
-        Group {
+        // Serif C (the app icon), then subject + elapsed in the bar
+        // itself; totals live in the popover.
+        HStack(spacing: 5) {
+            Text("C")
+                .font(DS.serif(15, weight: .semibold))
             if let at = state.timerStartedAt {
-                Label(
-                    formatElapsed(now.timeIntervalSince(at) * 1000)
-                        + (state.timerKind == "reading" ? " R" : " W")
-                        + (todayText.isEmpty ? "" : " · \(todayText) today"),
-                    systemImage: "timer"
-                )
+                Text(shortSubject)
+                    .lineLimit(1)
+                Text(formatElapsed(now.timeIntervalSince(at) * 1000))
+                    .monospacedDigit()
             } else if !todayText.isEmpty {
-                Label("\(todayText) today", systemImage: "timer")
-            } else {
-                Label("Timer", systemImage: "timer")
+                Text(todayText)
+                    .monospacedDigit()
             }
         }
         .task { await state.refreshTodayTotal() }
         .onReceive(ticker) { tick in
             if state.timerStartedAt != nil { now = tick }
         }
+    }
+
+    private var shortSubject: String {
+        let label = state.timerSubjectLabel
+            ?? state.timerSubjectKey?.replacingOccurrences(of: "title:", with: "")
+            ?? ""
+        return label.count > 18 ? String(label.prefix(17)) + "…" : label
     }
 }
 
@@ -110,6 +118,7 @@ struct MenuTimerView: View {
         .padding(12)
         .frame(width: 260)
         .task { await loadRecents() }
+        .task(id: state.timerSubjectKey) { await resolveSubject() }
     }
 
     private func loadRecents() async {
@@ -178,17 +187,34 @@ struct MenuTimerView: View {
             // Switching subjects logs the running timer first.
             Task {
                 await state.stopAndLogTimer()
-                state.startTimer(key: s.key, kind: kind)
+                state.startTimer(key: s.key, kind: kind, label: subjectLabel(s))
             }
         } else {
-            state.startTimer(key: s.key, kind: kind)
+            state.startTimer(key: s.key, kind: kind, label: subjectLabel(s))
         }
     }
+
+    @State private var resolvedSubject = ""
 
     private var subjectName: String {
         guard let key = state.timerSubjectKey else { return "" }
         if key.hasPrefix("title:") { return String(key.dropFirst(6)) }
-        return key
+        return resolvedSubject.isEmpty ? key : resolvedSubject
+    }
+
+    private func resolveSubject() async {
+        guard let key = state.timerSubjectKey else { return }
+        if key.hasPrefix("pile:") {
+            let id = String(key.dropFirst(5))
+            if let pile = try? await state.client.pile(id: id) {
+                resolvedSubject = pile.name ?? id
+            }
+        } else if key.hasPrefix("work:") {
+            let id = String(key.dropFirst(5))
+            if let work = try? await state.client.work(id: id) {
+                resolvedSubject = work.name ?? id
+            }
+        }
     }
 }
 #endif

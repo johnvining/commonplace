@@ -67,7 +67,7 @@ struct MacRootView: View {
                                 openPin(pin)
                             } label: {
                                 HStack {
-                                    Image(systemName: "star.fill")
+                                    Image(systemName: pin.type == "time" ? "timer" : "star.fill")
                                         .font(DS.ui(10)).foregroundStyle(DS.muted)
                                     Text(pin.label ?? pin.id)
                                         .font(DS.ui(12)).lineLimit(1)
@@ -142,6 +142,11 @@ struct MacRootView: View {
             routedType = nil; routedId = nil
             timePreselect = pin.id
             section = "time"
+            // A starred time subject starts its timer on click (unless
+            // one is already running — then just show the Time page).
+            if !state.timerIsRunning {
+                state.startTimer(key: pin.id, kind: state.timerKind, label: pin.label)
+            }
         default:
             routedType = nil; routedId = nil
             section = "starred"

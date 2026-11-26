@@ -30,6 +30,7 @@ final class AppState: ObservableObject {
     private var pinSyncAgain = false
 
     @Published var timerSubjectKey: String?
+    @Published var timerSubjectLabel: String?
     @Published var timerKind = "writing"
     @Published var timerStartedAt: Date?
     /// Minutes logged today (all kinds), shown next to the timer.
@@ -51,6 +52,7 @@ final class AppState: ObservableObject {
            let key = obj["key"], let kind = obj["kind"],
            let at = obj["startedAt"], let date = ISO8601DateFormatter().date(from: at) {
             timerSubjectKey = key
+            timerSubjectLabel = obj["label"]
             timerKind = kind
             timerStartedAt = date
         }
@@ -100,7 +102,8 @@ final class AppState: ObservableObject {
     func persistTimer() {
         guard let key = timerSubjectKey, let at = timerStartedAt else { return }
         let s = ISO8601DateFormatter().string(from: at)
-        let obj = ["key": key, "kind": timerKind, "startedAt": s]
+        var obj = ["key": key, "kind": timerKind, "startedAt": s]
+        if let label = timerSubjectLabel { obj["label"] = label }
         if let data = try? JSONEncoder().encode(obj) {
             UserDefaults.standard.set(data, forKey: "time_timer_v1")
         }
@@ -142,12 +145,14 @@ final class AppState: ObservableObject {
 
     func clearTimer() {
         timerSubjectKey = nil
+        timerSubjectLabel = nil
         timerStartedAt = nil
         UserDefaults.standard.removeObject(forKey: "time_timer_v1")
     }
 
-    func startTimer(key: String, kind: String) {
+    func startTimer(key: String, kind: String, label: String? = nil) {
         timerSubjectKey = key
+        timerSubjectLabel = label
         timerKind = kind
         timerStartedAt = Date()
         persistTimer()
