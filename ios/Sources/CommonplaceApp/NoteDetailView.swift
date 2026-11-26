@@ -90,10 +90,11 @@ struct NoteDetailView: View {
                         if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
                     } else {
                         NoteStatusLine(note: note)
-                        // Reading card like the web note: accent edge,
-                        // image on top, serif title, take in italics.
+                        // Reading card like the web note: image on top,
+                        // serif title, take in italics. (No accent edge:
+                        // on the web the blue bar means keyboard-selected,
+                        // and this note is not in a selection.)
                         HStack(alignment: .top, spacing: 12) {
-                            Rectangle().fill(DS.accent).frame(width: 3)
                             VStack(alignment: .leading, spacing: 8) {
                                 if let first = imageDatas.first {
                                     NoteImageView(data: first)

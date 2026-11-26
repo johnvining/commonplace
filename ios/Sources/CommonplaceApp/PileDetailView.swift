@@ -88,8 +88,10 @@ struct PileDetailView: View {
                 async let p = state.client.pile(id: pileId)
                 async let n = state.client.pileNotes(id: pileId)
                 async let w = state.client.pileWorks(id: pileId)
-                async let t = state.client.listTimeEntries(pile: pileId, limit: 1000)
-                let (pp, nn, ww, tt) = try await (p, n, w, t)
+                let (pp, nn, ww) = try await (p, n, w)
+                // Time totals are decoration: a failure there must not
+                // take down the whole pile page (#403).
+                let tt = (try? await state.client.listTimeEntries(pile: pileId, limit: 1000)) ?? []
                 let r = tt.filter { $0.kind == "reading" }.reduce(0) { $0 + ($1.minutes ?? 0) }
                 let wr = tt.filter { $0.kind == "writing" }.reduce(0) { $0 + ($1.minutes ?? 0) }
                 await MainActor.run {
@@ -97,7 +99,7 @@ struct PileDetailView: View {
                     timeTotals = (tt.reduce(0) { $0 + ($1.minutes ?? 0) }, r, wr, tt.count)
                 }
             } catch {
-                await MainActor.run { self.error = "Load failed — retry." }
+                await MainActor.run { self.error = "Load failed: \(describe(error))" }
             }
         }
     }
