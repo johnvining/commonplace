@@ -22,7 +22,7 @@
        in the Mac app (and check iOS) — find why createNote() throws
        and fix it; also stop the menu shortcut and the Notes button
        both firing for one Cmd+N.
-10. [ ] Commonplace (Mac) and iOS: what work is it doing with a running
+10. [x] Commonplace (Mac) and iOS: what work is it doing with a running
         timer? Give the user at least a top-5 profile before calling
         the performance pass (item 3) done.
 11. [x] Note page: a real Edit mode matching the web edit form (one
