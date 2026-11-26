@@ -47,7 +47,10 @@ struct MaintenanceView: View {
     }
 
     private func load() async {
-        do { tasks = try await state.client.maintenanceList() }
+        do {
+            tasks = try await state.client.maintenanceList()
+            state.maintenancePending = tasks.filter { $0.pending == true }.count
+        }
         catch { self.error = "Load failed — retry." }
     }
 

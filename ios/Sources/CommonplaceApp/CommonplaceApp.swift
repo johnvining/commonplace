@@ -19,7 +19,11 @@ struct CommonplaceApp: App {
             }
             .task {
                 await state.validateSession()
-                if state.isSignedIn { await state.refreshPins() }
+                if state.isSignedIn {
+                    await state.refreshPins()
+                    await state.refreshCounts()
+                    await state.refreshMaintenancePending()
+                }
             }
         }
         .commands {

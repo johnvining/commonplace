@@ -39,7 +39,25 @@ struct MacRootView: View {
             )) {
                 Section {
                     ForEach(sections, id: \.id) { s in
-                        Label(s.label, systemImage: s.icon).tag(s.id)
+                        HStack(spacing: 6) {
+                            Label(s.label, systemImage: s.icon)
+                            Spacer()
+                            // Grey total beside countable sections.
+                            if let count = sectionCount(s.id) {
+                                Text("\(count)")
+                                    .font(DS.ui(11))
+                                    .monospacedDigit()
+                                    .foregroundStyle(DS.faint)
+                            }
+                            // Dot when maintenance has open tasks.
+                            if s.id == "maintenance", state.maintenancePending > 0 {
+                                Circle()
+                                    .fill(DS.accent)
+                                    .frame(width: 7, height: 7)
+                                    .help("\(state.maintenancePending) open maintenance tasks")
+                            }
+                        }
+                        .tag(s.id)
                     }
                 }
                 if !state.pins.isEmpty {
@@ -100,6 +118,18 @@ struct MacRootView: View {
 
     /// Starred clicks open the item itself, in this window — not a new
     /// window, and not just the section's list.
+    private func sectionCount(_ id: String) -> Int? {
+        guard let c = state.counts else { return nil }
+        switch id {
+        case "notes": return c.notes
+        case "works": return c.works
+        case "authors": return c.authors
+        case "ideas": return c.ideas
+        case "piles": return c.piles
+        default: return nil
+        }
+    }
+
     private func openPin(_ pin: PinItem) {
         switch pin.type {
         case "note", "pile", "work", "idea":
