@@ -374,7 +374,7 @@ struct TimeEntryRow: View {
                 Text(entry.pile?.name ?? entry.title ?? "")
                     .foregroundStyle(.secondary)
                 Spacer()
-                Button("★", action: onStar)
+                Button { onStar() } label: { Image(systemName: "star") }
                 Button("Edit") {
                     title = entry.title ?? ""
                     minutes = String(entry.minutes ?? 0)

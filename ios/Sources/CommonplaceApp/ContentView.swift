@@ -144,7 +144,7 @@ struct HelpView: View {
                 Text("Pull down — refresh lists").font(DS.ui(13))
             }
             Section("Notes") {
-                Text("Tap a note to open it; ☆ stars it from its page. Piles and ideas are pill editors — type 2+ letters, tap a match, or Create.").font(DS.ui(13))
+                Text("Tap a note to open it; star it from its page. Piles and ideas are pill editors — type 2+ letters, tap a match, or Create.").font(DS.ui(13))
             }
             Section("Time") {
                 Text("Pick a starred/recent subject (or name something new), choose Reading or Writing, Start. Stop logs to today; a failed stop keeps the timer running.").font(DS.ui(13))

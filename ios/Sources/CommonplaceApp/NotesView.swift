@@ -10,6 +10,7 @@ struct NotesView: View {
     @State private var notes: [Note] = []
     @State private var page = 1
     @State private var search = ""
+    @State private var searchTask: Task<Void, Never>?
     @State private var pileSel: [PickOption] = []
     @State private var ideaSel: [PickOption] = []
     @State private var error: String?
@@ -25,6 +26,7 @@ struct NotesView: View {
                         TextField("Search notes", text: $search)
                             .font(DS.ui(14))
                             .onSubmit { applySearch() }
+                            .onChange(of: search) { scheduleSearch() }
                         Button("＋ Note") { createNote() }
                             .keyboardShortcut("n", modifiers: .command)
                             .font(DS.ui(13, weight: .medium))
@@ -147,6 +149,15 @@ struct NotesView: View {
         }
     }
 
+    private func scheduleSearch() {
+        searchTask?.cancel()
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if Task.isCancelled { return }
+            await MainActor.run { applySearch() }
+        }
+    }
+
     private func applySearch() {
         Task {
             do {
@@ -200,7 +211,7 @@ struct NoteRow: View {
                 Text(note.title ?? "(untitled)")
                     .font(DS.ui(14, weight: .medium)).lineLimit(1)
                 if let imgs = note.images, !imgs.isEmpty {
-                    Text("🖼 \(imgs.count)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                    HStack(spacing: 3) { Image(systemName: "photo").font(DS.ui(10)); Text("\(imgs.count)") }.font(DS.ui(11)).foregroundStyle(DS.muted)
                 }
                 if (note.reviewCount ?? 0) > 0 {
                     Text("worn").font(DS.ui(10)).foregroundStyle(DS.muted)

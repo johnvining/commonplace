@@ -204,7 +204,7 @@ struct WorkDetailView: View {
                         Text(authors.compactMap(\.name).joined(separator: ", ")).foregroundStyle(.secondary)
                     }
                     HStack {
-                        Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
                         Button(editing ? "Cancel" : "Edit") {
                             editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
                             editing.toggle()
@@ -355,7 +355,7 @@ struct AuthorDetailView: View {
                         }
                     }
                     HStack {
-                        Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
                         Button(editing ? "Cancel" : "Edit") {
                             editName = a.name ?? ""
                             editBirth = a.birth_year.map(String.init) ?? ""
@@ -472,7 +472,7 @@ struct IdeaDetailView: View {
                         }
                     }
                     HStack {
-                        Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
                         Button(editing ? "Cancel" : "Edit") {
                             editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
                             editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false

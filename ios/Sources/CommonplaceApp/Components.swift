@@ -18,7 +18,7 @@ struct CopyNickButton: View {
         } label: {
             HStack(spacing: 4) {
                 Text("nick: \(nick)").font(DS.mono(11))
-                Text(copied ? "✓" : "⧉").font(DS.ui(11))
+                Image(systemName: copied ? "checkmark" : "doc.on.doc").font(DS.ui(11))
             }.foregroundStyle(DS.muted)
         }
     }

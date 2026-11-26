@@ -199,12 +199,14 @@ struct SearchView: View {
                 }
                 Spacer()
                 if let type = item.type {
-                    Button(state.pins.contains { $0.type == type && $0.id == id } ? "★" : "☆") {
+                    Button {
                         if state.pins.contains(where: { $0.type == type && $0.id == id }) {
                             state.queueUnpin(type: type, id: id)
                         } else {
                             state.queuePin(type: type, id: id, label: item.displayName, href: nil)
                         }
+                    } label: {
+                        Image(systemName: state.pins.contains(where: { $0.type == type && $0.id == id }) ? "star.fill" : "star")
                     }
                 }
             }

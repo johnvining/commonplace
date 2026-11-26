@@ -29,7 +29,7 @@ struct PileDetailView: View {
                     Text(pile?.name ?? "Loading…").font(DS.ui(17, weight: .semibold))
                 }
                 HStack {
-                    Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                    Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
                     Button(editing ? "Cancel" : "Edit") {
                         newName = pile?.name ?? ""
                         editing.toggle()

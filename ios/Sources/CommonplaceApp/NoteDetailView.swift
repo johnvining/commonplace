@@ -129,7 +129,7 @@ struct NoteDetailView: View {
                 }
                 Section {
                     HStack {
-                        Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }
+                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
                         Button(editing ? "Cancel" : "Edit") {
                             title = note.title ?? ""; text = note.text ?? ""; take = note.take ?? ""
                             urlField = note.url ?? ""; yearField = note.year.map(String.init) ?? ""; pageField = note.page ?? ""
