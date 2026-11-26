@@ -30,6 +30,16 @@ struct CommonplaceApp: App {
                 }
                 .keyboardShortcut("n", modifiers: .command)
             }
+            CommandMenu("View") {
+                Button("Notes") { NotificationCenter.default.post(name: .macSection, object: "notes") }
+                    .keyboardShortcut("1", modifiers: .command)
+                Button("Time") { NotificationCenter.default.post(name: .macSection, object: "time") }
+                    .keyboardShortcut("2", modifiers: .command)
+                Button("Piles") { NotificationCenter.default.post(name: .macSection, object: "piles") }
+                    .keyboardShortcut("3", modifiers: .command)
+                Button("Search") { NotificationCenter.default.post(name: .macSection, object: "search") }
+                    .keyboardShortcut("k", modifiers: .command)
+            }
             CommandMenu("Time") {
                 Button(state.timerIsRunning ? "Stop Timer" : "Start from Time section") {
                     if state.timerIsRunning {

@@ -66,6 +66,9 @@ struct MacRootView: View {
             detail
                 .frame(minWidth: 560, minHeight: 480)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .macSection)) { note in
+            if let s = note.object as? String { section = s }
+        }
     }
 
     private func openPin(_ pin: PinItem) {
