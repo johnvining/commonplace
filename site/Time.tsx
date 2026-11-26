@@ -715,32 +715,41 @@ function Time(props: any) {
       </div>
 
 
-      <div className="time-day-nav">
-        <TopLevelStandardButton
-          name="‹ Prev"
-          onClick={() => setSelectedDate(shiftDay(selectedDate, -1))}
-        />
-        <input
-          aria-label="Selected day"
-          className="top-level input compact time-date-input"
-          type="date"
-          value={selectedDate}
-          onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
-        />
-        <TopLevelStandardButton
-          name="Next ›"
-          onClick={() => setSelectedDate(shiftDay(selectedDate, 1))}
-        />
-        <TopLevelStandardButton name="Today" onClick={() => setSelectedDate(todayLocal())} />
-      </div>
-
       {loading || !summary ? (
         <div className="search-empty-state">Loading…</div>
       ) : (
         <>
           <div className="time-entries">
-            <div className="top-level form-label time-section-head">
-              {selectedDate === todayLocal() ? 'Today' : selectedDate}
+            <div className="time-entries-head">
+              <div className="top-level form-label time-section-head">
+                {selectedDate === todayLocal() ? 'Today' : selectedDate}
+              </div>
+              <div className="time-day-nav">
+                <button
+                  className="button compact"
+                  aria-label="Previous day"
+                  onClick={() => setSelectedDate(shiftDay(selectedDate, -1))}
+                >
+                  ‹
+                </button>
+                <input
+                  aria-label="Selected day"
+                  className="top-level input compact time-date-input"
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
+                />
+                <button
+                  className="button compact"
+                  aria-label="Next day"
+                  onClick={() => setSelectedDate(shiftDay(selectedDate, 1))}
+                >
+                  ›
+                </button>
+                <button className="button compact" onClick={() => setSelectedDate(todayLocal())}>
+                  Today
+                </button>
+              </div>
             </div>
             {dayEntries.length ? (
               <ul className="time-entry-list">

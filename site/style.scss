@@ -2718,3 +2718,13 @@ mark.search-highlight {
 }
 .time-entries .time-entry-actions { gap: 6px; }
 .time-entries .time-section-head { margin: 8px 0 4px; }
+
+.time-entries-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.time-entries-head .time-section-head { margin: 8px 0 4px; }
+.time-entries-head .time-day-nav { margin: 0; gap: 4px; }
+.time-entries-head .top-level.input.time-date-input {
+  width: 132px; flex: 0 0 auto; font-size: 12px; padding: 3px 6px;
+}
