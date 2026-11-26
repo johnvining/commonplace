@@ -26,7 +26,7 @@ struct PileDetailView: View {
                     TextField("Name", text: $newName)
                     Button("Save") { saveName() }
                 } else {
-                    Text(pile?.name ?? "Loading…").font(.headline)
+                    Text(pile?.name ?? "Loading…").font(DS.ui(17, weight: .semibold))
                 }
                 HStack {
                     Button(starred ? "★ Starred" : "☆ Star") { toggleStar() }

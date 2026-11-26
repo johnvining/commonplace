@@ -188,7 +188,7 @@ struct WorkDetailView: View {
                         TextField("URL", text: $editURL)
                         Button("Save") { saveEdit() }
                     } else {
-                        Text(w.name ?? "(unnamed)").font(.headline)
+                        Text(w.name ?? "(unnamed)").font(DS.ui(17, weight: .semibold))
                         if let y = w.year { Text(String(y)).foregroundStyle(.secondary) }
                         if let u = w.url, !u.isEmpty { Text(u).font(.caption) }
                         if let eds = w.editors, !eds.isEmpty {
@@ -348,7 +348,7 @@ struct AuthorDetailView: View {
                         TextField("Death year", text: $editDeath)
                         Button("Save") { saveEdit() }
                     } else {
-                        Text(a.name ?? "(unnamed)").font(.headline)
+                        Text(a.name ?? "(unnamed)").font(DS.ui(17, weight: .semibold))
                         if a.birth_year != nil || a.death_year != nil {
                             Text("\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")")
                                 .foregroundStyle(.secondary)
@@ -463,7 +463,7 @@ struct IdeaDetailView: View {
                         Toggle("This idea is a person", isOn: $editPerson)
                         Button("Save") { saveEdit() }
                     } else {
-                        Text(i.name ?? "(unnamed)").font(.headline)
+                        Text(i.name ?? "(unnamed)").font(DS.ui(17, weight: .semibold))
                         if i.person == true || i.start_year != nil || i.end_year != nil {
                             Text([i.person == true ? "Person" : nil,
                                   i.start_year.map(String.init), i.end_year.map(String.init)]
