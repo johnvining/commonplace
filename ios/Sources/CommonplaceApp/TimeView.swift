@@ -7,10 +7,11 @@ import CommonplaceKit
 /// with star/edit/delete, and a manual entry form.
 struct TimeView: View {
     @EnvironmentObject var state: AppState
+    var preselectSubject: String? = nil
     @State private var subjects: [RecentSubject] = []
     @State private var selection = ""
-    @State private var kind = "reading"
-    @State private var day = dayString(Date())
+    @State private var kind = "writing"
+    @State private var day = localDayString()
     @State private var entries: [TimeEntry] = []
     @State private var summary: TimeSummary?
     @State private var error: String?
@@ -32,9 +33,10 @@ struct TimeView: View {
                                 }
                             }
                         }
-                        if !subjects.isEmpty {
+                        let recentUnstarred = subjects.filter { s in !starred.contains { $0.id == s.key } }
+                        if !recentUnstarred.isEmpty {
                             Section("Recent") {
-                                ForEach(subjects, id: \.key) { s in
+                                ForEach(recentUnstarred, id: \.key) { s in
                                     Text(subjectLabel(s)).tag(s.key)
                                 }
                             }
@@ -147,9 +149,12 @@ struct TimeView: View {
            let map = try? JSONDecoder().decode([String: String].self, from: data) {
             customTitles = map
         }
+        if let preselectSubject, !preselectSubject.isEmpty { selection = preselectSubject }
         Task {
-            subjects = (try? await state.client.recentSubjects(limit: 20)) ?? []
-            if let first = subjects.first, selection.isEmpty { selection = first.key }
+            do {
+                subjects = try await state.client.recentSubjects(limit: 20)
+                if let first = subjects.first, selection.isEmpty { selection = first.key }
+            } catch { self.error = "Recent subjects failed: \(describe(error))" }
         }
         reload()
     }
@@ -179,15 +184,29 @@ struct TimeView: View {
     private func stopTimer() {
         guard let at = state.timerStartedAt else { return }
         let key = state.timerSubjectKey ?? selection
+        guard !key.isEmpty else { self.error = "Pick a subject before stopping."; return }
+        if case .pile(let pid) = TimeSubjectKey.parse(key) {
+            // Validate the pile still exists before logging against it.
+            Task {
+                do { _ = try await state.client.pile(id: pid) }
+                catch { await MainActor.run { self.error = "That pile no longer exists — pick another subject." }; return }
+                finishStop(at: at, key: key)
+            }
+            return
+        }
+        finishStop(at: at, key: key)
+    }
+
+    private func finishStop(at: Date, key: String) {
         let logKind = state.timerKind
         var t = TimerState(subjectKey: key, kind: logKind, startedAt: at)
-        guard let minutes = t.stop(at: Date()) else { return }
+        guard let minutes = t.stop(at: Date()), minutes >= 1 else { self.error = "Nothing to log yet."; return }
         Task {
             do {
-                try await log(key: key, kind: logKind, minutes: minutes, date: dayString(Date()))
+                try await log(key: key, kind: logKind, minutes: max(1, minutes), date: localDayString())
                 await MainActor.run { state.clearTimer(); reload() }
             } catch {
-                await MainActor.run { self.error = "Stop failed — retry." }
+                await MainActor.run { self.error = "Stop failed: \(describe(error))" }
             }
         }
     }
@@ -381,7 +400,7 @@ struct ManualEntryForm: View {
     @State private var title = ""
     @State private var pile = ""
     @State private var pileName = ""
-    @State private var kind = "reading"
+    @State private var kind = "writing"
     @State private var minutes = ""
     @State private var date = ""
     @State private var error: String?

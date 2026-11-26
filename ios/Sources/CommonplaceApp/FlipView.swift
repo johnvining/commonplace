@@ -9,6 +9,7 @@ struct FlipView: View {
     @State private var index = 0
     @State private var error: String?
     @State private var done = false
+    @State private var rating = false
 
     var body: some View {
         List {
@@ -19,9 +20,13 @@ struct FlipView: View {
             } else {
                 let n = deck[index]
                 Section {
+                    NoteStatusLine(note: n)
                     Text(n.title ?? "(untitled)").font(.headline)
                     if let t = n.text, !t.isEmpty { Text(t) }
                     if let k = n.take, !k.isEmpty { Text(k).italic() }
+                    if let id = n._id {
+                        NavigationLink { NoteDetailView(noteId: id, editFirst: true) } label: { Text("Edit in place") }
+                    }
                 }
                 Section("How soon again?") {
                     HStack {
@@ -30,8 +35,12 @@ struct FlipView: View {
                         Button("Med") { rate("med") }
                         Spacer()
                         Button("Slow") { rate("slow") }
+                    }.disabled(rating)
+                    HStack {
+                        Button("‹ Prev") { if index > 0 { index -= 1 } }.disabled(index == 0)
+                        Spacer()
+                        Button("Skip") { index += 1 }
                     }
-                    Button("Skip") { index += 1 }
                 }
                 Section {
                     Text("\(index + 1) of \(deck.count)").font(.caption).foregroundStyle(.secondary)
@@ -40,7 +49,9 @@ struct FlipView: View {
         }
         .listStyle(.plain)
         .navigationTitle("Review")
+        .refreshable { load() }
         .task { load() }
+        .onAppear { if !deck.isEmpty { load() } }
     }
 
     private func load() {
@@ -49,17 +60,24 @@ struct FlipView: View {
             do {
                 deck = try await state.client.flipDeck()
                 index = 0
-            } catch { self.error = "Load failed — retry." }
+                error = nil
+            } catch { self.error = "Load failed: \(describe(error))" }
         }
     }
 
-    private func rate(_ rating: String) {
-        guard index < deck.count, let id = deck[index]._id else { return }
+    private func rate(_ ratingValue: String) {
+        guard !rating, index < deck.count, let id = deck[index]._id else { return }
+        rating = true
         Task {
-            _ = try? await state.client.reviewNote(id: id, rating: rating)
-            await MainActor.run {
-                index += 1
-                if index >= deck.count { done = true }
+            do {
+                _ = try await state.client.reviewNote(id: id, rating: ratingValue)
+                await MainActor.run {
+                    index += 1
+                    if index >= deck.count { done = true }
+                    rating = false
+                }
+            } catch {
+                await MainActor.run { self.error = "Rating failed — not advanced: \(describe(error))"; rating = false }
             }
         }
     }
