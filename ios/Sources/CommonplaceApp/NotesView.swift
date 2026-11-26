@@ -90,6 +90,10 @@ struct NotesView: View {
                         Button("＋ Note") { createNote() }
                             .keyboardShortcut("n", modifiers: .command)
                             .font(DS.ui(13, weight: .medium))
+                            // Borderless: in a List row, a default button
+                            // can swallow taps meant for the filter
+                            // controls sharing the row (#399).
+                            .buttonStyle(.borderless)
                     }
                     DisclosureGroup("Filter by pile / idea") {
                         VStack(alignment: .leading, spacing: 8) {

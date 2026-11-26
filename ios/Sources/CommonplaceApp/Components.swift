@@ -354,6 +354,7 @@ struct PillEditor: View {
                             Button("×") { onRemove(option) }
                                 .font(DS.ui(12, weight: .bold))
                                 .foregroundStyle(DS.muted)
+                                .buttonStyle(.borderless)
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
