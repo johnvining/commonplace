@@ -3084,6 +3084,17 @@ mark.search-highlight {
   margin-bottom: 8px;
   width: 100%;
   max-width: 640px;
+  table-layout: fixed;
+}
+
+.time-table th:first-child,
+.time-table td:first-child {
+  width: 40%;
+}
+
+.time-table th:nth-child(n+2),
+.time-table td:nth-child(n+2) {
+  width: 20%;
 }
 
 .time-table th {
@@ -4601,6 +4612,15 @@ a.grid-link > a {
 
 .time-subject-list button:hover {
   background: var(--hover);
+}
+
+.time-subject-list button.highlighted {
+  background: var(--accent-soft, #eef3fd);
+}
+
+.time-subject-empty {
+  padding: 7px 9px;
+  opacity: 0.65;
 }
 
 /*# sourceMappingURL=style.css.map */
