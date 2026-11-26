@@ -34,6 +34,10 @@ final class AppState: ObservableObject {
     @Published var timerStartedAt: Date?
     /// Minutes logged today (all kinds), shown next to the timer.
     @Published var todayTotalMinutes: Int = 0
+    /// Open (pending) maintenance tasks, for the sidebar dot.
+    @Published var maintenancePending: Int = 0
+    /// Library totals shown grey beside sidebar sections.
+    @Published var counts: StatsCounts?
 
     var timerIsRunning: Bool { timerStartedAt != nil }
 
@@ -67,6 +71,30 @@ final class AppState: ObservableObject {
         if s.hasSuffix("/api") { s = String(s.dropLast(4)) }
         if s.hasSuffix("/") { s = String(s.dropLast()) }
         return URL(string: s)
+    }
+
+    /// A specific page on the web app, e.g. webURL(path: "note/abc").
+    func webURL(path: String) -> URL? {
+        webURL?.appendingPathComponent(path)
+    }
+
+    /// The standard nick fetch for entity pages (nil on any failure).
+    func nick(type: String, id: String) async -> String? {
+        (try? await client.nickFor(type: type, id: id))?.key
+    }
+
+    /// Refresh the open-maintenance count behind the sidebar dot.
+    func refreshMaintenancePending() async {
+        guard isSignedIn else { return }
+        if let tasks = try? await client.maintenanceList() {
+            maintenancePending = tasks.filter { $0.pending == true }.count
+        }
+    }
+
+    /// Refresh library totals for the sidebar counts.
+    func refreshCounts() async {
+        guard isSignedIn else { return }
+        counts = try? await client.stats()
     }
 
     func persistTimer() {

@@ -86,6 +86,55 @@ struct EntityTitleBlock: View {
     }
 }
 
+/// The standard entity-page header used by Pile, Work, Author and
+/// Idea pages: title block (name, byline, nick+copy) on the left, the
+/// page's standard buttons — Star, Edit, Web, Delete, plus any extras —
+/// top-right. Every entity page shares this so formatting, links and
+/// nick handling can never drift apart.
+struct EntityPageHeader<Actions: View>: View {
+    let name: String
+    var italicName: Bool = false
+    var byline: String? = nil
+    var nick: String? = nil
+    @ViewBuilder var actions: Actions
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            EntityTitleBlock(name: name, italicName: italicName, byline: byline, nick: nick)
+            Spacer()
+            HStack(spacing: 6) {
+                actions
+            }
+        }
+    }
+}
+
+/// Opens this exact page on the website (note/…, pile/…, idea/…,
+/// work/…, auth/…), in the same quiet button style as DSButton.
+struct OpenInWebButton: View {
+    @EnvironmentObject var state: AppState
+    let path: String
+
+    var body: some View {
+        if let url = state.webURL(path: path) {
+            Link(destination: url) {
+                HStack(spacing: 4) {
+                    Text("Web")
+                    Image(systemName: "arrow.up.forward.square").font(DS.ui(11))
+                }
+                .font(DS.ui(13))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .foregroundStyle(DS.ink)
+                .overlay(RoundedRectangle(cornerRadius: 4).stroke(DS.hairline, lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+            }
+            .buttonStyle(.plain)
+            .help("Open this page on the website")
+        }
+    }
+}
+
 /// The label half of DSButton for NavigationLinks (Narrow, Read, …)
 /// so link-buttons look identical to action buttons.
 struct DSButtonLabel: View {
@@ -205,6 +254,25 @@ func downsampledImageData(_ data: Data, maxPixelSize: Int) -> Data? {
     #endif
 }
 
+/// Downsampled thumbnails by note+index, so switching view modes or
+/// scrolling rows back on screen never refetches or re-decodes.
+final class ThumbCache {
+    static let shared: NSCache<NSString, NSData> = {
+        let cache = NSCache<NSString, NSData>()
+        cache.countLimit = 300
+        return cache
+    }()
+}
+
+extension ThumbCache {
+    static func get(_ key: String) -> Data? {
+        shared.object(forKey: key as NSString) as Data?
+    }
+    static func set(_ key: String, _ data: Data) {
+        shared.setObject(data as NSData, forKey: key as NSString)
+    }
+}
+
 /// Thumbnail that fetches one of a note's images (1-based, API order).
 struct NoteImageThumb: View {
     @EnvironmentObject var state: AppState
@@ -213,12 +281,20 @@ struct NoteImageThumb: View {
 
     @State private var data: Data?
 
+    private var cacheKey: String { "\(noteId)-\(index)" }
+
     var body: some View {
         NoteImageView(data: data)
-            .task(id: "\(noteId)-\(index)") {
+            .task(id: cacheKey) {
+                if let cached = ThumbCache.get(cacheKey) {
+                    data = cached
+                    return
+                }
                 guard let raw = try? await state.client.noteImageData(noteId: noteId, index: index)
                 else { return }
-                data = downsampledImageData(raw, maxPixelSize: 512) ?? raw
+                let thumb = downsampledImageData(raw, maxPixelSize: 512) ?? raw
+                ThumbCache.set(cacheKey, thumb)
+                data = thumb
             }
     }
 }

@@ -193,25 +193,26 @@ struct WorkDetailView: View {
                         TextField("URL", text: $editURL)
                         Button("Save") { saveEdit() }
                     } else {
-                        HStack(alignment: .top, spacing: 12) {
-                            EntityTitleBlock(
-                                name: w.name ?? "(unnamed)",
-                                italicName: true,
-                                byline: w.year.map(String.init),
-                                nick: nick
-                            )
-                            Spacer()
-                            HStack(spacing: 6) {
-                                DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
-                                DSButton(title: "Edit") {
-                                    editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
-                                    editing = true
-                                }
-                                DSButton(title: "Delete") { confirmingDelete = true }
+                        EntityPageHeader(
+                            name: w.name ?? "(unnamed)",
+                            italicName: true,
+                            byline: w.year.map(String.init),
+                            nick: nick
+                        ) {
+                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                            DSButton(title: "Edit") {
+                                editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
+                                editing = true
                             }
-                            .confirmationDialog("Delete this work?", isPresented: $confirmingDelete) {
-                                Button("Delete", role: .destructive) { deleteWork() }
+                            NavigationLink { ReadView(workId: workId, title: w.name ?? "Read") } label: {
+                                DSButtonLabel(title: "Read")
                             }
+                            .buttonStyle(.plain)
+                            OpenInWebButton(path: "work/\(workId)")
+                            DSButton(title: "Delete") { confirmingDelete = true }
+                        }
+                        .confirmationDialog("Delete this work?", isPresented: $confirmingDelete) {
+                            Button("Delete", role: .destructive) { deleteWork() }
                         }
                         if let u = w.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
                         if let eds = w.editors, !eds.isEmpty {
@@ -253,8 +254,8 @@ struct WorkDetailView: View {
                     }
                     if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
                     HStack {
-                        Button("Add Note") { addNoteForWork() }
-                        NavigationLink { ReadView(workId: workId, title: w.name ?? "Read") } label: { Text("Read") }
+                        DSButton(title: "Add Note") { addNoteForWork() }
+                        Spacer()
                     }
                     TextField("Import notes for this work…", text: $importText, axis: .vertical)
                     Button("Import notes") { importForWork() }.disabled(importText.isEmpty)
@@ -323,9 +324,7 @@ struct WorkDetailView: View {
             async let n = state.client.workNotes(id: workId)
             let (ww, nn) = try await (w, n)
             work = ww; notes = nn; loaded = true
-            if let key = try? await state.client.nickFor(type: "work", id: workId) {
-                nick = key.key
-            }
+            nick = await state.nick(type: "work", id: workId)
             pileSel = (ww.piles ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
             ideaSel = (ww.ideas ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
             do { _ = try await state.client.recordWorkOpened(id: workId) }
@@ -366,28 +365,25 @@ struct AuthorDetailView: View {
                         TextField("Death year", text: $editDeath)
                         Button("Save") { saveEdit() }
                     } else {
-                        HStack(alignment: .top, spacing: 12) {
-                            EntityTitleBlock(
-                                name: a.name ?? "(unnamed)",
-                                byline: (a.birth_year != nil || a.death_year != nil)
-                                    ? "\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")"
-                                    : nil,
-                                nick: nick
-                            )
-                            Spacer()
-                            HStack(spacing: 6) {
-                                DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
-                                DSButton(title: "Edit") {
-                                    editName = a.name ?? ""
-                                    editBirth = a.birth_year.map(String.init) ?? ""
-                                    editDeath = a.death_year.map(String.init) ?? ""
-                                    editing = true
-                                }
-                                DSButton(title: "Delete") { confirmingDelete = true }
+                        EntityPageHeader(
+                            name: a.name ?? "(unnamed)",
+                            byline: (a.birth_year != nil || a.death_year != nil)
+                                ? "\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")"
+                                : nil,
+                            nick: nick
+                        ) {
+                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                            DSButton(title: "Edit") {
+                                editName = a.name ?? ""
+                                editBirth = a.birth_year.map(String.init) ?? ""
+                                editDeath = a.death_year.map(String.init) ?? ""
+                                editing = true
                             }
-                            .confirmationDialog("Delete this author?", isPresented: $confirmingDelete) {
-                                Button("Delete", role: .destructive) { deleteAuthor() }
-                            }
+                            OpenInWebButton(path: "auth/\(authorId)")
+                            DSButton(title: "Delete") { confirmingDelete = true }
+                        }
+                        .confirmationDialog("Delete this author?", isPresented: $confirmingDelete) {
+                            Button("Delete", role: .destructive) { deleteAuthor() }
                         }
                     }
                 }
@@ -448,9 +444,7 @@ struct AuthorDetailView: View {
             async let n = state.client.authorNotes(id: authorId)
             let (aa, ww, nn) = try await (a, w, n)
             author = aa; works = ww; notes = nn; loaded = true
-            if let key = try? await state.client.nickFor(type: "auth", id: authorId) {
-                nick = key.key
-            }
+            nick = await state.nick(type: "auth", id: authorId)
         } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 
@@ -494,28 +488,25 @@ struct IdeaDetailView: View {
                     } else {
                         // Web entity-page-header: title left, quiet
                         // bordered toolbar buttons top-right, nick under.
-                        HStack(alignment: .top, spacing: 12) {
-                            EntityTitleBlock(
-                                name: i.name ?? "(unnamed)",
-                                byline: [i.person == true ? "Person" : nil,
-                                         i.start_year.map(String.init), i.end_year.map(String.init)]
-                                    .compactMap { $0 }.joined(separator: " • "),
-                                nick: nick
-                            )
-                            Spacer()
-                            HStack(spacing: 6) {
-                                DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
-                                DSButton(title: "Edit") {
-                                    editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
-                                    editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false
-                                    editing = true
-                                }
-                                DSButton(title: "Add Note") { addNoteForIdea() }
-                                DSButton(title: "Delete") { confirmingDelete = true }
+                        EntityPageHeader(
+                            name: i.name ?? "(unnamed)",
+                            byline: [i.person == true ? "Person" : nil,
+                                     i.start_year.map(String.init), i.end_year.map(String.init)]
+                                .compactMap { $0 }.joined(separator: " • "),
+                            nick: nick
+                        ) {
+                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                            DSButton(title: "Edit") {
+                                editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
+                                editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false
+                                editing = true
                             }
-                            .confirmationDialog("Delete this idea?", isPresented: $confirmingDelete) {
-                                Button("Delete", role: .destructive) { deleteIdea() }
-                            }
+                            DSButton(title: "Add Note") { addNoteForIdea() }
+                            OpenInWebButton(path: "idea/\(ideaId)")
+                            DSButton(title: "Delete") { confirmingDelete = true }
+                        }
+                        .confirmationDialog("Delete this idea?", isPresented: $confirmingDelete) {
+                            Button("Delete", role: .destructive) { deleteIdea() }
                         }
                         if let t = i.text, !t.isEmpty {
                             NoteText(text: t, size: 14.5)
@@ -595,9 +586,7 @@ struct IdeaDetailView: View {
             async let n = state.client.ideaNotes(id: ideaId)
             let (ii, ww, nn) = try await (i, w, n)
             idea = ii; works = ww; notes = nn; loaded = true
-            if let key = try? await state.client.nickFor(type: "idea", id: ideaId) {
-                nick = key.key
-            }
+            nick = await state.nick(type: "idea", id: ideaId)
         } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 

@@ -145,11 +145,11 @@ struct NoteDetailView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
-                // Read mode: linked things navigate (tapping an author,
-                // pile or idea opens it — never deletes). Edit mode:
-                // the pill editors, where × is the only remove path.
-                Section("Authors") {
-                    if editing {
+                // Labels (Authors/Work/Piles/…) belong to the edit form
+                // only. Read mode shows the linked things themselves,
+                // unlabeled, and tapping one opens it — never deletes.
+                if editing {
+                    Section("Authors") {
                         PillEditor(
                             placeholder: "Add an author…", tint: DS.accentSoft, selected: $authorOptions,
                             load: { q in ((try? await state.client.autocompleteAuthors(q)) ?? []).compactMap { a in a._id.map { PickOption(id: $0, name: a.name ?? "") } } },
@@ -157,16 +157,8 @@ struct NoteDetailView: View {
                             onRemove: { opt in authorOptions.removeAll { $0.id == opt.id }; saveAuthors() },
                             onCreateNew: { name in createAuthorNamed(name) }
                         )
-                    } else {
-                        ForEach(note.displayAuthors, id: \.id) { a in
-                            NavigationLink { AuthorDetailView(authorId: a.id) } label: {
-                                Text(a.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.ink)
-                            }
-                        }
                     }
-                }
-                Section("About (people)") {
-                    if editing {
+                    Section("About (people)") {
                         PillEditor(
                             placeholder: "Add a person this is about…", tint: DS.accentSoft, selected: $peopleOptions,
                             load: { q in ((try? await state.client.autocompleteAuthors(q)) ?? []).compactMap { a in a._id.map { PickOption(id: $0, name: a.name ?? "", subtitle: yearsLabel(a)) } } },
@@ -174,23 +166,11 @@ struct NoteDetailView: View {
                             onRemove: { opt in peopleOptions.removeAll { $0.id == opt.id }; savePeople() },
                             onCreateNew: { name in createPersonNamed(name) }
                         )
-                    } else {
-                        ForEach(note.people ?? [], id: \.id) { a in
-                            NavigationLink { AuthorDetailView(authorId: a.id) } label: {
-                                Text(a.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.ink)
-                            }
-                        }
                     }
-                }
-                Section("Work") {
-                    if let w = note.work {
-                        NavigationLink { WorkDetailView(workId: w.id) } label: {
+                    Section("Work") {
+                        if let w = note.work {
                             Text(w.name ?? w.id).font(DS.serif(14.5)).italic().foregroundStyle(DS.ink)
                         }
-                    } else {
-                        Text("No work linked").font(DS.ui(12)).foregroundStyle(DS.muted)
-                    }
-                    if editing {
                         TypeaheadField(
                             placeholder: "Link a work…",
                             load: { q in ((try? await state.client.autocompleteWorks(q)) ?? []).compactMap { w in w._id.map { PickOption(id: $0, name: w.name ?? "") } } },
@@ -198,9 +178,7 @@ struct NoteDetailView: View {
                             onCreate: { name in Task { do { _ = try await state.client.createWorkForNote(noteId: noteId, name: name); reloadNote() } catch { self.error = "Work create failed: \(describe(error))" } } }
                         )
                     }
-                }
-                Section("Piles") {
-                    if editing {
+                    Section("Piles") {
                         PillEditor(
                             placeholder: "Add a pile…", tint: DS.pileSoft, selected: $pileOptions,
                             load: { q in ((try? await state.client.autocompletePiles(q)) ?? []).compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } } },
@@ -208,16 +186,8 @@ struct NoteDetailView: View {
                             onRemove: { opt in pileOptions.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removePileFromNote(noteId: noteId, pileId: opt.id); reloadNote() } },
                             onCreateNew: { name in Task { _ = try? await state.client.createPileForNote(noteId: noteId, name: name); reloadNote() } }
                         )
-                    } else {
-                        ForEach(note.piles ?? [], id: \.id) { p in
-                            NavigationLink { PileDetailView(pileId: p.id) } label: {
-                                Text(p.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.pile)
-                            }
-                        }
                     }
-                }
-                Section("Ideas") {
-                    if editing {
+                    Section("Ideas") {
                         PillEditor(
                             placeholder: "Add an idea…", tint: DS.accentSoft, selected: $ideaOptions,
                             load: { q in ((try? await state.client.autocompleteIdeas(q)) ?? []).compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } } },
@@ -225,13 +195,36 @@ struct NoteDetailView: View {
                             onRemove: { opt in ideaOptions.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removeIdeaFromNote(noteId: noteId, ideaId: opt.id); reloadNote() } },
                             onCreateNew: { name in Task { _ = try? await state.client.createIdeaForNote(noteId: noteId, name: name); reloadNote() } }
                         )
-                    } else {
+                    }
+                } else {
+                    Section {
+                        ForEach(note.displayAuthors, id: \.id) { a in
+                            NavigationLink { AuthorDetailView(authorId: a.id) } label: {
+                                Text(a.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.ink)
+                            }
+                        }
+                        ForEach(note.people ?? [], id: \.id) { a in
+                            NavigationLink { AuthorDetailView(authorId: a.id) } label: {
+                                Text(a.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.ink)
+                            }
+                        }
+                        if let w = note.work {
+                            NavigationLink { WorkDetailView(workId: w.id) } label: {
+                                Text(w.name ?? w.id).font(DS.serif(14.5)).italic().foregroundStyle(DS.ink)
+                            }
+                        }
+                        ForEach(note.piles ?? [], id: \.id) { p in
+                            NavigationLink { PileDetailView(pileId: p.id) } label: {
+                                Text(p.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.pile)
+                            }
+                        }
                         ForEach(note.ideas ?? [], id: \.id) { i in
                             NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
                                 Text(i.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.accent)
                             }
                         }
                     }
+                    .listRowSeparator(.hidden)
                 }
                 Section {
                     HStack(spacing: 6) {
@@ -242,6 +235,7 @@ struct NoteDetailView: View {
                             editing.toggle()
                         }
                         DSButton(title: "Delete") { confirming = true }
+                        OpenInWebButton(path: "note/\(noteId)")
                         Spacer()
                     }
                     .confirmationDialog("Delete note?", isPresented: $confirming) {

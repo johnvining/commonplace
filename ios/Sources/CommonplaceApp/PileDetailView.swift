@@ -35,32 +35,29 @@ struct PileDetailView: View {
                 } else {
                     // Web entity header: title + nick left, standard
                     // buttons top-right, nothing at the bottom.
-                    HStack(alignment: .top, spacing: 12) {
-                        EntityTitleBlock(
-                            name: pile?.name ?? "Loading…",
-                            byline: [pile?.start_year.map(String.init), pile?.end_year.map(String.init)]
-                                .compactMap { $0 }.joined(separator: " • "),
-                            nick: nick
-                        )
-                        Spacer()
-                        HStack(spacing: 6) {
-                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
-                            DSButton(title: "Edit") {
-                                newName = pile?.name ?? ""
-                                editing = true
-                            }
-                            DSButton(title: "Add Note") { addNote() }
-                            NavigationLink {
-                                NotesView(initialPile: PickOption(id: pileId, name: pile?.name ?? "Pile"))
-                            } label: {
-                                DSButtonLabel(title: "Narrow")
-                            }
-                            .buttonStyle(.plain)
-                            DSButton(title: "Delete") { confirmingDelete = true }
+                    EntityPageHeader(
+                        name: pile?.name ?? "Loading…",
+                        byline: [pile?.start_year.map(String.init), pile?.end_year.map(String.init)]
+                            .compactMap { $0 }.joined(separator: " • "),
+                        nick: nick
+                    ) {
+                        DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                        DSButton(title: "Edit") {
+                            newName = pile?.name ?? ""
+                            editing = true
                         }
-                        .confirmationDialog("Delete this pile?", isPresented: $confirmingDelete) {
-                            Button("Delete", role: .destructive) { deletePile() }
+                        DSButton(title: "Add Note") { addNote() }
+                        NavigationLink {
+                            NotesView(initialPile: PickOption(id: pileId, name: pile?.name ?? "Pile"))
+                        } label: {
+                            DSButtonLabel(title: "Narrow")
                         }
+                        .buttonStyle(.plain)
+                        OpenInWebButton(path: "pile/\(pileId)")
+                        DSButton(title: "Delete") { confirmingDelete = true }
+                    }
+                    .confirmationDialog("Delete this pile?", isPresented: $confirmingDelete) {
+                        Button("Delete", role: .destructive) { deletePile() }
                     }
                 }
                 // One quiet line, only when there is time (web parity).
@@ -114,9 +111,8 @@ struct PileDetailView: View {
                 async let n = state.client.pileNotes(id: pileId)
                 async let w = state.client.pileWorks(id: pileId)
                 let (pp, nn, ww) = try await (p, n, w)
-                if let key = try? await state.client.nickFor(type: "pile", id: pileId) {
-                    await MainActor.run { nick = key.key }
-                }
+                let fetched = await state.nick(type: "pile", id: pileId)
+                await MainActor.run { nick = fetched }
                 // Time totals are decoration: a failure there must not
                 // take down the whole pile page (#403).
                 let tt = (try? await state.client.listTimeEntries(pile: pileId, limit: 1000)) ?? []
