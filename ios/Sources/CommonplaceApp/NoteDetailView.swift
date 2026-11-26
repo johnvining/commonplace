@@ -67,7 +67,7 @@ struct NoteDetailView: View {
                         if let ts = note.titleSource, !ts.isEmpty {
                             Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
                         }
-                        if let t = note.text, !t.isEmpty { Text(t) }
+                        if let t = note.text, !t.isEmpty { NoteText(text: t) }
                         if let k = note.take, !k.isEmpty { Text(k).italic() }
                         if let u = note.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
                         if note.year != nil || (note.page?.isEmpty == false) {

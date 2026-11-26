@@ -22,7 +22,7 @@ struct FlipView: View {
                 Section {
                     NoteStatusLine(note: n)
                     Text(n.title ?? "(untitled)").font(.headline)
-                    if let t = n.text, !t.isEmpty { Text(t) }
+                    if let t = n.text, !t.isEmpty { NoteText(text: t) }
                     if let k = n.take, !k.isEmpty { Text(k).italic() }
                     if let id = n._id {
                         NavigationLink { NoteDetailView(noteId: id, editFirst: true) } label: { Text("Edit in place") }

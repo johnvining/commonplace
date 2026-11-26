@@ -25,6 +25,7 @@ struct NotesView: View {
                             .font(DS.ui(14))
                             .onSubmit { applySearch() }
                         Button("＋ Note") { createNote() }
+                            .keyboardShortcut("n", modifiers: .command)
                             .font(DS.ui(13, weight: .medium))
                     }
                     DisclosureGroup("Filter by pile / idea") {

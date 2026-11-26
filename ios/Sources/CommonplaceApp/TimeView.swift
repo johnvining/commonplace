@@ -141,6 +141,9 @@ struct TimeView: View {
             .listStyle(.plain)
         .navigationTitle("Time")
             .task { initialLoad() }
+            .onChange(of: preselectSubject) {
+                if let preselectSubject, !preselectSubject.isEmpty { selection = preselectSubject }
+            }
         }
     }
 

@@ -183,3 +183,20 @@ struct PillEditor: View {
         }
     }
 }
+
+/// Note body text: markdown rendered inline (bold/italic/links/code),
+/// falling back to plain text when parsing fails. Serif, web parity.
+struct NoteText: View {
+    let text: String
+    var size: CGFloat = 15
+    var body: some View {
+        if let attributed = try? AttributedString(
+            markdown: text,
+            options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+        ) {
+            Text(attributed).font(DS.serif(size))
+        } else {
+            Text(text).font(DS.serif(size))
+        }
+    }
+}
