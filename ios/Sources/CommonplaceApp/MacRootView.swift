@@ -59,10 +59,7 @@ struct MacRootView: View {
             .navigationSplitViewColumnWidth(min: 180, ideal: 210, max: 260)
             .safeAreaInset(edge: .bottom) {
                 if state.timerIsRunning {
-                    Text("Timing \(state.timerKind)…")
-                        .font(DS.ui(11)).foregroundStyle(DS.muted)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12).padding(.vertical, 6)
+                    SidebarTimerView()
                 }
             }
         } detail: {
@@ -104,5 +101,65 @@ struct MacRootView: View {
         case "settings": SettingsView()
         default: NotesView()
         }
+    }
+}
+
+/// Running timer at the foot of the sidebar: live elapsed, subject,
+/// kind, and Stop & log — visible from every section.
+struct SidebarTimerView: View {
+    @EnvironmentObject var state: AppState
+    @State private var subjectName = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "timer")
+                    .font(DS.ui(12)).foregroundStyle(DS.accent)
+                if let at = state.timerStartedAt {
+                    TimelineView(.periodic(from: Date(), by: 1)) { ctx in
+                        Text(formatElapsed(ctx.date.timeIntervalSince(at) * 1000))
+                            .font(DS.ui(17, weight: .semibold))
+                            .monospacedDigit()
+                    }
+                }
+                Spacer()
+                Button("Stop") {
+                    Task { await state.stopAndLogTimer() }
+                }
+                .controlSize(.small)
+            }
+            Text("\(state.timerKind.capitalized) · \(subjectName.isEmpty ? (state.timerSubjectKey ?? "") : subjectName)")
+                .font(DS.serif(12))
+                .foregroundStyle(DS.muted)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(DS.hover)
+        .overlay(Rectangle().fill(DS.hairline).frame(height: 1), alignment: .top)
+        .task(id: state.timerSubjectKey) { await resolveSubject() }
+    }
+
+    private func resolveSubject() async {
+        guard let key = state.timerSubjectKey else { return }
+        if key.hasPrefix("title:") {
+            subjectName = String(key.dropFirst(6))
+            return
+        }
+        if key.hasPrefix("pile:") {
+            let id = String(key.dropFirst(5))
+            if let pile = try? await state.client.pile(id: id) {
+                subjectName = pile.name ?? id
+            }
+            return
+        }
+        if key.hasPrefix("work:") {
+            let id = String(key.dropFirst(5))
+            if let work = try? await state.client.work(id: id) {
+                subjectName = work.name ?? id
+            }
+            return
+        }
+        subjectName = key
     }
 }
