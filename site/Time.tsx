@@ -586,6 +586,21 @@ function Time(props: any) {
 
   const weekly = summary?.weekly
   const daily = summary?.daily
+  const [analysisScope, setAnalysisScope] = useState<'today' | 'week' | 'last7' | 'month'>('today')
+  const scoped =
+    analysisScope === 'today'
+      ? daily
+      : analysisScope === 'week'
+        ? weekly
+        : analysisScope === 'last7'
+          ? summary?.last7
+          : summary?.monthly
+  const scopeWhen =
+    analysisScope === 'today'
+      ? daily?.date
+      : analysisScope === 'week'
+        ? `${weekly?.weekStart} – ${weekly?.weekEnd}`
+        : `${scoped?.start} – ${scoped?.end}`
 
   return (
     <div>
@@ -799,80 +814,76 @@ function Time(props: any) {
 
 
           <div className="time-card time-analysis">
-            <div className="top-level form-label">Analysis</div>
-            <div className="time-analysis-head">
-              <span className="time-analysis-when">Today — {daily.date}</span>
-              <KindTotals summary={daily} />
+            <div className="time-scope-tabs" role="tablist" aria-label="Analysis range">
+              {(
+                [
+                  ['today', 'Today'],
+                  ['week', 'This week'],
+                  ['last7', 'Last 7 days'],
+                  ['month', 'This month'],
+                ] as const
+              ).map(([key, label]) => (
+                <button
+                  key={key}
+                  role="tab"
+                  aria-selected={analysisScope === key}
+                  className={'button compact' + (analysisScope === key ? ' button-selected' : '')}
+                  onClick={() => setAnalysisScope(key)}
+                >
+                  {label}
+                </button>
+              ))}
+              <span className="time-scope-when">{scopeWhen}</span>
             </div>
-            {daily.byPile.length ? (
+            <KindTotals summary={scoped} />
+            {scoped.byDay?.length ? (
+              <>
+                <div className="top-level form-label time-table-title">By day</div>
+                <table className="time-table">
+                  <thead>
+                    <tr>
+                      <th>Day</th>
+                      <th>Reading</th>
+                      <th>Writing</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scoped.byDay.map((d: any) => (
+                      <tr key={d.date} className={d.date === selectedDate ? 'time-today' : undefined}>
+                        <td>
+                          <button className="time-day-link" onClick={() => setSelectedDate(d.date)}>
+                            {d.date}
+                          </button>
+                        </td>
+                        <td>{formatMinutes(d.readingMinutes)}</td>
+                        <td>{formatMinutes(d.writingMinutes)}</td>
+                        <td>{formatMinutes(d.totalMinutes)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            ) : null}
+            {scoped.byPile?.length ? (
               <>
                 <div className="top-level form-label time-table-title">By pile</div>
-                <SubjectTable rows={daily.byPile} pileLink />
+                <SubjectTable rows={scoped.byPile} pileLink />
               </>
             ) : null}
-            {daily.byWork?.length ? (
+            {scoped.byWork?.length ? (
               <>
                 <div className="top-level form-label time-table-title">By work</div>
-                <SubjectTable rows={daily.byWork} workLink />
+                <SubjectTable rows={scoped.byWork} workLink />
               </>
             ) : null}
-            {daily.byTitle.length ? (
+            {scoped.byTitle?.length ? (
               <>
                 <div className="top-level form-label time-table-title">By title</div>
-                <SubjectTable rows={daily.byTitle} />
+                <SubjectTable rows={scoped.byTitle} />
               </>
             ) : null}
-            {!daily.entryCount ? <div className="sidebar-muted">Nothing logged this day.</div> : null}
-            <div className="time-analysis-divider" />
-            <div className="time-analysis-head">
-              <span className="time-analysis-when">
-                This week — {weekly.weekStart} to {weekly.weekEnd}
-              </span>
-              <KindTotals summary={weekly} />
-            </div>
-            <div className="top-level form-label time-table-title">By day</div>
-            <table className="time-table">
-              <thead>
-                <tr>
-                  <th>Day</th>
-                  <th>Reading</th>
-                  <th>Writing</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {weekly.byDay.map((d: any) => (
-                  <tr key={d.date} className={d.date === selectedDate ? 'time-today' : undefined}>
-                    <td>
-                      <button className="time-day-link" onClick={() => setSelectedDate(d.date)}>
-                        {d.date}
-                      </button>
-                    </td>
-                    <td>{formatMinutes(d.readingMinutes)}</td>
-                    <td>{formatMinutes(d.writingMinutes)}</td>
-                    <td>{formatMinutes(d.totalMinutes)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {weekly.byPile.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By pile</div>
-                <SubjectTable rows={weekly.byPile} pileLink />
-              </>
-            ) : null}
-            {weekly.byWork?.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By work</div>
-                <SubjectTable rows={weekly.byWork} workLink />
-              </>
-            ) : null}
-            {weekly.byTitle.length ? (
-              <>
-                <div className="top-level form-label time-table-title">By title</div>
-                <SubjectTable rows={weekly.byTitle} />
-              </>
-            ) : null}
+            {!scoped.entryCount ? <div className="sidebar-muted">Nothing logged in this range.</div> : null}
           </div>
 
           <details

@@ -2681,3 +2681,12 @@ mark.search-highlight {
 }
 .time-split-reading { background: var(--accent); }
 .time-split-writing { background: var(--faint); }
+
+.time-scope-tabs {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.time-scope-when { margin-left: auto; font-size: var(--font-size-sm); color: var(--muted); }
+.time-total { font-family: $reading_font; font-size: 19px; }
+.time-table th { font-size: var(--font-size-xs); }
+.time-table td { font-size: var(--font-size-md); }
+.time-table td:nth-child(n+2) { font-family: $sans_font; }
