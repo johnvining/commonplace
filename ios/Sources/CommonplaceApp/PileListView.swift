@@ -6,6 +6,8 @@ struct PileListView: View {
     @EnvironmentObject var state: AppState
     @State private var piles: [Pile] = []
     @State private var error: String?
+    @State private var query = ""
+    @State private var searchTask: Task<Void, Never>?
     @State private var newName = ""
     @State private var newPileId: String?
     @State private var showingNew = false
@@ -15,6 +17,9 @@ struct PileListView: View {
             List {
                 if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
                 Section {
+                    TextField("Search piles", text: $query)
+                        .font(DS.ui(14))
+                        .onChange(of: query) { scheduleSearch() }
                     HStack {
                         TextField("New pile name", text: $newName)
                             .font(DS.ui(14))
@@ -38,6 +43,29 @@ struct PileListView: View {
                 PileDetailView(pileId: newPileId ?? "")
             }
             .task { load() }
+        }
+    }
+
+    private func scheduleSearch() {
+        searchTask?.cancel()
+        let q = query.trimmingCharacters(in: .whitespaces)
+        if q.isEmpty { load(); return }
+        guard q.count >= 2 else { return }
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            if Task.isCancelled { return }
+            await MainActor.run { search() }
+        }
+    }
+
+    private func search() {
+        let q = query.trimmingCharacters(in: .whitespaces)
+        guard !q.isEmpty else { return }
+        Task {
+            do {
+                let rows = try await state.client.autocompletePiles(q)
+                await MainActor.run { piles = rows }
+            } catch { await MainActor.run { self.error = "Search failed — retry." } }
         }
     }
 
