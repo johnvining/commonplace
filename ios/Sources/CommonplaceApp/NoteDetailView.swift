@@ -63,7 +63,7 @@ struct NoteDetailView: View {
                         }
                         if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
                     } else {
-                        Text(note.title ?? "(untitled)").font(.headline)
+                        Text(note.title ?? "(untitled)").font(DS.ui(17, weight: .semibold))
                         if let ts = note.titleSource, !ts.isEmpty {
                             Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
                         }
@@ -299,11 +299,19 @@ struct NoteDetailView: View {
     }
 
     private func loadImages() {
+        // Fetch images concurrently; preserving index order matters
+        // (lightbox and delete address images by position).
         Task {
             guard let count = note?.images?.count, count > 0 else { return }
-            var datas: [Data] = []
             do {
-                for i in 1...count { datas.append(try await state.client.noteImageData(noteId: noteId, index: i)) }
+                let datas = try await withThrowingTaskGroup(of: (Int, Data).self) { group in
+                    for i in 1...count {
+                        group.addTask { (i, try await state.client.noteImageData(noteId: noteId, index: i)) }
+                    }
+                    var collected: [(Int, Data)] = []
+                    for try await pair in group { collected.append(pair) }
+                    return collected.sorted { $0.0 < $1.0 }.map(\.1)
+                }
                 await MainActor.run { imageDatas = datas }
             } catch { await MainActor.run { self.error = "Images failed: \(describe(error))" } }
         }

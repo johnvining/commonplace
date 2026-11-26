@@ -162,13 +162,29 @@ struct TimeView: View {
         reload()
     }
 
+    @State private var reloadTask: Task<Void, Never>?
+
     private func reload() {
-        Task {
+        // Coalesce rapid day changes: cancel the in-flight load so stale
+        // results can't land after newer ones.
+        reloadTask?.cancel()
+        let forDay = day
+        reloadTask = Task {
             do {
-                entries = try await state.client.listTimeEntries(from: day, to: day)
-                summary = try await state.client.timeSummary(date: day)
+                async let e = state.client.listTimeEntries(from: forDay, to: forDay)
+                async let s = state.client.timeSummary(date: forDay)
+                let (entriesResult, summaryResult) = try await (e, s)
+                if Task.isCancelled { return }
+                await MainActor.run {
+                    if day == forDay {
+                        entries = entriesResult
+                        summary = summaryResult
+                    }
+                }
             } catch {
-                self.error = "Load failed — retry."
+                if !Task.isCancelled {
+                    await MainActor.run { self.error = "Load failed: \(describe(error))" }
+                }
             }
         }
     }
