@@ -2338,292 +2338,6 @@ mark.search-highlight {
   margin-bottom: 12px;
 }
 
-// Time logging page (/time): log form, daily/weekly summaries, entries.
-// Cards and labels follow the entity-page conventions above: note
-// background, note border, small uppercase grey labels.
-.time-card {
-  background: $note_background;
-  border: 1px solid $note_border;
-  border-radius: 6px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-}
-
-.time-form {
-  margin-bottom: 12px;
-  max-width: 640px;
-}
-
-// Compact controls for the time page: body-size text, not the big
-// entity-form sizing. Everything here stays time-scoped.
-.top-level.input.compact {
-  font-size: 14px;
-  padding: 6px 8px;
-}
-
-.button.compact {
-  height: auto;
-  min-height: 32px;
-  padding: 4px 12px;
-  font-size: 13px;
-}
-
-.time-timer-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.time-subject-select {
-  flex: 1 1 200px;
-  min-width: 0;
-}
-
-.time-elapsed {
-  font-size: 20px;
-  font-variant-numeric: tabular-nums;
-  min-width: 64px;
-  text-align: right;
-}
-
-.time-manual {
-  margin: 20px 0 8px;
-  max-width: 640px;
-}
-
-.time-manual > summary {
-  cursor: pointer;
-  margin-bottom: 8px;
-}
-
-.time-form-grid {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 10px 12px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.time-pile-pick {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  background: $input_background;
-  border: 1px solid $low_intensity_border;
-  border-radius: 4px;
-  padding: 4px 4px 4px 10px;
-  font-size: 20px;
-
-  &.compact {
-    font-size: 14px;
-  }
-}
-
-.time-pile-results {
-  list-style: none;
-  margin: 4px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  .button {
-    width: 100%;
-    justify-content: flex-start;
-    height: auto;
-    min-height: 42px;
-    white-space: normal;
-    text-align: left;
-  }
-}
-
-.time-kind-toggle {
-  display: flex;
-  gap: 8px;
-}
-
-.time-error {
-  color: #a00;
-  margin-bottom: 8px;
-}
-
-.time-day-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 16px 0;
-}
-
-.time-date-input {
-  width: auto;
-  flex: 0 1 auto;
-}
-
-.time-kind-totals {
-  display: flex;
-  gap: 8px 20px;
-  flex-wrap: wrap;
-  align-items: baseline;
-  margin: 8px 0 4px;
-}
-
-.time-total {
-  font-size: 20px;
-}
-
-// Kind tags reuse the site's note-label shape (small square tags,
-// main font) but stay neutral: the entity colours are reserved for
-// actual ideas and piles, so kinds get ink text on a hairline tag.
-.time-kind {
-  display: inline-flex;
-  align-items: center;
-  height: 19px;
-  padding: 0 6px;
-  font-family: $main_font;
-  font-size: var(--font-size-sm);
-  line-height: 1;
-  color: var(--muted);
-  background: transparent;
-  border: 1px solid var(--hairline);
-  border-radius: 2px;
-  white-space: nowrap;
-}
-
-.time-count {
-  opacity: 0.6;
-  font-size: var(--font-size-sm);
-}
-
-.time-crosscheck {
-  font-size: var(--font-size-sm);
-  opacity: 0.6;
-  margin: 2px 0 8px;
-}
-
-.time-crosscheck-bad {
-  opacity: 1;
-  color: #a00;
-  font-weight: bold;
-}
-
-.time-table-title {
-  margin: 16px 0 4px;
-}
-
-.time-table {
-  border-collapse: collapse;
-  margin-bottom: 8px;
-  width: 100%;
-  max-width: 640px;
-  table-layout: fixed;
-}
-
-.time-table th:first-child,
-.time-table td:first-child {
-  width: 40%;
-}
-
-.time-table th:nth-child(n+2),
-.time-table td:nth-child(n+2) {
-  width: 20%;
-}
-
-.time-table th {
-  font-size: var(--font-size-sm);
-  font-family: $sans_font;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: $grey3;
-  font-weight: normal;
-  text-align: left;
-  padding: 4px 16px 4px 0;
-}
-
-.time-table td {
-  text-align: left;
-  padding: 6px 16px 6px 0;
-  font-variant-numeric: tabular-nums;
-}
-
-.time-table tbody tr + tr td {
-  border-top: 1px solid $note_border;
-}
-
-.time-table td:nth-child(n+2),
-.time-table th:nth-child(n+2) {
-  text-align: right;
-  padding-right: 0;
-  padding-left: 16px;
-}
-
-.time-table td:last-child,
-.time-table th:last-child {
-  font-weight: bold;
-}
-
-.time-today td {
-  font-weight: bold;
-}
-
-.time-day-link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: $link_color;
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-}
-
-.time-entry-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  max-width: 720px;
-}
-
-.time-entry {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 8px 0;
-  flex-wrap: wrap;
-}
-
-.time-entry-list .time-entry + .time-entry {
-  border-top: 1px solid $note_border;
-}
-
-.time-entry .time-subject {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.time-entry .time-minutes {
-  font-variant-numeric: tabular-nums;
-  font-weight: bold;
-  min-width: 4em;
-}
-
-.time-entry-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-// Reading/writing line on a pile page.
-.time-pile-summary {
-  background: $note_background;
-  border: 1px solid $note_border;
-  border-radius: 6px;
-  padding: 10px 16px;
-  margin: 8px 0 16px;
-}
-
-// Minimal redesign layer; keep last so it overrides the rules above.
 @import '_minimal';
 
 .time-subject-picker { flex: 1 1 200px; min-width: 0; position: relative; }
@@ -2733,3 +2447,160 @@ mark.search-highlight {
 // Manual-form suggestion lists sit in flow (not absolute overlays).
 .time-pile-results { position: static; box-shadow: none; }
 .time-pile-results .button { justify-content: flex-start; }
+
+// ── Time page (/time) ──────────────────────────────────────────────
+// One consolidated section. Tokens only from _variables/_minimal:
+// hairlines, surface cards, reading serif for names/content, small
+// sans for controls/numbers. Pile/work subjects reuse the standard
+// .pill-input.piles .pill component (PileLabel), suggestion lists
+// reuse .pill-input-suggestions — no local lookalikes.
+.time-card {
+  background: $note_background;
+  border: 1px solid $note_border;
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+.top-level.form-label.time-section-head {
+  text-transform: none; letter-spacing: 0;
+  font-size: 15px; font-weight: 600; color: var(--ink);
+  margin: 0 0 10px;
+}
+.time-timer-row, .time-name-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.time-subject-picker { flex: 1 1 200px; min-width: 0; position: relative; }
+.top-level.input.time-subject-select,
+.time-day-nav .top-level.input { width: auto; flex: 1 1 140px; min-width: 0; }
+.time-subject-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 6px 5px 10px; max-width: 100%;
+  border: 1px solid var(--hairline); border-radius: 2px; background: var(--hover);
+  font-size: var(--font-size-md);
+}
+.time-subject-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: $reading_font; }
+.time-subject-chip button { background: none; border: none; cursor: pointer; font-size: 16px; color: inherit; }
+.time-subject-empty { padding: 7px 9px; opacity: 0.65; }
+.time-kind-toggle { display: flex; gap: 8px; }
+.time-elapsed {
+  font-size: 20px; font-variant-numeric: tabular-nums;
+  min-width: 64px; text-align: right;
+}
+.time-error { color: #a00; margin-bottom: 8px; }
+.top-level.input.compact { font-size: 14px; padding: 6px 8px; }
+.button.compact {
+  height: auto; min-height: 32px; padding: 4px 12px; font-size: 13px;
+}
+.button.compact:disabled { opacity: 0.45; }
+
+// Entries (Today card)
+.time-entries {
+  background: $note_background; border: 1px solid $note_border;
+  border-radius: 6px; padding: 6px 16px 10px; margin-bottom: 20px;
+}
+.time-entries-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+.time-entries-head .time-section-head { margin: 8px 0 4px; }
+.time-entries-head .time-day-nav { display: flex; align-items: center; margin: 0; gap: 4px; flex-wrap: wrap; }
+.time-entries-head .top-level.input.time-date-input {
+  width: 132px; flex: 0 0 auto; font-size: 12px; padding: 3px 6px;
+}
+.time-entry-list { list-style: none; margin: 0; padding: 0; max-width: 720px; }
+.time-entry {
+  display: flex; gap: 10px; align-items: center;
+  padding: 6px 0; flex-wrap: wrap;
+}
+.time-entry-list .time-entry + .time-entry { border-top: 1px solid $note_border; }
+.time-entry .time-kind { width: 64px; justify-content: center; flex: 0 0 auto; }
+.time-entry .time-minutes {
+  font-size: var(--font-size-md); font-variant-numeric: tabular-nums;
+  min-width: 44px;
+}
+.time-entry .time-subject { min-width: 0; overflow-wrap: anywhere; font-family: $reading_font; }
+.time-entry-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.time-entry-actions .button.compact { min-height: 28px; padding: 2px 10px; font-size: 12px; }
+
+// Kind tags: neutral hairline labels (entity colours stay reserved
+// for actual ideas/piles).
+.time-kind {
+  display: inline-flex; align-items: center; height: 19px; padding: 0 6px;
+  font-family: $main_font; font-size: var(--font-size-sm); line-height: 1;
+  color: var(--muted); background: transparent;
+  border: 1px solid var(--hairline); border-radius: 2px; white-space: nowrap;
+}
+
+// Analysis
+.time-scope-tabs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.time-scope-when { margin-left: auto; font-size: var(--font-size-sm); color: var(--muted); }
+.time-kind-totals {
+  display: flex; gap: 8px 20px; flex-wrap: wrap; align-items: baseline; margin: 8px 0 4px;
+}
+.time-analysis .time-kind-totals { margin: 0; }
+.time-total { font-family: $reading_font; font-size: 19px; }
+.time-count { opacity: 0.6; font-size: var(--font-size-sm); }
+.time-split {
+  display: flex; height: 4px; max-width: 420px; border-radius: 2px;
+  overflow: hidden; background: var(--hairline); margin: 2px 0 6px;
+}
+.time-split-reading { background: var(--accent); }
+.time-split-writing { background: var(--faint); }
+.time-table-title { margin: 16px 0 4px; }
+.time-table {
+  border-collapse: collapse; margin-bottom: 8px;
+  width: 100%; max-width: 640px; table-layout: fixed;
+}
+.time-table th:first-child, .time-table td:first-child { width: 40%; }
+.time-table th:nth-child(n+2), .time-table td:nth-child(n+2) {
+  width: 20%; text-align: right; padding-left: 16px; padding-right: 0;
+  font-family: $sans_font;
+}
+.time-table th {
+  font-size: var(--font-size-xs); font-family: $sans_font;
+  text-transform: uppercase; letter-spacing: 0.04em; color: $grey3;
+  font-weight: normal; text-align: left; padding: 4px 16px 4px 0;
+}
+.time-table td {
+  font-size: var(--font-size-md); text-align: left;
+  padding: 6px 16px 6px 0; font-variant-numeric: tabular-nums;
+}
+.time-table td:first-child { font-family: $reading_font; }
+.time-table tbody tr + tr td { border-top: 1px solid $note_border; }
+.time-table td:last-child, .time-table th:last-child { font-weight: bold; }
+.time-today td { font-weight: bold; }
+.time-day-link {
+  background: none; border: none; padding: 0; color: $link_color;
+  font: inherit; font-variant-numeric: tabular-nums; cursor: pointer;
+}
+
+// Pile subjects use the standard pile pill component tokens.
+.time-pile-pill {
+  display: inline-flex; align-items: center; padding: 1px 6px;
+  border: 1px solid transparent; border-radius: 3px;
+  background: var(--semantic-pile); font-size: 13px; line-height: 1.4;
+  font-family: $reading_font;
+}
+
+// Manual form
+.time-manual { margin: 20px 0 8px; max-width: 640px; }
+.time-manual > summary { cursor: pointer; margin-bottom: 8px; }
+.time-form { margin-bottom: 12px; max-width: 640px; }
+.time-form-grid {
+  display: grid; grid-template-columns: max-content 1fr;
+  gap: 10px 12px; align-items: center; margin-bottom: 12px;
+}
+.time-pile-pick {
+  display: inline-flex; gap: 8px; align-items: center;
+  background: $input_background; border: 1px solid $low_intensity_border;
+  border-radius: 4px; padding: 4px 4px 4px 10px; font-size: 20px;
+  &.compact { font-size: 14px; }
+}
+.time-pile-results { position: static; box-shadow: none; }
+.time-shortcuts { margin-bottom: 20px; max-width: 720px; }
+
+// Pile page totals line
+.time-pile-summary {
+  background: $note_background; border: 1px solid $note_border;
+  border-radius: 6px; padding: 10px 16px; margin: 8px 0 16px;
+}
