@@ -57,6 +57,18 @@ function toEntryBody(body: any, isCreate: boolean) {
     out.pile = null
   }
 
+  if (body.work !== undefined) {
+    if (body.work === null || body.work === '') {
+      out.work = null
+    } else if (typeof body.work === 'string' && isValidObjectId(body.work)) {
+      out.work = body.work
+    } else {
+      throw invalid('Invalid work')
+    }
+  } else if (isCreate) {
+    out.work = null
+  }
+
   if (body.kind !== undefined || isCreate) {
     if (!TIME_KINDS.includes(body.kind)) throw invalid('Kind must be reading or writing')
     out.kind = body.kind
@@ -76,16 +88,37 @@ function toEntryBody(body: any, isCreate: boolean) {
     out.date = day
   }
 
+  for (const field of ['startedAt', 'endedAt'] as const) {
+    if (body[field] !== undefined) {
+      if (body[field] === null || body[field] === '') {
+        out[field] = null
+      } else {
+        const when = new Date(body[field])
+        if (Number.isNaN(when.getTime())) throw invalid(`${field} must be an ISO timestamp`)
+        out[field] = when
+      }
+    } else if (isCreate) {
+      out[field] = null
+    }
+  }
+  const started = (out.startedAt ?? body.startedAt) as Date | string | null | undefined
+  const ended = (out.endedAt ?? body.endedAt) as Date | string | null | undefined
+  if (started && ended && new Date(ended).getTime() < new Date(started).getTime()) {
+    throw invalid('endedAt must not be before startedAt')
+  }
+
   const title = (out.title ?? body.title ?? '') as string
   const pile = out.pile ?? body.pile
-  if (isCreate && !String(title).trim() && !pile) {
-    throw invalid('Give the entry a title or a pile')
+  const work = out.work ?? body.work
+  if (isCreate && !String(title).trim() && !pile && !work) {
+    throw invalid('Give the entry a title, a pile, or a work')
   }
   return out
 }
 
 type PopulatedEntry = {
   pile?: { _id?: unknown; name?: string } | null
+  work?: { _id?: unknown; name?: string } | null
   title?: string
   kind: string
   minutes: number
@@ -107,6 +140,7 @@ function summarize(entries: PopulatedEntry[]) {
   let readingMinutes = 0
   let writingMinutes = 0
   const pileMap = new Map<string, SubjectRow & { pile: string; name: string }>()
+  const workMap = new Map<string, SubjectRow & { work: string; name: string }>()
   const titleMap = new Map<string, SubjectRow & { title: string }>()
   for (const e of entries) {
     if (e.kind === 'reading') readingMinutes += e.minutes
@@ -126,7 +160,24 @@ function summarize(entries: PopulatedEntry[]) {
       row.entryCount += 1
       addKind(row, e.kind, e.minutes)
       pileMap.set(pileId, row)
-    } else {
+    }
+    const workId = e.work?._id ? String(e.work._id) : null
+    if (workId) {
+      const name = e.work?.name ?? 'Unknown work'
+      const row = workMap.get(workId) ?? {
+        work: workId,
+        name,
+        minutes: 0,
+        readingMinutes: 0,
+        writingMinutes: 0,
+        entryCount: 0,
+      }
+      row.minutes += e.minutes
+      row.entryCount += 1
+      addKind(row, e.kind, e.minutes)
+      workMap.set(workId, row)
+    }
+    if (!pileId && !workId) {
       const title = (e.title ?? '').trim() || 'Untitled'
       const row = titleMap.get(title) ?? {
         title,
@@ -142,6 +193,7 @@ function summarize(entries: PopulatedEntry[]) {
     }
   }
   const byPile = [...pileMap.values()].sort((a, b) => b.minutes - a.minutes)
+  const byWork = [...workMap.values()].sort((a, b) => b.minutes - a.minutes)
   const byTitle = [...titleMap.values()].sort((a, b) => b.minutes - a.minutes)
   return {
     totalMinutes: readingMinutes + writingMinutes,
@@ -149,13 +201,14 @@ function summarize(entries: PopulatedEntry[]) {
     writingMinutes,
     entryCount: entries.length,
     byPile,
+    byWork,
     byTitle,
   }
 }
 
 export const reqCreateTimeEntry = async (req: Request) => {
   const doc = await TimeEntry.create(toEntryBody(req.body ?? {}, true))
-  return TimeEntry.findById(doc._id).populate('pile', 'name').lean().exec()
+  return TimeEntry.findById(doc._id).populate('pile', 'name').populate('work', 'name').lean().exec()
 }
 
 export const reqListTimeEntries = async (req: Request) => {
@@ -186,17 +239,23 @@ export const reqListTimeEntries = async (req: Request) => {
     }
     filter.pile = req.query.pile
   }
+  if (req.query.work) {
+    if (typeof req.query.work !== 'string' || !isValidObjectId(req.query.work)) {
+      throw invalid('Invalid work')
+    }
+    filter.work = req.query.work
+  }
   const limit = Math.min(Math.max(Number(req.query.limit) || 200, 1), 1000)
   return TimeEntry.find(filter)
     .sort({ date: -1, createdAt: -1 })
     .limit(limit)
-    .populate('pile', 'name')
+    .populate('pile', 'name').populate('work', 'name')
     .lean()
     .exec()
 }
 
 export const reqGetTimeEntry = async (req: Request) => {
-  const doc = await TimeEntry.findById(req.params.id).populate('pile', 'name').lean().exec()
+  const doc = await TimeEntry.findById(req.params.id).populate('pile', 'name').populate('work', 'name').lean().exec()
   if (!doc) {
     const e = new Error('Time entry not found') as Error & { status: number }
     e.status = 404
@@ -220,7 +279,7 @@ export const reqUpdateTimeEntry = async (req: Request) => {
     if (!String(titleAfter ?? '').trim()) throw invalid('Give the entry a title or a pile')
   }
   const doc = await TimeEntry.findByIdAndUpdate(req.params.id, { $set: body }, { new: true })
-    .populate('pile', 'name')
+    .populate('pile', 'name').populate('work', 'name')
     .lean()
     .exec()
   if (!doc) {
@@ -273,7 +332,7 @@ export const reqRecentSubjects = async (req: Request) => {
   const entries = await TimeEntry.find({})
     .sort({ date: -1, createdAt: -1 })
     .limit(500)
-    .populate('pile', 'name')
+    .populate('pile', 'name').populate('work', 'name')
     .lean()
     .exec()
   const seen = new Set<string>()
@@ -281,16 +340,31 @@ export const reqRecentSubjects = async (req: Request) => {
     key: string
     title?: string
     pile?: { id: string; name: string }
+    work?: { id: string; name: string }
     kind: string
     minutes: number
     lastDate: string
   }> = []
   for (const e of entries as any[]) {
     const pileId = e.pile?._id ? String(e.pile._id) : null
-    const key = pileId ? `pile:${pileId}` : `title:${((e.title ?? '').trim() || 'Untitled').toLowerCase()}`
+    const workId = e.work?._id ? String(e.work._id) : null
+    const key = pileId
+      ? `pile:${pileId}`
+      : workId
+        ? `work:${workId}`
+        : `title:${((e.title ?? '').trim() || 'Untitled').toLowerCase()}`
     if (seen.has(key)) continue
     seen.add(key)
-    if (pileId) {
+    if (workId && !pileId) {
+      subjects.push({
+        key,
+        work: { id: workId, name: e.work?.name ?? 'Unknown work' },
+        ...(e.title?.trim() ? { title: e.title.trim() } : {}),
+        kind: e.kind,
+        minutes: e.minutes,
+        lastDate: dayString(new Date(e.date)),
+      })
+    } else if (pileId) {
       subjects.push({
         key,
         pile: { id: pileId, name: e.pile?.name ?? 'Unknown pile' },
@@ -321,7 +395,7 @@ export const reqGetTimeSummary = async (req: Request) => {
   const week = weekRange(refDay)
 
   const entries = await TimeEntry.find({ date: { $gte: week.start, $lt: week.end } })
-    .populate('pile', 'name')
+    .populate('pile', 'name').populate('work', 'name')
     .lean()
     .exec()
   const inDay = entries.filter((e: any) => e.date >= day.start && e.date < day.end)

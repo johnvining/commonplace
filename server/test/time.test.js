@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { authedAgent, createPile } from './setup.js'
+import { authedAgent, createPile, createWork } from './setup.js'
 
 function createEntry(agent, body) {
   return agent.post('/api/time/').send(body)
@@ -214,6 +214,42 @@ describe('time', () => {
         minutes: 30,
         pile: { id: String(pile._id), name: 'Essay: Attention' },
       })
+    })
+  })
+
+  describe('work links and session times', () => {
+    it('stores startedAt/endedAt and summarises by work', async () => {
+      const agent = await authedAgent()
+      const work = await createWork(agent, { name: 'Meditations' })
+      const res = await createEntry(agent, {
+        work: work._id,
+        kind: 'reading',
+        minutes: 40,
+        date: '2026-11-20',
+        startedAt: '2026-11-20T14:00:00.000Z',
+        endedAt: '2026-11-20T14:40:00.000Z',
+      }).expect(201)
+      expect(res.body.data.work?.name ?? work.name).toBeTruthy()
+      expect(res.body.data.startedAt).toBeTruthy()
+
+      const summary = await agent.get('/api/time/summary').query({ date: '2026-11-20' }).expect(200)
+      expect(summary.body.data.daily.byWork).toHaveLength(1)
+      expect(summary.body.data.daily.byWork[0]).toMatchObject({ name: 'Meditations', minutes: 40, readingMinutes: 40 })
+
+      const subjects = await agent.get('/api/time/recent-subjects').expect(200)
+      expect(subjects.body.data[0]).toMatchObject({ key: `work:${work._id}`, kind: 'reading' })
+    })
+
+    it('400s when endedAt is before startedAt', async () => {
+      const agent = await authedAgent()
+      await createEntry(agent, {
+        title: 'Backwards',
+        kind: 'reading',
+        minutes: 10,
+        date: '2026-11-20',
+        startedAt: '2026-11-20T15:00:00.000Z',
+        endedAt: '2026-11-20T14:00:00.000Z',
+      }).expect(400)
     })
   })
 
