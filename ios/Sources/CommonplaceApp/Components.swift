@@ -1,5 +1,6 @@
 import SwiftUI
 import CommonplaceKit
+import ImageIO
 #if os(iOS)
 import UIKit
 #elseif os(macOS)
@@ -137,6 +138,25 @@ struct NoteImageView: View {
     }
 }
 
+/// Decode image data down to a thumbnail-sized bitmap so list/grid
+/// scrolling never decodes full-resolution photos.
+func downsampledImageData(_ data: Data, maxPixelSize: Int) -> Data? {
+    let options: [CFString: Any] = [
+        kCGImageSourceCreateThumbnailFromImageAlways: true,
+        kCGImageSourceCreateThumbnailWithTransform: true,
+        kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+    ]
+    guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+          let cg = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+    else { return nil }
+    #if os(macOS)
+    let rep = NSBitmapImageRep(cgImage: cg)
+    return rep.representation(using: .png, properties: [:])
+    #else
+    return UIImage(cgImage: cg).pngData()
+    #endif
+}
+
 /// Thumbnail that fetches one of a note's images (1-based, API order).
 struct NoteImageThumb: View {
     @EnvironmentObject var state: AppState
@@ -148,7 +168,9 @@ struct NoteImageThumb: View {
     var body: some View {
         NoteImageView(data: data)
             .task(id: "\(noteId)-\(index)") {
-                data = try? await state.client.noteImageData(noteId: noteId, index: index)
+                guard let raw = try? await state.client.noteImageData(noteId: noteId, index: index)
+                else { return }
+                data = downsampledImageData(raw, maxPixelSize: 512) ?? raw
             }
     }
 }
