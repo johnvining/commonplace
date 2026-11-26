@@ -223,9 +223,7 @@ struct UnifiedViewSelector: View {
                         .foregroundStyle(mode == v.mode ? DS.ink : DS.muted)
                         .frame(width: 34, height: 26)
                         .background(mode == v.mode ? DS.hover : Color.clear)
-                        .clipShape(
-                            RoundedRectangle(cornerRadius: 4)
-                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
                 .buttonStyle(.plain)
                 .help("\(v.label) (Ctrl+Shift+\(v.key))")
@@ -235,8 +233,9 @@ struct UnifiedViewSelector: View {
                 }
             }
         }
-        .overlay(RoundedRectangle(cornerRadius: 5).stroke(DS.hairline, lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 5))
+        // No border of its own: in a toolbar the system already draws
+        // one capsule around the group — a second outline fought it.
+        .padding(.horizontal, 2)
     }
 }
 
