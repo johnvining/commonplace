@@ -70,6 +70,84 @@ function subjectKeyFor(entry: any): { key: string; label: string; href: string }
   return { key, label: title, href: `/time?subject=${encodeURIComponent(key)}` }
 }
 
+
+function KindTotals({ summary }: { summary: any }) {
+  return (
+    <div className="time-kind-totals">
+      <span className="time-total">{formatMinutes(summary.totalMinutes)} total</span>
+      <span className="time-kind time-kind-reading">{formatMinutes(summary.readingMinutes)} reading</span>
+      <span className="time-kind time-kind-writing">{formatMinutes(summary.writingMinutes)} writing</span>
+      <span className="time-count">
+        {summary.entryCount} {summary.entryCount === 1 ? 'entry' : 'entries'}
+      </span>
+    </div>
+  )
+}
+
+function SubjectTable({
+  rows,
+  pileLink,
+  workLink,
+}: {
+  rows: any[]
+  pileLink?: boolean
+  workLink?: boolean
+}) {
+  if (!rows.length) return null
+  return (
+    <table className="time-table">
+      <thead>
+        <tr>
+          <th>{pileLink ? 'Pile' : workLink ? 'Work' : 'Title'}</th>
+          <th>Reading</th>
+          <th>Writing</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row: any, i: number) => (
+          <tr key={i}>
+            <td>
+              {pileLink && row.pile ? (
+                <Link to={'/pile/' + row.pile}>{row.name}</Link>
+              ) : workLink && row.work ? (
+                <Link to={'/work/' + row.work}>
+                  <em>{row.name}</em>
+                </Link>
+              ) : (
+                row.name ?? row.title
+              )}
+            </td>
+            <td>{formatMinutes(row.readingMinutes)}</td>
+            <td>{formatMinutes(row.writingMinutes)}</td>
+            <td>{formatMinutes(row.minutes)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
+function Time(props: any) {
+  const [selectedDate, setSelectedDate] = useState(todayLocal())
+  const [summary, setSummary] = useState<any>(null)
+  const [dayEntries, setDayEntries] = useState<any[]>([])
+  const [subjects, setSubjects] = useState<any[]>([])
+  const [starred, setStarred] = useState<any[]>(() => getPinnedItems().filter((p) => p.type === 'time'))
+  const [loading, setLoading] = useState(true)
+  const [params, setParams] = useSearchParams()
+  const subjectApplied = useRef<string | null>(null)
+  const [timerKey, setTimerKey] = useState('')
+  const [timerQuery, setTimerQuery] = useState('')
+  const [timerLabel, setTimerLabel] = useState('')
+  const [timerOpen, setTimerOpen] = useState(false)
+  const [timerPiles, setTimerPiles] = useState<any[]>([])
+  const [timerWorks, setTimerWorks] = useState<any[]>([])
+  const [timerHighlight, setTimerHighlight] = useState(0)
+  const [timerKind, setTimerKind] = useState('writing')
+  const [timerStartedAt, setTimerStartedAt] = useState<number | null>(null)
+  const [now, setNow] = useState(Date.now())
+
 function Time(props: any) {
   const [selectedDate, setSelectedDate] = useState(todayLocal())
   const [summary, setSummary] = useState<any>(null)
