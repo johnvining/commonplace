@@ -38,6 +38,9 @@ struct NoteDetailView: View {
     @State private var confirming = false
     @State private var confirmingDismiss = false
     @Environment(\.dismiss) private var dismiss
+    #if os(macOS)
+    @Environment(\.openWindow) private var openWindow
+    #endif
 
     private var dirty: Bool {
         guard let n = note else { return false }
@@ -63,12 +66,28 @@ struct NoteDetailView: View {
                         }
                         if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
                     } else {
-                        Text(note.title ?? "(untitled)").font(DS.ui(17, weight: .semibold))
+                        Text(note.title ?? "(untitled)")
+                            .font(DS.serif(21, weight: .semibold))
+                            .foregroundStyle(DS.ink)
+                        if (note.authors?.isEmpty == false) || note.work != nil {
+                            HStack(spacing: 6) {
+                                if let authors = note.authors, !authors.isEmpty {
+                                    Text(authors.compactMap(\.name).joined(separator: ", "))
+                                }
+                                if let w = note.work?.name, !w.isEmpty {
+                                    Text(w).italic()
+                                }
+                            }
+                            .font(DS.serif(13))
+                            .foregroundStyle(DS.muted)
+                        }
                         if let ts = note.titleSource, !ts.isEmpty {
                             Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
                         }
                         if let t = note.text, !t.isEmpty { NoteText(text: t) }
-                        if let k = note.take, !k.isEmpty { Text(k).italic() }
+                        if let k = note.take, !k.isEmpty {
+                            Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.ink)
+                        }
                         if let u = note.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
                         if note.year != nil || (note.page?.isEmpty == false) {
                             Text([note.year.map(String.init), note.page].compactMap { $0 }.joined(separator: " · "))
@@ -234,6 +253,16 @@ struct NoteDetailView: View {
                     Button("Back") { confirmingDismiss = true }
                 }
             }
+            #if os(macOS)
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    openWindow(value: noteId)
+                } label: {
+                    Label("Open in New Window", systemImage: "macwindow.badge.plus")
+                }
+                .help("Open this note in its own window")
+            }
+            #endif
         }
         .task { load() }
     }
