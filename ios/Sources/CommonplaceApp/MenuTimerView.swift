@@ -23,7 +23,12 @@ struct MenuTimerLabel: View {
         // subject + elapsed. A single Text renders reliably as a
         // MenuBarExtra label; multi-view stacks can collapse.
         Text(labelText)
-            .task { await state.refreshTodayTotal() }
+            .task {
+                await state.refreshTodayTotal()
+                // Keep polling alive with the menu bar even when the
+                // main window is closed (its task would cancel).
+                state.startTimerPolling()
+            }
             .onReceive(ticker) { tick in
                 if state.timerStartedAt != nil { now = tick }
             }

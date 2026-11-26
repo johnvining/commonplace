@@ -177,6 +177,7 @@ final class AppState: ObservableObject {
                 await syncRunningTimer()
                 await refreshTodayTotal()
             }
+            timerPollTask = nil
         }
     }
 
