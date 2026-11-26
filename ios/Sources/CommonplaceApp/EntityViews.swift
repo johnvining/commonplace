@@ -204,6 +204,7 @@ struct WorkDetailView: View {
                                 editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
                                 editing = true
                             }
+                            DSButton(title: "Add Note") { addNoteForWork() }
                             NavigationLink { ReadView(workId: workId, title: w.name ?? "Read") } label: {
                                 DSButtonLabel(title: "Read")
                             }
@@ -271,23 +272,27 @@ struct WorkDetailView: View {
                     }
                     .listRowSeparator(.hidden)
                     if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
-                    HStack {
-                        DSButton(title: "Add Note") { addNoteForWork() }
-                        Spacer()
-                    }
-                    TextField("Import notes for this work…", text: $importText, axis: .vertical)
-                    Button("Import notes") { importForWork() }.disabled(importText.isEmpty)
                 }
-                .navigationDestination(isPresented: $showingNewNote) {
-                    NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
+                if editing {
+                    // Import lives with the other edit tools, not
+                    // stranded under the notes list.
+                    Section("Import notes") {
+                        TextField("Paste notes to import…", text: $importText, axis: .vertical)
+                        DSButton(title: "Import notes") { importForWork() }
+                            .disabled(importText.isEmpty)
+                            .opacity(importText.isEmpty ? 0.5 : 1)
+                    }
                 }
             } else if loaded {
                 Text("Work not found.").foregroundStyle(.secondary)
             } else {
-                Text("Loading…")
+                LoadingBlock()
             }
         }
         .listStyle(.plain)
+        .navigationDestination(isPresented: $showingNewNote) {
+            NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
+        }
         .navigationTitle("Work")
         .task { await load() }
     }
@@ -423,7 +428,7 @@ struct AuthorDetailView: View {
             } else if loaded {
                 Text("Author not found.").foregroundStyle(.secondary)
             } else {
-                Text("Loading…")
+                LoadingBlock()
             }
         }
         .listStyle(.plain)
@@ -559,7 +564,7 @@ struct IdeaDetailView: View {
             } else if loaded {
                 Text("Idea not found.").foregroundStyle(.secondary)
             } else {
-                Text("Loading…")
+                LoadingBlock()
             }
         }
         .listStyle(.plain)

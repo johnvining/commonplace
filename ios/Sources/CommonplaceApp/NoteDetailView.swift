@@ -315,7 +315,7 @@ struct NoteDetailView: View {
                 Text("Note not found — it may have been deleted.")
                     .foregroundStyle(.secondary)
             } else {
-                Text("Loading…")
+                LoadingBlock()
             }
         }
         .listStyle(.plain)

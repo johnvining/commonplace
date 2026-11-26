@@ -109,6 +109,19 @@ struct EntityPageHeader<Actions: View>: View {
     }
 }
 
+/// Quiet full-page loading state, so detail pages don't flash an
+/// empty white list before their content lands.
+struct LoadingBlock: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            ProgressView()
+            Text("Loading…").font(DS.ui(12)).foregroundStyle(DS.muted)
+        }
+        .frame(maxWidth: .infinity, minHeight: 220)
+        .listRowSeparator(.hidden)
+    }
+}
+
 /// Opens this exact page on the website (note/…, pile/…, idea/…,
 /// work/…, auth/…), in the same quiet button style as DSButton.
 struct OpenInWebButton: View {

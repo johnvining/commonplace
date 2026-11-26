@@ -19,25 +19,26 @@ struct MenuTimerLabel: View {
     }
 
     var body: some View {
-        // Serif C (the app icon), then subject + elapsed in the bar
-        // itself; totals live in the popover.
-        HStack(spacing: 5) {
-            Text("C")
-                .font(.custom("Georgia", size: 15).weight(.bold))
-            if let at = state.timerStartedAt {
-                Text(shortSubject)
-                    .lineLimit(1)
-                Text(formatElapsed(now.timeIntervalSince(at) * 1000))
-                    .monospacedDigit()
-            } else if !todayText.isEmpty {
-                Text(todayText)
-                    .monospacedDigit()
+        // One text in the bar itself: serif C (the app icon), then
+        // subject + elapsed. A single Text renders reliably as a
+        // MenuBarExtra label; multi-view stacks can collapse.
+        Text(labelText)
+            .task { await state.refreshTodayTotal() }
+            .onReceive(ticker) { tick in
+                if state.timerStartedAt != nil { now = tick }
             }
+    }
+
+    private var labelText: AttributedString {
+        var c = AttributedString("C")
+        c.font = .custom("Georgia", size: 15).weight(.bold)
+        if let at = state.timerStartedAt {
+            return c + AttributedString("  \(shortSubject) \(formatElapsed(now.timeIntervalSince(at) * 1000))")
         }
-        .task { await state.refreshTodayTotal() }
-        .onReceive(ticker) { tick in
-            if state.timerStartedAt != nil { now = tick }
+        if !todayText.isEmpty {
+            return c + AttributedString("  \(todayText)")
         }
+        return c
     }
 
     private var shortSubject: String {
