@@ -1,4 +1,5 @@
 import PillInput from './PillInput'
+import PileName from './PileName'
 
 // Piles as pills (see PillInput). Each add or remove fires its own
 // callback so the parent can save it right away. Pills show the
@@ -22,23 +23,11 @@ interface Props {
   compact?: boolean
 }
 
-// Split a `Prefix: Name` pile name into `{ pre, label }`. If there is no
-// colon, returns the whole name as the label.
-function splitPileName(name: string | null | undefined): { pre: string | null; label: string } {
-  if (!name) return { pre: null, label: '' }
-  const idx = name.indexOf(':')
-  if (idx < 0) return { pre: null, label: name }
-  return { pre: name.slice(0, idx).trim(), label: name.slice(idx + 1).trim() }
-}
-
+// Pile labels render through the one PileName component everywhere
+// (display tags, list rows, titles, and these pills), so the prefix
+// key looks identical in every context.
 export function PileLabel({ name }: { name?: string | null }) {
-  const { pre, label } = splitPileName(name)
-  return (
-    <>
-      {pre ? <span className="pill-pre">{pre}</span> : null}
-      <span>{label}</span>
-    </>
-  )
+  return <PileName name={name ?? undefined} />
 }
 
 export default function PilesPillList(props: Props) {

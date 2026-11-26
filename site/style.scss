@@ -2246,16 +2246,8 @@ mark.search-highlight {
   border-color: transparent;
 }
 
-.pill-input .pill-pre {
-  font-size: 10px;
-  background: $note_background;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 1px 4px;
-  border-radius: 2px;
-  margin-right: 4px;
-  vertical-align: middle;
-}
+// .pile-pre is defined once, in _minimal.scss — no boxed variant here,
+// so a "Status: X" prefix looks the same in pills, tags, and titles.
 // Maintenance page (one-off data fixes after an update).
 .maintenance-task {
   border: 1px solid $note_border;
