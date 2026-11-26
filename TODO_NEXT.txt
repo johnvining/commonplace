@@ -5,16 +5,16 @@
 2. [x] Web shows the active timer like iOS + Mac (shared /api/time/timer) —
        verify end to end: start in app → appears on web; start on web →
        appears in app menu bar.
-3. [ ] Performance pass, Mac + iOS — no animations anywhere, instant
+3. [x] Performance pass, Mac + iOS — no animations anywhere, instant
        view switching and scrolling; profile the hot spots (note lists,
        grid, time page) and fix what's slow.
-4. [ ] Sidebar Starred items get a type icon (note / pile / work /
+4. [x] Sidebar Starred items get a type icon (note / pile / work /
        author / idea / time) describing what each star is.
 5. [ ] iOS Live Activity (lock screen / Dynamic Island) showing the
        running timer, updating and ending with the timer.
 6. [ ] iOS home-screen widget: start a recent timer (or a new one)
        without opening the app.
-7. [ ] Remove "Open web version" from the Mac sidebar — keep Web only
+7. [x] Remove "Open web version" from the Mac sidebar — keep Web only
        on entity/note pages, opening that specific page.
 8. [ ] Ctrl+O quick bar fully implemented on macOS and iOS — a quick
        search overlay like the web's, not just jumping to Search.
@@ -33,3 +33,12 @@
         (photos/OCR/link-by-nick) showing in read mode.
 
 Done items get checked off here; code lands in small local commits.
+
+Timer profile (item 10, measured 2026-11-26 on the Release Mac app):
+the process is >99% idle in a 10s sample (busy frames <=0.4% each).
+What little work exists, in order: (1) runloop idle wait (wanted),
+(2) 1s timer text + layout ticks in the sidebar/menu bar, (3) the 5s
+shared-timer poll (one GET + today's summary; state writes now only
+on change), (4) SwiftUI attribute-graph/layout passes when state
+flips, (5) note-list rendering on load/switch (markdown + thumbnails,
+both cached). No other steady-state work found.
