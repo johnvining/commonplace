@@ -22,8 +22,44 @@ struct NotesView: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                if isCardMode {
+            // Both presentations stay mounted; switching formats only
+            // toggles visibility, so grid/tile cards (markdown, images)
+            // are pre-rendered and switching costs no rebuild at all.
+            ZStack {
+                listBody
+                    .opacity(isCardMode ? 0 : 1)
+                    .allowsHitTesting(!isCardMode)
+                    .accessibilityHidden(isCardMode)
+                cardBody
+                    .opacity(isCardMode ? 1 : 0)
+                    .allowsHitTesting(isCardMode)
+                    .accessibilityHidden(!isCardMode)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .macNewNote)) { _ in
+                createNote()
+            }
+            .navigationTitle("Notes")
+            .navigationDestination(isPresented: $showingNewNote) {
+                NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
+            }
+            .toolbar {
+                // Always visible, top right — not a row in the content.
+                ToolbarItem(placement: .primaryAction) {
+                    UnifiedViewSelector(mode: $viewMode)
+                }
+            }
+            .task {
+                // Seed from the session cache so coming back to Notes
+                // is instant; the load below refreshes in place.
+                if notes.isEmpty, initialPile == nil, !state.recentNotesCache.isEmpty {
+                    notes = state.recentNotesCache
+                }
+                if let initialPile, pileSel.isEmpty { pileSel = [initialPile]; applySearch() } else { loadRecent() }
+            }
+        }
+    }
+
+    private var cardBody: some View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 12) {
                             headerControls
@@ -57,27 +93,6 @@ struct NotesView: View {
                         .padding(16)
                     }
                     .refreshable { loadRecent() }
-                } else {
-                    listBody
-                }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .macNewNote)) { _ in
-                createNote()
-            }
-            .navigationTitle("Notes")
-            .navigationDestination(isPresented: $showingNewNote) {
-                NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
-            }
-            .toolbar {
-                // Always visible, top right — not a row in the content.
-                ToolbarItem(placement: .primaryAction) {
-                    UnifiedViewSelector(mode: $viewMode)
-                }
-            }
-            .task {
-                if let initialPile, pileSel.isEmpty { pileSel = [initialPile]; applySearch() } else { loadRecent() }
-            }
-        }
     }
 
     private var headerControls: some View {
@@ -198,6 +213,7 @@ struct NotesView: View {
                 await MainActor.run {
                     page = wanted
                     notes = wanted == 1 ? rows : notes + rows
+                    if wanted == 1 { state.recentNotesCache = rows }
                 }
             } catch {
                 await MainActor.run { self.error = "Load failed: \(describe(error))" }

@@ -197,34 +197,42 @@ struct NoteDetailView: View {
                         )
                     }
                 } else {
-                    Section {
-                        ForEach(note.displayAuthors, id: \.id) { a in
-                            NavigationLink { AuthorDetailView(authorId: a.id) } label: {
-                                Text(a.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.ink)
+                    // Read mode: everything linked shows as one compact
+                    // tag flow under the card — online shows tags inline,
+                    // not one full-width row per link.
+                    if !note.displayAuthors.isEmpty || !(note.people ?? []).isEmpty
+                        || note.work != nil || !(note.piles ?? []).isEmpty || !(note.ideas ?? []).isEmpty {
+                        Section {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), alignment: .leading)], alignment: .leading, spacing: 6) {
+                                ForEach(note.displayAuthors, id: \.id) { a in
+                                    NavigationLink { AuthorDetailView(authorId: a.id) } label: {
+                                        linkTag(a.name ?? "", color: DS.ink, tint: DS.hover)
+                                    }.buttonStyle(.plain)
+                                }
+                                ForEach(note.people ?? [], id: \.id) { a in
+                                    NavigationLink { AuthorDetailView(authorId: a.id) } label: {
+                                        linkTag(a.name ?? "", color: DS.ink, tint: DS.hover)
+                                    }.buttonStyle(.plain)
+                                }
+                                if let w = note.work {
+                                    NavigationLink { WorkDetailView(workId: w.id) } label: {
+                                        linkTag(w.name ?? w.id, color: DS.ink, tint: DS.hover, italic: true)
+                                    }.buttonStyle(.plain)
+                                }
+                                ForEach(note.piles ?? [], id: \.id) { p in
+                                    NavigationLink { PileDetailView(pileId: p.id) } label: {
+                                        linkTag(p.name ?? "", color: DS.pile, tint: DS.pileSoft)
+                                    }.buttonStyle(.plain)
+                                }
+                                ForEach(note.ideas ?? [], id: \.id) { i in
+                                    NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
+                                        linkTag(i.name ?? "", color: DS.accent, tint: DS.accentSoft)
+                                    }.buttonStyle(.plain)
+                                }
                             }
                         }
-                        ForEach(note.people ?? [], id: \.id) { a in
-                            NavigationLink { AuthorDetailView(authorId: a.id) } label: {
-                                Text(a.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.ink)
-                            }
-                        }
-                        if let w = note.work {
-                            NavigationLink { WorkDetailView(workId: w.id) } label: {
-                                Text(w.name ?? w.id).font(DS.serif(14.5)).italic().foregroundStyle(DS.ink)
-                            }
-                        }
-                        ForEach(note.piles ?? [], id: \.id) { p in
-                            NavigationLink { PileDetailView(pileId: p.id) } label: {
-                                Text(p.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.pile)
-                            }
-                        }
-                        ForEach(note.ideas ?? [], id: \.id) { i in
-                            NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
-                                Text(i.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.accent)
-                            }
-                        }
+                        .listRowSeparator(.hidden)
                     }
-                    .listRowSeparator(.hidden)
                 }
                 Section {
                     HStack(spacing: 6) {
@@ -243,72 +251,91 @@ struct NoteDetailView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
-                Section("Images") {
-                    ScrollView(.horizontal) {
-                        HStack {
-                            ForEach(Array(imageDatas.enumerated()), id: \.offset) { idx, data in
-                                VStack {
-                                    NoteImageView(data: data)
-                                        .frame(width: 90, height: 90)
-                                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                                        .onTapGesture { lightboxIndex = idx }
-                                    Button("Delete") { deleteImage(idx) }.font(DS.ui(11))
+                // Images: read mode is just the photos (+ lightbox);
+                // add/delete/OCR/suggest are Edit-mode tools. The whole
+                // section disappears when there's nothing to show.
+                if editing || !imageDatas.isEmpty {
+                    Section("Images") {
+                        if !imageDatas.isEmpty {
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ForEach(Array(imageDatas.enumerated()), id: \.offset) { idx, data in
+                                        VStack {
+                                            NoteImageView(data: data)
+                                                .frame(width: 90, height: 90)
+                                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                                .onTapGesture { lightboxIndex = idx }
+                                            if editing {
+                                                Button("Delete") { deleteImage(idx) }.font(DS.ui(11))
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                    if let idx = lightboxIndex, imageDatas.indices.contains(idx) {
-                        VStack {
-                            NoteImageView(data: imageDatas[idx], contentMode: .fit)
-                                .frame(maxHeight: 420)
-                            HStack {
-                                Button("‹ Prev") { lightboxIndex = max(0, idx - 1) }.disabled(idx == 0)
-                                Text("\(idx + 1) / \(imageDatas.count)").font(DS.ui(11)).foregroundStyle(DS.muted)
-                                Button("Next ›") { lightboxIndex = min(imageDatas.count - 1, idx + 1) }.disabled(idx >= imageDatas.count - 1)
-                                Button("Close") { lightboxIndex = nil }
+                        if let idx = lightboxIndex, imageDatas.indices.contains(idx) {
+                            VStack {
+                                NoteImageView(data: imageDatas[idx], contentMode: .fit)
+                                    .frame(maxHeight: 420)
+                                HStack {
+                                    Button("‹ Prev") { lightboxIndex = max(0, idx - 1) }.disabled(idx == 0)
+                                    Text("\(idx + 1) / \(imageDatas.count)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                                    Button("Next ›") { lightboxIndex = min(imageDatas.count - 1, idx + 1) }.disabled(idx >= imageDatas.count - 1)
+                                    Button("Close") { lightboxIndex = nil }
+                                }
                             }
                         }
-                    }
-                    PhotosPicker(selection: $photoItems, matching: .images) {
-                        Text(uploading ? "Uploading…" : "Add photos")
-                    }
-                    .onChange(of: photoItems) { uploadPhotos() }
-                    if uploading { ProgressView() }
-                    HStack {
-                        Button("Run OCR") { runOCR() }
-                        Button("Suggest title") { suggestTitle() }
-                        Button(suggestBusy ? "Suggesting…" : "Suggest ideas") { suggestIdeas() }.disabled(suggestBusy)
-                    }
-                    if let toast { Text(toast).font(DS.ui(12)).foregroundStyle(DS.muted) }
-                    if let t = suggestedTitle {
-                        Button("Use title: \(t)") {
-                            title = t
-                            if !editing { editing = true }
+                        if editing {
+                            PhotosPicker(selection: $photoItems, matching: .images) {
+                                Text(uploading ? "Uploading…" : "Add photos")
+                            }
+                            .onChange(of: photoItems) { uploadPhotos() }
+                            if uploading { ProgressView() }
+                            HStack {
+                                DSButton(title: "Run OCR") { runOCR() }
+                                DSButton(title: "Suggest title") { suggestTitle() }
+                                DSButton(title: suggestBusy ? "Suggesting…" : "Suggest ideas") { suggestIdeas() }
+                                    .disabled(suggestBusy)
+                                    .opacity(suggestBusy ? 0.5 : 1)
+                            }
+                            if let t = suggestedTitle {
+                                Button("Use title: \(t)") {
+                                    title = t
+                                }
+                            }
+                            ForEach(suggestedIdeas, id: \.self) { idea in
+                                Button("Add idea: \(idea)") { addSuggestedIdea(idea) }
+                            }
+                            if let ocr = ocrResult {
+                                Text(ocr).font(DS.serif(13))
+                                Button("Append OCR to text") {
+                                    text = (text.isEmpty ? ocr : text + "\n\n" + ocr)
+                                }
+                            }
                         }
-                    }
-                    ForEach(suggestedIdeas, id: \.self) { idea in
-                        Button("Add idea: \(idea)") { addSuggestedIdea(idea) }
-                    }
-                    if let ocr = ocrResult {
-                        Text(ocr).font(DS.serif(13))
-                        Button("Append OCR to text") {
-                            text = (text.isEmpty ? ocr : text + "\n\n" + ocr)
-                            if !editing { editing = true }
-                        }
+                        if let toast { Text(toast).font(DS.ui(12)).foregroundStyle(DS.muted) }
                     }
                 }
-                Section("Linked notes") {
-                    ForEach(linked, id: \.stableId) { n in
-                        HStack {
-                            NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
-                                NoteRow(note: n)
+                if editing || !linked.isEmpty {
+                    Section("Linked notes") {
+                        ForEach(linked, id: \.stableId) { n in
+                            HStack {
+                                NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
+                                    NoteRow(note: n)
+                                }
+                                if editing {
+                                    Button("Unlink") { unlink(n) }
+                                }
                             }
-                            Button("Unlink") { unlink(n) }
                         }
-                    }
-                    HStack {
-                        TextField("Link by nick (e.g. n123456)", text: $linkNick)
-                        Button("Link") { linkByNick() }.disabled(linkNick.trimmingCharacters(in: .whitespaces).isEmpty)
+                        if editing {
+                            HStack {
+                                TextField("Link by nick (e.g. n123456)", text: $linkNick)
+                                DSButton(title: "Link") { linkByNick() }
+                                    .disabled(linkNick.trimmingCharacters(in: .whitespaces).isEmpty)
+                                    .opacity(linkNick.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
+                            }
+                        }
                     }
                 }
             } else if loaded {
@@ -347,6 +374,18 @@ struct NoteDetailView: View {
 
     /// Edit-form field: small-caps label above a bordered input,
     /// like the web edit form (TITLE / TEXT / AUTHORS …).
+    /// One tag in the read-mode link flow (type-tinted, opens its page).
+    private func linkTag(_ name: String, color: Color, tint: Color, italic: Bool = false) -> some View {
+        Text(name)
+            .font(DS.serif(13))
+            .italic(italic)
+            .foregroundStyle(color)
+            .lineLimit(1)
+            .padding(.horizontal, 7).padding(.vertical, 3)
+            .background(tint)
+            .clipShape(RoundedRectangle(cornerRadius: 2))
+    }
+
     private func editField<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             DSLabel(text: label)
