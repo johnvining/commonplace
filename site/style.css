@@ -4796,4 +4796,8 @@ a.grid-link > a {
   padding: 3px 6px;
 }
 
+.time-timer .time-section-head, .time-analysis .time-section-head {
+  margin: 0 0 10px;
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -599,8 +599,8 @@ function Time(props: any) {
 
   return (
     <div>
-      <div className="top-level form-label time-section-head">Start Entry</div>
       <div className="time-card time-timer">
+      <div className="top-level form-label time-section-head">Start Entry</div>
         <div className="time-timer-row">
           <div className="time-subject-picker">
             {timerKey ? (
@@ -815,8 +815,8 @@ function Time(props: any) {
           </div>
 
 
-          <div className="top-level form-label time-section-head">Analysis</div>
           <div className="time-card time-analysis">
+          <div className="top-level form-label time-section-head">Analysis</div>
             <div className="time-scope-tabs" role="tablist" aria-label="Analysis range">
               {(
                 [
