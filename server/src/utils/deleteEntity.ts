@@ -38,6 +38,7 @@ export const CASCADE: Record<EntityType, (id: string) => Step[]> = {
     ['notes', () => Note.updateMany({ work: id }, { $set: { work: null } }).exec()],
     ['nick', () => retireNick('work', id)],
     ['star', () => unpin('work', id)],
+    ['time-star', () => Pin.deleteMany({ type: 'time', target: `work:${id}` }).exec()],
   ],
   idea: (id) => [
     ['notes', () => Note.updateMany({ ideas: id }, { $pull: { ideas: id } }).exec()],

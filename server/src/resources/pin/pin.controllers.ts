@@ -3,10 +3,12 @@ import Pin from './pin.model.js'
 
 const TYPES = new Set(['note', 'work', 'auth', 'idea', 'pile', 'time'])
 
-// A starred time-logging subject: `pile:<pileId>` or `title:<lowercased title>`.
-// Unlike entity stars, these name no record, so the id isn't an ObjectId.
+// A starred time-logging subject: `pile:<pileId>`, `work:<workId>`, or
+// `title:<lowercased title>`. Unlike entity stars, these name no record,
+// so the id isn't an ObjectId.
 function isTimeTarget(id: string): boolean {
   if (id.startsWith('pile:')) return /^[0-9a-f]{24}$/i.test(id.slice(5))
+  if (id.startsWith('work:')) return /^[0-9a-f]{24}$/i.test(id.slice(5))
   if (id.startsWith('title:')) {
     const title = id.slice(6)
     return title.length >= 1 && title.length <= 200 && !/[\0-\x1f\x7f]/.test(title)
