@@ -13,24 +13,24 @@ struct PileListView: View {
     var body: some View {
         NavigationStack {
             List {
-                if let error { Text(error).foregroundStyle(.red) }
+                if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
                 Section {
                     HStack {
                         TextField("New pile name", text: $newName)
+                            .font(DS.ui(14))
                         Button("Create") { create() }.disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
                     }
                 }
+                .listRowSeparator(.hidden)
                 ForEach(piles, id: \.stableId) { p in
                     NavigationLink { PileDetailView(pileId: p._id ?? "") } label: {
-                        VStack(alignment: .leading) {
-                            Text(p.name ?? "(unnamed)")
-                            HStack(spacing: 6) {
-                                if let c = p.note_count { Text("\(c) notes") }
-                                if let w = p.work_count { Text("\(w) works") }
-                            }.font(.caption).foregroundStyle(.secondary)
-                        }
+                        EntityListRow(
+                            name: p.name ?? "(unnamed)",
+                            meta: [p.note_count.map { "\($0) notes" }, p.work_count.map { "\($0) works" }].compactMap { $0 }
+                        )
                     }
                 }
+                .listRowSeparator(.hidden)
             }
             .refreshable { load() }
             .navigationTitle("Piles")

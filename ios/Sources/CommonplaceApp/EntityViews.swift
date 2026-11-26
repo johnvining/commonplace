@@ -14,22 +14,23 @@ struct WorksListView: View {
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             Section {
                 TextField("Search works", text: $query)
+                    .font(DS.ui(14))
                     .onChange(of: query) { scheduleSearch() }
             }
+            .listRowSeparator(.hidden)
             ForEach(works, id: \.stableId) { w in
                 NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
-                    VStack(alignment: .leading) {
-                        Text(w.name ?? "(unnamed)")
-                        HStack(spacing: 6) {
-                            if let y = w.year { Text(String(y)) }
-                            if let c = w.note_count { Text("\(c) notes") }
-                        }.font(.caption).foregroundStyle(.secondary)
-                    }
+                    EntityListRow(
+                        name: w.name ?? "(unnamed)",
+                        meta: [w.year.map(String.init), w.note_count.map { "\($0) notes" }].compactMap { $0 },
+                        italicName: true
+                    )
                 }
             }
+            .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
         .navigationTitle("Works")
@@ -66,22 +67,22 @@ struct AuthorsListView: View {
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             Section {
                 TextField("Search authors", text: $query)
+                    .font(DS.ui(14))
                     .onChange(of: query) { scheduleSearch() }
             }
+            .listRowSeparator(.hidden)
             ForEach(authors, id: \.stableId) { a in
                 NavigationLink { AuthorDetailView(authorId: a._id ?? "") } label: {
-                    VStack(alignment: .leading) {
-                        Text(a.name ?? "(unnamed)")
-                        HStack(spacing: 6) {
-                            if let c = a.note_count { Text("\(c) notes") }
-                            if let w = a.work_count { Text("\(w) works") }
-                        }.font(.caption).foregroundStyle(.secondary)
-                    }
+                    EntityListRow(
+                        name: a.name ?? "(unnamed)",
+                        meta: [a.note_count.map { "\($0) notes" }, a.work_count.map { "\($0) works" }].compactMap { $0 }
+                    )
                 }
             }
+            .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
         .navigationTitle("Authors")
@@ -118,19 +119,22 @@ struct IdeasListView: View {
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             Section {
                 TextField("Search ideas", text: $query)
+                    .font(DS.ui(14))
                     .onChange(of: query) { scheduleSearch() }
             }
+            .listRowSeparator(.hidden)
             ForEach(ideas, id: \.stableId) { i in
                 NavigationLink { IdeaDetailView(ideaId: i._id ?? "") } label: {
-                    VStack(alignment: .leading) {
-                        Text(i.name ?? "(unnamed)")
-                        if let c = i.note_count { Text("\(c) notes").font(.caption).foregroundStyle(.secondary) }
-                    }
+                    EntityListRow(
+                        name: i.name ?? "(unnamed)",
+                        meta: [i.note_count.map { "\($0) notes" }].compactMap { $0 }
+                    )
                 }
             }
+            .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
         .navigationTitle("Ideas")

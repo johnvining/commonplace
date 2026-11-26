@@ -60,6 +60,31 @@ struct NoteStatusLine: View {
     }
 }
 
+/// One row in an entity list (works/authors/ideas/piles): serif name,
+/// quiet count line, no system separator — the site's lists separate
+/// with whitespace, not lines under every row.
+struct EntityListRow: View {
+    let name: String
+    var meta: [String] = []
+    var italicName: Bool = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(name)
+                .font(DS.serif(15.5, weight: .semibold))
+                .italic(italicName)
+                .foregroundStyle(DS.ink)
+                .lineLimit(1)
+            if !meta.isEmpty {
+                Text(meta.joined(separator: " · "))
+                    .font(DS.ui(11))
+                    .foregroundStyle(DS.muted)
+            }
+        }
+        .padding(.vertical, 3)
+    }
+}
+
 extension Note {
     private func nonEmpty(_ s: String?) -> String? {
         let t = (s ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
