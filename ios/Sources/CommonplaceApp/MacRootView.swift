@@ -21,7 +21,7 @@ struct MacRootView: View {
         ("search", "Search", "magnifyingglass"),
         ("flip", "Review", "rectangle.stack"),
         ("starred", "Starred", "star"),
-        ("files", "Files", "folder"),
+        ("files", "Notes to file", "tray"),
         ("import", "Import", "square.and.arrow.down"),
         ("maintenance", "Maintenance", "wrench"),
         ("settings", "Settings", "gear"),

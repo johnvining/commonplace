@@ -57,6 +57,24 @@ struct NoteStatusLine: View {
     }
 }
 
+extension Note {
+    private func nonEmpty(_ s: String?) -> String? {
+        let t = (s ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return t.isEmpty ? nil : t
+    }
+
+    /// What to call the note: title, else its first content.
+    var displayTitle: String {
+        nonEmpty(title) ?? nonEmpty(text) ?? nonEmpty(take) ?? nonEmpty(url) ?? "No Text"
+    }
+
+    /// Preview/body cascade: text → take → URL → "No Text", so a note
+    /// with no text still displays something meaningful.
+    var displayText: String {
+        nonEmpty(text) ?? nonEmpty(take) ?? nonEmpty(url) ?? "No Text"
+    }
+}
+
 /// One note image rendered from API data on both platforms.
 struct NoteImageView: View {
     let data: Data?

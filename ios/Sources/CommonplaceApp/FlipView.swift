@@ -21,9 +21,13 @@ struct FlipView: View {
                 let n = deck[index]
                 Section {
                     NoteStatusLine(note: n)
-                    Text(n.title ?? "(untitled)").font(.headline)
-                    if let t = n.text, !t.isEmpty { NoteText(text: t) }
-                    if let k = n.take, !k.isEmpty { Text(k).italic() }
+                    Text(n.displayTitle).font(DS.serif(17, weight: .semibold)).foregroundStyle(DS.ink)
+                    if let t = n.text, !t.isEmpty {
+                        NoteText(text: t)
+                        if let k = n.take, !k.isEmpty { Text(k).italic() }
+                    } else {
+                        Text(n.displayText).font(DS.serif(15)).foregroundStyle(DS.muted)
+                    }
                     if let id = n._id {
                         NavigationLink { NoteDetailView(noteId: id, editFirst: true) } label: { Text("Edit in place") }
                     }

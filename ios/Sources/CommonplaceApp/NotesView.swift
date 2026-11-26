@@ -248,7 +248,7 @@ struct NoteCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top, spacing: 6) {
-                Text(note.title ?? "(untitled)")
+                Text(note.displayTitle)
                     .font(DS.serif(15, weight: .semibold))
                     .foregroundStyle(DS.ink)
                     .lineLimit(2)
@@ -279,9 +279,8 @@ struct NoteCard: View {
                     }
                 }
             }
-            if let text = note.text, !text.isEmpty {
-                Text(text)
-                    .font(DS.serif(13))
+            if (note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false) {
+                NoteText(text: note.displayText, size: 13)
                     .foregroundStyle(DS.muted)
                     .lineLimit(large ? 6 : 3)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -332,7 +331,7 @@ struct NoteRow: View {
                     Text(authors.compactMap(\.name).joined(separator: ", ") + ":")
                         .font(DS.ui(12)).foregroundStyle(DS.muted).lineLimit(1)
                 }
-                Text(note.title ?? "(untitled)")
+                Text(note.displayTitle)
                     .font(DS.serif(15, weight: .semibold)).foregroundStyle(DS.ink).lineLimit(1)
                 if let imgs = note.images, !imgs.isEmpty {
                     HStack(spacing: 3) { Image(systemName: "photo").font(DS.ui(10)); Text("\(imgs.count)") }.font(DS.ui(11)).foregroundStyle(DS.muted)
@@ -341,8 +340,10 @@ struct NoteRow: View {
                     Text("worn").font(DS.ui(10)).foregroundStyle(DS.muted)
                 }
             }
-            if let text = note.text, !text.isEmpty {
-                Text(text).lineLimit(full ? nil : 1).font(DS.serif(13)).foregroundStyle(DS.muted)
+            if (note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false) {
+                NoteText(text: note.displayText, size: 13)
+                    .lineLimit(full ? nil : 1)
+                    .foregroundStyle(DS.muted)
             }
             if full { NoteStatusLine(note: note) }
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {

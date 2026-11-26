@@ -66,7 +66,7 @@ struct NoteDetailView: View {
                         }
                         if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
                     } else {
-                        Text(note.title ?? "(untitled)")
+                        Text(note.displayTitle)
                             .font(DS.serif(21, weight: .semibold))
                             .foregroundStyle(DS.ink)
                         if (note.authors?.isEmpty == false) || note.work != nil {
@@ -84,9 +84,16 @@ struct NoteDetailView: View {
                         if let ts = note.titleSource, !ts.isEmpty {
                             Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
                         }
-                        if let t = note.text, !t.isEmpty { NoteText(text: t) }
-                        if let k = note.take, !k.isEmpty {
-                            Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.ink)
+                        if let t = note.text, !t.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            NoteText(text: t)
+                            if let k = note.take, !k.isEmpty {
+                                Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.ink)
+                            }
+                        } else {
+                            // No text: fall back take → URL → "No Text".
+                            Text(note.displayText)
+                                .font(DS.serif(15))
+                                .foregroundStyle(DS.muted)
                         }
                         if let u = note.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
                         if note.year != nil || (note.page?.isEmpty == false) {
