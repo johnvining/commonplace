@@ -4800,4 +4800,13 @@ a.grid-link > a {
   margin: 0 0 10px;
 }
 
+.time-pile-results {
+  position: static;
+  box-shadow: none;
+}
+
+.time-pile-results .button {
+  justify-content: flex-start;
+}
+
 /*# sourceMappingURL=style.css.map */

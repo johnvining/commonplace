@@ -2729,3 +2729,7 @@ mark.search-highlight {
   width: 132px; flex: 0 0 auto; font-size: 12px; padding: 3px 6px;
 }
 .time-timer .time-section-head, .time-analysis .time-section-head { margin: 0 0 10px; }
+
+// Manual-form suggestion lists sit in flow (not absolute overlays).
+.time-pile-results { position: static; box-shadow: none; }
+.time-pile-results .button { justify-content: flex-start; }

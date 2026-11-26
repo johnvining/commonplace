@@ -602,7 +602,7 @@ function Time(props: any) {
       <div className="time-card time-timer">
       <div className="top-level form-label time-section-head">Start Entry</div>
         <div className="time-timer-row">
-          <div className="time-subject-picker">
+          <div className="time-subject-picker pill-input">
             {timerKey ? (
               <div className={'time-subject-chip' + (timerKey.startsWith('pile:') ? ' pill-input piles' : '')}>
                 <span className={timerKey.startsWith('pile:') ? 'pill' : undefined}>
@@ -662,13 +662,13 @@ function Time(props: any) {
                   }}
                 />
                 {timerOpen ? (
-                  <ul className="time-subject-list" role="listbox">
+                  <ul className="pill-input-suggestions time-subject-list" role="listbox">
                     {timerOptions().map((opt, i) => (
                       <li key={opt.key + '-' + i}>
                         <button
                           role="option"
                           aria-selected={i === timerHighlight}
-                          className={i === timerHighlight ? 'highlighted' : ''}
+                          className={'pill-input-option' + (i === timerHighlight ? ' highlighted' : '')}
                           onMouseEnter={() => setTimerHighlight(i)}
                           onClick={() => {
                             if (opt.label.startsWith('Use ')) useTypedTimerName()
@@ -936,17 +936,17 @@ function Time(props: any) {
                         onChange={(e) => setPileQuery(e.target.value)}
                       />
                       {pileResults.length > 0 || pileQuery.trim().length >= 2 ? (
-                        <ul className="time-pile-results">
+                        <ul className="pill-input-suggestions time-pile-results">
                           {pileResults.map((p: any) => (
                             <li key={p._id}>
-                              <button className="button compact" onClick={() => pickPile(p._id, p.name)}>
+                              <button className="pill-input-option" onClick={() => pickPile(p._id, p.name)}>
                                 {p.name}
                               </button>
                             </li>
                           ))}
                           {pileQuery.trim() ? (
                             <li>
-                              <button className="button compact" onClick={createPile}>
+                              <button className="pill-input-option" onClick={createPile}>
                                 New pile: {pileQuery.trim()}
                               </button>
                             </li>
@@ -983,17 +983,17 @@ function Time(props: any) {
                         onChange={(e) => setWorkQuery(e.target.value)}
                       />
                       {workResults.length > 0 || workQuery.trim().length >= 2 ? (
-                        <ul className="time-pile-results">
+                        <ul className="pill-input-suggestions time-pile-results">
                           {workResults.map((w: any) => (
                             <li key={w._id}>
-                              <button className="button compact" onClick={() => pickWork(w._id, w.name)}>
+                              <button className="pill-input-option" onClick={() => pickWork(w._id, w.name)}>
                                 <em>{w.name}</em>
                               </button>
                             </li>
                           ))}
                           {workQuery.trim() ? (
                             <li>
-                              <button className="button compact" onClick={createWork}>
+                              <button className="pill-input-option" onClick={createWork}>
                                 New work: {workQuery.trim()}
                               </button>
                             </li>
