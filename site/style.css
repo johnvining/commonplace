@@ -4538,4 +4538,69 @@ a.grid-link > a {
   min-width: 0;
 }
 
+.time-subject-picker {
+  flex: 1 1 200px;
+  min-width: 0;
+  position: relative;
+}
+
+.time-subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 12px;
+  border: 1px solid var(--note-border);
+  border-radius: 16px;
+  background: var(--hover);
+  max-width: 100%;
+}
+
+.time-subject-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.time-subject-chip button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: inherit;
+}
+
+.time-subject-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 4px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  background: var(--note-background, #fff);
+  border: 1px solid var(--note-border);
+  border-radius: 8px;
+  z-index: 30;
+  max-height: 260px;
+  overflow: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.time-subject-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 7px 9px;
+  border-radius: 5px;
+  color: inherit;
+  font: inherit;
+}
+
+.time-subject-list button:hover {
+  background: var(--hover);
+}
+
 /*# sourceMappingURL=style.css.map */
