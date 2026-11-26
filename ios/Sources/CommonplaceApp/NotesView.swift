@@ -6,6 +6,7 @@ import CommonplaceKit
 struct NotesView: View {
     var initialPile: PickOption? = nil
     @EnvironmentObject var state: AppState
+    @Environment(\.openWindow) private var openWindow
     @State private var notes: [Note] = []
     @State private var page = 1
     @State private var search = ""
@@ -85,6 +86,13 @@ struct NotesView: View {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
                             NoteRow(note: n, full: viewMode == "full")
+                        }
+                        .contextMenu {
+                            #if os(macOS)
+                            Button("Open in New Window") {
+                                if let id = n._id { openWindow(value: id) }
+                            }
+                            #endif
                         }
                         .listRowSeparatorTint(DS.hairline)
                         .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))

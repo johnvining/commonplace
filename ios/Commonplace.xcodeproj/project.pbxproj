@@ -27,6 +27,26 @@
 		5BA616E329C6C67E03D3B762 /* ReadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1402F06EF9222703AC98DC /* ReadView.swift */; };
 		5BC84523A15D8C141B440224 /* FileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3221982BD0AA2400A98D9BEA /* FileListView.swift */; };
 		FA800CEF855359F92CC941AB /* CommonplaceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D5C52C8577CFD5382376FB /* CommonplaceApp.swift */; };
+		4BAAF1741B9A5F3096F4BF29 /* FlipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0677BC63D5FA0CC05252AD /* FlipView.swift */; };
+		DED7F8FCC75130328265F9F1 /* PinsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F6406BF5C7EA83B394DCCCB /* PinsView.swift */; };
+		F899C9549EABE29B82C0DD4F /* NoteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1EBBE19B806BB9CFA95D76 /* NoteDetailView.swift */; };
+		9121CE6A31898DE348004B6B /* PileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B05006D056F2E6604BCF998 /* PileListView.swift */; };
+		F65606D4C33044C6C38FCB4C /* PileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058E71DCB9421DD6CFDE2123 /* PileDetailView.swift */; };
+		04C669AD712C0E004D655480 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5548BB4C190C37CDDA8CE8D7 /* LoginView.swift */; };
+		35A775479E20751828C64292 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BB8CED081CEA1575E7F7D03 /* NotesView.swift */; };
+		558D09996145CDD7029075FE /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 065E8ED6E13F03E9D6405757 /* DesignSystem.swift */; };
+		ED8D9B3933A78513A8210743 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998B4C8FDCDE82D695DFCDCF /* SettingsView.swift */; };
+		93CD6F39BA06C601A6A91053 /* MaintenanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9854D8978B751EA42D92FC6E /* MaintenanceView.swift */; };
+		199D585CF9C5171D32BA2588 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5185ED4844F94E9B12A67B90 /* SearchView.swift */; };
+		3D29DBCD17EC9B362161F3AF /* EntityViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F9912ACC88B9A6CF247DD24 /* EntityViews.swift */; };
+		BF800FD26E9E1393EF003BD0 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8419AA657B5F870CC6D7E7D /* AppState.swift */; };
+		4DA83CD502C0F1910F16835B /* TimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E184FD0CD1C04661FFE7C7B /* TimeView.swift */; };
+		95E98F77A2D783F525A4CEAB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148457CA2984AD20F6E277F2 /* ContentView.swift */; };
+		3370AA30E5AF6137B97168CC /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37824F4B685F178F3DAEE880 /* Components.swift */; };
+		F38139EF1382B67AC5BEB2D4 /* ReadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1402F06EF9222703AC98DC /* ReadView.swift */; };
+		154E75E5D05ADB3677C545D4 /* FileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3221982BD0AA2400A98D9BEA /* FileListView.swift */; };
+		90E6F98A40995F7241E783F2 /* CommonplaceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D5C52C8577CFD5382376FB /* CommonplaceApp.swift */; };
+		683F3B710ECEF48239F11906 /* CommonplaceKit in Frameworks */ = {isa = PBXBuildFile; productRef = E93448F43D8818924A640E43 /* CommonplaceKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +70,7 @@
 		BD0677BC63D5FA0CC05252AD /* FlipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipView.swift; sourceTree = "<group>"; };
 		DE1EBBE19B806BB9CFA95D76 /* NoteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailView.swift; sourceTree = "<group>"; };
 		E8419AA657B5F870CC6D7E7D /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		D788C1A2A28105D28F44863C /* CommonplaceMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CommonplaceMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +79,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				788A77A6BD7A279D75A054D6 /* CommonplaceKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6C97ECA42614865B9F12ECD7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				683F3B710ECEF48239F11906 /* CommonplaceKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				90CDE29E451C90539ECC37BD /* Commonplace.app */,
+				D788C1A2A28105D28F44863C /* CommonplaceMac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -127,6 +157,26 @@
 			);
 			productName = Commonplace;
 			productReference = 90CDE29E451C90539ECC37BD /* Commonplace.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C4EA5A2CE5AC164670C16685 /* CommonplaceMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DAA2E6649406C387BCFB7C1 /* Build configuration list for PBXNativeTarget "CommonplaceMac" */;
+			buildPhases = (
+				C7BFB32AB9CF9EEA09CF2C41 /* Sources */,
+				6C97ECA42614865B9F12ECD7 /* Frameworks */,
+				3CC806AFF9BACA0F8D2C0D0C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CommonplaceMac;
+			packageProductDependencies = (
+				E93448F43D8818924A640E43 /* CommonplaceKit */,
+			);
+			productName = CommonplaceMac;
+			productReference = D788C1A2A28105D28F44863C /* CommonplaceMac.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -161,12 +211,20 @@
 			projectRoot = "";
 			targets = (
 				42AEFBAE01D2DFD981F7DA7D /* Commonplace */,
+				C4EA5A2CE5AC164670C16685 /* CommonplaceMac */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		80AC1B9B294EAEA0EE94013F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3CC806AFF9BACA0F8D2C0D0C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -199,6 +257,32 @@
 				A782D520023C394699F7B6E2 /* SearchView.swift in Sources */,
 				827F3A899787AAFCE2E4FB46 /* SettingsView.swift in Sources */,
 				BA8E5259C41C2C907B6DB324 /* TimeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7BFB32AB9CF9EEA09CF2C41 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BAAF1741B9A5F3096F4BF29 /* FlipView.swift in Sources */,
+				DED7F8FCC75130328265F9F1 /* PinsView.swift in Sources */,
+				F899C9549EABE29B82C0DD4F /* NoteDetailView.swift in Sources */,
+				9121CE6A31898DE348004B6B /* PileListView.swift in Sources */,
+				F65606D4C33044C6C38FCB4C /* PileDetailView.swift in Sources */,
+				04C669AD712C0E004D655480 /* LoginView.swift in Sources */,
+				35A775479E20751828C64292 /* NotesView.swift in Sources */,
+				558D09996145CDD7029075FE /* DesignSystem.swift in Sources */,
+				ED8D9B3933A78513A8210743 /* SettingsView.swift in Sources */,
+				93CD6F39BA06C601A6A91053 /* MaintenanceView.swift in Sources */,
+				199D585CF9C5171D32BA2588 /* SearchView.swift in Sources */,
+				3D29DBCD17EC9B362161F3AF /* EntityViews.swift in Sources */,
+				BF800FD26E9E1393EF003BD0 /* AppState.swift in Sources */,
+				4DA83CD502C0F1910F16835B /* TimeView.swift in Sources */,
+				95E98F77A2D783F525A4CEAB /* ContentView.swift in Sources */,
+				3370AA30E5AF6137B97168CC /* Components.swift in Sources */,
+				F38139EF1382B67AC5BEB2D4 /* ReadView.swift in Sources */,
+				154E75E5D05ADB3677C545D4 /* FileListView.swift in Sources */,
+				90E6F98A40995F7241E783F2 /* CommonplaceApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,6 +349,40 @@
 			};
 			name = Debug;
 		};
+		FCFB5737EAB271C7D7CC0139 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44RDP8JPDQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Commonplace-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.commonplacejv.app.mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		82E42B43D6F6A0DF8FD5A982 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 44RDP8JPDQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Commonplace-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.commonplacejv.app.mac;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -286,6 +404,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		1DAA2E6649406C387BCFB7C1 /* Build configuration list for PBXNativeTarget "CommonplaceMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FCFB5737EAB271C7D7CC0139 /* Debug */,
+				82E42B43D6F6A0DF8FD5A982 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -297,6 +424,11 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		869F65799D0CC330698782DB /* CommonplaceKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55049303D0BF797DB6D71B1A /* XCLocalSwiftPackageReference "." */;
+			productName = CommonplaceKit;
+		};
+		E93448F43D8818924A640E43 /* CommonplaceKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 55049303D0BF797DB6D71B1A /* XCLocalSwiftPackageReference "." */;
 			productName = CommonplaceKit;

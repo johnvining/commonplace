@@ -16,5 +16,16 @@ struct CommonplaceApp: App {
                     .environmentObject(state)
             }
         }
+        // Mac: each note can live in its own window (Window > Merge All
+        // Windows turns them into tabs, like document tabs).
+        WindowGroup("Note", for: String.self) { $noteId in
+            if let noteId, !noteId.isEmpty {
+                NavigationStack {
+                    NoteDetailView(noteId: noteId)
+                }
+                .environmentObject(state)
+                .frame(minWidth: 420, minHeight: 480)
+            }
+        }
     }
 }
