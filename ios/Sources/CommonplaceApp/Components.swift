@@ -195,8 +195,10 @@ extension Note {
         return t.isEmpty ? nil : t
     }
 
-    /// What to call the note: title, else its first content (with
-    /// newlines collapsed, so a three-line text makes a one-line title).
+    /// LIST DISPLAY ONLY: what to call the note in a row or card —
+    /// title, else its first content (newlines collapsed, so a
+    /// three-line text makes a one-line title). The note page itself
+    /// never uses this; it shows the real title or "(untitled)".
     var displayTitle: String {
         if let t = nonEmpty(title) { return t }
         let collapsed = [text, take, url]
@@ -207,8 +209,8 @@ extension Note {
         return collapsed ?? "No Text"
     }
 
-    /// Preview/body cascade: text → take → URL → "No Text", so a note
-    /// with no text still displays something meaningful.
+    /// LIST DISPLAY ONLY: preview cascade text → take → URL →
+    /// "No Text", so a row always has something to show.
     var displayText: String {
         nonEmpty(text) ?? nonEmpty(take) ?? nonEmpty(url) ?? "No Text"
     }

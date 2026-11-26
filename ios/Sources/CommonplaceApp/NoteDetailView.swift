@@ -102,7 +102,12 @@ struct NoteDetailView: View {
                                         .frame(height: 190)
                                         .clipShape(RoundedRectangle(cornerRadius: 4))
                                 }
-                                Text(note.displayTitle)
+                                // The note page shows the real title
+                                // only — the title→text→take→URL cascade
+                                // is for list rows, which need something
+                                // to show. No fake titles here.
+                                Text(note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+                                     ? note.title! : "(untitled)")
                                     .font(DS.serif(20, weight: .semibold))
                                     .foregroundStyle(DS.ink)
                                 if !note.displayAuthors.isEmpty || note.work != nil {
@@ -120,18 +125,16 @@ struct NoteDetailView: View {
                                 if let ts = note.titleSource, !ts.isEmpty {
                                     Text("title source: \(ts)").font(DS.ui(11)).foregroundStyle(DS.muted)
                                 }
-                                if (note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false),
-                                   let t = note.text, !t.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                if let t = note.text, !t.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                                     NoteText(text: t)
                                 }
                                 if let k = note.take, !k.isEmpty {
                                     Text(k).font(DS.serif(14.5)).italic().foregroundStyle(DS.ink)
-                                } else if (note.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) {
-                                    Text(note.displayText)
-                                        .font(DS.serif(15))
-                                        .foregroundStyle(DS.muted)
                                 }
-                                if let u = note.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
+                                if let u = note.url, !u.isEmpty,
+                                   u != note.text?.trimmingCharacters(in: .whitespacesAndNewlines) {
+                                    Text(u).font(DS.ui(11)).foregroundStyle(DS.muted)
+                                }
                                 if note.year != nil || (note.page?.isEmpty == false) {
                                     Text([note.year.map(String.init), note.page].compactMap { $0 }.joined(separator: " · "))
                                         .font(DS.ui(11)).foregroundStyle(DS.muted)
