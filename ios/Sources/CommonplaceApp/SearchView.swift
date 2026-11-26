@@ -26,18 +26,55 @@ struct SearchView: View {
         NavigationStack {
             List {
                 Section {
-                    TextField("Search or paste a nick", text: $query)
-                        .onChange(of: query) { scheduleRun() }
-                        .onSubmit { run() }
-                    Text("Prefixes: auth: find: idea: list: note: pile: work: read:")
-                        .font(DS.ui(11)).foregroundStyle(DS.muted)
-                    Button("Create note from search") { createNoteFromSearch() }
-                        .font(DS.ui(12))
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "magnifyingglass")
+                                .font(DS.ui(13)).foregroundStyle(DS.faint)
+                            TextField("Search or paste a nick", text: $query)
+                                .textFieldStyle(.plain)
+                                .font(DS.ui(14))
+                                .onChange(of: query) { scheduleRun() }
+                                .onSubmit { run() }
+                            if !query.isEmpty {
+                                Button {
+                                    query = ""; items = []; nickNote = []; nickInfo = nil
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill").foregroundStyle(DS.faint)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .background(DS.surface)
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(DS.hairline, lineWidth: 1))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+
+                        HStack(spacing: 4) {
+                            ForEach(["auth", "find", "idea", "list", "note", "pile", "work", "read"], id: \.self) { prefix in
+                                Button("\(prefix):") { applyPrefix(prefix) }
+                                    .font(DS.mono(10))
+                                    .foregroundStyle(DS.muted)
+                                    .padding(.horizontal, 5).padding(.vertical, 2)
+                                    .background(DS.hover)
+                                    .clipShape(RoundedRectangle(cornerRadius: 3))
+                                    .buttonStyle(.plain)
+                                    .help("Search only \(prefix) results")
+                            }
+                        }
+
+                        HStack {
+                            Spacer()
+                            DSButton(title: "Create note from search") { createNoteFromSearch() }
+                        }
+                    }
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                 }
                 if searching { LoadStateView(state: .loading) }
-                if let error { Text(error).foregroundStyle(.red) }
+                if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
                 if let info = nickInfo {
-                    Text(info).font(.caption).foregroundStyle(.secondary)
+                    Text(info).font(DS.ui(11)).foregroundStyle(DS.muted)
                 }
                 if hasSearched && !searching && items.isEmpty && nickNote.isEmpty && nickPileId == nil && nickWorkId == nil && nickIdeaId == nil && nickAuthorId == nil && nickInfo == nil {
                     Text("No results.").font(DS.ui(13)).foregroundStyle(DS.muted)
@@ -48,17 +85,17 @@ struct SearchView: View {
                     }
                 }
                 if let pid = nickPileId {
-                    NavigationLink { PileDetailView(pileId: pid) } label: { Text("Open pile").font(.headline) }
+                    NavigationLink { PileDetailView(pileId: pid) } label: { Text("Open pile").font(DS.serif(15, weight: .semibold)).foregroundStyle(DS.ink) }
                 }
                 if let wid = nickWorkId {
-                    NavigationLink { WorkDetailView(workId: wid) } label: { Text("Open work").font(.headline) }
+                    NavigationLink { WorkDetailView(workId: wid) } label: { Text("Open work").font(DS.serif(15, weight: .semibold)).foregroundStyle(DS.ink) }
                     NavigationLink { ReadView(workId: wid, title: "Read") } label: { Text("Read work").font(DS.ui(13)) }
                 }
                 if let iid = nickIdeaId {
-                    NavigationLink { IdeaDetailView(ideaId: iid) } label: { Text("Open idea").font(.headline) }
+                    NavigationLink { IdeaDetailView(ideaId: iid) } label: { Text("Open idea").font(DS.serif(15, weight: .semibold)).foregroundStyle(DS.ink) }
                 }
                 if let aid = nickAuthorId {
-                    NavigationLink { AuthorDetailView(authorId: aid) } label: { Text("Open author").font(.headline) }
+                    NavigationLink { AuthorDetailView(authorId: aid) } label: { Text("Open author").font(DS.serif(15, weight: .semibold)).foregroundStyle(DS.ink) }
                 }
                 ForEach(items, id: \.stableId) { item in
                     searchRow(item)
@@ -72,6 +109,14 @@ struct SearchView: View {
                 NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
             }
         }
+    }
+
+    /// Tapping a prefix chip scopes the search: replaces any existing
+    /// modifier with `prefix: <term>` and reruns.
+    private func applyPrefix(_ prefix: String) {
+        let term = parseModifier(query.trimmingCharacters(in: .whitespacesAndNewlines)).term
+        query = term.isEmpty ? "\(prefix): " : "\(prefix): \(term)"
+        run()
     }
 
     private func createNoteFromSearch() {
@@ -176,11 +221,14 @@ struct SearchView: View {
     @ViewBuilder
     private func searchRow(_ item: UnifiedSearchItem) -> some View {
         let label = VStack(alignment: .leading, spacing: 2) {
-            Text(item.displayName).lineLimit(1)
-            HStack(spacing: 6) {
-                Text(item.type ?? "").font(.caption).foregroundStyle(.secondary)
-                if item.type == "note" { Text("note").font(DS.ui(10)).foregroundStyle(DS.accent) }
-            }
+            Text(item.displayName)
+                .font(DS.serif(15, weight: .semibold))
+                .foregroundStyle(DS.ink)
+                .lineLimit(1)
+            Text((item.type ?? "").uppercased())
+                .font(DS.ui(10, weight: .semibold))
+                .tracking(0.8)
+                .foregroundStyle(DS.muted)
             if let snippet = snippet(for: item) {
                 Text(snippet).font(DS.serif(12)).foregroundStyle(DS.muted).lineLimit(2)
             }
