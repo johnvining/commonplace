@@ -318,6 +318,71 @@ struct NoteCard: View {
     }
 }
 
+/// Flowing note row for entity pages, web slim parity: one serif
+/// paragraph — authors, work in italics, bold title, then the text —
+/// followed by square tag labels with coloured text (ideas blue,
+/// piles purple), not filled pills.
+struct NoteFlowRow: View {
+    let note: Note
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(flow)
+                .font(DS.serif(14.5))
+                .foregroundStyle(DS.ink)
+                .lineSpacing(3)
+                .lineLimit(4)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
+                HStack(spacing: 4) {
+                    ForEach((note.ideas ?? []).prefix(3), id: \.id) { i in
+                        tag(i.name ?? "", color: DS.accent, bg: DS.accentSoft)
+                    }
+                    ForEach((note.piles ?? []).prefix(3), id: \.id) { p in
+                        tag(p.name ?? "", color: DS.pile, bg: DS.pileSoft)
+                    }
+                    let extra = max(0, (note.ideas?.count ?? 0) - 3) + max(0, (note.piles?.count ?? 0) - 3)
+                    if extra > 0 {
+                        Text("+\(extra)").font(DS.ui(11)).foregroundStyle(DS.muted)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func tag(_ name: String, color: Color, bg: Color) -> some View {
+        Text(name)
+            .font(DS.ui(11))
+            .foregroundStyle(color)
+            .lineLimit(1)
+            .padding(.horizontal, 5).padding(.vertical, 1)
+            .background(bg)
+            .clipShape(RoundedRectangle(cornerRadius: 2))
+    }
+
+    private var flow: AttributedString {
+        var md = ""
+        var cite: [String] = []
+        if let authors = note.authors, !authors.isEmpty {
+            cite.append(authors.compactMap(\.name).joined(separator: ", "))
+        }
+        if let w = note.work?.name, !w.isEmpty {
+            cite.append("*\(w)*")
+        }
+        if !cite.isEmpty { md += cite.joined(separator: ", ") + ": " }
+        let hasTitle = !(note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        if hasTitle {
+            md += "**\(note.displayTitle).** "
+        }
+        md += note.displayText
+        if let attributed = try? AttributedString(markdown: md, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)) {
+            return attributed
+        }
+        return AttributedString(md)
+    }
+}
+
 /// Slim note row, web parity: authors + title on one line, one line of
 /// serif preview, then idea/pile tags in their tints.
 struct NoteRow: View {

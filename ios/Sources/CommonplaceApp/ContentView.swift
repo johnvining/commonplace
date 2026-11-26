@@ -52,6 +52,12 @@ struct ContentView: View {
         }
         }
         }
+        // Ctrl+O opens Search, like the web (hardware keyboards).
+        .background {
+            Button("") { tab = 3 }
+                .keyboardShortcut("o", modifiers: .control)
+                .hidden()
+        }
         .task {
             await state.validateSession()
             await state.refreshPins()

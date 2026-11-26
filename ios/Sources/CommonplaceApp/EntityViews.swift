@@ -449,11 +449,12 @@ struct IdeaDetailView: View {
     @State private var confirmingDelete = false
     @State private var newNoteId: String?
     @State private var showingNewNote = false
+    @State private var nick: String?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             if let i = idea {
                 Section {
                     if editing {
@@ -462,41 +463,65 @@ struct IdeaDetailView: View {
                         TextField("End year", text: $editEnd)
                         Toggle("This idea is a person", isOn: $editPerson)
                         Button("Save") { saveEdit() }
+                        Button("Cancel") { editing = false }
                     } else {
-                        Text(i.name ?? "(unnamed)").font(DS.ui(17, weight: .semibold))
-                        if i.person == true || i.start_year != nil || i.end_year != nil {
-                            Text([i.person == true ? "Person" : nil,
-                                  i.start_year.map(String.init), i.end_year.map(String.init)]
-                                .compactMap { $0 }.joined(separator: " • "))
-                                .font(DS.ui(12)).foregroundStyle(DS.muted)
-                        }
-                    }
-                    HStack {
-                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
-                        Button(editing ? "Cancel" : "Edit") {
-                            editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
-                            editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false
-                            editing.toggle()
-                        }
-                        Button("Delete") { confirmingDelete = true }.foregroundStyle(DS.danger)
+                        // Web entity-page-header: title left, quiet
+                        // bordered toolbar buttons top-right, nick under.
+                        HStack(alignment: .top, spacing: 12) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(i.name ?? "(unnamed)")
+                                    .font(DS.ui(20, weight: .semibold))
+                                    .foregroundStyle(DS.ink)
+                                if i.person == true || i.start_year != nil || i.end_year != nil {
+                                    Text([i.person == true ? "Person" : nil,
+                                          i.start_year.map(String.init), i.end_year.map(String.init)]
+                                        .compactMap { $0 }.joined(separator: " • "))
+                                        .font(DS.ui(12)).foregroundStyle(DS.muted)
+                                }
+                                if let nick, !nick.isEmpty {
+                                    CopyNickButton(nick: nick)
+                                }
+                            }
+                            Spacer()
+                            HStack(spacing: 6) {
+                                DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                                DSButton(title: "Edit") {
+                                    editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
+                                    editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false
+                                    editing = true
+                                }
+                                DSButton(title: "Add Note") { addNoteForIdea() }
+                                DSButton(title: "Delete") { confirmingDelete = true }
+                            }
                             .confirmationDialog("Delete this idea?", isPresented: $confirmingDelete) {
                                 Button("Delete", role: .destructive) { deleteIdea() }
                             }
-                    }
-                }
-                Section("Works") {
-                    ForEach(works, id: \.stableId) { w in
-                        NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
-                            Text(w.name ?? "(unnamed)")
+                        }
+                        if let t = i.text, !t.isEmpty {
+                            NoteText(text: t, size: 14.5)
+                                .foregroundStyle(DS.ink)
                         }
                     }
                 }
-                Section("Notes") {
+                .listRowSeparator(.hidden)
+                if !works.isEmpty {
+                    Section {
+                        ForEach(works, id: \.stableId) { w in
+                            NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
+                                Text(w.name ?? "(unnamed)")
+                                    .font(DS.serif(14.5)).italic()
+                                    .foregroundStyle(DS.ink)
+                            }
+                        }
+                    } header: {
+                        Text("Works")
+                    }
+                }
+                Section {
                     ForEach(notes, id: \.stableId) { n in
-                        NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
+                        NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteFlowRow(note: n) }
                     }
                     if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
-                    Button("Add Note") { addNoteForIdea() }
                 }
                 .navigationDestination(isPresented: $showingNewNote) {
                     NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
@@ -550,6 +575,9 @@ struct IdeaDetailView: View {
             async let n = state.client.ideaNotes(id: ideaId)
             let (ii, ww, nn) = try await (i, w, n)
             idea = ii; works = ww; notes = nn; loaded = true
+            if let key = try? await state.client.nickFor(type: "idea", id: ideaId) {
+                nick = key.key
+            }
         } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 

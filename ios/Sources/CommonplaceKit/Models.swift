@@ -210,6 +210,7 @@ public struct Work: Codable, Sendable {
 public struct Idea: Codable, Sendable {
     public var _id: String?
     public var name: String?
+    public var text: String?
     public var note_count: Int?
     public var start_year: Int?
     public var end_year: Int?

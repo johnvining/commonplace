@@ -69,6 +69,12 @@ struct MacRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .macSection)) { note in
             if let s = note.object as? String { section = s }
         }
+        // Ctrl+O opens Search, like the web's search shortcut.
+        .background {
+            Button("") { section = "search" }
+                .keyboardShortcut("o", modifiers: .control)
+                .hidden()
+        }
     }
 
     private func openPin(_ pin: PinItem) {
