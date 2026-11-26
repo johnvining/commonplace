@@ -70,75 +70,6 @@ function subjectKeyFor(entry: any): { key: string; label: string; href: string }
   return { key, label: title, href: `/time?subject=${encodeURIComponent(key)}` }
 }
 
-// Reading + writing cross-check: the two kinds must sum to the total.
-// Rendered on each summary so a mismatch is visible, not silent.
-function CrossCheck({ reading, writing, total }: { reading: number; writing: number; total: number }) {
-  const ok = reading + writing === total
-  return (
-    <div className={'time-crosscheck' + (ok ? '' : ' time-crosscheck-bad')}>
-      cross-check: {formatMinutes(reading)} reading + {formatMinutes(writing)} writing ={' '}
-      {formatMinutes(total)} total {ok ? '✓' : `✗ (sums to ${formatMinutes(reading + writing)})`}
-    </div>
-  )
-}
-
-function KindTotals({ summary }: { summary: any }) {
-  return (
-    <div className="time-kind-totals">
-      <span className="time-total">{formatMinutes(summary.totalMinutes)} total</span>
-      <span className="time-kind time-kind-reading">{formatMinutes(summary.readingMinutes)} reading</span>
-      <span className="time-kind time-kind-writing">{formatMinutes(summary.writingMinutes)} writing</span>
-      <span className="time-count">
-        {summary.entryCount} {summary.entryCount === 1 ? 'entry' : 'entries'}
-      </span>
-    </div>
-  )
-}
-
-function SubjectTable({
-  rows,
-  pileLink,
-  workLink,
-}: {
-  rows: any[]
-  pileLink?: boolean
-  workLink?: boolean
-}) {
-  if (!rows.length) return null
-  return (
-    <table className="time-table">
-      <thead>
-        <tr>
-          <th>{pileLink ? 'Pile' : workLink ? 'Work' : 'Title'}</th>
-          <th>Reading</th>
-          <th>Writing</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row: any, i: number) => (
-          <tr key={i}>
-            <td>
-              {pileLink && row.pile ? (
-                <Link to={'/pile/' + row.pile}>{row.name}</Link>
-              ) : workLink && row.work ? (
-                <Link to={'/work/' + row.work}>
-                  <em>{row.name}</em>
-                </Link>
-              ) : (
-                row.name ?? row.title
-              )}
-            </td>
-            <td>{formatMinutes(row.readingMinutes)}</td>
-            <td>{formatMinutes(row.writingMinutes)}</td>
-            <td>{formatMinutes(row.minutes)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
-}
-
 function Time(props: any) {
   const [selectedDate, setSelectedDate] = useState(todayLocal())
   const [summary, setSummary] = useState<any>(null)
@@ -587,7 +518,6 @@ function Time(props: any) {
 
   const weekly = summary?.weekly
   const daily = summary?.daily
-  const weekDaySum = weekly?.byDay?.reduce((n: number, d: any) => n + d.totalMinutes, 0) ?? 0
 
   return (
     <div>
@@ -736,7 +666,6 @@ function Time(props: any) {
           <div className="time-card">
             <div className="top-level form-label">Daily — {daily.date}</div>
             <KindTotals summary={daily} />
-            <CrossCheck reading={daily.readingMinutes} writing={daily.writingMinutes} total={daily.totalMinutes} />
             {daily.byPile.length ? (
               <>
                 <div className="top-level form-label time-table-title">By pile</div>
@@ -826,15 +755,6 @@ function Time(props: any) {
               Weekly — {weekly.weekStart} to {weekly.weekEnd}
             </div>
             <KindTotals summary={weekly} />
-            <CrossCheck reading={weekly.readingMinutes} writing={weekly.writingMinutes} total={weekly.totalMinutes} />
-            <div
-              className={
-                'time-crosscheck' + (weekDaySum === weekly.totalMinutes ? '' : ' time-crosscheck-bad')
-              }
-            >
-              cross-check: 7 days sum to {formatMinutes(weekDaySum)}{' '}
-              {weekDaySum === weekly.totalMinutes ? '✓' : `✗ (week total ${formatMinutes(weekly.totalMinutes)})`}
-            </div>
             <div className="top-level form-label time-table-title">By day</div>
             <table className="time-table">
               <thead>
