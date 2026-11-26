@@ -61,6 +61,14 @@ final class AppState: ObservableObject {
         return APIClient(baseURL: url)
     }
 
+    /// The web app for this server (the API base minus its /api suffix).
+    var webURL: URL? {
+        var s = serverURLString
+        if s.hasSuffix("/api") { s = String(s.dropLast(4)) }
+        if s.hasSuffix("/") { s = String(s.dropLast()) }
+        return URL(string: s)
+    }
+
     func persistTimer() {
         guard let key = timerSubjectKey, let at = timerStartedAt else { return }
         let s = ISO8601DateFormatter().string(from: at)

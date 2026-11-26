@@ -131,6 +131,15 @@ struct MoreView: View {
                 NavigationLink("Starred") { PinsView() }
                 NavigationLink("Help & shortcuts") { HelpView() }
                 NavigationLink("Settings") { SettingsView() }
+                if let web = state.webURL {
+                    Link(destination: web) {
+                        HStack {
+                            Text("Open web version")
+                            Spacer()
+                            Image(systemName: "safari").foregroundStyle(DS.muted)
+                        }
+                    }
+                }
             }
             .navigationTitle("More")
             .task {

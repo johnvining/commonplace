@@ -65,6 +65,20 @@ struct MacRootView: View {
             }
             .navigationSplitViewColumnWidth(min: 180, ideal: 210, max: 260)
             .safeAreaInset(edge: .bottom) {
+                if let web = state.webURL {
+                    Link(destination: web) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "safari").font(DS.ui(11))
+                            Text("Open web version").font(DS.ui(12))
+                            Spacer()
+                        }
+                        .foregroundStyle(DS.muted)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                    }
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
                 if state.timerIsRunning {
                     SidebarTimerView()
                 }
