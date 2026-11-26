@@ -66,9 +66,13 @@ struct MacRootView: View {
                             Button {
                                 openPin(pin)
                             } label: {
-                                HStack {
+                                HStack(spacing: 6) {
+                                    // Fixed frame: symbols have different
+                                    // intrinsic sizes, without it the text
+                                    // column starts at a different x per row.
                                     Image(systemName: pin.typeIcon)
-                                        .font(DS.ui(10)).foregroundStyle(DS.muted)
+                                        .font(DS.ui(11)).foregroundStyle(DS.muted)
+                                        .frame(width: 16, height: 16)
                                     Text(pin.label ?? pin.id)
                                         .font(DS.ui(12)).lineLimit(1)
                                     if pin.pending == true {
