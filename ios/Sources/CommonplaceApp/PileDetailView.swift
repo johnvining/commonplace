@@ -16,58 +16,83 @@ struct PileDetailView: View {
     @State private var confirmingDelete = false
     @State private var newNoteId: String?
     @State private var showingNewNote = false
+    @State private var nick: String?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             Section {
                 if editing {
                     TextField("Name", text: $newName)
-                    Button("Save") { saveName() }
+                        .textFieldStyle(.roundedBorder)
+                        .font(DS.serif(15))
+                    HStack(spacing: 6) {
+                        DSButton(title: "Save") { saveName() }
+                        DSButton(title: "Cancel") { editing = false }
+                        Spacer()
+                    }
                 } else {
-                    Text(pile?.name ?? "Loading…").font(DS.ui(17, weight: .semibold))
+                    // Web entity header: title + nick left, standard
+                    // buttons top-right, nothing at the bottom.
+                    HStack(alignment: .top, spacing: 12) {
+                        EntityTitleBlock(
+                            name: pile?.name ?? "Loading…",
+                            byline: [pile?.start_year.map(String.init), pile?.end_year.map(String.init)]
+                                .compactMap { $0 }.joined(separator: " • "),
+                            nick: nick
+                        )
+                        Spacer()
+                        HStack(spacing: 6) {
+                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                            DSButton(title: "Edit") {
+                                newName = pile?.name ?? ""
+                                editing = true
+                            }
+                            DSButton(title: "Add Note") { addNote() }
+                            NavigationLink {
+                                NotesView(initialPile: PickOption(id: pileId, name: pile?.name ?? "Pile"))
+                            } label: {
+                                DSButtonLabel(title: "Narrow")
+                            }
+                            .buttonStyle(.plain)
+                            DSButton(title: "Delete") { confirmingDelete = true }
+                        }
+                        .confirmationDialog("Delete this pile?", isPresented: $confirmingDelete) {
+                            Button("Delete", role: .destructive) { deletePile() }
+                        }
+                    }
                 }
-                HStack {
-                    Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
-                    Button(editing ? "Cancel" : "Edit") {
-                        newName = pile?.name ?? ""
-                        editing.toggle()
+                // One quiet line, only when there is time (web parity).
+                if let t = timeTotals, t.count > 0 {
+                    HStack(spacing: 6) {
+                        Text("Time on this pile: \(formatMinutes(t.reading)) reading + \(formatMinutes(t.writing)) writing = \(formatMinutes(t.total)) (\(t.count) \(t.count == 1 ? "entry" : "entries"))")
+                            .font(DS.ui(12)).foregroundStyle(DS.muted)
+                        NavigationLink { TimeView(preselectSubject: TimeSubjectKey.pileKey(pileId: pileId)) } label: {
+                            Text("Open in Time log").font(DS.ui(12)).foregroundStyle(DS.accent)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
-            Section("Time on this pile") {
-                if let t = timeTotals {
-                    Text("Reading \(formatMinutes(t.reading)) + Writing \(formatMinutes(t.writing)) = \(formatMinutes(t.total)) (\(t.count) entries)")
-                    NavigationLink { TimeView(preselectSubject: TimeSubjectKey.pileKey(pileId: pileId)) } label: { Text("Time log") }
-                } else {
-                    Text("Loading…")
-                }
-            }
-            Section("Works") {
-                ForEach(works, id: \.stableId) { w in
-                    NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
-                        Text(w.name ?? "(unnamed)")
+            .listRowSeparator(.hidden)
+            if !works.isEmpty {
+                Section("Works") {
+                    ForEach(works, id: \.stableId) { w in
+                        NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
+                            EntityListRow(name: w.name ?? "(unnamed)", italicName: true)
+                        }
                     }
+                    .listRowSeparator(.hidden)
                 }
             }
             Section("Notes") {
                 ForEach(notes, id: \.stableId) { n in
                     NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
-                        NoteRow(note: n)
+                        NoteFlowRow(note: n)
                     }
                 }
                 if notes.count >= 500 { Button("Load more") { loadMoreNotes() } }
-                NavigationLink { NotesView(initialPile: PickOption(id: pileId, name: pile?.name ?? "Pile")) } label: { Text("Narrow — filter by this pile") }
-                HStack {
-                    Button("Add Note") { addNote() }
-                    Spacer()
-                    Button("Delete Pile") { confirmingDelete = true }
-                        .foregroundStyle(.red)
-                        .confirmationDialog("Delete this pile?", isPresented: $confirmingDelete) {
-                            Button("Delete", role: .destructive) { deletePile() }
-                        }
-                }
             }
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "")
@@ -89,6 +114,9 @@ struct PileDetailView: View {
                 async let n = state.client.pileNotes(id: pileId)
                 async let w = state.client.pileWorks(id: pileId)
                 let (pp, nn, ww) = try await (p, n, w)
+                if let key = try? await state.client.nickFor(type: "pile", id: pileId) {
+                    await MainActor.run { nick = key.key }
+                }
                 // Time totals are decoration: a failure there must not
                 // take down the whole pile page (#403).
                 let tt = (try? await state.client.listTimeEntries(pile: pileId, limit: 1000)) ?? []

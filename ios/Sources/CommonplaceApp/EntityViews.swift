@@ -179,11 +179,12 @@ struct WorkDetailView: View {
     @State private var importText = ""
     @State private var newNoteId: String?
     @State private var showingNewNote = false
+    @State private var nick: String?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             if let w = work {
                 Section {
                     if editing {
@@ -192,9 +193,27 @@ struct WorkDetailView: View {
                         TextField("URL", text: $editURL)
                         Button("Save") { saveEdit() }
                     } else {
-                        Text(w.name ?? "(unnamed)").font(DS.ui(17, weight: .semibold))
-                        if let y = w.year { Text(String(y)).foregroundStyle(.secondary) }
-                        if let u = w.url, !u.isEmpty { Text(u).font(.caption) }
+                        HStack(alignment: .top, spacing: 12) {
+                            EntityTitleBlock(
+                                name: w.name ?? "(unnamed)",
+                                italicName: true,
+                                byline: w.year.map(String.init),
+                                nick: nick
+                            )
+                            Spacer()
+                            HStack(spacing: 6) {
+                                DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                                DSButton(title: "Edit") {
+                                    editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
+                                    editing = true
+                                }
+                                DSButton(title: "Delete") { confirmingDelete = true }
+                            }
+                            .confirmationDialog("Delete this work?", isPresented: $confirmingDelete) {
+                                Button("Delete", role: .destructive) { deleteWork() }
+                            }
+                        }
+                        if let u = w.url, !u.isEmpty { Text(u).font(DS.ui(11)).foregroundStyle(DS.muted) }
                         if let eds = w.editors, !eds.isEmpty {
                             Text("Edited by \(eds.compactMap(\.name).joined(separator: ", "))").font(DS.ui(12)).foregroundStyle(DS.muted)
                         }
@@ -205,20 +224,11 @@ struct WorkDetailView: View {
                         if let sum = w.summary, !sum.isEmpty { Text(sum).font(DS.serif(13)) }
                     }
                     if let authors = w.authors, !authors.isEmpty {
-                        Text(authors.compactMap(\.name).joined(separator: ", ")).foregroundStyle(.secondary)
-                    }
-                    HStack {
-                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
-                        Button(editing ? "Cancel" : "Edit") {
-                            editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
-                            editing.toggle()
-                        }
-                        Button("Delete") { confirmingDelete = true }.foregroundStyle(DS.danger)
-                            .confirmationDialog("Delete this work?", isPresented: $confirmingDelete) {
-                                Button("Delete", role: .destructive) { deleteWork() }
-                            }
+                        Text(authors.compactMap(\.name).joined(separator: ", "))
+                            .font(DS.serif(13)).foregroundStyle(DS.muted)
                     }
                 }
+                .listRowSeparator(.hidden)
                 Section("Piles") {
                     PillEditor(
                         placeholder: "Add a pile…", tint: DS.pileSoft, selected: $pileSel,
@@ -313,6 +323,9 @@ struct WorkDetailView: View {
             async let n = state.client.workNotes(id: workId)
             let (ww, nn) = try await (w, n)
             work = ww; notes = nn; loaded = true
+            if let key = try? await state.client.nickFor(type: "work", id: workId) {
+                nick = key.key
+            }
             pileSel = (ww.piles ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
             ideaSel = (ww.ideas ?? []).map { PickOption(id: $0.id, name: $0.name ?? "") }
             do { _ = try await state.client.recordWorkOpened(id: workId) }
@@ -339,11 +352,12 @@ struct AuthorDetailView: View {
     @State private var editBirth = ""
     @State private var editDeath = ""
     @State private var confirmingDelete = false
+    @State private var nick: String?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             if let a = author {
                 Section {
                     if editing {
@@ -352,26 +366,32 @@ struct AuthorDetailView: View {
                         TextField("Death year", text: $editDeath)
                         Button("Save") { saveEdit() }
                     } else {
-                        Text(a.name ?? "(unnamed)").font(DS.ui(17, weight: .semibold))
-                        if a.birth_year != nil || a.death_year != nil {
-                            Text("\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    HStack {
-                        Button { toggleStar() } label: { Label(starred ? "Starred" : "Star", systemImage: starred ? "star.fill" : "star") }
-                        Button(editing ? "Cancel" : "Edit") {
-                            editName = a.name ?? ""
-                            editBirth = a.birth_year.map(String.init) ?? ""
-                            editDeath = a.death_year.map(String.init) ?? ""
-                            editing.toggle()
-                        }
-                        Button("Delete") { confirmingDelete = true }.foregroundStyle(DS.danger)
+                        HStack(alignment: .top, spacing: 12) {
+                            EntityTitleBlock(
+                                name: a.name ?? "(unnamed)",
+                                byline: (a.birth_year != nil || a.death_year != nil)
+                                    ? "\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")"
+                                    : nil,
+                                nick: nick
+                            )
+                            Spacer()
+                            HStack(spacing: 6) {
+                                DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                                DSButton(title: "Edit") {
+                                    editName = a.name ?? ""
+                                    editBirth = a.birth_year.map(String.init) ?? ""
+                                    editDeath = a.death_year.map(String.init) ?? ""
+                                    editing = true
+                                }
+                                DSButton(title: "Delete") { confirmingDelete = true }
+                            }
                             .confirmationDialog("Delete this author?", isPresented: $confirmingDelete) {
                                 Button("Delete", role: .destructive) { deleteAuthor() }
                             }
+                        }
                     }
                 }
+                .listRowSeparator(.hidden)
                 Section("Works") {
                     ForEach(works, id: \.stableId) { w in
                         NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
@@ -428,6 +448,9 @@ struct AuthorDetailView: View {
             async let n = state.client.authorNotes(id: authorId)
             let (aa, ww, nn) = try await (a, w, n)
             author = aa; works = ww; notes = nn; loaded = true
+            if let key = try? await state.client.nickFor(type: "auth", id: authorId) {
+                nick = key.key
+            }
         } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 
@@ -472,20 +495,13 @@ struct IdeaDetailView: View {
                         // Web entity-page-header: title left, quiet
                         // bordered toolbar buttons top-right, nick under.
                         HStack(alignment: .top, spacing: 12) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(i.name ?? "(unnamed)")
-                                    .font(DS.ui(20, weight: .semibold))
-                                    .foregroundStyle(DS.ink)
-                                if i.person == true || i.start_year != nil || i.end_year != nil {
-                                    Text([i.person == true ? "Person" : nil,
-                                          i.start_year.map(String.init), i.end_year.map(String.init)]
-                                        .compactMap { $0 }.joined(separator: " • "))
-                                        .font(DS.ui(12)).foregroundStyle(DS.muted)
-                                }
-                                if let nick, !nick.isEmpty {
-                                    CopyNickButton(nick: nick)
-                                }
-                            }
+                            EntityTitleBlock(
+                                name: i.name ?? "(unnamed)",
+                                byline: [i.person == true ? "Person" : nil,
+                                         i.start_year.map(String.init), i.end_year.map(String.init)]
+                                    .compactMap { $0 }.joined(separator: " • "),
+                                nick: nick
+                            )
                             Spacer()
                             HStack(spacing: 6) {
                                 DSButton(title: starred ? "Starred" : "Star") { toggleStar() }

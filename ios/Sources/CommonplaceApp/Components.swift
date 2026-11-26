@@ -61,6 +61,47 @@ struct NoteStatusLine: View {
     }
 }
 
+/// Standard entity-page header (web entity-page-header-left): name at
+/// title size, quiet byline, and the nick with tap-to-copy under it.
+/// The page's standard buttons sit top-right beside this block.
+struct EntityTitleBlock: View {
+    let name: String
+    var italicName: Bool = false
+    var byline: String? = nil
+    var nick: String? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(name)
+                .font(DS.ui(20, weight: .semibold))
+                .italic(italicName)
+                .foregroundStyle(DS.ink)
+            if let byline, !byline.isEmpty {
+                Text(byline).font(DS.ui(12)).foregroundStyle(DS.muted)
+            }
+            if let nick, !nick.isEmpty {
+                CopyNickButton(nick: nick)
+            }
+        }
+    }
+}
+
+/// The label half of DSButton for NavigationLinks (Narrow, Read, …)
+/// so link-buttons look identical to action buttons.
+struct DSButtonLabel: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(DS.ui(13))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .foregroundStyle(DS.ink)
+            .overlay(RoundedRectangle(cornerRadius: 4).stroke(DS.hairline, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+    }
+}
+
 /// One row in an entity list (works/authors/ideas/piles): serif name,
 /// quiet count line, no system separator — the site's lists separate
 /// with whitespace, not lines under every row.
