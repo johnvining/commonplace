@@ -75,8 +75,8 @@ function KindTotals({ summary }: { summary: any }) {
   return (
     <div className="time-kind-totals">
       <span className="time-total">{formatMinutes(summary.totalMinutes)} total</span>
-      <span className="time-kind time-kind-reading">{formatMinutes(summary.readingMinutes)} reading</span>
-      <span className="time-kind time-kind-writing">{formatMinutes(summary.writingMinutes)} writing</span>
+      <span className="time-kind time-kind-reading">{formatMinutes(summary.readingMinutes)} Reading</span>
+      <span className="time-kind time-kind-writing">{formatMinutes(summary.writingMinutes)} Writing</span>
       <span className="time-count">
         {summary.entryCount} {summary.entryCount === 1 ? 'entry' : 'entries'}
       </span>
@@ -753,7 +753,9 @@ function Time(props: any) {
                   const subject = subjectKeyFor(e)
                   return (
                     <li key={e._id} className="time-entry">
-                      <span className={'time-kind time-kind-' + e.kind}>{e.kind}</span>
+                      <span className={'time-kind time-kind-' + e.kind}>
+                        {e.kind === 'reading' ? 'Reading' : 'Writing'}
+                      </span>
                       <span className="time-minutes">{formatMinutes(e.minutes)}</span>
                       <span className="time-subject">
                         {e.pile?._id ? (

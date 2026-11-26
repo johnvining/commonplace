@@ -3046,19 +3046,11 @@ mark.search-highlight {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   font-size: var(--font-size-sm);
   line-height: 1;
-  border: 1px solid transparent;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--hairline);
   border-radius: 2px;
   white-space: nowrap;
-}
-
-.time-kind-reading {
-  color: var(--idea);
-  background: var(--accent-soft);
-}
-
-.time-kind-writing {
-  color: var(--pile);
-  background: var(--semantic-pile);
 }
 
 .time-count {

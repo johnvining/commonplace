@@ -2473,9 +2473,9 @@ mark.search-highlight {
   font-size: 20px;
 }
 
-// Kind tags reuse the site's note-label treatment (idea/pile labels in
-// _minimal.scss): small square tags, main font, coloured by kind —
-// reading takes the idea tint, writing the pile tint.
+// Kind tags reuse the site's note-label shape (small square tags,
+// main font) but stay neutral: the entity colours are reserved for
+// actual ideas and piles, so kinds get ink text on a hairline tag.
 .time-kind {
   display: inline-flex;
   align-items: center;
@@ -2484,19 +2484,11 @@ mark.search-highlight {
   font-family: $main_font;
   font-size: var(--font-size-sm);
   line-height: 1;
-  border: 1px solid transparent;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--hairline);
   border-radius: 2px;
   white-space: nowrap;
-}
-
-.time-kind-reading {
-  color: var(--idea);
-  background: var(--accent-soft);
-}
-
-.time-kind-writing {
-  color: var(--pile);
-  background: var(--semantic-pile);
 }
 
 .time-count {
