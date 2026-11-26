@@ -228,7 +228,7 @@ struct NoteDetailView: View {
                 }
                 Section {
                     HStack(spacing: 6) {
-                        DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                        DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
                         DSButton(title: editing ? "Cancel" : "Edit") {
                             title = note.title ?? ""; text = note.text ?? ""; take = note.take ?? ""
                             urlField = note.url ?? ""; yearField = note.year.map(String.init) ?? ""; pageField = note.page ?? ""

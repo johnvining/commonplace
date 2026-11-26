@@ -199,7 +199,7 @@ struct WorkDetailView: View {
                             byline: w.year.map(String.init),
                             nick: nick
                         ) {
-                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                            DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
                             DSButton(title: "Edit") {
                                 editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
                                 editing = true
@@ -222,7 +222,7 @@ struct WorkDetailView: View {
                             Text("Translated by \(trs.compactMap(\.name).joined(separator: ", "))").font(DS.ui(12)).foregroundStyle(DS.muted)
                         }
                         if let cit = w.citation_information, !cit.isEmpty { Text(cit).font(DS.ui(12)) }
-                        if let sum = w.summary, !sum.isEmpty { Text(sum).font(DS.serif(13)) }
+                        if let sum = w.summary, !sum.isEmpty { NoteText(text: sum, size: 13.5) }
                     }
                     if let authors = w.authors, !authors.isEmpty {
                         Text(authors.compactMap(\.name).joined(separator: ", "))
@@ -230,28 +230,46 @@ struct WorkDetailView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
-                Section("Piles") {
-                    PillEditor(
-                        placeholder: "Add a pile…", tint: DS.pileSoft, selected: $pileSel,
-                        load: { q in ((try? await state.client.autocompletePiles(q)) ?? []).compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } } },
-                        onAdd: { opt in pileSel.append(opt); Task { _ = try? await state.client.addPileToWork(workId: workId, pileId: opt.id); await load() } },
-                        onRemove: { opt in pileSel.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removePileFromWork(workId: workId, pileId: opt.id); await load() } },
-                        onCreateNew: { name in Task { _ = try? await state.client.createPileForWork(workId: workId, name: name); await load() } }
-                    )
-                }
-                Section("Ideas") {
-                    PillEditor(
-                        placeholder: "Add an idea…", tint: DS.accentSoft, selected: $ideaSel,
-                        load: { q in ((try? await state.client.autocompleteIdeas(q)) ?? []).compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } } },
-                        onAdd: { opt in ideaSel.append(opt); Task { _ = try? await state.client.addIdeaToWork(workId: workId, ideaId: opt.id); await load() } },
-                        onRemove: { opt in ideaSel.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removeIdeaFromWork(workId: workId, ideaId: opt.id); await load() } },
-                        onCreateNew: { name in Task { _ = try? await state.client.createIdeaForWork(workId: workId, name: name); await load() } }
-                    )
+                if editing {
+                    Section("Piles") {
+                        PillEditor(
+                            placeholder: "Add a pile…", tint: DS.pileSoft, selected: $pileSel,
+                            load: { q in ((try? await state.client.autocompletePiles(q)) ?? []).compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } } },
+                            onAdd: { opt in pileSel.append(opt); Task { _ = try? await state.client.addPileToWork(workId: workId, pileId: opt.id); await load() } },
+                            onRemove: { opt in pileSel.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removePileFromWork(workId: workId, pileId: opt.id); await load() } },
+                            onCreateNew: { name in Task { _ = try? await state.client.createPileForWork(workId: workId, name: name); await load() } }
+                        )
+                    }
+                    Section("Ideas") {
+                        PillEditor(
+                            placeholder: "Add an idea…", tint: DS.accentSoft, selected: $ideaSel,
+                            load: { q in ((try? await state.client.autocompleteIdeas(q)) ?? []).compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } } },
+                            onAdd: { opt in ideaSel.append(opt); Task { _ = try? await state.client.addIdeaToWork(workId: workId, ideaId: opt.id); await load() } },
+                            onRemove: { opt in ideaSel.removeAll { $0.id == opt.id }; Task { _ = try? await state.client.removeIdeaFromWork(workId: workId, ideaId: opt.id); await load() } },
+                            onCreateNew: { name in Task { _ = try? await state.client.createIdeaForWork(workId: workId, name: name); await load() } }
+                        )
+                    }
+                } else {
+                    // Read mode: linked piles/ideas, unlabeled, tappable.
+                    Section {
+                        ForEach(w.piles ?? [], id: \.id) { p in
+                            NavigationLink { PileDetailView(pileId: p.id) } label: {
+                                Text(p.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.pile)
+                            }
+                        }
+                        ForEach(w.ideas ?? [], id: \.id) { i in
+                            NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
+                                Text(i.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.accent)
+                            }
+                        }
+                    }
+                    .listRowSeparator(.hidden)
                 }
                 Section("Notes") {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
                     }
+                    .listRowSeparator(.hidden)
                     if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
                     HStack {
                         DSButton(title: "Add Note") { addNoteForWork() }
@@ -372,7 +390,7 @@ struct AuthorDetailView: View {
                                 : nil,
                             nick: nick
                         ) {
-                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                            DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
                             DSButton(title: "Edit") {
                                 editName = a.name ?? ""
                                 editBirth = a.birth_year.map(String.init) ?? ""
@@ -399,6 +417,7 @@ struct AuthorDetailView: View {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
                     }
+                    .listRowSeparator(.hidden)
                     if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
                 }
             } else if loaded {
@@ -495,7 +514,7 @@ struct IdeaDetailView: View {
                                 .compactMap { $0 }.joined(separator: " • "),
                             nick: nick
                         ) {
-                            DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                            DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
                             DSButton(title: "Edit") {
                                 editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
                                 editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false

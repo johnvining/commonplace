@@ -41,7 +41,7 @@ struct PileDetailView: View {
                             .compactMap { $0 }.joined(separator: " • "),
                         nick: nick
                     ) {
-                        DSButton(title: starred ? "Starred" : "Star") { toggleStar() }
+                        DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
                         DSButton(title: "Edit") {
                             newName = pile?.name ?? ""
                             editing = true

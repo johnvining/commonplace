@@ -93,25 +93,40 @@ struct ImportView: View {
     @State private var busy = false
 
     var body: some View {
-        Form {
+        List {
             Picker("Import", selection: $kind) {
-                Text("Time CSV").tag("time")
-                Text("Notes CSV").tag("notes")
+                Text("Time").tag("time")
+                Text("Notes").tag("notes")
                 Text("Instapaper").tag("instapaper")
                 Text("URLs").tag("urls")
-            }.pickerStyle(.segmented)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .listRowInsets(.standardRow)
+            .listRowSeparator(.hidden)
             if kind == "urls" {
                 Text("One URL per line. Each creates a note with Title and URL set, filed under “Status: URL to Review”.")
                     .font(DS.ui(11)).foregroundStyle(DS.muted)
+                    .listRowInsets(.standardRow)
+                    .listRowSeparator(.hidden)
             }
             Section(kind == "time" ? "date,kind,minutes,title,pile" : "Paste the file contents") {
                 TextEditor(text: $text).frame(minHeight: 160).font(DS.mono(12))
+                    .listRowInsets(.standardRow)
             }
-            Button(busy ? "Importing…" : "Import") { run() }.disabled(busy || text.isEmpty)
+            HStack {
+                DSButton(title: busy ? "Importing…" : "Import") { run() }
+                    .disabled(busy || text.isEmpty)
+                    .opacity(busy || text.isEmpty ? 0.5 : 1)
+                Spacer()
+            }
+            .listRowInsets(.standardRow)
+            .listRowSeparator(.hidden)
             if let report {
                 Section("Result") { Text(report).font(DS.mono(11)) }
             }
         }
+        .listStyle(.plain)
         .navigationTitle("Import")
     }
 
