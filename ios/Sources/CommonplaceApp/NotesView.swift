@@ -27,7 +27,6 @@ struct NotesView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 12) {
                             headerControls
-                            viewPicker
                             if let error {
                                 Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
                             }
@@ -69,16 +68,15 @@ struct NotesView: View {
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
             }
+            .toolbar {
+                // Always visible, top right — not a row in the content.
+                ToolbarItem(placement: .primaryAction) {
+                    UnifiedViewSelector(mode: $viewMode)
+                }
+            }
             .task {
                 if let initialPile, pileSel.isEmpty { pileSel = [initialPile]; applySearch() } else { loadRecent() }
             }
-        }
-    }
-
-    private var viewPicker: some View {
-        HStack {
-            Spacer()
-            UnifiedViewSelector(mode: $viewMode)
         }
     }
 
@@ -142,7 +140,6 @@ struct NotesView: View {
                 Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
                     .listRowSeparator(.hidden)
             }
-            viewPicker.listRowSeparator(.hidden)
             ForEach(notes, id: \.stableId) { n in
                 NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
                     NoteRow(note: n, full: viewMode == "full")
