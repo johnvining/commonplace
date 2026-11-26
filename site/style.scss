@@ -2470,7 +2470,9 @@ mark.search-highlight {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .time-subject-picker { flex: 1 1 200px; min-width: 0; position: relative; }
-.top-level.input.time-subject-select,
+.top-level.input.time-subject-select {
+  display: block; width: 100%; box-sizing: border-box; min-width: 0;
+}
 .time-day-nav .top-level.input { width: auto; flex: 1 1 140px; min-width: 0; }
 .time-subject-chip {
   display: inline-flex; align-items: center; gap: 8px;
