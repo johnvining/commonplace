@@ -306,6 +306,20 @@ public struct PinItem: Codable, Sendable {
     /// Local-only: queued but not yet confirmed by the server.
     public var pending: Bool?
 
+    /// SF Symbol describing what kind of thing this pin is, matching
+    /// the sidebar section icons — used wherever starred items list.
+    public var typeIcon: String {
+        switch type {
+        case "note": return "note.text"
+        case "pile": return "tray.full"
+        case "work": return "book"
+        case "auth", "author": return "person.2"
+        case "idea": return "lightbulb"
+        case "time": return "timer"
+        default: return "star.fill"
+        }
+    }
+
     public init(type: String, id: String, label: String? = nil,
                 href: String? = nil, pinnedAt: Double? = nil, pending: Bool? = nil) {
         self.type = type

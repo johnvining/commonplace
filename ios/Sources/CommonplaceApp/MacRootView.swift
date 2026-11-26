@@ -67,7 +67,7 @@ struct MacRootView: View {
                                 openPin(pin)
                             } label: {
                                 HStack {
-                                    Image(systemName: pin.type == "time" ? "timer" : "star.fill")
+                                    Image(systemName: pin.typeIcon)
                                         .font(DS.ui(10)).foregroundStyle(DS.muted)
                                     Text(pin.label ?? pin.id)
                                         .font(DS.ui(12)).lineLimit(1)
@@ -82,20 +82,6 @@ struct MacRootView: View {
                 }
             }
             .navigationSplitViewColumnWidth(min: 180, ideal: 210, max: 260)
-            .safeAreaInset(edge: .bottom) {
-                if let web = state.webURL {
-                    Link(destination: web) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "safari").font(DS.ui(11))
-                            Text("Open web version").font(DS.ui(12))
-                            Spacer()
-                        }
-                        .foregroundStyle(DS.muted)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                    }
-                }
-            }
             .safeAreaInset(edge: .bottom) {
                 if state.timerIsRunning {
                     SidebarTimerView()

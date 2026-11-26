@@ -59,21 +59,24 @@ struct PinsView: View {
     }
 
     private func pinLabel(_ p: PinItem) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 6) {
-                if p.type == "pile", let label = p.label {
-                    Text("Pile:").font(DS.ui(12)).foregroundStyle(DS.pile)
-                    Text(label).font(DS.ui(14)).lineLimit(1)
-                } else if p.type == "work" {
-                    Text(p.label ?? p.id).font(DS.ui(14)).italic().lineLimit(1)
-                } else {
-                    Text(p.label ?? p.id).font(DS.ui(14)).lineLimit(1)
+        HStack(spacing: 8) {
+            Image(systemName: p.typeIcon)
+                .font(DS.ui(13))
+                .foregroundStyle(DS.muted)
+                .frame(width: 18)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 6) {
+                    if p.type == "work" {
+                        Text(p.label ?? p.id).font(DS.ui(14)).italic().lineLimit(1)
+                    } else {
+                        Text(p.label ?? p.id).font(DS.ui(14)).lineLimit(1)
+                    }
+                    if p.pending == true {
+                        Text("pending").font(DS.ui(10)).foregroundStyle(DS.muted)
+                    }
                 }
-                if p.pending == true {
-                    Text("pending").font(DS.ui(10)).foregroundStyle(DS.muted)
-                }
+                Text(p.type).font(.caption).foregroundStyle(.secondary)
             }
-            Text(p.type).font(.caption).foregroundStyle(.secondary)
         }
         .opacity(p.pending == true ? 0.6 : 1)
     }

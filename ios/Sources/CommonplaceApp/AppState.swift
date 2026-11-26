@@ -191,11 +191,16 @@ final class AppState: ObservableObject {
         guard isSignedIn else { return }
         if let remote = try? await client.runningTimer(),
            let at = ISO8601DateFormatter().date(from: remote.startedAt) {
-            timerSubjectKey = remote.key
-            timerSubjectLabel = remote.label
-            timerKind = remote.kind
-            timerStartedAt = at
-            persistTimer()
+            // Only touch state (and disk) when something actually
+            // changed — identical writes every 5s churn the UI.
+            if timerSubjectKey != remote.key || timerKind != remote.kind
+                || timerStartedAt != at || timerSubjectLabel != remote.label {
+                timerSubjectKey = remote.key
+                timerSubjectLabel = remote.label
+                timerKind = remote.kind
+                timerStartedAt = at
+                persistTimer()
+            }
         } else if let key = timerSubjectKey, let at = timerStartedAt {
             try? await client.setRunningTimer(
                 RunningTimerState(key: key, kind: timerKind,
