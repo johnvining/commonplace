@@ -50,6 +50,7 @@ import RecentList from './RecentList'
 import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
 import Stats from './Stats'
+import TopBarTimer from './TopBarTimer'
 import { TopLevelStandardButton } from './TopLevelStandardButton'
 import ViewSelector from './ViewSelector'
 import HelpOverlay from './HelpOverlay'
@@ -173,6 +174,9 @@ class App extends React.Component<any, any> {
           </div>
           <div className="stats-center">
             <Stats />
+          </div>
+          <div className="topbar-timer-center">
+            <TopBarTimer />
           </div>
           <div className="top-action-bar">
             <RefreshButton />

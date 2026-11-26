@@ -108,9 +108,9 @@ struct MacRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: .macSection)) { note in
             if let s = note.object as? String { section = s; routedType = nil; routedId = nil }
         }
-        // Ctrl+O opens Search, like the web's search shortcut.
+        // Ctrl+O navigates to Time (Cmd+K keeps Search).
         .background {
-            Button("") { section = "search" }
+            Button("") { section = "time"; routedType = nil; routedId = nil }
                 .keyboardShortcut("o", modifiers: .control)
                 .hidden()
         }

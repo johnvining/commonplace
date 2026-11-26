@@ -52,9 +52,9 @@ struct ContentView: View {
         }
         }
         }
-        // Ctrl+O opens Search, like the web (hardware keyboards).
+        // Ctrl+O navigates to Time (hardware keyboards).
         .background {
-            Button("") { tab = 3 }
+            Button("") { tab = 1 }
                 .keyboardShortcut("o", modifiers: .control)
                 .hidden()
         }

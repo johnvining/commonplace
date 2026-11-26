@@ -225,7 +225,10 @@ public final class APIClient: Sendable {
         var body: [String: String] = [:]
         if let title { body["title"] = title }
         if let work { body["work"] = work }
-        return try await post("note", body: body)
+        // POST /note is the one unwrapped endpoint: it returns the raw
+        // record, not the usual { data: … } envelope (the server keeps
+        // it that way for its other clients).
+        return try await performRaw(try request(path: "note", method: "POST", body: body))
     }
 
     public func findNotes(searchString: String) async throws -> [Note] {
