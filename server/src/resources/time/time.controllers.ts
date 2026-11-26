@@ -387,34 +387,69 @@ export const reqRecentSubjects = async (req: Request) => {
   return subjects
 }
 
+function scopeSummary(
+  entries: any[],
+  start: Date,
+  end: Date,
+  withByDay: boolean
+) {
+  const scoped = entries.filter((e: any) => e.date >= start && e.date < end)
+  const out: Record<string, unknown> = {
+    start: dayString(start),
+    end: dayString(new Date(end.getTime() - 1)),
+    ...summarize(scoped as PopulatedEntry[]),
+  }
+  if (withByDay) {
+    const byDay = []
+    for (let t = start.getTime(); t < end.getTime(); t += DAY_MS) {
+      const dStart = new Date(t)
+      const dEnd = new Date(t + DAY_MS)
+      byDay.push({
+        date: dayString(dStart),
+        ...summarize(scoped.filter((e: any) => e.date >= dStart && e.date < dEnd) as PopulatedEntry[]),
+      })
+    }
+    out.byDay = byDay
+  }
+  return out
+}
+
 export const reqGetTimeSummary = async (req: Request) => {
   const ref = req.query.date === undefined ? new Date() : parseDay(req.query.date)
   if (!ref || Number.isNaN(ref.getTime())) throw invalid('Date must be YYYY-MM-DD')
   const refDay = new Date(Date.UTC(ref.getUTCFullYear(), ref.getUTCMonth(), ref.getUTCDate()))
   const day = dayRange(refDay)
   const week = weekRange(refDay)
+  const last7 = {
+    start: new Date(refDay.getTime() - 6 * DAY_MS),
+    end: new Date(refDay.getTime() + DAY_MS),
+  }
+  const month = {
+    start: new Date(Date.UTC(refDay.getUTCFullYear(), refDay.getUTCMonth(), 1)),
+    end: new Date(Date.UTC(refDay.getUTCFullYear(), refDay.getUTCMonth() + 1, 1)),
+  }
+  const widest = {
+    start: new Date(Math.min(week.start.getTime(), month.start.getTime(), last7.start.getTime())),
+    end: new Date(Math.max(week.end.getTime(), month.end.getTime(), last7.end.getTime())),
+  }
 
-  const entries = await TimeEntry.find({ date: { $gte: week.start, $lt: week.end } })
+  const entries = await TimeEntry.find({ date: { $gte: widest.start, $lt: widest.end } })
     .populate('pile', 'name').populate('work', 'name')
     .lean()
     .exec()
-  const inDay = entries.filter((e: any) => e.date >= day.start && e.date < day.end)
-
-  const byDay = []
-  for (let t = week.start.getTime(); t < week.end.getTime(); t += DAY_MS) {
-    const dStart = new Date(t)
-    const dEnd = new Date(t + DAY_MS)
-    const scoped = entries.filter((e: any) => e.date >= dStart && e.date < dEnd)
-    byDay.push({ date: dayString(dStart), ...summarize(scoped as PopulatedEntry[]) })
-  }
+  const daily = scopeSummary(entries, day.start, day.end, false)
+  const weekly = scopeSummary(entries, week.start, week.end, true)
+  const rolling7 = scopeSummary(entries, last7.start, last7.end, true)
+  const monthly = scopeSummary(entries, month.start, month.end, true)
 
   return {
-    daily: { date: dayString(refDay), ...summarize(inDay as PopulatedEntry[]) },
+    daily: { date: dayString(refDay), ...daily },
     weekly: {
       weekStart: dayString(week.start),
       weekEnd: dayString(new Date(week.end.getTime() - 1)),
-      ...summarize(entries as PopulatedEntry[]),
-      byDay,
+      ...weekly,
     },
+    last7: rolling7,
+    monthly,
   }
 }

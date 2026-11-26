@@ -156,6 +156,18 @@ describe('time', () => {
       })
     })
 
+    it('returns last-7-days and this-month scopes', async () => {
+      const agent = await authedAgent()
+      await createEntry(agent, { title: 'Today', kind: 'reading', minutes: 10, date: '2026-11-25' }).expect(201)
+      await createEntry(agent, { title: 'Three days ago', kind: 'writing', minutes: 20, date: '2026-11-22' }).expect(201)
+      await createEntry(agent, { title: 'Last month', kind: 'reading', minutes: 40, date: '2026-10-31' }).expect(201)
+      const res = await agent.get('/api/time/summary').query({ date: '2026-11-25' }).expect(200)
+      expect(res.body.data.last7.totalMinutes).toBe(30)
+      expect(res.body.data.last7.byDay).toHaveLength(7)
+      expect(res.body.data.monthly.totalMinutes).toBe(30)
+      expect(res.body.data.monthly.byDay).toHaveLength(30)
+    })
+
     it('400s on a bad date', async () => {
       const agent = await authedAgent()
       await agent.get('/api/time/summary').query({ date: 'yesterday' }).expect(400)
