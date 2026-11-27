@@ -50,6 +50,13 @@ struct CommonplaceApp: App {
                     .keyboardShortcut("k", modifiers: .command)
             }
             CommandMenu("Time") {
+                // Menu commands are the reliable shortcut path — a
+                // hidden background button never reliably receives
+                // key equivalents.
+                Button("Go to Time") {
+                    NotificationCenter.default.post(name: .macSection, object: "time")
+                }
+                .keyboardShortcut("o", modifiers: .control)
                 Button(state.timerIsRunning ? "Stop Timer" : "Start from Time section") {
                     if state.timerIsRunning {
                         Task { await state.stopAndLogTimer() }
