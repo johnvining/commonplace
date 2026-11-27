@@ -194,8 +194,8 @@ struct NotesView: View {
             }
             if loaded && !notes.isEmpty {
                 DSButton(title: "Load more") { loadRecent(page: page + 1) }
+                    .listRowSeparator(.hidden)
             }
-                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
         .refreshable { loadRecent() }
