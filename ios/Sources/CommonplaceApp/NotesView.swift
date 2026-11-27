@@ -316,26 +316,7 @@ struct NoteCard: View {
             }
             Spacer(minLength: 0)
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
-                HStack(spacing: 6) {
-                    ForEach((note.ideas ?? []).prefix(2), id: \.id) { i in
-                        Text(i.name ?? "")
-                            .font(DS.ui(11)).lineLimit(1)
-                            .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(DS.accentSoft)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    ForEach((note.piles ?? []).prefix(2), id: \.id) { p in
-                        Text(p.name ?? "")
-                            .font(DS.ui(11)).lineLimit(1)
-                            .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(DS.pileSoft)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    let extra = max(0, (note.ideas?.count ?? 0) - 2) + max(0, (note.piles?.count ?? 0) - 2)
-                    if extra > 0 {
-                        Text("+\(extra)").font(DS.ui(11)).foregroundStyle(DS.muted)
-                    }
-                }
+                NoteTagRow(note: note)
             }
         }
         .padding(10)
@@ -358,31 +339,10 @@ struct NoteFlowRow: View {
         VStack(alignment: .leading, spacing: 5) {
             NoteFlowText(note: note, lines: 4)
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
-                HStack(spacing: 4) {
-                    ForEach((note.ideas ?? []).prefix(3), id: \.id) { i in
-                        tag(i.name ?? "", color: DS.accent, bg: DS.accentSoft)
-                    }
-                    ForEach((note.piles ?? []).prefix(3), id: \.id) { p in
-                        tag(p.name ?? "", color: DS.pile, bg: DS.pileSoft)
-                    }
-                    let extra = max(0, (note.ideas?.count ?? 0) - 3) + max(0, (note.piles?.count ?? 0) - 3)
-                    if extra > 0 {
-                        Text("+\(extra)").font(DS.ui(11)).foregroundStyle(DS.muted)
-                    }
-                }
+                NoteTagRow(note: note)
             }
         }
         .padding(.vertical, 4)
-    }
-
-    private func tag(_ name: String, color: Color, bg: Color) -> some View {
-        Text(name)
-            .font(DS.ui(11))
-            .foregroundStyle(color)
-            .lineLimit(1)
-            .padding(.horizontal, 5).padding(.vertical, 1)
-            .background(bg)
-            .clipShape(RoundedRectangle(cornerRadius: 2))
     }
 
     private var flow: AttributedString {
@@ -417,26 +377,20 @@ struct NoteRow: View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(alignment: .top, spacing: 6) {
                 // One flowing serif paragraph, one size (web pattern).
-                NoteFlowText(note: note, lines: full ? 6 : 2)
+                NoteFlowText(note: note, lines: full ? 10 : 3)
                 if let imgs = note.images, !imgs.isEmpty {
                     HStack(spacing: 3) { Image(systemName: "photo").font(DS.ui(10)); Text("\(imgs.count)") }.font(DS.ui(11)).foregroundStyle(DS.muted)
                 }
-                if (note.reviewCount ?? 0) > 0 {
-                    Text("worn").font(DS.ui(10)).foregroundStyle(DS.muted)
+                if (note.openCount ?? 0) >= 5 {
+                    Rectangle()
+                        .fill(Color.orange.opacity((note.openCount ?? 0) >= 50 ? 0.95 : (note.openCount ?? 0) >= 20 ? 0.6 : 0.3))
+                        .frame(width: 4)
+                        .accessibilityLabel("Opened \(note.openCount ?? 0) times")
                 }
             }
             if full { NoteStatusLine(note: note) }
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
-                HStack(spacing: 6) {
-                    ForEach((note.ideas ?? []).prefix(3), id: \.id) { i in
-                        Text(i.name ?? "").font(DS.ui(11)).lineLimit(1).padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(DS.accentSoft).clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                    ForEach((note.piles ?? []).prefix(3), id: \.id) { p in
-                        Text(p.name ?? "").font(DS.ui(11)).lineLimit(1).padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(DS.pileSoft).clipShape(RoundedRectangle(cornerRadius: 8))
-                    }
-                }
+                NoteTagRow(note: note)
             }
         }
         .padding(.vertical, 2)

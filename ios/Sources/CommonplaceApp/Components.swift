@@ -23,9 +23,9 @@ struct CopyNickButton: View {
             Task { try? await Task.sleep(nanoseconds: 2_000_000_000); copied = false }
         } label: {
             HStack(spacing: 4) {
-                Text("nick: \(nick)").font(DS.mono(11))
                 Image(systemName: copied ? "checkmark" : "doc.on.doc").font(DS.ui(11))
-            }.foregroundStyle(DS.muted)
+                Text(nick).font(DS.mono(11))
+            }.foregroundStyle(DS.faint)
         }
     }
 }
@@ -35,31 +35,29 @@ struct CopyNickButton: View {
 struct NoteStatusLine: View {
     let note: Note
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(spacing: 6) {
-                if let c = note.createdAt { Text("Created \(c, style: .relative) ago").font(DS.ui(11)) }
-                if let u = note.updatedAt, u != note.createdAt { Text("· edited \(u, style: .relative) ago").font(DS.ui(11)) }
-            }.foregroundStyle(DS.muted)
-            HStack(spacing: 6) {
-                if let rc = note.reviewCount, rc > 0 {
-                    Text("reviewed \(rc)×").font(DS.ui(11))
-                    if let d = note.reviewDueAt {
-                        Text(d < Date() ? "· overdue" : "· due \(d, style: .relative)").font(DS.ui(11))
-                            .foregroundStyle(d < Date() ? DS.danger : DS.muted)
-                    }
-                } else { Text("never reviewed").font(DS.ui(11)) }
-                if let oc = note.openCount, oc > 0 { Text("· opened \(oc)×").font(DS.ui(11)) }
-                else { Text("· never opened").font(DS.ui(11)) }
-                if note.embeddingStale == true || note.embeddingHash == nil {
-                    Text("· ● not yet embedded").font(DS.ui(11)).foregroundStyle(DS.accent)
-                }
-                if let ts = note.titleSource, !ts.isEmpty {
-                    Text("· title: \(ts)").font(DS.ui(11))
-                }
-            }.foregroundStyle(DS.muted)
+        FlowLayout(spacing: 4) {
+            if let c = note.createdAt { Text("Created \(c, style: .relative) ago").font(DS.ui(11)).foregroundStyle(DS.muted) }
+            if let u = note.updatedAt, u != note.createdAt { Text("· edited \(u, style: .relative) ago").font(DS.ui(11)).foregroundStyle(DS.muted) }
+            if let reviewedAt = note.reviewedAt {
+                Text("· reviewed \(reviewedAt, style: .relative) ago").font(DS.ui(11)).foregroundStyle(DS.muted)
+            } else if (note.reviewCount ?? 0) > 0 {
+                Text("· reviewed \(note.reviewCount ?? 0)×").font(DS.ui(11)).foregroundStyle(DS.muted)
+            } else {
+                Text("· never reviewed").font(DS.ui(11)).foregroundStyle(DS.muted)
+            }
+            if let d = note.reviewDueAt {
+                Text(d < Date() ? "· overdue" : "· due \(d, style: .relative)")
+                    .font(DS.ui(11))
+                    .foregroundStyle(d < Date() ? DS.danger : DS.muted)
+            }
+            if let oc = note.openCount, oc > 0 { Text("· opened \(oc)×").font(DS.ui(11)).foregroundStyle(DS.muted) }
+            else { Text("· never opened").font(DS.ui(11)).foregroundStyle(DS.muted) }
+            if note.embeddingStale == true || note.embeddingHash == nil {
+                Circle().fill(DS.faint).frame(width: 6, height: 6)
+                    .accessibilityLabel("Not yet embedded")
+            }
         }
-    }
-}
+    }}
 
 /// Standard entity-page header (web entity-page-header-left): name at
 /// title size, quiet byline, and the nick with tap-to-copy under it.
@@ -102,9 +100,13 @@ struct EntityPageHeader<Actions: View>: View {
         HStack(alignment: .top, spacing: 12) {
             EntityTitleBlock(name: name, italicName: italicName, byline: byline, nick: nick)
             Spacer()
-            HStack(spacing: 6) {
+            FlowLayout(spacing: 6) {
                 actions
             }
+        }
+        .padding(.bottom, 12)
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(DS.hairline).frame(height: 1)
         }
     }
 }
@@ -135,12 +137,12 @@ struct OpenInWebButton: View {
                     Text("Web")
                     Image(systemName: "arrow.up.forward.square").font(DS.ui(11))
                 }
-                .font(DS.ui(13))
+                .font(DS.ui(13, weight: .medium))
                 .padding(.horizontal, 10)
-                .padding(.vertical, 5)
+                .frame(minHeight: 28)
                 .foregroundStyle(DS.ink)
-                .overlay(RoundedRectangle(cornerRadius: 4).stroke(DS.hairline, lineWidth: 1))
-                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .overlay(RoundedRectangle(cornerRadius: 5).stroke(DS.hairline, lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 5))
             }
             .buttonStyle(.plain)
             .help("Open this page on the website")
@@ -161,6 +163,44 @@ struct DSButtonLabel: View {
             .foregroundStyle(DS.ink)
             .overlay(RoundedRectangle(cornerRadius: 4).stroke(DS.hairline, lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 4))
+    }
+}
+
+/// One web-format tag: square, kind-coloured text on its kind tint.
+struct NoteTag: View {
+    let name: String
+    let color: Color
+    let tint: Color
+
+    var body: some View {
+        Text(name)
+            .font(DS.ui(11))
+            .foregroundStyle(color)
+            .lineLimit(1)
+            .padding(.horizontal, 5)
+            .frame(height: 19)
+            .background(tint)
+            .clipShape(RoundedRectangle(cornerRadius: 2))
+    }
+}
+
+/// All idea/pile tags for a note on one clipped line (web clips the
+/// row instead of counting "+N").
+struct NoteTagRow: View {
+    let note: Note
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(note.ideas ?? [], id: \.id) { idea in
+                NoteTag(name: idea.name ?? "", color: DS.accent, tint: DS.accentSoft)
+            }
+            ForEach(note.piles ?? [], id: \.id) { pile in
+                NoteTag(name: pile.name ?? "", color: DS.pile, tint: DS.pileSoft)
+            }
+        }
+        .lineLimit(1)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .clipped()
     }
 }
 

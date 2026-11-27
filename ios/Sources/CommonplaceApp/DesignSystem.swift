@@ -63,9 +63,9 @@ struct DSLabel: View {
     let text: String
     var body: some View {
         Text(text.uppercased())
-            .font(DS.ui(11, weight: .medium))
+            .font(DS.ui(11, weight: .semibold))
             .tracking(0.6)
-            .foregroundStyle(DS.muted)
+            .foregroundStyle(DS.faint)
     }
 }
 
@@ -89,13 +89,13 @@ struct DSButton: View {
     var body: some View {
         Button(title, action: action)
             .buttonStyle(.plain)
-            .font(DS.ui(13))
+            .font(DS.ui(13, weight: .medium))
             .padding(.horizontal, 10)
-            .padding(.vertical, 5)
+            .frame(minHeight: 28)
             .background(selected ? DS.hover : Color.clear)
             .foregroundStyle(DS.ink)
-            .overlay(RoundedRectangle(cornerRadius: 4).stroke(DS.hairline, lineWidth: 1))
-            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .overlay(RoundedRectangle(cornerRadius: 5).stroke(DS.hairline, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
     }
 }
 
@@ -117,5 +117,18 @@ struct LoadStateView: View {
                 if let retry { Button("Retry", action: retry).font(DS.ui(13)) }
             }
         }
+    }
+}
+
+/// Web edit-input treatment: hairline border, 3pt radius, quiet padding.
+extension View {
+    func dsInput() -> some View {
+        self
+            .textFieldStyle(.plain)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(DS.surface)
+            .overlay(RoundedRectangle(cornerRadius: 3).stroke(DS.hairline, lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: 3))
     }
 }

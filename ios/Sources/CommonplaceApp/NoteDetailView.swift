@@ -50,36 +50,37 @@ struct NoteDetailView: View {
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger).listRowSeparator(.hidden) }
             if let note {
                 Section {
                     if editing {
                         editField("Title") {
                             TextField("Title", text: $title)
-                                .textFieldStyle(.roundedBorder)
-                                .font(DS.serif(15))
+                                .dsInput()
+                                .font(DS.ui(14, weight: .semibold))
                         }
                         editField("Text") {
                             TextField("Text", text: $text, axis: .vertical)
-                                .textFieldStyle(.roundedBorder)
-                                .font(DS.serif(15))
+                                .dsInput()
+                                .font(DS.serif(14))
                         }
                         editField("Take") {
                             TextField("Take", text: $take, axis: .vertical)
-                                .textFieldStyle(.roundedBorder)
-                                .font(DS.serif(15))
+                                .dsInput()
+                                .font(DS.serif(14))
                         }
                         editField("URL") {
                             TextField("URL", text: $urlField)
-                                .textFieldStyle(.roundedBorder)
+                                .dsInput()
+                                .font(DS.mono(13))
                                 .autocorrectionDisabled()
                         }
                         HStack(spacing: 12) {
                             editField("Year") {
-                                TextField("Year", text: $yearField).textFieldStyle(.roundedBorder)
+                                TextField("Year", text: $yearField).dsInput().font(DS.ui(13))
                             }
                             editField("Page") {
-                                TextField("Page", text: $pageField).textFieldStyle(.roundedBorder)
+                                TextField("Page", text: $pageField).dsInput().font(DS.ui(13))
                             }
                         }
                         HStack {
@@ -119,7 +120,7 @@ struct NoteDetailView: View {
                                             Text(w).italic()
                                         }
                                     }
-                                    .font(DS.serif(13))
+                                    .font(DS.ui(12))
                                     .foregroundStyle(DS.muted)
                                 }
                                 if let ts = note.titleSource, !ts.isEmpty {
@@ -129,7 +130,10 @@ struct NoteDetailView: View {
                                     NoteText(text: t)
                                 }
                                 if let k = note.take, !k.isEmpty {
-                                    Text(k).font(DS.serif(14.5)).italic().foregroundStyle(DS.ink)
+                                    HStack(alignment: .top, spacing: 0) {
+                                        Rectangle().fill(DS.hairline).frame(width: 2)
+                                        Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.muted).padding(.leading, 10)
+                                    }
                                 }
                                 if let u = note.url, !u.isEmpty,
                                    u != note.text?.trimmingCharacters(in: .whitespacesAndNewlines) {
@@ -159,7 +163,7 @@ struct NoteDetailView: View {
                                             }
                                             ForEach(note.people ?? [], id: \.id) { a in
                                                 NavigationLink { AuthorDetailView(authorId: a.id) } label: {
-                                                    linkTag(a.name ?? "", color: DS.muted, tint: DS.hover)
+                                                    linkTag(a.name ?? "", color: DS.muted, tint: .clear)
                                                 }.buttonStyle(.plain)
                                             }
                                         }
@@ -260,7 +264,7 @@ struct NoteDetailView: View {
                                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                                                 .onTapGesture { lightboxIndex = idx }
                                             if editing {
-                                                Button("Delete") { deleteImage(idx) }.font(DS.ui(11))
+                                                DSButton(title: "Delete") { deleteImage(idx) }
                                             }
                                         }
                                     }
@@ -272,10 +276,10 @@ struct NoteDetailView: View {
                                 NoteImageView(data: imageDatas[idx], contentMode: .fit)
                                     .frame(maxHeight: 420)
                                 HStack {
-                                    Button("‹ Prev") { lightboxIndex = max(0, idx - 1) }.disabled(idx == 0)
+                                    DSButton(title: "‹ Prev") { lightboxIndex = max(0, idx - 1) }.disabled(idx == 0).opacity(idx == 0 ? 0.5 : 1)
                                     Text("\(idx + 1) / \(imageDatas.count)").font(DS.ui(11)).foregroundStyle(DS.muted)
-                                    Button("Next ›") { lightboxIndex = min(imageDatas.count - 1, idx + 1) }.disabled(idx >= imageDatas.count - 1)
-                                    Button("Close") { lightboxIndex = nil }
+                                    DSButton(title: "Next ›") { lightboxIndex = min(imageDatas.count - 1, idx + 1) }.disabled(idx >= imageDatas.count - 1).opacity(idx >= imageDatas.count - 1 ? 0.5 : 1)
+                                    DSButton(title: "Close") { lightboxIndex = nil }
                                 }
                             }
                         }
@@ -293,16 +297,16 @@ struct NoteDetailView: View {
                                     .opacity(suggestBusy ? 0.5 : 1)
                             }
                             if let t = suggestedTitle {
-                                Button("Use title: \(t)") {
+                                DSButton(title: "Use title: \(t)") {
                                     title = t
                                 }
                             }
                             ForEach(suggestedIdeas, id: \.self) { idea in
-                                Button("Add idea: \(idea)") { addSuggestedIdea(idea) }
+                                DSButton(title: "Add idea: \(idea)") { addSuggestedIdea(idea) }
                             }
                             if let ocr = ocrResult {
                                 Text(ocr).font(DS.serif(13))
-                                Button("Append OCR to text") {
+                                DSButton(title: "Append OCR to text") {
                                     text = (text.isEmpty ? ocr : text + "\n\n" + ocr)
                                 }
                             }
@@ -318,7 +322,7 @@ struct NoteDetailView: View {
                                     NoteRow(note: n)
                                 }
                                 if editing {
-                                    Button("Unlink") { unlink(n) }
+                                    DSButton(title: "Unlink") { unlink(n) }
                                 }
                             }
                         }
@@ -340,6 +344,7 @@ struct NoteDetailView: View {
             }
         }
         .listStyle(.plain)
+        .listRowSeparator(.hidden)
         .navigationTitle("Note")
         .interactiveDismissDisabled(dirty)
         .confirmationDialog("Discard unsaved changes?", isPresented: $confirmingDismiss) {
@@ -379,6 +384,7 @@ struct NoteDetailView: View {
             .padding(.horizontal, 6)
             .frame(height: 19)
             .background(tint)
+            .overlay(RoundedRectangle(cornerRadius: 0).stroke(tint == .clear ? DS.hairline : Color.clear, lineWidth: 1))
             .clipShape(RoundedRectangle(cornerRadius: 0))
     }
 

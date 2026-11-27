@@ -10,13 +10,16 @@ struct FlipView: View {
     @State private var error: String?
     @State private var done = false
     @State private var rating = false
+    @State private var loaded = false
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(.red) }
-            if done || index >= deck.count {
-                Section { Text(deck.isEmpty ? "Nothing due for review." : "Deck finished — nice work.") }
-                Section { Button("Load deck") { load() } }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger).listRowSeparator(.hidden) }
+            if !loaded {
+                LoadingBlock()
+            } else if done || index >= deck.count {
+                Section { Text(deck.isEmpty ? "Nothing due for review." : "Deck finished — nice work.").font(DS.ui(13)).foregroundStyle(DS.muted) }
+                Section { DSButton(title: "Load deck") { load() } }
             } else {
                 let n = deck[index]
                 Section {
@@ -24,7 +27,12 @@ struct FlipView: View {
                     Text(n.displayTitle).font(DS.serif(17, weight: .semibold)).foregroundStyle(DS.ink)
                     if let t = n.text, !t.isEmpty {
                         NoteText(text: t)
-                        if let k = n.take, !k.isEmpty { Text(k).italic() }
+                        if let k = n.take, !k.isEmpty {
+                            HStack(alignment: .top, spacing: 0) {
+                                Rectangle().fill(DS.hairline).frame(width: 2)
+                                Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.muted).padding(.leading, 10)
+                            }
+                        }
                     } else {
                         Text(n.displayText).font(DS.serif(15)).foregroundStyle(DS.muted)
                     }
@@ -33,25 +41,24 @@ struct FlipView: View {
                     }
                 }
                 Section("How soon again?") {
-                    HStack {
-                        Button("Fast") { rate("fast") }
+                    HStack(spacing: 6) {
+                        Text("See again:").font(DS.ui(12)).foregroundStyle(DS.muted)
+                        DSButton(title: "Fast") { rate("fast") }
+                        DSButton(title: "Med") { rate("med") }
+                        DSButton(title: "Slow") { rate("slow") }
                         Spacer()
-                        Button("Med") { rate("med") }
-                        Spacer()
-                        Button("Slow") { rate("slow") }
+                        DSButton(title: "‹ Prev") { if index > 0 { index -= 1 } }
+                            .disabled(index == 0).opacity(index == 0 ? 0.5 : 1)
+                        DSButton(title: "Skip") { index += 1 }
                     }.disabled(rating)
-                    HStack {
-                        Button("‹ Prev") { if index > 0 { index -= 1 } }.disabled(index == 0)
-                        Spacer()
-                        Button("Skip") { index += 1 }
-                    }
+                    Text("\(index + 1) of \(deck.count)")
+                        .font(DS.ui(12)).monospacedDigit().foregroundStyle(DS.muted)
                 }
-                Section {
-                    Text("\(index + 1) of \(deck.count)").font(.caption).foregroundStyle(.secondary)
-                }
+                .listRowSeparator(.hidden)
             }
         }
         .listStyle(.plain)
+        .listRowSeparator(.hidden)
         .navigationTitle("Review")
         .refreshable { load() }
         .task { load() }
@@ -64,6 +71,7 @@ struct FlipView: View {
             do {
                 deck = try await state.client.flipDeck()
                 index = 0
+                loaded = true
                 error = nil
             } catch { self.error = "Load failed: \(describe(error))" }
         }
