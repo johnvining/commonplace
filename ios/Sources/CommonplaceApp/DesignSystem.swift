@@ -1,6 +1,8 @@
 import SwiftUI
 #if os(iOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
 #endif
 
 /// Design tokens ported from the web's minimal layer (site/_minimal.scss):
@@ -12,6 +14,14 @@ enum DS {
         return Color(UIColor { traits in
             let c = traits.userInterfaceStyle == .dark ? dark : light
             return UIColor(red: c.0, green: c.1, blue: c.2, alpha: 1)
+        })
+        #elseif os(macOS)
+        // AppKit dynamic provider, so tokens flip with the system
+        // appearance (freezing these to the light values made dark
+        // mode render dark-ink text on dark backgrounds).
+        return Color(NSColor(name: nil) { appearance in
+            let c = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? dark : light
+            return NSColor(red: c.0, green: c.1, blue: c.2, alpha: 1)
         })
         #else
         return Color(red: light.0, green: light.1, blue: light.2)
