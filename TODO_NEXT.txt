@@ -1,44 +1,18 @@
-# Next round — work top to bottom, small local commits, no push
+# The one work list — work top to bottom, small local commits, no push
+#
+# Everything else that used to live in KNOWN_ISSUES.md and
+# MULTI_AUTHORS_PLAN.md is done and those files are deleted.
+# Done items get checked off here; when the list empties, start a new one.
 
-1. [x] Menu bar icon serif — menu-bar extra shows the Georgia serif C
-       (like the app icon), verified in the running Mac app.
-2. [x] Web shows the active timer like iOS + Mac (shared /api/time/timer) —
-       verify end to end: start in app → appears on web; start on web →
-       appears in app menu bar.
-3. [x] Performance pass, Mac + iOS — no animations anywhere, instant
-       view switching and scrolling; profile the hot spots (note lists,
-       grid, time page) and fix what's slow.
-4. [x] Sidebar Starred items get a type icon (note / pile / work /
-       author / idea / time) describing what each star is.
-5. [x] iOS Live Activity (lock screen / Dynamic Island) showing the
-       running timer, updating and ending with the timer.
-6. [x] iOS home-screen widget: start a recent timer (or a new one)
-       without opening the app.
-7. [x] Remove "Open web version" from the Mac sidebar — keep Web only
-       on entity/note pages, opening that specific page.
-8. [x] Ctrl+O quick bar fully implemented on macOS and iOS — Cmd+K
-       quick search overlay like the web's (Ctrl+O itself goes to Time).
-9. [x] Cmd+N / New Note fails with "Could not create note — retry."
-       in the Mac app (and check iOS) — find why createNote() throws
-       and fix it; also stop the menu shortcut and the Notes button
-       both firing for one Cmd+N.
-10. [x] Commonplace (Mac) and iOS: what work is it doing with a running
-        timer? Give the user at least a top-5 profile before calling
-        the performance pass (item 3) done.
-11. [x] Note page: a real Edit mode matching the web edit form (one
-        form, labeled fields, save/cancel) instead of edit controls
-        scattered through the read view.
-12. [x] Note display cleaned up to match online: one reading card,
-        tags inline after the text, no per-link rows, no edit tools
-        (photos/OCR/link-by-nick) showing in read mode.
+1. [ ] Fix the flaky server tests. About 1 full run in 5 fails a random
+       test — usually the first test in a file timing out after 30s, or
+       a 401 right after registering ("User already exists", or the
+       login cookie not accepted). Never reproduces with one file alone.
+       Leads: background work a test starts but doesn't await
+       (embeddings, nicks, touch updates) landing after the next test's
+       cleanup; beforeEach cleanup only clears collections for models
+       registered so far. Done when 10 full runs pass in a row.
 
-Done items get checked off here; code lands in small local commits.
-
-Timer profile (item 10, measured 2026-11-26 on the Release Mac app):
-the process is >99% idle in a 10s sample (busy frames <=0.4% each).
-What little work exists, in order: (1) runloop idle wait (wanted),
-(2) 1s timer text + layout ticks in the sidebar/menu bar, (3) the 5s
-shared-timer poll (one GET + today's summary; state writes now only
-on change), (4) SwiftUI attribute-graph/layout passes when state
-flips, (5) note-list rendering on load/switch (markdown + thumbnails,
-both cached). No other steady-state work found.
+2. [ ] iPad app. Commonplace on iPad — layout that uses the bigger
+       screen rather than a stretched phone UI. Scope to be written up
+       before starting.
