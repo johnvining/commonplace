@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Local development only: allow the app to reach the Commonplace
-	     server on this Mac / LAN over plain HTTP. Remove (or scope to
-	     NSExceptionDomains) before any distribution build. -->
+	<!-- Allow the app to reach the Commonplace server on this Mac / LAN
+	     over plain HTTP. Scoped to local networking only, so ATS still
+	     applies everywhere else and this is safe in distribution builds. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
 	<key>CFBundleURLTypes</key>
