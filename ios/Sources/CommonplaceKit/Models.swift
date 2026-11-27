@@ -241,6 +241,7 @@ public struct Work: Codable, Sendable {
     public var ideas: [PopulatedRef]?
     public var note_count: Int?
     public var summary: String?
+    public var original_name: String?
     public var citation_information: String?
     public var createdAt: Date?
     public var updatedAt: Date?
@@ -261,6 +262,7 @@ public struct Idea: Codable, Sendable {
 public struct Pile: Codable, Sendable {
     public var _id: String?
     public var name: String?
+    public var text: String?
     public var note_count: Int?
     public var work_count: Int?
     public var start_year: Int?

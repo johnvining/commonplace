@@ -24,11 +24,12 @@ struct PileDetailView: View {
             if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             Section {
                 if editing {
+                    DSLabel(text: "Name")
                     TextField("Name", text: $newName)
-                        .textFieldStyle(.roundedBorder)
-                        .font(DS.serif(15))
+                        .dsInput()
+                        .font(DS.ui(14))
                     HStack(spacing: 6) {
-                        DSButton(title: "Save") { saveName() }
+                        DSButton(title: "Done") { saveName() }
                         DSButton(title: "Cancel") { editing = false }
                         Spacer()
                     }
@@ -36,10 +37,11 @@ struct PileDetailView: View {
                     // Web entity header: title + nick left, standard
                     // buttons top-right, nothing at the bottom.
                     EntityPageHeader(
-                        name: pile?.name ?? "Loading…",
+                        name: pile?.name ?? "",
                         byline: [pile?.start_year.map(String.init), pile?.end_year.map(String.init)]
                             .compactMap { $0 }.joined(separator: " • "),
-                        nick: nick
+                        nick: nick,
+                        splitPilePrefix: true
                     ) {
                         DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
                         DSButton(title: "Edit") {
@@ -63,7 +65,7 @@ struct PileDetailView: View {
                 // One quiet line, only when there is time (web parity).
                 if let t = timeTotals, t.count > 0 {
                     HStack(spacing: 6) {
-                        Text("Time on this pile: \(formatMinutes(t.reading)) reading + \(formatMinutes(t.writing)) writing = \(formatMinutes(t.total)) (\(t.count) \(t.count == 1 ? "entry" : "entries"))")
+                        Text("Time on this pile: \(formatMinutes(t.reading)) reading + \(formatMinutes(t.writing)) writing = \(formatMinutes(t.total)) total (\(t.count) \(t.count == 1 ? "entry" : "entries"))")
                             .font(DS.ui(12)).foregroundStyle(DS.muted)
                         NavigationLink { TimeView(preselectSubject: TimeSubjectKey.pileKey(pileId: pileId)) } label: {
                             Text("Open in Time log").font(DS.ui(12)).foregroundStyle(DS.accent)
@@ -71,26 +73,30 @@ struct PileDetailView: View {
                         .buttonStyle(.plain)
                     }
                 }
+                if !editing, let overview = pile?.text, !overview.isEmpty {
+                    DSLabel(text: "Overview")
+                    NoteText(text: overview, size: 14.5)
+                }
             }
             .listRowSeparator(.hidden)
             if !works.isEmpty {
-                Section("Works") {
+                Section {
                     ForEach(works, id: \.stableId) { w in
                         NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
                             EntityListRow(name: w.name ?? "(unnamed)", italicName: true)
                         }
                     }
                     .listRowSeparator(.hidden)
-                }
+                } header: { DSLabel(text: "Works") }
             }
-            Section("Notes") {
+            Section {
                 ForEach(notes, id: \.stableId) { n in
                     NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
                         NoteFlowRow(note: n)
                     }
                 }
-                if notes.count >= 500 { Button("Load more") { loadMoreNotes() } }
-            }
+                if notes.count >= 500 { DSButton(title: "Load more") { loadMoreNotes() } }
+            } header: { DSLabel(text: "Notes") }
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "")
             }

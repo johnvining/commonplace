@@ -162,6 +162,10 @@ struct IdeasListView: View {
     }
 }
 
+private func editLabel(_ text: String) -> some View {
+    DSLabel(text: text)
+}
+
 struct WorkDetailView: View {
     @EnvironmentObject var state: AppState
     let workId: String
@@ -180,6 +184,7 @@ struct WorkDetailView: View {
     @State private var newNoteId: String?
     @State private var showingNewNote = false
     @State private var nick: String?
+    @State private var summaryOpen = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -188,10 +193,17 @@ struct WorkDetailView: View {
             if let w = work {
                 Section {
                     if editing {
-                        TextField("Name", text: $editName)
-                        TextField("Year", text: $editYear)
-                        TextField("URL", text: $editURL)
-                        Button("Save") { saveEdit() }
+                        editLabel("Name")
+                        TextField("Name", text: $editName).dsInput().font(DS.ui(14))
+                        editLabel("Year")
+                        TextField("Year", text: $editYear).dsInput().font(DS.ui(13))
+                        editLabel("URL")
+                        TextField("URL", text: $editURL).dsInput().font(DS.mono(13))
+                        HStack(spacing: 6) {
+                            DSButton(title: "Done") { saveEdit() }
+                            DSButton(title: "Cancel") { editing = false }
+                            Spacer()
+                        }
                     } else {
                         EntityPageHeader(
                             name: w.name ?? "(unnamed)",
@@ -222,8 +234,20 @@ struct WorkDetailView: View {
                         if let trs = w.translators, !trs.isEmpty {
                             Text("Translated by \(trs.compactMap(\.name).joined(separator: ", "))").font(DS.ui(12)).foregroundStyle(DS.muted)
                         }
-                        if let cit = w.citation_information, !cit.isEmpty { Text(cit).font(DS.ui(12)) }
-                        if let sum = w.summary, !sum.isEmpty { NoteText(text: sum, size: 13.5) }
+                        if let original = w.original_name, !original.isEmpty {
+                            Text(original).font(DS.ui(12)).italic().foregroundStyle(DS.muted)
+                        }
+                        if (w.citation_information?.isEmpty == false) || (w.summary?.isEmpty == false) {
+                            DisclosureGroup(isExpanded: $summaryOpen) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    if let cit = w.citation_information, !cit.isEmpty { Text(cit).font(DS.ui(12)).foregroundStyle(DS.muted) }
+                                    if let sum = w.summary, !sum.isEmpty { NoteText(text: sum, size: 13.5) }
+                                }
+                                .padding(.top, 4)
+                            } label: {
+                                DSLabel(text: "Summary")
+                            }
+                        }
                     }
                     if let authors = w.authors, !authors.isEmpty {
                         Text(authors.compactMap(\.name).joined(separator: ", "))
@@ -251,32 +275,34 @@ struct WorkDetailView: View {
                         )
                     }
                 } else {
-                    // Read mode: linked piles/ideas, unlabeled, tappable.
+                    // Read mode: linked piles/ideas as web-format chips.
                     Section {
-                        ForEach(w.piles ?? [], id: \.id) { p in
-                            NavigationLink { PileDetailView(pileId: p.id) } label: {
-                                Text(p.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.pile)
+                        FlowLayout(spacing: 4) {
+                            ForEach(w.piles ?? [], id: \.id) { p in
+                                NavigationLink { PileDetailView(pileId: p.id) } label: {
+                                    NoteTag(name: p.name ?? "", color: DS.pile, tint: DS.pileSoft)
+                                }.buttonStyle(.plain)
                             }
-                        }
-                        ForEach(w.ideas ?? [], id: \.id) { i in
-                            NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
-                                Text(i.name ?? "").font(DS.serif(14.5)).foregroundStyle(DS.accent)
+                            ForEach(w.ideas ?? [], id: \.id) { i in
+                                NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
+                                    NoteTag(name: i.name ?? "", color: DS.accent, tint: DS.accentSoft)
+                                }.buttonStyle(.plain)
                             }
                         }
                     }
                     .listRowSeparator(.hidden)
                 }
-                Section("Notes") {
+                Section {
                     ForEach(notes, id: \.stableId) { n in
-                        NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
+                        NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteFlowRow(note: n) }
                     }
                     .listRowSeparator(.hidden)
-                    if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
+                    if notes.count >= 500 { DSButton(title: "Load more") { Task { await loadMoreNotes() } } }
                 }
                 if editing {
                     // Import lives with the other edit tools, not
                     // stranded under the notes list.
-                    Section("Import notes") {
+                    Section {
                         TextField("Paste notes to import…", text: $importText, axis: .vertical)
                         DSButton(title: "Import notes") { importForWork() }
                             .disabled(importText.isEmpty)
@@ -383,15 +409,23 @@ struct AuthorDetailView: View {
             if let a = author {
                 Section {
                     if editing {
-                        TextField("Name", text: $editName)
-                        TextField("Birth year", text: $editBirth)
-                        TextField("Death year", text: $editDeath)
-                        Button("Save") { saveEdit() }
+                        editLabel("Name")
+                        TextField("Name", text: $editName).dsInput().font(DS.ui(14))
+                        editLabel("Birth year")
+                        TextField("Birth year", text: $editBirth).dsInput().font(DS.ui(13))
+                        editLabel("Death year")
+                        TextField("Death year", text: $editDeath).dsInput().font(DS.ui(13))
+                        HStack(spacing: 6) {
+                            DSButton(title: "Done") { saveEdit() }
+                            DSButton(title: "Cancel") { editing = false }
+                            Spacer()
+                        }
                     } else {
                         EntityPageHeader(
                             name: a.name ?? "(unnamed)",
                             byline: (a.birth_year != nil || a.death_year != nil)
-                                ? "\(a.birth_year.map(String.init) ?? "?") – \(a.death_year.map(String.init) ?? "")"
+                                ? [a.birth_year.map { "b. \($0)" }, a.death_year.map { "d. \($0)" }]
+                                    .compactMap { $0 }.joined(separator: " • ")
                                 : nil,
                             nick: nick
                         ) {
@@ -408,6 +442,10 @@ struct AuthorDetailView: View {
                         .confirmationDialog("Delete this author?", isPresented: $confirmingDelete) {
                             Button("Delete", role: .destructive) { deleteAuthor() }
                         }
+                        if let names = a.usernames, !names.isEmpty {
+                            Text(names.map { "@\($0)" }.joined(separator: "  "))
+                                .font(DS.ui(12)).foregroundStyle(DS.muted)
+                        }
                     }
                 }
                 .listRowSeparator(.hidden)
@@ -423,7 +461,7 @@ struct AuthorDetailView: View {
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
                     }
                     .listRowSeparator(.hidden)
-                    if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
+                    if notes.count >= 500 { DSButton(title: "Load more") { Task { await loadMoreNotes() } } }
                 }
             } else if loaded {
                 Text("Author not found.").foregroundStyle(.secondary)
@@ -503,12 +541,18 @@ struct IdeaDetailView: View {
             if let i = idea {
                 Section {
                     if editing {
-                        TextField("Name", text: $editName)
-                        TextField("Start year", text: $editStart)
-                        TextField("End year", text: $editEnd)
-                        Toggle("This idea is a person", isOn: $editPerson)
-                        Button("Save") { saveEdit() }
-                        Button("Cancel") { editing = false }
+                        editLabel("Name")
+                        TextField("Name", text: $editName).dsInput().font(DS.ui(14))
+                        editLabel("Start year")
+                        TextField("Start year", text: $editStart).dsInput().font(DS.ui(13))
+                        editLabel("End year")
+                        TextField("End year", text: $editEnd).dsInput().font(DS.ui(13))
+                        Toggle("This idea is a person", isOn: $editPerson).font(DS.ui(13))
+                        HStack(spacing: 6) {
+                            DSButton(title: "Done") { saveEdit() }
+                            DSButton(title: "Cancel") { editing = false }
+                            Spacer()
+                        }
                     } else {
                         // Web entity-page-header: title left, quiet
                         // bordered toolbar buttons top-right, nick under.
@@ -533,6 +577,7 @@ struct IdeaDetailView: View {
                             Button("Delete", role: .destructive) { deleteIdea() }
                         }
                         if let t = i.text, !t.isEmpty {
+                            DSLabel(text: "Overview")
                             NoteText(text: t, size: 14.5)
                                 .foregroundStyle(DS.ink)
                         }
@@ -556,7 +601,7 @@ struct IdeaDetailView: View {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteFlowRow(note: n) }
                     }
-                    if notes.count >= 500 { Button("Load more") { Task { await loadMoreNotes() } } }
+                    if notes.count >= 500 { DSButton(title: "Load more") { Task { await loadMoreNotes() } } }
                 }
                 .navigationDestination(isPresented: $showingNewNote) {
                     NoteDetailView(noteId: newNoteId ?? "", editFirst: true)

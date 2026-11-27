@@ -67,13 +67,25 @@ struct EntityTitleBlock: View {
     var italicName: Bool = false
     var byline: String? = nil
     var nick: String? = nil
+    var splitPilePrefix: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text(name)
-                .font(DS.ui(20, weight: .semibold))
-                .italic(italicName)
-                .foregroundStyle(DS.ink)
+            if splitPilePrefix, let parts = Self.pileParts(name) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(parts.0.uppercased())
+                        .font(DS.ui(11, weight: .semibold)).tracking(0.6)
+                        .foregroundStyle(DS.faint)
+                    Text(parts.1)
+                        .font(DS.ui(20, weight: .semibold))
+                        .foregroundStyle(DS.ink)
+                }
+            } else {
+                Text(name)
+                    .font(DS.ui(20, weight: .semibold))
+                    .italic(italicName)
+                    .foregroundStyle(DS.ink)
+            }
             if let byline, !byline.isEmpty {
                 Text(byline).font(DS.ui(12)).foregroundStyle(DS.muted)
             }
@@ -81,6 +93,14 @@ struct EntityTitleBlock: View {
                 CopyNickButton(nick: nick)
             }
         }
+    }
+
+    static func pileParts(_ name: String) -> (String, String)? {
+        guard let colon = name.firstIndex(of: ":") else { return nil }
+        let prefix = name[..<colon].trimmingCharacters(in: .whitespaces)
+        let value = name[name.index(after: colon)...].trimmingCharacters(in: .whitespaces)
+        guard !prefix.isEmpty, prefix.count <= 20, !prefix.contains(" "), !value.isEmpty else { return nil }
+        return (prefix, value)
     }
 }
 
@@ -94,11 +114,12 @@ struct EntityPageHeader<Actions: View>: View {
     var italicName: Bool = false
     var byline: String? = nil
     var nick: String? = nil
+    var splitPilePrefix: Bool = false
     @ViewBuilder var actions: Actions
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            EntityTitleBlock(name: name, italicName: italicName, byline: byline, nick: nick)
+            EntityTitleBlock(name: name, italicName: italicName, byline: byline, nick: nick, splitPilePrefix: splitPilePrefix)
             Spacer()
             FlowLayout(spacing: 6) {
                 actions
