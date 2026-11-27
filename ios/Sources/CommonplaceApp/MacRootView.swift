@@ -1,5 +1,24 @@
 import SwiftUI
 import CommonplaceKit
+#if os(macOS)
+import AppKit
+
+/// Captures the hosting NSWindow so section shortcuts can bring the
+/// main window forward from anywhere in the app.
+private struct WindowCapture: NSViewRepresentable {
+    @Binding var window: NSWindow?
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async { window = view.window }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {
+        DispatchQueue.main.async { window = nsView.window }
+    }
+}
+#endif
 
 /// Split shell for wide screens (iPad landscape / Mac): sidebar
 /// sections + detail, instead of the iPhone tab bar. Each section
@@ -14,6 +33,9 @@ struct MacRootView: View {
     /// sidebar section clears it and returns to that section's list.
     @State private var routedType: String?
     @State private var routedId: String?
+    #if os(macOS)
+    @State private var mainWindow: NSWindow?
+    #endif
 
     private let sections: [(id: String, label: String, icon: String)] = [
         ("notes", "Notes", "note.text"),
@@ -96,8 +118,21 @@ struct MacRootView: View {
                 .frame(minWidth: 560, minHeight: 480)
         }
         .onReceive(NotificationCenter.default.publisher(for: .macSection)) { note in
-            if let s = note.object as? String { section = s; routedType = nil; routedId = nil }
+            if let s = note.object as? String {
+                section = s; routedType = nil; routedId = nil
+                // Bring this (main) window forward: menu shortcuts
+                // (Ctrl+O, Cmd+1…) also fire while a detached note
+                // window has focus, and switching an invisible window
+                // reads as "shortcut doesn't work".
+                #if os(macOS)
+                NSApp.activate(ignoringOtherApps: true)
+                mainWindow?.makeKeyAndOrderFront(nil)
+                #endif
+            }
         }
+        #if os(macOS)
+        .background(WindowCapture(window: $mainWindow))
+        #endif
         // No animations anywhere: instant state changes.
         .transaction { $0.animation = nil }
         // Ctrl+O navigates to Time (Cmd+K keeps Search).

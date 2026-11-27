@@ -124,11 +124,19 @@ struct NoteDetailView: View {
                         // and this note is not in a selection.)
                         HStack(alignment: .top, spacing: 12) {
                             VStack(alignment: .leading, spacing: 8) {
-                                if let first = imageDatas.first {
-                                    NoteImageView(data: first)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 190)
-                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                if !imageDatas.isEmpty {
+                                    // Web image row: every image once,
+                                    // small — never a giant cropped hero.
+                                    ScrollView(.horizontal, showsIndicators: false) {
+                                        HStack(spacing: 6) {
+                                            ForEach(Array(imageDatas.enumerated()), id: \.offset) { idx, data in
+                                                NoteImageView(data: data)
+                                                    .frame(width: 120, height: 80)
+                                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                    .onTapGesture { lightboxIndex = idx }
+                                            }
+                                        }
+                                    }
                                 }
                                 // The note page shows the real title
                                 // only — the title→text→take→URL cascade
