@@ -139,6 +139,32 @@ struct NoteDetailView: View {
                                     Text([note.year.map(String.init), note.page].compactMap { $0 }.joined(separator: " · "))
                                         .font(DS.ui(11)).foregroundStyle(DS.muted)
                                 }
+                                // Piles/ideas (and people/work) tags at
+                                // the top of the page, right-aligned, in
+                                // the web's square kind-tag format.
+                                if !(note.piles ?? []).isEmpty || !(note.ideas ?? []).isEmpty
+                                    || !(note.people ?? []).isEmpty {
+                                    HStack(alignment: .top, spacing: 0) {
+                                        Spacer(minLength: 24)
+                                        FlowLayout(spacing: 4) {
+                                            ForEach(note.piles ?? [], id: \.id) { p in
+                                                NavigationLink { PileDetailView(pileId: p.id) } label: {
+                                                    linkTag(p.name ?? "", color: DS.pile, tint: DS.pileSoft)
+                                                }.buttonStyle(.plain)
+                                            }
+                                            ForEach(note.ideas ?? [], id: \.id) { i in
+                                                NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
+                                                    linkTag(i.name ?? "", color: DS.accent, tint: DS.accentSoft)
+                                                }.buttonStyle(.plain)
+                                            }
+                                            ForEach(note.people ?? [], id: \.id) { a in
+                                                NavigationLink { AuthorDetailView(authorId: a.id) } label: {
+                                                    linkTag(a.name ?? "", color: DS.muted, tint: DS.hover)
+                                                }.buttonStyle(.plain)
+                                            }
+                                        }
+                                    }
+                                }
                                 if let nick = note.nick { CopyNickButton(nick: nick) }
                             }
                             .padding(.vertical, 6)
@@ -199,44 +225,9 @@ struct NoteDetailView: View {
                             onCreateNew: { name in Task { _ = try? await state.client.createIdeaForNote(noteId: noteId, name: name); reloadNote() } }
                         )
                     }
-                } else {
-                    // Read mode: everything linked shows as one compact
-                    // tag flow under the card — online shows tags inline,
-                    // not one full-width row per link.
-                    if !note.displayAuthors.isEmpty || !(note.people ?? []).isEmpty
-                        || note.work != nil || !(note.piles ?? []).isEmpty || !(note.ideas ?? []).isEmpty {
-                        Section {
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), alignment: .leading)], alignment: .leading, spacing: 6) {
-                                ForEach(note.displayAuthors, id: \.id) { a in
-                                    NavigationLink { AuthorDetailView(authorId: a.id) } label: {
-                                        linkTag(a.name ?? "", color: DS.ink, tint: DS.hover)
-                                    }.buttonStyle(.plain)
-                                }
-                                ForEach(note.people ?? [], id: \.id) { a in
-                                    NavigationLink { AuthorDetailView(authorId: a.id) } label: {
-                                        linkTag(a.name ?? "", color: DS.ink, tint: DS.hover)
-                                    }.buttonStyle(.plain)
-                                }
-                                if let w = note.work {
-                                    NavigationLink { WorkDetailView(workId: w.id) } label: {
-                                        linkTag(w.name ?? w.id, color: DS.ink, tint: DS.hover, italic: true)
-                                    }.buttonStyle(.plain)
-                                }
-                                ForEach(note.piles ?? [], id: \.id) { p in
-                                    NavigationLink { PileDetailView(pileId: p.id) } label: {
-                                        linkTag(p.name ?? "", color: DS.pile, tint: DS.pileSoft)
-                                    }.buttonStyle(.plain)
-                                }
-                                ForEach(note.ideas ?? [], id: \.id) { i in
-                                    NavigationLink { IdeaDetailView(ideaId: i.id) } label: {
-                                        linkTag(i.name ?? "", color: DS.accent, tint: DS.accentSoft)
-                                    }.buttonStyle(.plain)
-                                }
-                            }
-                        }
-                        .listRowSeparator(.hidden)
-                    }
                 }
+                // (Read-mode tags live in the reading card now, right-
+                // aligned under the text — nothing more to render here.)
                 Section {
                     HStack(spacing: 6) {
                         DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
@@ -377,16 +368,18 @@ struct NoteDetailView: View {
 
     /// Edit-form field: small-caps label above a bordered input,
     /// like the web edit form (TITLE / TEXT / AUTHORS …).
-    /// One tag in the read-mode link flow (type-tinted, opens its page).
+    /// One tag in the read-mode link flow: the web's kind tags —
+    /// small, square, kind-coloured text on the kind tint.
     private func linkTag(_ name: String, color: Color, tint: Color, italic: Bool = false) -> some View {
         Text(name)
-            .font(DS.serif(13))
+            .font(DS.ui(11))
             .italic(italic)
             .foregroundStyle(color)
             .lineLimit(1)
-            .padding(.horizontal, 7).padding(.vertical, 3)
+            .padding(.horizontal, 6)
+            .frame(height: 19)
             .background(tint)
-            .clipShape(RoundedRectangle(cornerRadius: 2))
+            .clipShape(RoundedRectangle(cornerRadius: 0))
     }
 
     private func editField<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
