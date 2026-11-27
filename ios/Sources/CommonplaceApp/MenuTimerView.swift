@@ -129,6 +129,9 @@ struct MenuTimerView: View {
 
     private func loadRecents() async {
         subjects = (try? await state.client.recentSubjects(limit: 20)) ?? []
+        state.publishWidgetSnapshot(recents: subjects.map {
+            WidgetRecent(key: $0.key, label: subjectLabel($0), kind: $0.kind ?? "writing")
+        })
     }
 
     private var starredRows: [RecentSubject] {

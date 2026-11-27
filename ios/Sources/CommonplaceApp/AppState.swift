@@ -1,6 +1,12 @@
 import Combine
 import Foundation
 import CommonplaceKit
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
+#if canImport(ActivityKit)
+import ActivityKit
+#endif
 
 /// Shared session state: server URL, auth flag, pins cache, timer persistence.
 /// Timer persistence mirrors the web client's `time_timer_v1` localStorage
@@ -154,6 +160,8 @@ final class AppState: ObservableObject {
         timerStartedAt = nil
         UserDefaults.standard.removeObject(forKey: "time_timer_v1")
         Task { try? await client.clearRunningTimer() }
+        publishWidgetSnapshot()
+        syncLiveActivity()
     }
 
     func startTimer(key: String, kind: String, label: String? = nil) {
@@ -167,6 +175,8 @@ final class AppState: ObservableObject {
             try? await client.setRunningTimer(
                 RunningTimerState(key: key, kind: kind, label: label, startedAt: iso))
         }
+        publishWidgetSnapshot()
+        syncLiveActivity()
     }
 
     private var timerPollTask: Task<Void, Never>?
@@ -186,6 +196,61 @@ final class AppState: ObservableObject {
         }
     }
 
+    // MARK: - Widgets & Live Activity
+
+    /// Write the widget snapshot (server, session, recents, running
+    /// timer) into the App Group and refresh widget timelines.
+    func publishWidgetSnapshot(recents: [WidgetRecent]? = nil) {
+        #if os(iOS)
+        var snap = TimerWidgetSnapshot.load()
+            ?? TimerWidgetSnapshot(serverURL: serverURLString)
+        snap.serverURL = serverURLString
+        if let url = URL(string: serverURLString),
+           let jwt = HTTPCookieStorage.shared.cookies(for: url)?.first(where: { $0.name == "jwt" })?.value {
+            snap.jwt = jwt
+        }
+        if let recents { snap.recents = recents }
+        snap.runningKey = timerSubjectKey
+        snap.runningLabel = timerSubjectLabel
+        snap.runningKind = timerStartedAt == nil ? nil : timerKind
+        snap.runningStartedAt = timerStartedAt.map { ISO8601DateFormatter().string(from: $0) }
+        snap.save()
+        WidgetCenter.shared.reloadAllTimelines()
+        #endif
+    }
+
+    #if os(iOS)
+    private var liveActivityId: String?
+
+    /// Keep the Live Activity in step with the local timer state.
+    func syncLiveActivity() {
+        guard #available(iOS 16.2, *) else { return }
+        Task {
+            let activities = Activity<TimerActivityAttributes>.activities
+            if let at = timerStartedAt {
+                let state = TimerActivityAttributes.ContentState(
+                    kind: timerKind, label: timerSubjectLabel ?? timerSubjectKey ?? "")
+                if let existing = activities.first {
+                    liveActivityId = existing.id
+                    await existing.update(ActivityContent(state: state, staleDate: nil))
+                } else if liveActivityId == nil {
+                    let activity = try? Activity.request(
+                        attributes: TimerActivityAttributes(startedAt: at),
+                        content: ActivityContent(state: state, staleDate: nil))
+                    liveActivityId = activity?.id
+                }
+            } else {
+                for activity in activities {
+                    await activity.end(nil, dismissalPolicy: .immediate)
+                }
+                liveActivityId = nil
+            }
+        }
+    }
+    #else
+    func syncLiveActivity() {}
+    #endif
+
     /// Reconcile with the server's running timer: the server copy wins
     /// when it exists (another client started it); a local-only timer
     /// is pushed up so the web sees it too.
@@ -202,6 +267,8 @@ final class AppState: ObservableObject {
                 timerKind = remote.kind
                 timerStartedAt = at
                 persistTimer()
+                publishWidgetSnapshot()
+                syncLiveActivity()
             }
         } else if let key = timerSubjectKey, let at = timerStartedAt {
             try? await client.setRunningTimer(
@@ -302,6 +369,7 @@ final class AppState: ObservableObject {
         do {
             try await client.validateSession()
             isSignedIn = true
+            publishWidgetSnapshot()
             authError = nil
             unreachable = false
         } catch let error as APIError {

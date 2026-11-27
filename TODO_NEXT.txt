@@ -10,9 +10,9 @@
        grid, time page) and fix what's slow.
 4. [x] Sidebar Starred items get a type icon (note / pile / work /
        author / idea / time) describing what each star is.
-5. [ ] iOS Live Activity (lock screen / Dynamic Island) showing the
+5. [~] iOS Live Activity (lock screen / Dynamic Island) showing the
        running timer, updating and ending with the timer.
-6. [ ] iOS home-screen widget: start a recent timer (or a new one)
+6. [~] iOS home-screen widget: start a recent timer (or a new one)
        without opening the app.
 7. [x] Remove "Open web version" from the Mac sidebar — keep Web only
        on entity/note pages, opening that specific page.

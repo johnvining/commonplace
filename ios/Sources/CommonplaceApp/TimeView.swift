@@ -206,6 +206,9 @@ struct TimeView: View {
         Task {
             do {
                 subjects = try await state.client.recentSubjects(limit: 20)
+                state.publishWidgetSnapshot(recents: subjects.map {
+                    WidgetRecent(key: $0.key, label: subjectLabel($0), kind: $0.kind ?? "writing")
+                })
                 if let first = subjects.first, selection.isEmpty { selection = first.key }
             } catch { self.error = "Recent subjects failed: \(describe(error))" }
         }
