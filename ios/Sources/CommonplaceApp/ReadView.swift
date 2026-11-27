@@ -62,14 +62,11 @@ struct ReadView: View {
     private func load() {
         Task {
             do {
-            async let w = state.client.work(id: workId)
-            async let rows = state.client.workNotes(id: workId, skip: 0, limit: 500)
-            let (loadedWork, loadedNotes) = try await (w, rows)
-            work = loadedWork
-            nick = await state.nick(type: "work", id: workId)
-            notes = Array(loadedNotes.reversed())
-            loaded = true
-            catch { self.error = "Load failed: \(describe(error))" }
+                work = try await state.client.work(id: workId)
+                nick = await state.nick(type: "work", id: workId)
+                notes = Array(try await state.client.workNotes(id: workId, skip: 0, limit: 500).reversed())
+                loaded = true
+            } catch { self.error = "Load failed: \(describe(error))" }
         }
     }
 
