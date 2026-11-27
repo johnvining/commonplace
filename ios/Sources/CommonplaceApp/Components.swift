@@ -635,19 +635,22 @@ struct PillEditor: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             if !selected.isEmpty {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), alignment: .leading)], alignment: .leading, spacing: 6) {
+                FlowLayout(spacing: 4) {
                     ForEach(selected) { option in
                         HStack(spacing: 4) {
-                            Text(option.name).font(DS.ui(12)).lineLimit(1)
+                            Text(option.name)
+                                .font(DS.ui(12))
+                                .foregroundStyle(tint == DS.pileSoft ? DS.pile : DS.accent)
+                                .lineLimit(1)
                             Button("×") { onRemove(option) }
                                 .font(DS.ui(12, weight: .bold))
                                 .foregroundStyle(DS.muted)
                                 .buttonStyle(.borderless)
                         }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
                         .background(tint)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .clipShape(RoundedRectangle(cornerRadius: 2))
                     }
                 }
             }
