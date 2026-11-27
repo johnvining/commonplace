@@ -427,6 +427,14 @@ public final class APIClient: Sendable {
         try await get("auth/\(id)/works")
     }
 
+    public func authorCredits(id: String) async throws -> AuthorCredits {
+        try await get("auth/\(id)/credits")
+    }
+
+    public func notesAboutAuthor(id: String) async throws -> [Note] {
+        try await get("auth/\(id)/notes-about")
+    }
+
     // MARK: - Works (`/api/work`)
 
     public func createWork(name: String) async throws -> Work {

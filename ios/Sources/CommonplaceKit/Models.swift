@@ -637,3 +637,9 @@ public struct MaintenanceJob: Codable, Sendable {
     public var dryRun: Bool?
     public var output: [String]?
 }
+
+/// Works a person edited or translated (GET auth/:id/credits).
+public struct AuthorCredits: Codable, Sendable {
+    public var edited: [Work]?
+    public var translated: [Work]?
+}

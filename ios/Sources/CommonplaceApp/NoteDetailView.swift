@@ -90,6 +90,33 @@ struct NoteDetailView: View {
                         }
                         if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
                     } else {
+                        // Web action bar: icon buttons at the top-right
+                        // of the reading card (labels via help).
+                        HStack(spacing: 6) {
+                            Spacer()
+                            DSIconButton(systemImage: starred ? "star.fill" : "star", selected: starred, label: starred ? "Starred" : "Star") { toggleStar() }
+                            DSIconButton(systemImage: "pencil", label: "Edit") {
+                                title = note.title ?? ""; text = note.text ?? ""; take = note.take ?? ""
+                                urlField = note.url ?? ""; yearField = note.year.map(String.init) ?? ""; pageField = note.page ?? ""
+                                editing = true
+                            }
+                            DSIconButton(systemImage: "trash", label: "Delete") { confirming = true }
+                            if let web = state.webURL(path: "note/\(noteId)") {
+                                Link(destination: web) {
+                                    Image(systemName: "arrow.up.forward.square")
+                                        .font(DS.ui(12, weight: .medium))
+                                        .frame(width: 26, height: 26)
+                                }
+                                .buttonStyle(.plain)
+                                .foregroundStyle(DS.ink)
+                                .overlay(RoundedRectangle(cornerRadius: 5).stroke(DS.hairline, lineWidth: 1))
+                                .clipShape(RoundedRectangle(cornerRadius: 5))
+                                .help("Open in web")
+                            }
+                        }
+                        .confirmationDialog("Delete note?", isPresented: $confirming) {
+                            Button("Delete", role: .destructive) { remove() }
+                        }
                         NoteStatusLine(note: note)
                         // Reading card like the web note: image on top,
                         // serif title, take in italics. (No accent edge:
@@ -232,6 +259,7 @@ struct NoteDetailView: View {
                 }
                 // (Read-mode tags live in the reading card now, right-
                 // aligned under the text — nothing more to render here.)
+                if editing {
                 Section {
                     HStack(spacing: 6) {
                         DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
@@ -249,6 +277,7 @@ struct NoteDetailView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
+                }
                 // Images: read mode is just the photos (+ lightbox);
                 // add/delete/OCR/suggest are Edit-mode tools. The whole
                 // section disappears when there's nothing to show.

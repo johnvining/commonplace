@@ -132,3 +132,27 @@ extension View {
             .clipShape(RoundedRectangle(cornerRadius: 3))
     }
 }
+
+/// Icon-only action button (web .action-button): 26pt, hairline
+/// border, label carried by help/accessibility instead of text.
+struct DSIconButton: View {
+    let systemImage: String
+    var selected = false
+    let label: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(DS.ui(12, weight: .medium))
+                .frame(width: 26, height: 26)
+        }
+        .buttonStyle(.plain)
+        .background(selected ? DS.hover : Color.clear)
+        .foregroundStyle(DS.ink)
+        .overlay(RoundedRectangle(cornerRadius: 5).stroke(DS.hairline, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .help(label)
+        .accessibilityLabel(label)
+    }
+}

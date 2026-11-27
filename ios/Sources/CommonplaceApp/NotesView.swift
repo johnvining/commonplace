@@ -288,7 +288,7 @@ struct NoteCard: View {
                 Text(note.displayTitle)
                     .font(DS.serif(15, weight: .semibold))
                     .foregroundStyle(DS.ink)
-                    .lineLimit(2)
+                    .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if let imgs = note.images, !imgs.isEmpty {
                     HStack(spacing: 3) {
@@ -297,10 +297,6 @@ struct NoteCard: View {
                     }
                     .font(DS.ui(11)).foregroundStyle(DS.muted)
                 }
-            }
-            if !note.displayAuthors.isEmpty {
-                Text(note.displayAuthors.compactMap(\.name).joined(separator: ", "))
-                    .font(DS.ui(11)).foregroundStyle(DS.muted).lineLimit(1)
             }
             if let imgs = note.images, !imgs.isEmpty, let noteId = note._id {
                 HStack(spacing: 4) {
@@ -319,19 +315,24 @@ struct NoteCard: View {
             if (note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false) {
                 NoteText(text: note.displayText, size: 13)
                     .foregroundStyle(DS.muted)
-                    .lineLimit(large ? 6 : 3)
+                    .lineLimit(large ? ((note.images?.isEmpty == false) ? 2 : 6) : 3)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             Spacer(minLength: 0)
             if (note.ideas?.isEmpty == false) || (note.piles?.isEmpty == false) {
                 NoteTagRow(note: note)
             }
+            if !note.displayAuthors.isEmpty {
+                Text(note.displayAuthors.compactMap(\.name).joined(separator: ", "))
+                    .font(DS.ui(11)).foregroundStyle(DS.muted).lineLimit(1)
+            }
         }
-        .padding(10)
-        .frame(maxWidth: .infinity, minHeight: large ? 150 : 110, alignment: .topLeading)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .frame(height: large ? 272 : 160)
         .background(DS.surface)
-        .overlay(RoundedRectangle(cornerRadius: 6).stroke(DS.hairline, lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(RoundedRectangle(cornerRadius: 0).stroke(DS.hairline, lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 0))
         .contentShape(Rectangle())
     }
 }

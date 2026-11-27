@@ -393,6 +393,9 @@ struct AuthorDetailView: View {
     @State private var author: Author?
     @State private var works: [Work] = []
     @State private var notes: [Note] = []
+    @State private var editedWorks: [Work] = []
+    @State private var translatedWorks: [Work] = []
+    @State private var notesAbout: [Note] = []
     @State private var loaded = false
     @State private var error: String?
     @State private var editing = false
@@ -507,6 +510,11 @@ struct AuthorDetailView: View {
             let (aa, ww, nn) = try await (a, w, n)
             author = aa; works = ww; notes = nn; loaded = true
             nick = await state.nick(type: "auth", id: authorId)
+            if let credits = try? await state.client.authorCredits(id: authorId) {
+                editedWorks = credits.edited ?? []
+                translatedWorks = credits.translated ?? []
+            }
+            notesAbout = (try? await state.client.notesAboutAuthor(id: authorId)) ?? []
         } catch { self.error = "Load failed: \(describe(error))"; loaded = true }
     }
 
