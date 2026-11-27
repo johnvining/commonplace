@@ -4,7 +4,7 @@
 # MULTI_AUTHORS_PLAN.md is done and those files are deleted.
 # Done items get checked off here; when the list empties, start a new one.
 
-1. [ ] Fix the flaky server tests. About 1 full run in 5 fails a random
+1. [x] Fix the flaky server tests. About 1 full run in 5 fails a random
        test — usually the first test in a file timing out after 30s, or
        a 401 right after registering ("User already exists", or the
        login cookie not accepted). Never reproduces with one file alone.
