@@ -10,27 +10,48 @@ struct ReadView: View {
     let title: String
     @State private var notes: [Note] = []
     @State private var error: String?
-    @State private var photoItems: [String: [PhotosPickerItem]] = [:]
+    @State private var photoItems: [PhotosPickerItem] = []
+    @State private var work: Work?
+    @State private var nick: String?
+    @State private var loaded = false
 
     var body: some View {
         List {
             if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
             Section {
-                Text(title).font(.headline)
-                Text("\(notes.count) notes").font(DS.ui(11)).foregroundStyle(DS.muted)
-            }
-            ForEach(notes, id: \.stableId) { n in
-                VStack(alignment: .leading, spacing: 4) {
-                    NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n, full: true) }
-                    if let id = n._id {
-                        PhotosPicker(selection: binding(for: id), matching: .images) {
-                            Text("Quick Photo Note").font(DS.ui(12))
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(work?.name ?? title)
+                        .font(DS.serif(20, weight: .semibold)).italic().foregroundStyle(DS.ink)
+                    HStack(spacing: 6) {
+                        if let authors = work?.authors, !authors.isEmpty {
+                            Text(authors.compactMap(\.name).joined(separator: ", "))
                         }
-                        .onChange(of: photoItems[id] ?? []) { uploadQuickPhoto(noteId: id) }
+                        if let year = work?.year { Text(String(year)) }
+                        if let url = work?.url, !url.isEmpty { Text(url) }
+                    }
+                    .font(DS.ui(12)).foregroundStyle(DS.muted)
+                    if let nick { CopyNickButton(nick: nick) }
+                    Text("\(notes.count) notes").font(DS.ui(11)).foregroundStyle(DS.muted)
+                    HStack(spacing: 6) {
+                        PhotosPicker(selection: $photoItems, matching: .images) {
+                            DSButtonLabel(title: "Add photo notes")
+                        }
+                        .buttonStyle(.plain)
+                        .onChange(of: photoItems) { uploadPhotoNotes() }
+                        Spacer()
                     }
                 }
             }
-            if notes.count >= 500 { Button("Load more") { loadMore() } }
+            .listRowSeparator(.hidden)
+            if !loaded {
+                LoadingBlock()
+            } else if notes.isEmpty && error == nil {
+                Text("No notes yet.").font(DS.ui(13)).italic().foregroundStyle(DS.muted)
+            }
+            ForEach(notes, id: \.stableId) { n in
+                NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteFlowRow(note: n) }
+            }
+            if notes.count >= 500 { DSButton(title: "Load more") { loadMore() } }
         }
         .listStyle(.plain)
         .navigationTitle("Read")
@@ -38,13 +59,16 @@ struct ReadView: View {
         .task { load() }
     }
 
-    private func binding(for id: String) -> Binding<[PhotosPickerItem]> {
-        Binding(get: { photoItems[id] ?? [] }, set: { photoItems[id] = $0 })
-    }
-
     private func load() {
         Task {
-            do { notes = Array(try await state.client.workNotes(id: workId, skip: 0, limit: 500).reversed()) }
+            do {
+            async let w = state.client.work(id: workId)
+            async let rows = state.client.workNotes(id: workId, skip: 0, limit: 500)
+            let (loadedWork, loadedNotes) = try await (w, rows)
+            work = loadedWork
+            nick = await state.nick(type: "work", id: workId)
+            notes = Array(loadedNotes.reversed())
+            loaded = true
             catch { self.error = "Load failed: \(describe(error))" }
         }
     }
@@ -58,18 +82,22 @@ struct ReadView: View {
         }
     }
 
-    private func uploadQuickPhoto(noteId: String) {
-        guard let items = photoItems[noteId], !items.isEmpty else { return }
+    private func uploadPhotoNotes() {
+        guard !photoItems.isEmpty else { return }
+        let items = photoItems
+        photoItems = []
         Task {
             do {
                 for item in items {
                     if let data = try await item.loadTransferable(type: Data.self), !data.isEmpty {
-                        try await state.client.uploadNoteImage(noteId: noteId, data: data)
+                        let created = try await state.client.createNote(work: workId)
+                        if let id = created._id {
+                            try await state.client.uploadNoteImage(noteId: id, data: data)
+                        }
                     }
                 }
                 load()
-            } catch { self.error = "Photo note failed: \(describe(error))" }
-            photoItems[noteId] = []
+            } catch { self.error = "Photo notes failed: \(describe(error))" }
         }
     }
 }

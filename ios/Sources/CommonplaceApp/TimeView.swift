@@ -24,6 +24,7 @@ struct TimeView: View {
         NavigationStack {
             List {
                 Section {
+                    DSLabel(text: "Start Entry")
                     // One left-to-right row like the web timer:
                     // subject, kind, elapsed/Start — nothing right-aligned.
                     HStack(spacing: 10) {
@@ -59,13 +60,13 @@ struct TimeView: View {
                         .labelsHidden()
                         .pickerStyle(.menu)
                         .fixedSize()
-                        Picker("Kind", selection: $kind) {
-                            Text("Reading").tag("reading")
-                            Text("Writing").tag("writing")
+                        HStack(spacing: 6) {
+                            ForEach(["reading", "writing"], id: \.self) { value in
+                                DSButton(title: value.capitalized, selected: kind == value) { kind = value }
+                                    .disabled(state.timerIsRunning)
+                                    .opacity(state.timerIsRunning ? 0.5 : 1)
+                            }
                         }
-                        .labelsHidden()
-                        .pickerStyle(.segmented)
-                        .frame(width: 170)
                         if state.timerIsRunning, let at = state.timerStartedAt {
                             TimelineView(.periodic(from: Date(), by: 1.0)) { ctx in
                                 Text(formatElapsed(ctx.date.timeIntervalSince(at) * 1000))
@@ -86,7 +87,8 @@ struct TimeView: View {
                     }
                     HStack(spacing: 8) {
                         TextField("Name something new…", text: $newName)
-                            .textFieldStyle(.roundedBorder)
+                            .dsInput()
+                            .font(DS.ui(13))
                             .autocorrectionDisabled()
                         DSButton(title: "Use name") { useNewName() }
                             .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty || state.timerIsRunning)
@@ -103,6 +105,7 @@ struct TimeView: View {
                     }
                     ForEach(entries, id: \.stableId) { e in
                         TimeEntryRow(entry: e, onStar: { star(e) },
+                                    onStartAgain: { startAgain(e) },
                                     onSave: { reload() },
                                     onDelete: { delete(e) },
                                     onError: { self.error = $0 })
@@ -124,18 +127,17 @@ struct TimeView: View {
 
                 if summary != nil {
                     Section {
-                        Picker("Scope", selection: $scope) {
-                            Text("Today").tag("today")
-                            Text("This week").tag("week")
-                            Text("Last 7 days").tag("last7")
-                            Text("This month").tag("month")
+                        HStack(spacing: 6) {
+                            ForEach([("today", "Today"), ("week", "This week"), ("last7", "Last 7 days"), ("month", "This month")], id: \.0) { item in
+                                DSButton(title: item.1, selected: scope == item.0) { scope = item.0 }
+                            }
+                            Spacer()
+                            if let scopeWhen { Text(scopeWhen).font(DS.ui(11)).foregroundStyle(DS.muted) }
                         }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
 
                         HStack(spacing: 10) {
                             Text(formatMinutes(analysis.total) + " total")
-                                .font(DS.serif(18, weight: .semibold))
+                                .font(DS.serif(19))
                                 .foregroundStyle(DS.ink)
                             KindMinutes(kind: "reading", minutes: analysis.reading)
                             KindMinutes(kind: "writing", minutes: analysis.writing)
@@ -144,15 +146,19 @@ struct TimeView: View {
                             Spacer()
                         }
 
-                        if scope != "today", let days = analysis.byDay {
-                            DSLabel(text: "By day")
-                            ForEach(days, id: \.date) { d in
-                                tableRow(name: d.date ?? "", reading: d.readingMinutes ?? 0,
-                                         writing: d.writingMinutes ?? 0, total: d.totalMinutes ?? 0)
+                        GeometryReader { proxy in
+                            let total = max(analysis.total, 1)
+                            HStack(spacing: 0) {
+                                Rectangle().fill(DS.accent).frame(width: proxy.size.width * CGFloat(analysis.reading) / CGFloat(total))
+                                Rectangle().fill(DS.faint).frame(width: proxy.size.width * CGFloat(analysis.writing) / CGFloat(total))
                             }
                         }
+                        .frame(maxWidth: 420)
+                        .frame(height: 4)
+
                         if let rows = analysis.byPile, !rows.isEmpty {
                             DSLabel(text: "By pile")
+                            tableHeader
                             ForEach(rows, id: \.pile) { r in
                                 tableRow(name: r.name ?? r.pile ?? "", reading: r.readingMinutes ?? 0,
                                          writing: r.writingMinutes ?? 0, total: r.minutes ?? 0)
@@ -160,6 +166,7 @@ struct TimeView: View {
                         }
                         if let rows = analysis.byWork, !rows.isEmpty {
                             DSLabel(text: "By work")
+                            tableHeader
                             ForEach(rows, id: \.work) { r in
                                 tableRow(name: r.name ?? r.work ?? "", reading: r.readingMinutes ?? 0,
                                          writing: r.writingMinutes ?? 0, total: r.minutes ?? 0, italicName: true)
@@ -167,9 +174,18 @@ struct TimeView: View {
                         }
                         if let rows = analysis.byTitle, !rows.isEmpty {
                             DSLabel(text: "By title")
+                            tableHeader
                             ForEach(rows, id: \.title) { r in
                                 tableRow(name: r.title ?? "", reading: r.readingMinutes ?? 0,
                                          writing: r.writingMinutes ?? 0, total: r.minutes ?? 0)
+                            }
+                        }
+                        if scope != "today", let days = analysis.byDay {
+                            DSLabel(text: "By day")
+                            tableHeader
+                            ForEach(days, id: \.date) { d in
+                                tableRow(name: d.date ?? "", reading: d.readingMinutes ?? 0,
+                                         writing: d.writingMinutes ?? 0, total: d.totalMinutes ?? 0)
                             }
                         }
                     } header: {
@@ -180,7 +196,7 @@ struct TimeView: View {
                     }
                 }
                 Section {
-                    Button(showManual ? "Hide manual log" : "Log manually") {
+                    DSButton(title: showManual ? "Hide manual log" : "Log manually") {
                         showManual.toggle()
                     }
                     if showManual {
@@ -341,6 +357,12 @@ struct TimeView: View {
                        href: "/time?subject=\(key)")
     }
 
+    private func startAgain(_ e: TimeEntry) {
+        guard !state.timerIsRunning else { return }
+        let key = subjectKey(of: e)
+        state.startTimer(key: key, kind: e.kind ?? "writing", label: subjectTitle(of: e))
+    }
+
     private func delete(_ e: TimeEntry) {
         guard let id = e._id else { return }
         Task {
@@ -391,6 +413,33 @@ struct TimeView: View {
         }
     }
 
+    private var scopeWhen: String? {
+        switch scope {
+        case "today": return summary?.daily?.date
+        case "week":
+            guard let w = summary?.weekly else { return nil }
+            return "\(w.weekStart ?? "") – \(w.weekEnd ?? "")"
+        case "last7":
+            guard let x = summary?.last7 else { return nil }
+            return "\(x.start ?? "") – \(x.end ?? "")"
+        default:
+            guard let x = summary?.monthly else { return nil }
+            return "\(x.start ?? "") – \(x.end ?? "")"
+        }
+    }
+
+    private var tableHeader: some View {
+        HStack(spacing: 8) {
+            Spacer()
+            ForEach(["READING", "WRITING", "TOTAL"], id: \.self) { label in
+                Text(label).frame(width: 56, alignment: .trailing)
+            }
+        }
+        .font(DS.ui(10, weight: .semibold))
+        .tracking(0.6)
+        .foregroundStyle(DS.faint)
+    }
+
     /// One quiet table row: serif name, then R/W/total as plain
     /// tabular text — never buttons.
     private func tableRow(name: String, reading: Int, writing: Int, total: Int, italicName: Bool = false) -> some View {
@@ -402,11 +451,12 @@ struct TimeView: View {
                 .lineLimit(1)
             Spacer()
             Text(formatMinutes(reading))
-                .frame(width: 52, alignment: .trailing)
+                .frame(width: 56, alignment: .trailing)
             Text(formatMinutes(writing))
-                .frame(width: 52, alignment: .trailing)
+                .frame(width: 56, alignment: .trailing)
             Text(formatMinutes(total))
-                .frame(width: 52, alignment: .trailing)
+                .frame(width: 56, alignment: .trailing)
+                .font(DS.ui(12, weight: .semibold))
                 .foregroundStyle(DS.ink)
         }
         .font(DS.ui(12))
@@ -422,14 +472,13 @@ private struct KindMinutes: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            Text(kind.uppercased())
-                .font(DS.ui(10, weight: .semibold))
-                .tracking(0.8)
-                .foregroundStyle(DS.muted)
             Text(formatMinutes(minutes))
                 .font(DS.ui(12))
                 .monospacedDigit()
                 .foregroundStyle(DS.ink)
+            Text(kind.capitalized)
+                .font(DS.ui(12))
+                .foregroundStyle(DS.muted)
         }
     }
 }
@@ -449,6 +498,7 @@ struct TimeEntryRow: View {
     @EnvironmentObject var state: AppState
     let entry: TimeEntry
     let onStar: () -> Void
+    var onStartAgain: () -> Void = {}
     let onSave: () -> Void
     let onDelete: () -> Void
     let onError: (String) -> Void
@@ -461,19 +511,28 @@ struct TimeEntryRow: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                KindSubjectLine(
-                    kind: entry.kind ?? "",
-                    subject: entry.pile?.name ?? entry.work?.name ?? entry.title ?? ""
-                )
-                Text(formatMinutes(entry.minutes ?? 0))
+            HStack(spacing: 8) {
+                Text((entry.kind ?? "").capitalized)
                     .font(DS.ui(12))
+                    .frame(width: 64, height: 19)
+                    .overlay(RoundedRectangle(cornerRadius: 2).stroke(DS.hairline, lineWidth: 1))
+                    .clipShape(RoundedRectangle(cornerRadius: 2))
+                Text(entry.pile?.name ?? entry.work?.name ?? entry.title ?? "")
+                    .font(DS.serif(13))
+                    .foregroundStyle(DS.ink)
+                    .lineLimit(1)
+                Text(formatMinutes(entry.minutes ?? 0))
+                    .font(DS.ui(13))
                     .monospacedDigit()
+                    .frame(width: 64, alignment: .trailing)
                     .foregroundStyle(DS.muted)
                 Spacer()
                 Button { onStar() } label: { Image(systemName: "star") }
                     .buttonStyle(.borderless)
                     .foregroundStyle(DS.muted)
+                DSButton(title: "Start again") { onStartAgain() }
+                    .disabled(state.timerIsRunning)
+                    .opacity(state.timerIsRunning ? 0.5 : 1)
                 DSButton(title: "Edit") {
                     title = entry.title ?? ""
                     minutes = String(entry.minutes ?? 0)
@@ -495,11 +554,12 @@ struct TimeEntryRow: View {
                         set: { date = dayString($0) }
                     ), displayedComponents: .date)
                 }
-                Picker("Kind", selection: $kind) {
-                    Text("Reading").tag("reading")
-                    Text("Writing").tag("writing")
-                }.pickerStyle(.segmented)
-                Button("Save") { save() }
+                HStack(spacing: 6) {
+                    ForEach(["reading", "writing"], id: \.self) { value in
+                        DSButton(title: value.capitalized, selected: kind == value) { kind = value }
+                    }
+                }
+                DSButton(title: "Save") { save() }
             }
         }
     }
@@ -557,17 +617,18 @@ struct ManualEntryForm: View {
                     }
                 )
             }
-            Picker("Kind", selection: $kind) {
-                Text("Reading").tag("reading")
-                Text("Writing").tag("writing")
-            }.pickerStyle(.segmented)
+            HStack(spacing: 6) {
+                ForEach(["reading", "writing"], id: \.self) { value in
+                    DSButton(title: value.capitalized, selected: kind == value) { kind = value }
+                }
+            }
             TextField("Minutes", text: $minutes)
             DatePicker("Day", selection: Binding(
                 get: { parseDay(date.isEmpty ? defaultDay : date) ?? Date() },
                 set: { date = dayString($0) }
             ), displayedComponents: .date)
-            Button("Save") { save() }
-            if let error { Text(error).foregroundStyle(.red).font(.caption) }
+            DSButton(title: "Save") { save() }
+            if let error { Text(error).foregroundStyle(DS.danger).font(DS.ui(11)) }
         }
     }
 

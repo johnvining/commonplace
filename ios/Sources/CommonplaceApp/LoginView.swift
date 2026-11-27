@@ -11,28 +11,54 @@ struct LoginView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Server") {
-                    TextField("Server URL", text: $state.serverURLString)
-                        .autocorrectionDisabled()
-                    #if os(iOS)
-                        .textInputAutocapitalization(.never)
-                    #endif
-                    TextField("Username", text: $state.username)
-                        .autocorrectionDisabled()
-                    #if os(iOS)
-                        .textInputAutocapitalization(.never)
-                    #endif
+            List {
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("Commonplace")
+                        .font(DS.ui(22, weight: .semibold)).foregroundStyle(DS.ink)
+                    VStack(alignment: .leading, spacing: 4) {
+                        DSLabel(text: "Server URL")
+                        TextField("Server URL", text: $state.serverURLString)
+                            .dsInput().font(DS.mono(13))
+                            .autocorrectionDisabled()
+                        #if os(iOS)
+                            .textInputAutocapitalization(.never)
+                        #endif
+                    }
+                    VStack(alignment: .leading, spacing: 4) {
+                        DSLabel(text: "Username")
+                        TextField("Username", text: $state.username)
+                            .dsInput().font(DS.ui(13))
+                            .autocorrectionDisabled()
+                        #if os(iOS)
+                            .textInputAutocapitalization(.never)
+                        #endif
+                    }
+                    VStack(alignment: .leading, spacing: 4) {
+                        DSLabel(text: "Password")
+                        SecureField("Password", text: $password)
+                            .dsInput().font(DS.ui(13))
+                            .onSubmit { signIn() }
+                    }
+                    if let error {
+                        Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
+                    }
+                    HStack {
+                        DSButton(title: busy ? "Signing in…" : "Sign In") { signIn() }
+                            .disabled(busy || password.isEmpty)
+                            .opacity(busy || password.isEmpty ? 0.5 : 1)
+                        Spacer()
+                    }
                 }
-                Section("Password") {
-                    SecureField("Password", text: $password)
-                    Button(busy ? "Signing in…" : "Sign In") { signIn() }
-                        .disabled(busy || password.isEmpty)
-                }
-                if let error {
-                    Section { Text(error).foregroundStyle(.red) }
-                }
+                .padding(24)
+                .frame(maxWidth: 420, alignment: .leading)
+                .background(DS.surface)
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DS.hairline, lineWidth: 1))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .listRowInsets(EdgeInsets(top: 32, leading: 24, bottom: 24, trailing: 24))
+                .listRowSeparator(.hidden)
+                .frame(maxWidth: .infinity, alignment: .center)
             }
+            .listStyle(.plain)
             .navigationTitle("Commonplace")
         }
     }

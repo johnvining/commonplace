@@ -9,15 +9,17 @@ struct MaintenanceView: View {
     @State private var jobs: [String: MaintenanceJob] = [:]
     @State private var confirming: String?
     @State private var error: String?
+    @State private var loaded = false
 
     var body: some View {
         List {
-            if let error { Text(error).foregroundStyle(DS.danger) }
+            if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
+            if !loaded { LoadingBlock() }
             ForEach(tasks, id: \.stableId) { task in
                 Section {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(task.title ?? task.id ?? "").font(DS.ui(14, weight: .medium))
-                        Text(task.pending == true ? "Pending" : "Done")
+                        Text("#\(task.issue ?? 0) · \(task.pending == true ? "Pending" : "Done")")
                             .font(DS.ui(11)).foregroundStyle(task.pending == true ? DS.accent : DS.muted)
                         if let d = task.description {
                             Text(d).font(DS.ui(12)).foregroundStyle(DS.muted)
@@ -25,19 +27,21 @@ struct MaintenanceView: View {
                     }
                     if confirming == task.id {
                         HStack {
-                            Button("Confirm run") { run(task, dry: false) }
-                            Button("Cancel") { confirming = nil }
+                            DSButton(title: "Confirm run") { run(task, dry: false) }
+                            DSButton(title: "Cancel") { confirming = nil }
                         }
                     } else {
                         HStack {
-                            Button("Dry run") { run(task, dry: true) }
-                            Button("Run") { confirming = task.id }
+                            DSButton(title: "Dry run") { run(task, dry: true) }
+                            DSButton(title: "Run") { confirming = task.id }
                         }
                     }
                     if let job = jobs[task.id ?? ""] {
+                        Text("\(job.status == "running" ? "Running" : "Finished") — \(job.status ?? "")")
+                            .font(DS.ui(11)).foregroundStyle(DS.muted)
                         Text((job.output ?? []).joined(separator: "\n"))
                             .font(DS.mono(11))
-                        Text(job.status ?? "").font(DS.ui(11)).foregroundStyle(DS.muted)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
             }
@@ -49,9 +53,10 @@ struct MaintenanceView: View {
     private func load() async {
         do {
             tasks = try await state.client.maintenanceList()
+            loaded = true
             state.maintenancePending = tasks.filter { $0.pending == true }.count
         }
-        catch { self.error = "Load failed — retry." }
+        catch { loaded = true; self.error = "Load failed — retry." }
     }
 
     private func run(_ task: MaintenanceItem, dry: Bool) {
@@ -100,7 +105,6 @@ struct ImportView: View {
                 Text("Instapaper").tag("instapaper")
                 Text("URLs").tag("urls")
             }
-            .pickerStyle(.segmented)
             .labelsHidden()
             .listRowInsets(.standardRow)
             .listRowSeparator(.hidden)
@@ -110,8 +114,20 @@ struct ImportView: View {
                     .listRowInsets(.standardRow)
                     .listRowSeparator(.hidden)
             }
-            Section(kind == "time" ? "date,kind,minutes,title,pile" : "Paste the file contents") {
-                TextEditor(text: $text).frame(minHeight: 160).font(DS.mono(12))
+            HStack(spacing: 6) {
+                ForEach([("time", "Time"), ("notes", "Notes"), ("instapaper", "Instapaper"), ("urls", "URLs")], id: \.0) { item in
+                    DSButton(title: item.1, selected: kind == item.0) { kind = item.0 }
+                }
+                Spacer()
+            }
+            .listRowInsets(.standardRow)
+            .listRowSeparator(.hidden)
+            Section {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(kind == "time" ? "date,kind,minutes,title,pile" : kind == "notes" ? "author,title,text,workName,url,ideas,externalImageUrls,piles,year,page,take" : "Paste the file contents")
+                        .font(DS.mono(11)).foregroundStyle(DS.muted)
+                    TextEditor(text: $text).frame(minHeight: 160).font(DS.mono(12))
+                }
                     .listRowInsets(.standardRow)
             }
             HStack {
@@ -123,7 +139,7 @@ struct ImportView: View {
             .listRowInsets(.standardRow)
             .listRowSeparator(.hidden)
             if let report {
-                Section("Result") { Text(report).font(DS.mono(11)) }
+                Section { Text(report).font(DS.mono(11)) } header: { DSLabel(text: "Result") }
             }
         }
         .listStyle(.plain)

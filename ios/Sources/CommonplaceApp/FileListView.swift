@@ -7,17 +7,20 @@ struct FileListView: View {
     @State private var notes: [Note] = []
     @State private var page = 1
     @State private var error: String?
+    @State private var loaded = false
 
     var body: some View {
         List {
             if let error { Text(error).font(DS.ui(12)).foregroundStyle(DS.danger) }
-            if notes.isEmpty && error == nil {
-                Text("Nothing to file.").font(DS.ui(13)).foregroundStyle(DS.muted)
+            if !loaded {
+                LoadingBlock()
+            } else if notes.isEmpty && error == nil {
+                Text("Nothing to file.").font(DS.ui(13)).italic().foregroundStyle(DS.muted)
             }
             ForEach(notes, id: \.stableId) { n in
                 NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
             }
-            Button("Load more") { load(page: page + 1) }
+            if notes.count >= 500 { DSButton(title: "Load more") { load(page: page + 1) } }
         }
         .listStyle(.plain)
         .navigationTitle("Notes to file")
@@ -29,7 +32,7 @@ struct FileListView: View {
         Task {
             do {
                 let rows = try await state.client.unfiledNotes(page: wanted)
-                await MainActor.run { page = wanted; notes = wanted == 1 ? rows : notes + rows }
+                await MainActor.run { page = wanted; notes = wanted == 1 ? rows : notes + rows; loaded = true }
             } catch { await MainActor.run { self.error = "Load failed: \(describe(error))" } }
         }
     }
