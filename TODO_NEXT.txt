@@ -10,14 +10,14 @@
        grid, time page) and fix what's slow.
 4. [x] Sidebar Starred items get a type icon (note / pile / work /
        author / idea / time) describing what each star is.
-5. [~] iOS Live Activity (lock screen / Dynamic Island) showing the
+5. [x] iOS Live Activity (lock screen / Dynamic Island) showing the
        running timer, updating and ending with the timer.
-6. [~] iOS home-screen widget: start a recent timer (or a new one)
+6. [x] iOS home-screen widget: start a recent timer (or a new one)
        without opening the app.
 7. [x] Remove "Open web version" from the Mac sidebar — keep Web only
        on entity/note pages, opening that specific page.
-8. [ ] Ctrl+O quick bar fully implemented on macOS and iOS — a quick
-       search overlay like the web's, not just jumping to Search.
+8. [x] Ctrl+O quick bar fully implemented on macOS and iOS — Cmd+K
+       quick search overlay like the web's (Ctrl+O itself goes to Time).
 9. [x] Cmd+N / New Note fails with "Could not create note — retry."
        in the Mac app (and check iOS) — find why createNote() throws
        and fix it; also stop the menu shortcut and the Notes button
