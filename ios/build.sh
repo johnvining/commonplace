@@ -8,9 +8,13 @@
 # these are compile checks; build in Xcode for signed/device builds.
 #
 # One thing this script cannot move: SwiftPM's manifest diagnostics go
-# to ~/Library/Caches/org.swift.swiftpm, with no flag to change it.
-# Point that one folder at ios/.swiftpm-cache once (see README note in
-# ios/.swiftpm-cache-redirect.txt) or xcodebuild fails in the sandbox.
+# to ~/Library/Caches/org.swift.swiftpm, with no flag to change it, and
+# sandboxed builds fail there. Point that folder in here once, from a
+# normal terminal:
+#   mv ~/Library/Caches/org.swift.swiftpm ~/Library/Caches/org.swift.swiftpm.backup
+#   ln -s "$PWD/.swiftpm-cache" ~/Library/Caches/org.swift.swiftpm
+# Undo by removing the link and moving the backup back (or deleting the
+# link; the cache recreates itself).
 #
 # Usage:
 #   ./build.sh          Mac app (default)
