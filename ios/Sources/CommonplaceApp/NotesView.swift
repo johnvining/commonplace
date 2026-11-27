@@ -9,6 +9,7 @@ struct NotesView: View {
     @Environment(\.openWindow) private var openWindow
     @State private var notes: [Note] = []
     @State private var page = 1
+    @State private var loaded = false
     @State private var search = ""
     @State private var searchTask: Task<Void, Never>?
     @State private var pileSel: [PickOption] = []
@@ -84,11 +85,14 @@ struct NotesView: View {
                                     }
                                 }
                             }
-                            if notes.isEmpty && error == nil {
-                                Text("No notes yet.").font(DS.ui(13)).foregroundStyle(DS.muted)
+                            if !loaded {
+                                LoadingBlock()
+                            } else if notes.isEmpty && error == nil {
+                                Text("No notes yet.").font(DS.ui(13)).italic().foregroundStyle(DS.muted)
                             }
-                            Button("Load more") { loadRecent(page: page + 1) }
-                                .font(DS.ui(13))
+                            if loaded && !notes.isEmpty {
+                                DSButton(title: "Load more") { loadRecent(page: page + 1) }
+                            }
                         }
                         .padding(16)
                     }
@@ -145,7 +149,7 @@ struct NotesView: View {
                                 onAdd: { ideaSel.append($0); applySearch() },
                                 onRemove: { opt in ideaSel.removeAll { $0.id == opt.id }; applySearch() }
                             )
-                            Button("Clear filters") {
+                            DSButton(title: "Clear filters") {
                                 search = ""; pileSel = []; ideaSel = []
                                 page = 1; loadRecent()
                             }
@@ -182,12 +186,15 @@ struct NotesView: View {
                 .listRowSeparatorTint(DS.hairline)
                 .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             }
-            if notes.isEmpty && error == nil {
-                Text("No notes yet.").font(DS.ui(13)).foregroundStyle(DS.muted)
+            if !loaded {
+                LoadingBlock()
+            } else if notes.isEmpty && error == nil {
+                Text("No notes yet.").font(DS.ui(13)).italic().foregroundStyle(DS.muted)
                     .listRowSeparator(.hidden)
             }
-            Button("Load more") { loadRecent(page: page + 1) }
-                .font(DS.ui(13))
+            if loaded && !notes.isEmpty {
+                DSButton(title: "Load more") { loadRecent(page: page + 1) }
+            }
                 .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
@@ -213,6 +220,7 @@ struct NotesView: View {
                 await MainActor.run {
                     page = wanted
                     notes = wanted == 1 ? rows : notes + rows
+                    loaded = true
                     if wanted == 1 { state.recentNotesCache = rows }
                 }
             } catch {

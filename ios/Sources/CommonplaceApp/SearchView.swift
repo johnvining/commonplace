@@ -101,7 +101,7 @@ struct SearchView: View {
                     searchRow(item)
                 }
                 if items.count >= 20 {
-                    Button("Load more results") { run(loadMore: true) }.font(DS.ui(13))
+                    DSButton(title: "Load more results") { run(loadMore: true) }
                 }
             }
             .navigationTitle("Search")
@@ -218,19 +218,35 @@ struct SearchView: View {
         }
     }
 
+    private func highlighted(_ value: String, font: Font) -> Text {
+        let term = parseModifier(query.trimmingCharacters(in: .whitespacesAndNewlines)).term
+        var attributed = AttributedString(value)
+        if !term.isEmpty {
+            var searchRange = attributed.startIndex..<attributed.endIndex
+            while let range = attributed[searchRange].range(of: term, options: .caseInsensitive) {
+                attributed[range].backgroundColor = DS.accentSoft
+                searchRange = range.upperBound..<attributed.endIndex
+            }
+        }
+        return Text(attributed).font(font)
+    }
+
     @ViewBuilder
     private func searchRow(_ item: UnifiedSearchItem) -> some View {
-        let label = VStack(alignment: .leading, spacing: 2) {
-            Text(item.displayName)
-                .font(DS.serif(15, weight: .semibold))
-                .foregroundStyle(DS.ink)
-                .lineLimit(1)
-            Text((item.type ?? "").uppercased())
-                .font(DS.ui(10, weight: .semibold))
-                .tracking(0.8)
-                .foregroundStyle(DS.muted)
-            if let snippet = snippet(for: item) {
-                Text(snippet).font(DS.serif(12)).foregroundStyle(DS.muted).lineLimit(2)
+        let label = HStack(alignment: .top, spacing: 8) {
+            Image(systemName: typeIcon(item.type))
+                .font(DS.ui(13)).foregroundStyle(DS.muted)
+                .frame(width: 16, height: 16)
+            VStack(alignment: .leading, spacing: 2) {
+                highlighted(item.displayName, font: DS.serif(15, weight: .semibold))
+                    .foregroundStyle(DS.ink)
+                    .lineLimit(1)
+                if let snippet = snippet(for: item) {
+                    highlighted(snippet, font: DS.serif(12))
+                        .foregroundStyle(DS.muted)
+                        .lineLimit(2)
+                        .padding(.leading, 24)
+                }
             }
         }
         if let id = item.itemId {
@@ -271,6 +287,17 @@ struct SearchView: View {
             return "…\(body[start..<end])…"
         }
         return String(body.prefix(120))
+    }
+
+    private func typeIcon(_ type: String?) -> String {
+        switch type {
+        case "note": return "note.text"
+        case "pile": return "tray.full"
+        case "work": return "book"
+        case "auth", "author": return "person.2"
+        case "idea": return "lightbulb"
+        default: return "doc"
+        }
     }
 
     private func isNick(_ s: String) -> Bool {
