@@ -1,4 +1,8 @@
 .build/
 build/
+build-ios/
+build-widgets/
 .swiftpm/
+.swiftpm-cache/
+DerivedData/
 xcuserdata/
