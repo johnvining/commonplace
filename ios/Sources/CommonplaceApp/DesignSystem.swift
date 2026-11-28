@@ -46,6 +46,15 @@ enum DS {
     static func serif(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         .system(size: size, weight: weight, design: .serif)
     }
+    /// The web's reading face (Iowan Old Style, Charter, Georgia). Apple's
+    /// system serif is visibly tighter and harder to read at note sizes.
+    static func reading(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        .custom("Iowan Old Style", size: size).weight(weight)
+    }
+    /// Web note title: 15pt sans, semibold, 1.3 line height.
+    static func noteTitle(_ size: CGFloat = 15) -> Font {
+        ui(size, weight: .semibold)
+    }
     static func mono(_ size: CGFloat) -> Font {
         .system(size: size, design: .monospaced)
     }

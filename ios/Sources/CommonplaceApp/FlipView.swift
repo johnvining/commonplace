@@ -24,17 +24,17 @@ struct FlipView: View {
                 let n = deck[index]
                 Section {
                     NoteStatusLine(note: n)
-                    Text(n.displayTitle).font(DS.serif(17, weight: .semibold)).foregroundStyle(DS.ink)
+                    Text(n.displayTitle).font(DS.noteTitle()).tracking(-0.075).foregroundStyle(DS.ink)
                     if let t = n.text, !t.isEmpty {
                         NoteText(text: t)
                         if let k = n.take, !k.isEmpty {
                             HStack(alignment: .top, spacing: 0) {
                                 Rectangle().fill(DS.hairline).frame(width: 2)
-                                Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.muted).padding(.leading, 10)
+                                Text(k).font(DS.reading(14)).italic().foregroundStyle(DS.muted).lineSpacing(5).padding(.leading, 10)
                             }
                         }
                     } else {
-                        Text(n.displayText).font(DS.serif(15)).foregroundStyle(DS.muted)
+                        Text(n.displayText).font(DS.reading(15)).foregroundStyle(DS.ink).lineSpacing(5)
                     }
                     if let id = n._id {
                         NavigationLink { NoteDetailView(noteId: id, editFirst: true) } label: { Text("Edit in place") }

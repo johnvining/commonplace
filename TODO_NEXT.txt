@@ -21,3 +21,4 @@
 14. [ ] Pass for private keys
 15. [ ] Pass for implementation details
 16. [ ] Pass for rasp pi references
+17. [ ] Font size control button

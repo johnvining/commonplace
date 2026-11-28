@@ -57,17 +57,17 @@ struct NoteDetailView: View {
                         editField("Title") {
                             TextField("Title", text: $title)
                                 .dsInput()
-                                .font(DS.ui(14, weight: .semibold))
+                                .font(DS.noteTitle())
                         }
                         editField("Text") {
                             TextField("Text", text: $text, axis: .vertical)
                                 .dsInput()
-                                .font(DS.serif(14))
+                                .font(DS.reading(15))
                         }
                         editField("Take") {
                             TextField("Take", text: $take, axis: .vertical)
                                 .dsInput()
-                                .font(DS.serif(14))
+                                .font(DS.reading(14))
                         }
                         editField("URL") {
                             TextField("URL", text: $urlField)
@@ -144,7 +144,9 @@ struct NoteDetailView: View {
                                 // to show. No fake titles here.
                                 Text(note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
                                      ? note.title! : "(untitled)")
-                                    .font(DS.serif(20, weight: .semibold))
+                                    .font(DS.noteTitle())
+                                    .tracking(-0.075)
+                                    .lineSpacing(2)
                                     .foregroundStyle(DS.ink)
                                 if !note.displayAuthors.isEmpty || note.work != nil {
                                     HStack(spacing: 6) {
@@ -155,7 +157,7 @@ struct NoteDetailView: View {
                                             Text(w).italic()
                                         }
                                     }
-                                    .font(DS.ui(12))
+                                    .font(DS.ui(13))
                                     .foregroundStyle(DS.muted)
                                 }
                                 if let ts = note.titleSource, !ts.isEmpty {
@@ -167,7 +169,7 @@ struct NoteDetailView: View {
                                 if let k = note.take, !k.isEmpty {
                                     HStack(alignment: .top, spacing: 0) {
                                         Rectangle().fill(DS.hairline).frame(width: 2)
-                                        Text(k).font(DS.serif(14)).italic().foregroundStyle(DS.muted).padding(.leading, 10)
+                                        Text(k).font(DS.reading(14)).italic().foregroundStyle(DS.muted).lineSpacing(5).padding(.leading, 10)
                                     }
                                 }
                                 if let u = note.url, !u.isEmpty,
@@ -206,9 +208,9 @@ struct NoteDetailView: View {
                                 }
                                 if let nick = note.nick { CopyNickButton(nick: nick) }
                             }
-                            .padding(.vertical, 6)
+                            .padding(.vertical, 2)
                         }
-                        .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 12))
+                        .listRowInsets(EdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 6))
                         .listRowBackground(DS.surface)
                     }
                 }
@@ -342,7 +344,7 @@ struct NoteDetailView: View {
                                 DSButton(title: "Add idea: \(idea)") { addSuggestedIdea(idea) }
                             }
                             if let ocr = ocrResult {
-                                Text(ocr).font(DS.serif(13))
+                                Text(ocr).font(DS.reading(13)).lineSpacing(4)
                                 DSButton(title: "Append OCR to text") {
                                     text = (text.isEmpty ? ocr : text + "\n\n" + ocr)
                                 }

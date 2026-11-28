@@ -155,13 +155,13 @@ struct WorkListRow: View {
             Image(systemName: "book").font(DS.ui(12)).foregroundStyle(DS.faint)
             HStack(spacing: 0) {
                 let names = joinAuthorNames(work.authors)
-                if !names.isEmpty { Text(names + ", ").font(DS.serif(14.5)) }
-                Text(work.name ?? "(unnamed)").italic().font(DS.serif(14.5))
+                if !names.isEmpty { Text(names + ", ").font(DS.reading(14.5)) }
+                Text(work.name ?? "(unnamed)").italic().font(DS.reading(14.5))
                 if let orig = work.original_name, !orig.isEmpty {
-                    Text(" (\(orig))").font(DS.serif(14.5)).foregroundStyle(DS.muted)
+                    Text(" (\(orig))").font(DS.reading(14.5)).foregroundStyle(DS.muted)
                 }
                 if let year = work.year {
-                    Text(" \(year)").font(DS.serif(14.5)).foregroundStyle(DS.muted)
+                    Text(" \(year)").font(DS.reading(14.5)).foregroundStyle(DS.muted)
                 }
             }
             .foregroundStyle(DS.ink).lineLimit(2)
@@ -346,14 +346,14 @@ final class FlowTextBox {
 /// rows never mix 12pt labels with 15pt titles.
 struct NoteFlowText: View {
     let note: Note
-    var size: CGFloat = 14.5
+    var size: CGFloat = 15
     var lines: Int? = nil
 
     var body: some View {
         Text(flow)
-            .font(DS.serif(size))
+            .font(DS.reading(size))
             .foregroundStyle(DS.ink)
-            .lineSpacing(3)
+            .lineSpacing(5)
             .lineLimit(lines)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -719,7 +719,9 @@ struct NoteText: View {
     let text: String
     var size: CGFloat = 15
     var body: some View {
-        Text(parsed).font(DS.serif(size))
+        Text(parsed)
+            .font(DS.reading(size))
+            .lineSpacing(5)
     }
 
     private var parsed: AttributedString {

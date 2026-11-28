@@ -286,7 +286,8 @@ struct NoteCard: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top, spacing: 6) {
                 Text(note.displayTitle)
-                    .font(DS.serif(15, weight: .semibold))
+                    .font(DS.noteTitle())
+                    .tracking(-0.075)
                     .foregroundStyle(DS.ink)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -313,8 +314,8 @@ struct NoteCard: View {
                 }
             }
             if (note.title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false) {
-                NoteText(text: note.displayText, size: 13)
-                    .foregroundStyle(DS.muted)
+                NoteText(text: note.displayText)
+                    .foregroundStyle(DS.ink)
                     .lineLimit(large ? ((note.images?.isEmpty == false) ? 2 : 6) : 3)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }

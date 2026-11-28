@@ -248,12 +248,13 @@ struct SearchView: View {
                 .font(DS.ui(13)).foregroundStyle(DS.muted)
                 .frame(width: 16, height: 16)
             VStack(alignment: .leading, spacing: 2) {
-                highlighted(item.displayName, font: DS.serif(15, weight: .semibold))
+                highlighted(item.displayName, font: DS.noteTitle())
                     .foregroundStyle(DS.ink)
                     .lineLimit(1)
                 if let snippet = snippet(for: item) {
-                    highlighted(snippet, font: DS.serif(12))
+                    highlighted(snippet, font: DS.reading(12))
                         .foregroundStyle(DS.muted)
+                        .lineSpacing(3)
                         .lineLimit(2)
                         .padding(.leading, 24)
                 }

@@ -132,7 +132,7 @@ struct QuickBarView: View {
                             Image(systemName: "plus").font(DS.ui(11)).foregroundStyle(DS.muted)
                         }
                         Text(s.isCreate ? "Create \u{201C}\(s.name)\u{201D}" : s.name)
-                            .font(DS.serif(14, weight: .semibold))
+                            .font(DS.noteTitle(14))
                             .foregroundStyle(DS.ink).lineLimit(1)
                         Spacer()
                     }
