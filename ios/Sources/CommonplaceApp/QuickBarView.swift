@@ -86,9 +86,11 @@ struct QuickBarView: View {
                 Text(modifier.uppercased())
                     .font(DS.ui(15, weight: .semibold))
                     .foregroundStyle(DS.surface)
-                    .padding(.horizontal, 12).padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .frame(height: 36)
                     .background(DS.ink)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .padding(.leading, 4)
             }
             TextField("", text: $typedText)
                 .textFieldStyle(.plain)
@@ -98,7 +100,7 @@ struct QuickBarView: View {
                 #if os(iOS)
                 .textInputAutocapitalization(.never)
                 #endif
-                .padding(.horizontal, 10).padding(.vertical, 8)
+                .padding(.horizontal, 10)
                 .onChange(of: typedText) { onTextChange() }
                 .onSubmit { execute() }
                 .onKeyPress(.downArrow) { move(1); return .handled }
@@ -117,6 +119,7 @@ struct QuickBarView: View {
             .buttonStyle(.plain)
             .padding(.horizontal, 6)
         }
+        .frame(height: 44)
         .overlay(RoundedRectangle(cornerRadius: 4).stroke(DS.hairline, lineWidth: 1))
     }
 
