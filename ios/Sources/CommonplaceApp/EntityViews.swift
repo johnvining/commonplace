@@ -452,10 +452,30 @@ struct AuthorDetailView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
-                Section("Works") {
+                // No "Works" heading: the web lists the works directly
+                // under the header, in citation form.
+                Section {
                     ForEach(works, id: \.stableId) { w in
                         NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
-                            Text(w.name ?? "(unnamed)")
+                            WorkListRow(work: w)
+                        }
+                    }
+                }
+                if !editedWorks.isEmpty {
+                    Section("Edited") {
+                        ForEach(editedWorks, id: \.stableId) { w in
+                            NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
+                                WorkListRow(work: w)
+                            }
+                        }
+                    }
+                }
+                if !translatedWorks.isEmpty {
+                    Section("Translated") {
+                        ForEach(translatedWorks, id: \.stableId) { w in
+                            NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
+                                WorkListRow(work: w)
+                            }
                         }
                     }
                 }
@@ -596,13 +616,9 @@ struct IdeaDetailView: View {
                     Section {
                         ForEach(works, id: \.stableId) { w in
                             NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
-                                Text(w.name ?? "(unnamed)")
-                                    .font(DS.serif(14.5)).italic()
-                                    .foregroundStyle(DS.ink)
+                                WorkListRow(work: w)
                             }
                         }
-                    } header: {
-                        Text("Works")
                     }
                 }
                 Section {

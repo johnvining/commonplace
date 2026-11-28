@@ -83,11 +83,11 @@ struct PileDetailView: View {
                 Section {
                     ForEach(works, id: \.stableId) { w in
                         NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
-                            EntityListRow(name: w.name ?? "(unnamed)", italicName: true)
+                            WorkListRow(work: w)
                         }
                     }
                     .listRowSeparator(.hidden)
-                } header: { DSLabel(text: "Works") }
+                }
             }
             Section {
                 ForEach(notes, id: \.stableId) { n in
@@ -96,7 +96,7 @@ struct PileDetailView: View {
                     }
                 }
                 if notes.count >= 500 { DSButton(title: "Load more") { loadMoreNotes() } }
-            } header: { DSLabel(text: "Notes") }
+            }
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "")
             }

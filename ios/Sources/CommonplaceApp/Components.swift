@@ -120,14 +120,60 @@ struct EntityPageHeader<Actions: View>: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             EntityTitleBlock(name: name, italicName: italicName, byline: byline, nick: nick, splitPilePrefix: splitPilePrefix)
-            Spacer()
-            FlowLayout(spacing: 6) {
+            Spacer(minLength: 12)
+            // Right-aligned on one row, like the web's header buttons;
+            // wrapping under the title made the actions drift left.
+            HStack(spacing: 6) {
                 actions
             }
+            .fixedSize(horizontal: true, vertical: false)
         }
         .padding(.bottom, 12)
         .overlay(alignment: .bottom) {
             Rectangle().fill(DS.hairline).frame(height: 1)
+        }
+    }
+}
+
+/// "A & B" / "A, B & C", like the web's author lists.
+func joinAuthorNames(_ authors: [PopulatedRef]?) -> String {
+    let names = (authors ?? []).compactMap { $0.name }.filter { !$0.isEmpty }
+    if names.count <= 1 { return names.first ?? "" }
+    if names.count == 2 { return names[0] + " & " + names[1] }
+    return names.dropLast().joined(separator: ", ") + " & " + names[names.count - 1]
+}
+
+/// One work in a list, the web's ResultWork in app form: book icon,
+/// "Names, *Title* (Original) Year", the work's own star at the right.
+struct WorkListRow: View {
+    @EnvironmentObject var state: AppState
+    let work: Work
+
+    var body: some View {
+        let isStarred = state.pins.contains { $0.type == "work" && $0.id == (work._id ?? "") }
+        HStack(spacing: 8) {
+            Image(systemName: "book").font(DS.ui(12)).foregroundStyle(DS.faint)
+            HStack(spacing: 0) {
+                let names = joinAuthorNames(work.authors)
+                if !names.isEmpty { Text(names + ", ").font(DS.serif(14.5)) }
+                Text(work.name ?? "(unnamed)").italic().font(DS.serif(14.5))
+                if let orig = work.original_name, !orig.isEmpty {
+                    Text(" (\(orig))").font(DS.serif(14.5)).foregroundStyle(DS.muted)
+                }
+                if let year = work.year {
+                    Text(" \(year)").font(DS.serif(14.5)).foregroundStyle(DS.muted)
+                }
+            }
+            .foregroundStyle(DS.ink).lineLimit(2)
+            Spacer()
+            Button {
+                if isStarred { state.queueUnpin(type: "work", id: work._id ?? "") }
+                else { state.queuePin(type: "work", id: work._id ?? "", label: work.name, href: "/work/\(work._id ?? "")") }
+            } label: {
+                Image(systemName: isStarred ? "star.fill" : "star")
+                    .font(DS.ui(13)).foregroundStyle(isStarred ? DS.accent : DS.faint)
+            }
+            .buttonStyle(.plain)
         }
     }
 }
