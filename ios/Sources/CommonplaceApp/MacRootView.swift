@@ -200,6 +200,8 @@ struct MacRootView: View {
                 .keyboardShortcut(".", modifiers: [.command])
             Button("") { state.escapeShortcut() }
                 .keyboardShortcut("[", modifiers: [.control])
+            Button("") { state.quickBarOpen = true }
+                .keyboardShortcut("/", modifiers: [])
         }
         .hidden()
     }
