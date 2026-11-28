@@ -4570,6 +4570,13 @@ a.grid-link > a {
   flex-wrap: wrap;
 }
 
+/* The generic pill-input bottom margin belongs to stacked forms. In
+   this row it makes the flex container centre the margin box, so the
+   subject sits visibly above the kind buttons and elapsed time. */
+.time-timer-row .time-subject-picker, .time-name-row .time-subject-picker {
+  margin-bottom: 0;
+}
+
 .time-subject-picker {
   flex: 1 1 200px;
   min-width: 0;

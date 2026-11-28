@@ -2452,6 +2452,12 @@ mark.search-highlight {
 .time-timer-row, .time-name-row {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
+/* The generic pill-input bottom margin belongs to stacked forms. In
+   this row it makes the flex container centre the margin box, so the
+   subject sits visibly above the kind buttons and elapsed time. */
+.time-timer-row .time-subject-picker, .time-name-row .time-subject-picker {
+  margin-bottom: 0;
+}
 .time-subject-picker { flex: 1 1 200px; min-width: 0; position: relative; }
 .top-level.input.time-subject-select {
   display: block; width: 100%; box-sizing: border-box; min-width: 0;
