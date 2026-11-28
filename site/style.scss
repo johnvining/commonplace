@@ -2373,7 +2373,7 @@ mark.search-highlight {
 .time-analysis .time-kind-totals { margin: 0; }
 
 .time-split {
-  display: flex; height: 4px; max-width: 420px; border-radius: 2px;
+  display: flex; height: 4px; border-radius: 2px;
   overflow: hidden; background: var(--hairline); margin: 2px 0 6px;
 }
 .time-split-reading { background: var(--accent); }
@@ -2532,7 +2532,7 @@ mark.search-highlight {
 .time-total { font-family: $reading_font; font-size: 19px; }
 .time-count { opacity: 0.6; font-size: var(--font-size-sm); }
 .time-split {
-  display: flex; height: 4px; max-width: 420px; border-radius: 2px;
+  display: flex; height: 4px; border-radius: 2px;
   overflow: hidden; background: var(--hairline); margin: 2px 0 6px;
 }
 .time-split-reading { background: var(--accent); }
@@ -2540,7 +2540,7 @@ mark.search-highlight {
 .time-table-title { margin: 16px 0 4px; }
 .time-table {
   border-collapse: collapse; margin-bottom: 8px;
-  width: 100%; max-width: 640px; table-layout: fixed;
+  width: 100%; table-layout: fixed;
 }
 .time-table th:first-child, .time-table td:first-child { width: 40%; }
 .time-table th:nth-child(n+2), .time-table td:nth-child(n+2) {

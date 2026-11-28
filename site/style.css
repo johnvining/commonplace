@@ -4401,7 +4401,6 @@ a.grid-link > a {
 .time-split {
   display: flex;
   height: 4px;
-  max-width: 420px;
   border-radius: 2px;
   overflow: hidden;
   background: var(--hairline);
@@ -4803,7 +4802,6 @@ a.grid-link > a {
 .time-split {
   display: flex;
   height: 4px;
-  max-width: 420px;
   border-radius: 2px;
   overflow: hidden;
   background: var(--hairline);
@@ -4826,7 +4824,6 @@ a.grid-link > a {
   border-collapse: collapse;
   margin-bottom: 8px;
   width: 100%;
-  max-width: 640px;
   table-layout: fixed;
 }
 
