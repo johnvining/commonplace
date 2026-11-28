@@ -2,24 +2,22 @@
 #
 # Done items come off the list. When it empties, start a new one.
 
-1. [ ] Verify the iPad app. It already builds for iPad and uses the
-       split-view (Mac-style) layout at regular width — what's missing
-       is a real pass on iPad: layout at full screen and in split
-       screen, the compact-width switch, widgets, quickbar.
-
-Before Landing
-- [ ] Clean up branches and figure out what needs to be done to get timer server + web done
-- [ ] Test menu bar on Mac
-- [ ] Fix control O on Mac
-- [ ] Test/create quickbar on iOS
-- [ ] Review iOS note display
-- [ ] Review mac note display
-- [ ] Test commonplace://
-- [ ] Test lock screen widget on iOS
-- [ ] Test timer starter widget on iOS
-- [ ] Walkthrough web UX
-- [ ] Review each server-side diff
-- [ ] Make sure all server commands have tests
-- [ ] Pass for private keys
-- [ ] Pass for implementation details
-- [ ] Pass for rasp pi references
+1. [ ] Verify the iPad app (it already builds for iPad with the
+       split-view layout at regular width; it needs a real pass on
+       iPad: full screen, split screen, compact-width switch,
+       widgets, quickbar)
+2. [ ] Clean up branches and figure out what needs to be done to get timer server + web done
+3. [ ] Test menu bar on Mac
+4. [ ] Fix control O on Mac
+5. [ ] Test/create quickbar on iOS
+6. [ ] Review iOS note display
+7. [ ] Review mac note display
+8. [ ] Test commonplace://
+9. [ ] Test lock screen widget on iOS
+10. [ ] Test timer starter widget on iOS
+11. [ ] Walkthrough web UX
+12. [ ] Review each server-side diff
+13. [ ] Make sure all server commands have tests
+14. [ ] Pass for private keys
+15. [ ] Pass for implementation details
+16. [ ] Pass for rasp pi references
