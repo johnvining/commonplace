@@ -4576,6 +4576,40 @@ a.grid-link > a {
   margin-bottom: 0;
 }
 
+/* One 36px centre line for every control in the timer row. Leaving
+   each control to size itself made the subject, kind toggles, elapsed
+   time and Stop button all sit at slightly different heights. */
+.time-timer-row {
+  align-items: stretch;
+}
+
+.time-timer-row .time-subject-picker {
+  display: flex;
+  align-items: center;
+}
+
+.time-timer-row .time-subject-chip,
+.time-timer-row .top-level.input.time-subject-select {
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.time-timer-row .time-kind-toggle {
+  align-items: center;
+}
+
+.time-timer-row .button.compact {
+  height: 36px;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.time-timer-row .time-elapsed {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+}
+
 .time-subject-picker {
   flex: 1 1 200px;
   min-width: 0;
@@ -4612,6 +4646,11 @@ a.grid-link > a {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: "Iowan Old Style", Charter, "Source Serif Pro", Georgia, serif;
+}
+
+.time-subject-chip > span {
+  display: inline-flex;
+  align-items: center;
 }
 
 .time-subject-chip button {

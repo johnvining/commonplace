@@ -2458,6 +2458,28 @@ mark.search-highlight {
 .time-timer-row .time-subject-picker, .time-name-row .time-subject-picker {
   margin-bottom: 0;
 }
+/* One 36px centre line for every control in the timer row. Leaving
+   each control to size itself made the subject, kind toggles, elapsed
+   time and Stop button all sit at slightly different heights. */
+.time-timer-row {
+  align-items: stretch;
+}
+.time-timer-row .time-subject-picker {
+  display: flex; align-items: center;
+}
+.time-timer-row .time-subject-chip,
+.time-timer-row .top-level.input.time-subject-select {
+  min-height: 36px; box-sizing: border-box;
+}
+.time-timer-row .time-kind-toggle {
+  align-items: center;
+}
+.time-timer-row .button.compact {
+  height: 36px; min-height: 36px; box-sizing: border-box;
+}
+.time-timer-row .time-elapsed {
+  display: inline-flex; align-items: center; min-height: 36px;
+}
 .time-subject-picker { flex: 1 1 200px; min-width: 0; position: relative; }
 .top-level.input.time-subject-select {
   display: block; width: 100%; box-sizing: border-box; min-width: 0;
@@ -2470,6 +2492,7 @@ mark.search-highlight {
   font-size: var(--font-size-md);
 }
 .time-subject-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: $reading_font; }
+.time-subject-chip > span { display: inline-flex; align-items: center; }
 .time-subject-chip button { background: none; border: none; cursor: pointer; font-size: 16px; color: inherit; }
 .time-subject-empty { padding: 7px 9px; opacity: 0.65; }
 .time-kind-toggle { display: flex; gap: 8px; }
