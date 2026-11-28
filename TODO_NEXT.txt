@@ -1,21 +1,11 @@
 # The one work list — work top to bottom, small local commits, no push
 #
-# Everything else that used to live in KNOWN_ISSUES.md and
-# MULTI_AUTHORS_PLAN.md is done and those files are deleted.
-# Done items get checked off here; when the list empties, start a new one.
+# Done items come off the list. When it empties, start a new one.
 
-1. [x] Fix the flaky server tests. About 1 full run in 5 fails a random
-       test — usually the first test in a file timing out after 30s, or
-       a 401 right after registering ("User already exists", or the
-       login cookie not accepted). Never reproduces with one file alone.
-       Leads: background work a test starts but doesn't await
-       (embeddings, nicks, touch updates) landing after the next test's
-       cleanup; beforeEach cleanup only clears collections for models
-       registered so far. Done when 10 full runs pass in a row.
-
-2. [ ] iPad app. Commonplace on iPad — layout that uses the bigger
-       screen rather than a stretched phone UI. Scope to be written up
-       before starting.
+1. [ ] Verify the iPad app. It already builds for iPad and uses the
+       split-view (Mac-style) layout at regular width — what's missing
+       is a real pass on iPad: layout at full screen and in split
+       screen, the compact-width switch, widgets, quickbar.
 
 Before Landing
 - [ ] Clean up branches and figure out what needs to be done to get timer server + web done
