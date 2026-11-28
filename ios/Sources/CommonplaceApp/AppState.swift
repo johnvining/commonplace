@@ -47,6 +47,12 @@ final class AppState: ObservableObject {
     @Published var counts: StatsCounts?
     /// Quick-bar overlay visibility (Cmd+K).
     @Published var quickBarOpen = false
+    /// An entity the quick bar asked the main window to show.
+    struct QuickRoute: Equatable { let type: String; let id: String }
+    @Published var entityRoute: QuickRoute?
+    /// A search the quick bar asked the Search section to run (`find`
+    /// modifier or plain Enter), consumed by SearchView.
+    @Published var pendingFind: String?
     /// Last unfiltered recent-notes page, so returning to the Notes
     /// section shows instantly instead of re-querying from scratch.
     var recentNotesCache: [Note] = []

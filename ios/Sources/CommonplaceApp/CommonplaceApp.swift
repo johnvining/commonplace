@@ -6,19 +6,23 @@ struct CommonplaceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if state.authChecking && !state.isSignedIn {
-                    ProgressView("Checking session…").environmentObject(state)
-                } else if state.isSignedIn {
-                    ContentView()
-                        .environmentObject(state)
-                } else {
-                    LoginView()
-                        .environmentObject(state)
+            ZStack {
+                Group {
+                    if state.authChecking && !state.isSignedIn {
+                        ProgressView("Checking session…").environmentObject(state)
+                    } else if state.isSignedIn {
+                        ContentView()
+                            .environmentObject(state)
+                    } else {
+                        LoginView()
+                            .environmentObject(state)
+                    }
                 }
-            }
-            .sheet(isPresented: $state.quickBarOpen) {
-                QuickBarView().environmentObject(state)
+                // The quick bar is an overlay in this window, like the
+                // web's — not a sheet.
+                if state.quickBarOpen && state.isSignedIn {
+                    QuickBarView().environmentObject(state)
+                }
             }
             .task {
                 await state.validateSession()
@@ -48,15 +52,21 @@ struct CommonplaceApp: App {
                     .keyboardShortcut("3", modifiers: .command)
                 Button("Quick Search…") { state.quickBarOpen = true }
                     .keyboardShortcut("k", modifiers: .command)
+                // Like the web: Ctrl+O toggles the quick bar. Go to
+                // Time keeps ⌘2 in this menu.
+                Button("Quick Search (Ctrl+O)") { state.quickBarOpen.toggle() }
+                    .keyboardShortcut("o", modifiers: .control)
             }
             CommandMenu("Time") {
                 // Menu commands are the reliable shortcut path — a
                 // hidden background button never reliably receives
                 // key equivalents.
+                // No own shortcut: ⌘2 in the View menu already goes
+                // to Time, and two menu items sharing one shortcut is
+                // undefined behaviour.
                 Button("Go to Time") {
                     NotificationCenter.default.post(name: .macSection, object: "time")
                 }
-                .keyboardShortcut("o", modifiers: .control)
                 Button(state.timerIsRunning ? "Stop Timer" : "Start from Time section") {
                     if state.timerIsRunning {
                         Task { await state.stopAndLogTimer() }

@@ -35,6 +35,8 @@ struct SearchView: View {
                                 .font(DS.ui(14))
                                 .onChange(of: query) { scheduleRun() }
                                 .onSubmit { run() }
+                                .task { consumePendingFind() }
+                                .onChange(of: state.pendingFind) { consumePendingFind() }
                             if !query.isEmpty {
                                 Button {
                                     query = ""; items = []; nickNote = []; nickInfo = nil
@@ -148,6 +150,14 @@ struct SearchView: View {
             return (k, String(q.dropFirst(k.count + 1)).trimmingCharacters(in: .whitespaces))
         }
         return (nil, q)
+    }
+
+    /// The quick bar's `find` hands its text over here.
+    private func consumePendingFind() {
+        guard let f = state.pendingFind, !f.isEmpty else { return }
+        state.pendingFind = nil
+        query = f
+        run()
     }
 
     private func run(loadMore: Bool = false) {

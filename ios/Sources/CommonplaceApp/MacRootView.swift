@@ -117,6 +117,20 @@ struct MacRootView: View {
             detail
                 .frame(minWidth: 560, minHeight: 480)
         }
+        .onChange(of: state.entityRoute) { route in
+            guard let route else { return }
+            state.entityRoute = nil
+            if route.type == "find" {
+                section = "search"; routedType = nil; routedId = nil
+            } else {
+                routedType = route.type == "author" ? "auth" : route.type
+                routedId = route.id
+            }
+            #if os(macOS)
+            NSApp.activate(ignoringOtherApps: true)
+            mainWindow?.makeKeyAndOrderFront(nil)
+            #endif
+        }
         .onReceive(NotificationCenter.default.publisher(for: .macSection)) { note in
             if let s = note.object as? String {
                 section = s; routedType = nil; routedId = nil
@@ -135,12 +149,6 @@ struct MacRootView: View {
         #endif
         // No animations anywhere: instant state changes.
         .transaction { $0.animation = nil }
-        // Ctrl+O navigates to Time (Cmd+K keeps Search).
-        .background {
-            Button("") { section = "time"; routedType = nil; routedId = nil }
-                .keyboardShortcut("o", modifiers: .control)
-                .hidden()
-        }
     }
 
     /// Starred clicks open the item itself, in this window — not a new

@@ -54,11 +54,14 @@ struct ContentView: View {
         }
         }
         }
-        // Ctrl+O navigates to Time (hardware keyboards).
+        // Ctrl+O opens the quick bar, like the web (hardware keyboards).
+        // iOS only: on macOS the menu command owns this shortcut.
         .background {
-            Button("") { tab = 1 }
+            #if os(iOS)
+            Button("") { state.quickBarOpen = true }
                 .keyboardShortcut("o", modifiers: .control)
                 .hidden()
+            #endif
         }
         // Cmd+K opens the quick bar (hardware keyboards).
         .background {
