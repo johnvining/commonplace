@@ -91,7 +91,9 @@ struct NoteDetailView: View {
                         }
                         HStack {
                             DSButton(title: "Save") { save() }
+                                .keyboardShortcut("a", modifiers: [.control])
                             DSButton(title: "Format text") { formatText() }
+                                .keyboardShortcut("f", modifiers: [.control])
                             Spacer()
                         }
                         if dirty { Text("Unsaved changes").font(DS.ui(11)).foregroundStyle(DS.danger) }
@@ -101,12 +103,11 @@ struct NoteDetailView: View {
                         HStack(spacing: 6) {
                             Spacer()
                             DSIconButton(systemImage: starred ? "star.fill" : "star", selected: starred, label: starred ? "Starred" : "Star") { toggleStar() }
-                            DSIconButton(systemImage: "pencil", label: "Edit") {
-                                title = note.title ?? ""; text = note.text ?? ""; take = note.take ?? ""
-                                urlField = note.url ?? ""; yearField = note.year.map(String.init) ?? ""; pageField = note.page ?? ""
-                                editing = true
-                            }
+                                .keyboardShortcut("s", modifiers: [.control])
+                            DSIconButton(systemImage: "pencil", label: "Edit") { beginEditing() }
+                                .keyboardShortcut("e", modifiers: [.control])
                             DSIconButton(systemImage: "trash", label: "Delete") { confirming = true }
+                                .keyboardShortcut("#", modifiers: [.shift])
                             if let web = state.webURL(path: "note/\(noteId)") {
                                 Link(destination: web) {
                                     Image(systemName: "arrow.up.forward.square")
