@@ -60,6 +60,20 @@ struct FlipView: View {
         .listStyle(.plain)
         .listRowSeparator(.hidden)
         .navigationTitle("Review")
+        .background {
+            Group {
+                Button("") { rate("fast") }.keyboardShortcut("1", modifiers: [])
+                Button("") { rate("med") }.keyboardShortcut("2", modifiers: [])
+                Button("") { rate("slow") }.keyboardShortcut("3", modifiers: [])
+                Button("") {
+                    if index + 1 >= deck.count { done = true } else { index += 1 }
+                }.keyboardShortcut("n", modifiers: [])
+                Button("") { if index > 0 { index -= 1 } }.keyboardShortcut("p", modifiers: [])
+                Button("") { if done || index >= deck.count { load() } }
+                    .keyboardShortcut(.return)
+            }
+            .hidden()
+        }
         .refreshable { load() }
         .task { load() }
         .onAppear { if !deck.isEmpty { load() } }
