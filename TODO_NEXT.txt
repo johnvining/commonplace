@@ -8,7 +8,7 @@
        widgets, quickbar)
 2. [ ] Clean up branches and figure out what needs to be done to get timer server + web done
 3. [ ] Test menu bar on Mac
-4. [ ] Fix control O on Mac
+4. [x] Fix control O on Mac
 5. [ ] Test/create quickbar on iOS
 6. [ ] Review iOS note display
 7. [ ] Review mac note display
