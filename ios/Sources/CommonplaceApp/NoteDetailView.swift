@@ -40,7 +40,10 @@ struct NoteDetailView: View {
     @State private var toast: String?
     @State private var confirming = false
     @State private var confirmingDismiss = false
-    private enum EditField: Hashable { case title }
+    /// The edit form's tab chain. Every field is bound so Tab walks
+    /// Title → Text → Take → URL → Year → Page instead of dropping
+    /// focus into the surrounding List.
+    private enum EditField: Hashable { case title, text, take, url, year, page }
     @FocusState private var focusedField: EditField?
     @Environment(\.dismiss) private var dismiss
     #if os(macOS)
@@ -69,24 +72,27 @@ struct NoteDetailView: View {
                             TextField("Text", text: $text, axis: .vertical)
                                 .dsInput()
                                 .font(DS.reading(15))
+                                .focused($focusedField, equals: .text)
                         }
                         editField("Take") {
                             TextField("Take", text: $take, axis: .vertical)
                                 .dsInput()
                                 .font(DS.reading(14))
+                                .focused($focusedField, equals: .take)
                         }
                         editField("URL") {
                             TextField("URL", text: $urlField)
                                 .dsInput()
                                 .font(DS.mono(13))
                                 .autocorrectionDisabled()
+                                .focused($focusedField, equals: .url)
                         }
                         HStack(spacing: 12) {
                             editField("Year") {
-                                TextField("Year", text: $yearField).dsInput().font(DS.ui(13))
+                                TextField("Year", text: $yearField).dsInput().font(DS.ui(13)).focused($focusedField, equals: .year)
                             }
                             editField("Page") {
-                                TextField("Page", text: $pageField).dsInput().font(DS.ui(13))
+                                TextField("Page", text: $pageField).dsInput().font(DS.ui(13)).focused($focusedField, equals: .page)
                             }
                         }
                         HStack {
