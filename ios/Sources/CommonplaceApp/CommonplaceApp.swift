@@ -44,16 +44,31 @@ struct CommonplaceApp: App {
                 .keyboardShortcut("n", modifiers: .command)
             }
             CommandMenu("View") {
+                // Section shortcuts in sidebar order after Time:
+                // ⌘0 Time, ⌘1 Notes, then continuing down the sidebar.
+                Button("Time") { NotificationCenter.default.post(name: .macSection, object: "time") }
+                    .keyboardShortcut("0", modifiers: .command)
                 Button("Notes") { NotificationCenter.default.post(name: .macSection, object: "notes") }
                     .keyboardShortcut("1", modifiers: .command)
-                Button("Time") { NotificationCenter.default.post(name: .macSection, object: "time") }
-                    .keyboardShortcut("2", modifiers: .command)
                 Button("Piles") { NotificationCenter.default.post(name: .macSection, object: "piles") }
+                    .keyboardShortcut("2", modifiers: .command)
+                Button("Works") { NotificationCenter.default.post(name: .macSection, object: "works") }
                     .keyboardShortcut("3", modifiers: .command)
+                Button("Authors") { NotificationCenter.default.post(name: .macSection, object: "authors") }
+                    .keyboardShortcut("4", modifiers: .command)
+                Button("Ideas") { NotificationCenter.default.post(name: .macSection, object: "ideas") }
+                    .keyboardShortcut("5", modifiers: .command)
+                Button("Search") { NotificationCenter.default.post(name: .macSection, object: "search") }
+                    .keyboardShortcut("6", modifiers: .command)
+                Button("Review") { NotificationCenter.default.post(name: .macSection, object: "flip") }
+                    .keyboardShortcut("7", modifiers: .command)
+                Button("Starred") { NotificationCenter.default.post(name: .macSection, object: "starred") }
+                    .keyboardShortcut("8", modifiers: .command)
+                Button("Notes to file") { NotificationCenter.default.post(name: .macSection, object: "files") }
+                    .keyboardShortcut("9", modifiers: .command)
                 Button("Quick Search…") { state.quickBarOpen = true }
                     .keyboardShortcut("k", modifiers: .command)
-                // Like the web: Ctrl+O toggles the quick bar. Go to
-                // Time keeps ⌘2 in this menu.
+                // Like the web: Ctrl+O toggles the quick bar.
                 Button("Quick Search (Ctrl+O)") { state.quickBarOpen.toggle() }
                     .keyboardShortcut("o", modifiers: .control)
             }
@@ -61,7 +76,7 @@ struct CommonplaceApp: App {
                 // Menu commands are the reliable shortcut path — a
                 // hidden background button never reliably receives
                 // key equivalents.
-                // No own shortcut: ⌘2 in the View menu already goes
+                // No own shortcut: ⌘0 in the View menu already goes
                 // to Time, and two menu items sharing one shortcut is
                 // undefined behaviour.
                 Button("Go to Time") {
