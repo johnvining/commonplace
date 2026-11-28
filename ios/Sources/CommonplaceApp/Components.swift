@@ -143,6 +143,49 @@ func joinAuthorNames(_ authors: [PopulatedRef]?) -> String {
     return names.dropLast().joined(separator: ", ") + " & " + names[names.count - 1]
 }
 
+/// The web's entity-page shortcut set (issue #406), shared by Work,
+/// Author, Idea and Pile detail pages. Only the active mode's buttons
+/// exist, so read-mode and edit-mode shortcuts cannot collide. Pages
+/// pass only the actions they have; the rest stay unbound.
+struct EntityShortcutButtons: View {
+    let editing: Bool
+    var onEdit: () -> Void
+    var onSave: () -> Void
+    var onExitEdit: () -> Void
+    var onToggleStar: () -> Void
+    var onDelete: () -> Void
+    var onNewNote: (() -> Void)? = nil
+    var onEditPiles: (() -> Void)? = nil
+    var onEditIdeas: (() -> Void)? = nil
+    var onViewNotes: (() -> Void)? = nil
+    var onNarrow: (() -> Void)? = nil
+    var onRead: (() -> Void)? = nil
+    var onImport: (() -> Void)? = nil
+    var onBack: (() -> Void)? = nil
+
+    var body: some View {
+        Group {
+            if editing {
+                Button("") { onSave() }.keyboardShortcut("a", modifiers: [.control])
+                Button("") { onExitEdit() }.keyboardShortcut(.escape)
+            } else {
+                Button("") { onEdit() }.keyboardShortcut("e", modifiers: [.control])
+                Button("") { onToggleStar() }.keyboardShortcut("s", modifiers: [.control])
+                Button("") { onDelete() }.keyboardShortcut("#", modifiers: [.shift])
+                if let onNewNote { Button("") { onNewNote() }.keyboardShortcut("n", modifiers: [.control]) }
+                if let onEditPiles { Button("") { onEditPiles() }.keyboardShortcut("p", modifiers: [.control]) }
+                if let onEditIdeas { Button("") { onEditIdeas() }.keyboardShortcut("t", modifiers: [.control]) }
+                if let onViewNotes { Button("") { onViewNotes() }.keyboardShortcut("v", modifiers: []) }
+                if let onNarrow { Button("") { onNarrow() }.keyboardShortcut("f", modifiers: []) }
+                if let onRead { Button("") { onRead() }.keyboardShortcut("r", modifiers: []) }
+                if let onImport { Button("") { onImport() }.keyboardShortcut("i", modifiers: []) }
+                if let onBack { Button("") { onBack() }.keyboardShortcut("b", modifiers: []) }
+            }
+        }
+        .hidden()
+    }
+}
+
 /// One work in a list, the web's ResultWork in app form: book icon,
 /// "Names, *Title* (Original) Year", the work's own star at the right.
 struct WorkListRow: View {

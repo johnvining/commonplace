@@ -16,6 +16,8 @@ struct PileDetailView: View {
     @State private var confirmingDelete = false
     @State private var newNoteId: String?
     @State private var showingNewNote = false
+    @State private var showingNarrow = false
+    @State private var notesOnly = false
     @State private var nick: String?
     @Environment(\.dismiss) private var dismiss
 
@@ -79,7 +81,7 @@ struct PileDetailView: View {
                 }
             }
             .listRowSeparator(.hidden)
-            if !works.isEmpty {
+            if !works.isEmpty && !notesOnly {
                 Section {
                     ForEach(works, id: \.stableId) { w in
                         NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
@@ -100,8 +102,24 @@ struct PileDetailView: View {
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "")
             }
+            .navigationDestination(isPresented: $showingNarrow) {
+                NotesView(initialPile: PickOption(id: pileId, name: pile?.name ?? "Pile"))
+            }
         }
         .listStyle(.plain)
+        .background {
+            EntityShortcutButtons(
+                editing: editing,
+                onEdit: { newName = pile?.name ?? ""; editing = true },
+                onSave: saveName,
+                onExitEdit: { editing = false },
+                onToggleStar: toggleStar,
+                onDelete: { confirmingDelete = true },
+                onNewNote: addNote,
+                onViewNotes: { notesOnly.toggle() },
+                onNarrow: { showingNarrow = true }
+            )
+        }
         .navigationTitle("Pile")
         .task { load() }
     }

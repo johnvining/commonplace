@@ -185,6 +185,9 @@ struct WorkDetailView: View {
     @State private var showingNewNote = false
     @State private var nick: String?
     @State private var summaryOpen = false
+    @State private var showingRead = false
+    @State private var showingAuthor = false
+    @State private var notesOnly = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -212,10 +215,7 @@ struct WorkDetailView: View {
                             nick: nick
                         ) {
                             DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
-                            DSButton(title: "Edit") {
-                                editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
-                                editing = true
-                            }
+                            DSButton(title: "Edit") { beginEditing() }
                             DSButton(title: "Add Note") { addNoteForWork() }
                             NavigationLink { ReadView(workId: workId, title: w.name ?? "Read") } label: {
                                 DSButtonLabel(title: "Read")
@@ -276,6 +276,8 @@ struct WorkDetailView: View {
                     }
                 } else {
                     // Read mode: linked piles/ideas as web-format chips.
+                    // `v` hides them for a notes-only view (web parity).
+                    if !notesOnly {
                     Section {
                         FlowLayout(spacing: 4) {
                             ForEach(w.piles ?? [], id: \.id) { p in
@@ -291,6 +293,7 @@ struct WorkDetailView: View {
                         }
                     }
                     .listRowSeparator(.hidden)
+                    }
                 }
                 Section {
                     ForEach(notes, id: \.stableId) { n in
@@ -319,8 +322,35 @@ struct WorkDetailView: View {
         .navigationDestination(isPresented: $showingNewNote) {
             NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
         }
+        .navigationDestination(isPresented: $showingRead) {
+            ReadView(workId: workId, title: work?.name ?? "Read")
+        }
+        .navigationDestination(isPresented: $showingAuthor) {
+            if let aid = work?.authors?.first?.id { AuthorDetailView(authorId: aid) }
+        }
+        .background {
+            EntityShortcutButtons(
+                editing: editing,
+                onEdit: beginEditing, onSave: saveEdit,
+                onExitEdit: { editing = false },
+                onToggleStar: toggleStar,
+                onDelete: { confirmingDelete = true },
+                onNewNote: addNoteForWork,
+                onEditPiles: beginEditing, onEditIdeas: beginEditing,
+                onViewNotes: { notesOnly.toggle() },
+                onRead: { showingRead = true },
+                onImport: beginEditing,
+                onBack: { showingAuthor = work?.authors?.first != nil }
+            )
+        }
         .navigationTitle("Work")
         .task { await load() }
+    }
+
+    private func beginEditing() {
+        guard let w = work else { return }
+        editName = w.name ?? ""; editYear = w.year.map(String.init) ?? ""; editURL = w.url ?? ""
+        editing = true
     }
 
     private func loadMoreNotes() async {
@@ -404,6 +434,7 @@ struct AuthorDetailView: View {
     @State private var editDeath = ""
     @State private var confirmingDelete = false
     @State private var nick: String?
+    @State private var notesOnly = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -433,12 +464,7 @@ struct AuthorDetailView: View {
                             nick: nick
                         ) {
                             DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
-                            DSButton(title: "Edit") {
-                                editName = a.name ?? ""
-                                editBirth = a.birth_year.map(String.init) ?? ""
-                                editDeath = a.death_year.map(String.init) ?? ""
-                                editing = true
-                            }
+                            DSButton(title: "Edit") { beginEditing() }
                             OpenInWebButton(path: "auth/\(authorId)")
                             DSButton(title: "Delete") { confirmingDelete = true }
                         }
@@ -453,7 +479,8 @@ struct AuthorDetailView: View {
                 }
                 .listRowSeparator(.hidden)
                 // No "Works" heading: the web lists the works directly
-                // under the header, in citation form.
+                // under the header, in citation form. `v` hides them.
+                if !notesOnly {
                 Section {
                     ForEach(works, id: \.stableId) { w in
                         NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
@@ -479,6 +506,7 @@ struct AuthorDetailView: View {
                         }
                     }
                 }
+                }
                 Section(header: Text("Notes — showing \(notes.count) of \(a.note_count ?? notes.count)")) {
                     ForEach(notes, id: \.stableId) { n in
                         NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: { NoteRow(note: n) }
@@ -493,8 +521,26 @@ struct AuthorDetailView: View {
             }
         }
         .listStyle(.plain)
+        .background {
+            EntityShortcutButtons(
+                editing: editing,
+                onEdit: beginEditing, onSave: saveEdit,
+                onExitEdit: { editing = false },
+                onToggleStar: toggleStar,
+                onDelete: { confirmingDelete = true },
+                onViewNotes: { notesOnly.toggle() }
+            )
+        }
         .navigationTitle("Author")
         .task { await load() }
+    }
+
+    private func beginEditing() {
+        guard let a = author else { return }
+        editName = a.name ?? ""
+        editBirth = a.birth_year.map(String.init) ?? ""
+        editDeath = a.death_year.map(String.init) ?? ""
+        editing = true
     }
 
     private var starred: Bool { state.pins.contains { $0.type == "auth" && $0.id == authorId } }
@@ -561,6 +607,7 @@ struct IdeaDetailView: View {
     @State private var newNoteId: String?
     @State private var showingNewNote = false
     @State private var nick: String?
+    @State private var notesOnly = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -592,11 +639,7 @@ struct IdeaDetailView: View {
                             nick: nick
                         ) {
                             DSButton(title: starred ? "Starred" : "Star", selected: starred) { toggleStar() }
-                            DSButton(title: "Edit") {
-                                editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
-                                editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false
-                                editing = true
-                            }
+                            DSButton(title: "Edit") { beginEditing() }
                             DSButton(title: "Add Note") { addNoteForIdea() }
                             OpenInWebButton(path: "idea/\(ideaId)")
                             DSButton(title: "Delete") { confirmingDelete = true }
@@ -612,7 +655,7 @@ struct IdeaDetailView: View {
                     }
                 }
                 .listRowSeparator(.hidden)
-                if !works.isEmpty {
+                if !works.isEmpty && !notesOnly {
                     Section {
                         ForEach(works, id: \.stableId) { w in
                             NavigationLink { WorkDetailView(workId: w._id ?? "") } label: {
@@ -637,8 +680,26 @@ struct IdeaDetailView: View {
             }
         }
         .listStyle(.plain)
+        .background {
+            EntityShortcutButtons(
+                editing: editing,
+                onEdit: beginEditing, onSave: saveEdit,
+                onExitEdit: { editing = false },
+                onToggleStar: toggleStar,
+                onDelete: { confirmingDelete = true },
+                onNewNote: addNoteForIdea,
+                onViewNotes: { notesOnly.toggle() }
+            )
+        }
         .navigationTitle("Idea")
         .task { await load() }
+    }
+
+    private func beginEditing() {
+        guard let i = idea else { return }
+        editName = i.name ?? ""; editStart = i.start_year.map(String.init) ?? ""
+        editEnd = i.end_year.map(String.init) ?? ""; editPerson = i.person ?? false
+        editing = true
     }
 
     private var starred: Bool { state.pins.contains { $0.type == "idea" && $0.id == ideaId } }
