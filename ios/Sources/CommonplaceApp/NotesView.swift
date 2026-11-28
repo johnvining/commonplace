@@ -198,6 +198,7 @@ struct NotesView: View {
     }
 
     private var listBody: some View {
+        ScrollViewReader { proxy in
         List {
             headerControls
                 .listRowSeparator(.hidden)
@@ -241,6 +242,12 @@ struct NotesView: View {
         }
         .listStyle(.plain)
         .refreshable { loadRecent() }
+        .onChange(of: focusedIndex) { _, newIndex in
+            // j/k focus must pull the list with it, not walk off-screen.
+            guard notes.indices.contains(newIndex) else { return }
+            proxy.scrollTo(notes[newIndex].stableId, anchor: .center)
+        }
+        }
     }
 
     private func createNote() {
