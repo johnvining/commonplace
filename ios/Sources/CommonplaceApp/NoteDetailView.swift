@@ -40,6 +40,8 @@ struct NoteDetailView: View {
     @State private var toast: String?
     @State private var confirming = false
     @State private var confirmingDismiss = false
+    private enum EditField: Hashable { case title }
+    @FocusState private var focusedField: EditField?
     @Environment(\.dismiss) private var dismiss
     #if os(macOS)
     @Environment(\.openWindow) private var openWindow
@@ -61,6 +63,7 @@ struct NoteDetailView: View {
                             TextField("Title", text: $title)
                                 .dsInput()
                                 .font(DS.noteTitle())
+                                .focused($focusedField, equals: .title)
                         }
                         editField("Text") {
                             TextField("Text", text: $text, axis: .vertical)
@@ -413,6 +416,15 @@ struct NoteDetailView: View {
             #endif
         }
         .background { noteShortcutButtons }
+        .onChange(of: editing) { nowEditing in
+            // Entering edit mode lands in Title, ready to type (web
+            // edit form focus), instead of leaving focus nowhere.
+            if nowEditing {
+                DispatchQueue.main.async { focusedField = .title }
+            } else {
+                focusedField = nil
+            }
+        }
         .task { load() }
     }
 
