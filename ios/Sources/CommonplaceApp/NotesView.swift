@@ -1,5 +1,10 @@
 import SwiftUI
 import CommonplaceKit
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 /// Recent notes list with keyword search + pile/idea filters
 /// (mirrors RecentList + Filter AND semantics).
@@ -18,6 +23,17 @@ struct NotesView: View {
     @State private var newNoteId: String?
     @State private var showingNewNote = false
     @AppStorage("notesViewMode") private var viewMode = "slim"
+    // Keyboard focus + multi-selection (issue #406): focus moves with
+    // j/k in Full view; x toggles the focused note in the other modes.
+    @State private var focusedIndex = 0
+    @State private var selectedIds: Set<String> = []
+    @State private var openedNoteId: String?
+    @State private var openedNoteEdit = false
+    @State private var showingOpenedNote = false
+    @State private var confirmingDeleteSelected = false
+    @State private var bulkKind: String?
+    @State private var showingBulkPicker = false
+    @FocusState private var searchFocused: Bool
 
     private var isCardMode: Bool { viewMode == "grid" || viewMode == "tile" }
 
@@ -43,6 +59,14 @@ struct NotesView: View {
             .navigationDestination(isPresented: $showingNewNote) {
                 NoteDetailView(noteId: newNoteId ?? "", editFirst: true)
             }
+            .navigationDestination(isPresented: $showingOpenedNote) {
+                NoteDetailView(noteId: openedNoteId ?? "", editFirst: openedNoteEdit)
+            }
+            .background { noteListShortcutButtons }
+            .confirmationDialog("Delete \(selectedIds.count) selected note(s)?", isPresented: $confirmingDeleteSelected) {
+                Button("Delete", role: .destructive) { deleteSelected() }
+            }
+            .sheet(isPresented: $showingBulkPicker) { bulkPickerSheet }
             .toolbar {
                 // Always visible, top right — not a row in the content.
                 ToolbarItem(placement: .primaryAction) {
@@ -71,9 +95,19 @@ struct NotesView: View {
                                 columns: [GridItem(.adaptive(minimum: viewMode == "tile" ? 240 : 180), spacing: 12)],
                                 alignment: .leading, spacing: 12
                             ) {
-                                ForEach(notes, id: \.stableId) { n in
+                                ForEach(Array(notes.enumerated()), id: \.element.stableId) { idx, n in
                                     NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
                                         NoteCard(note: n, large: viewMode == "tile")
+                                            .overlay(alignment: .topTrailing) {
+                                                if selectedIds.contains(n._id ?? "") {
+                                                    Image(systemName: "checkmark.circle.fill")
+                                                        .foregroundStyle(DS.accent).padding(6)
+                                                }
+                                            }
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 0)
+                                                    .stroke(idx == focusedIndex && isCardMode ? DS.accent : Color.clear, lineWidth: 2)
+                                            )
                                     }
                                     .buttonStyle(.plain)
                                     .contextMenu {
@@ -103,6 +137,7 @@ struct NotesView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         TextField("Search notes", text: $search)
+                            .focused($searchFocused)
                             .font(DS.ui(14))
                             .onSubmit { applySearch() }
                             .onChange(of: search) { scheduleSearch() }
@@ -172,10 +207,17 @@ struct NotesView: View {
                 Text(error).font(DS.ui(12)).foregroundStyle(DS.danger)
                     .listRowSeparator(.hidden)
             }
-            ForEach(notes, id: \.stableId) { n in
+            ForEach(Array(notes.enumerated()), id: \.element.stableId) { idx, n in
                 NavigationLink { NoteDetailView(noteId: n._id ?? "") } label: {
-                    NoteRow(note: n, full: viewMode == "full")
+                    HStack(spacing: 8) {
+                        if selectedIds.contains(n._id ?? "") {
+                            Image(systemName: "checkmark.circle.fill").foregroundStyle(DS.accent)
+                        }
+                        NoteRow(note: n, full: viewMode == "full")
+                    }
                 }
+                .id(n.stableId)
+                .listRowBackground(idx == focusedIndex && !isCardMode ? DS.accentSoft : Color.clear)
                 .contextMenu {
                     #if os(macOS)
                     Button("Open in New Window") {
@@ -211,6 +253,187 @@ struct NotesView: View {
                 await MainActor.run { self.error = "Could not create note — retry." }
             }
         }
+    }
+
+    private var focusedNote: Note? {
+        notes.indices.contains(focusedIndex) ? notes[focusedIndex] : nil
+    }
+
+    private func openFocused(edit: Bool = false) {
+        guard let id = focusedNote?._id else { return }
+        openedNoteId = id; openedNoteEdit = edit; showingOpenedNote = true
+    }
+
+    private func moveFocus(_ delta: Int) {
+        guard !notes.isEmpty else { return }
+        focusedIndex = min(max(0, focusedIndex + delta), notes.count - 1)
+    }
+
+    private func toggleFocusedSelection() {
+        guard let id = focusedNote?._id else { return }
+        if selectedIds.contains(id) { selectedIds.remove(id) } else { selectedIds.insert(id) }
+    }
+
+    private func toggleSelectAll() {
+        let all = Set(notes.compactMap(\._id))
+        selectedIds = selectedIds == all ? [] : all
+    }
+
+    private func deleteSelected() {
+        let ids = Array(selectedIds)
+        Task {
+            do {
+                for id in ids { try await state.client.deleteNote(id: id) }
+                await MainActor.run { selectedIds = []; loadRecent() }
+            } catch { await MainActor.run { self.error = "Delete failed: \(describe(error))" } }
+        }
+    }
+
+    private func goPage(_ wanted: Int) {
+        guard wanted >= 1 else { return }
+        Task {
+            do {
+                let rows = try await state.client.recentNotes(page: wanted)
+                await MainActor.run {
+                    page = wanted; notes = rows; loaded = true; focusedIndex = 0; selectedIds = []
+                }
+            } catch { await MainActor.run { self.error = "Page failed: \(describe(error))" } }
+        }
+    }
+
+    private func copySelectedAsList() {
+        let chosen = notes.filter { selectedIds.contains($0._id ?? "") }
+        let text = chosen.map { n in
+            let nick = n.nick.map { " (\($0))" } ?? ""
+            return "- \(n.displayTitle)\(nick)"
+        }.joined(separator: "\n")
+        #if os(iOS)
+        UIPasteboard.general.string = text
+        #elseif os(macOS)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        #endif
+    }
+
+    private func bulkTargets() -> [String] {
+        Array(selectedIds.isEmpty ? (focusedNote?._id.map { [$0] } ?? []) : selectedIds)
+    }
+
+    private func runBulkOcr() {
+        let ids = bulkTargets(); guard !ids.isEmpty else { return }
+        Task {
+            do { _ = try await state.client.bulkOcr(noteIds: ids); await MainActor.run { loadRecent() } }
+            catch { await MainActor.run { self.error = "OCR failed: \(describe(error))" } }
+        }
+    }
+
+    private func runBulkSuggestTitles() {
+        let ids = bulkTargets(); guard !ids.isEmpty else { return }
+        Task {
+            do { _ = try await state.client.bulkSuggestTitles(noteIds: ids); await MainActor.run { loadRecent() } }
+            catch { await MainActor.run { self.error = "Suggest titles failed: \(describe(error))" } }
+        }
+    }
+
+    private func startBulk(_ kind: String) {
+        bulkKind = kind
+        showingBulkPicker = true
+    }
+
+    private var bulkPickerSheet: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Add \(bulkKind ?? "") to \(bulkTargets().count) note(s)")
+                .font(DS.ui(15, weight: .semibold))
+            TypeaheadField(
+                placeholder: "Type to search…",
+                load: { q in
+                    switch bulkKind {
+                    case "idea": return ((try? await state.client.autocompleteIdeas(q)) ?? []).compactMap { i in i._id.map { PickOption(id: $0, name: i.name ?? "") } }
+                    case "work": return ((try? await state.client.autocompleteWorks(q)) ?? []).compactMap { w in w._id.map { PickOption(id: $0, name: w.name ?? "") } }
+                    case "auth": return ((try? await state.client.autocompleteAuthors(q)) ?? []).compactMap { a in a._id.map { PickOption(id: $0, name: a.name ?? "") } }
+                    default: return ((try? await state.client.autocompletePiles(q)) ?? []).compactMap { p in p._id.map { PickOption(id: $0, name: p.name ?? "") } }
+                    }
+                },
+                onPick: { opt in applyBulkTarget(opt); showingBulkPicker = false },
+                onCreate: { name in createBulkTarget(name) }
+            )
+            HStack { Spacer(); DSButton(title: "Close") { showingBulkPicker = false } }
+        }
+        .padding(20)
+        .frame(minWidth: 380, minHeight: 220)
+    }
+
+    private func createBulkTarget(_ name: String) {
+        Task {
+            do {
+                let opt: PickOption?
+                switch bulkKind {
+                case "idea": opt = try await state.client.createIdea(name: name)._id.map { PickOption(id: $0, name: name) }
+                case "work": opt = try await state.client.createWork(name: name)._id.map { PickOption(id: $0, name: name) }
+                case "auth": opt = try await state.client.createAuthor(name: name)._id.map { PickOption(id: $0, name: name) }
+                default: opt = try await state.client.createPile(name: name)._id.map { PickOption(id: $0, name: name) }
+                }
+                if let opt { await MainActor.run { applyBulkTarget(opt); showingBulkPicker = false } }
+            } catch { await MainActor.run { self.error = "Create failed: \(describe(error))" } }
+        }
+    }
+
+    private func applyBulkTarget(_ opt: PickOption) {
+        let ids = bulkTargets(); guard !ids.isEmpty else { return }
+        Task {
+            do {
+                for id in ids {
+                    switch bulkKind {
+                    case "idea": _ = try await state.client.addIdeaToNote(noteId: id, ideaId: opt.id)
+                    case "work": _ = try await state.client.addWorkToNote(noteId: id, workId: opt.id)
+                    case "pile": _ = try await state.client.addPileToNote(noteId: id, pileId: opt.id)
+                    case "auth":
+                        if let note = notes.first(where: { $0._id == id }) {
+                            var authorIds = note.displayAuthors.map(\.id)
+                            if !authorIds.contains(opt.id) { authorIds.append(opt.id) }
+                            _ = try await state.client.updateNote(id: id, NoteUpdate(authors: authorIds))
+                        }
+                    default: break
+                    }
+                }
+                await MainActor.run { loadRecent() }
+            } catch { await MainActor.run { self.error = "Add failed: \(describe(error))" } }
+        }
+    }
+
+    /// Web note-list shortcuts. The set exists only while the search
+    /// field is not being typed in, so letters keep their text meaning.
+    private var noteListShortcutButtons: some View {
+        Group {
+            if !searchFocused {
+                Button("") { goPage(page - 1) }.keyboardShortcut("[", modifiers: [])
+                Button("") { goPage(page + 1) }.keyboardShortcut("]", modifiers: [])
+                Button("") { confirmingDeleteSelected = !selectedIds.isEmpty }
+                    .keyboardShortcut("#", modifiers: [.shift])
+                Button("") { startBulk("idea") }.keyboardShortcut("t", modifiers: [.control])
+                Button("") { startBulk("work") }.keyboardShortcut("w", modifiers: [])
+                Button("") { startBulk("auth") }.keyboardShortcut("@", modifiers: [.shift])
+                Button("") { startBulk("pile") }.keyboardShortcut("p", modifiers: [.control])
+                Button("") { runBulkOcr() }.keyboardShortcut("r", modifiers: [.control])
+                Button("") { runBulkSuggestTitles() }.keyboardShortcut("s", modifiers: [.control])
+                Button("") { copySelectedAsList() }.keyboardShortcut("y", modifiers: [])
+                if isCardMode || viewMode != "full" {
+                    Button("") { toggleFocusedSelection() }.keyboardShortcut("x", modifiers: [])
+                    Button("") { toggleSelectAll() }.keyboardShortcut("*", modifiers: [.shift])
+                } else {
+                    Button("") { moveFocus(1) }.keyboardShortcut("j", modifiers: [])
+                    Button("") { moveFocus(-1) }.keyboardShortcut("k", modifiers: [])
+                    Button("") { openFocused() }.keyboardShortcut(.return)
+                    Button("") { openFocused() }.keyboardShortcut("o", modifiers: [])
+                    Button("") { openFocused(edit: true) }.keyboardShortcut("e", modifiers: [])
+                    Button("") { openFocused(edit: true) }.keyboardShortcut("e", modifiers: [.control])
+                    Button("") { openFocused(edit: true) }.keyboardShortcut("t", modifiers: [.control])
+                    Button("") { openFocused(edit: true) }.keyboardShortcut("p", modifiers: [.control])
+                    Button("") { focusedIndex = -1 }.keyboardShortcut(.escape)
+                }
+            }
+        }
+        .hidden()
     }
 
     private func loadRecent(page wanted: Int = 1) {

@@ -332,6 +332,22 @@ public final class APIClient: Sendable {
         try await get("note/\(noteId)/ideas/suggest")
     }
 
+    public struct BulkNoteResult: Codable, Sendable {
+        public var noteId: String?
+        public var success: Bool?
+        public var textUpdated: Bool?
+        public var titleUpdated: Bool?
+        public var suggestedTitle: String?
+    }
+
+    public func bulkOcr(noteIds: [String]) async throws -> [BulkNoteResult] {
+        try await post("note/bulk-ocr", body: ["noteIds": noteIds])
+    }
+
+    public func bulkSuggestTitles(noteIds: [String]) async throws -> [BulkNoteResult] {
+        try await post("note/bulk-suggest-titles", body: ["noteIds": noteIds])
+    }
+
     // MARK: Images & OCR
 
     /// Raw bytes of a note's nth image (1-based), session cookie attached.
