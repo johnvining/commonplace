@@ -67,18 +67,33 @@ struct NoteDetailView: View {
                                 .dsInput()
                                 .font(DS.noteTitle())
                                 .focused($focusedField, equals: .title)
+                                .onKeyPress(phases: .down) { press in
+                                    guard press.key == .tab else { return .ignored }
+                                    focusedField = tabTarget(from: .title, backward: press.modifiers.contains(.shift))
+                                    return .handled
+                                }
                         }
                         editField("Text") {
                             TextField("Text", text: $text, axis: .vertical)
                                 .dsInput()
                                 .font(DS.reading(15))
                                 .focused($focusedField, equals: .text)
+                                .onKeyPress(phases: .down) { press in
+                                    guard press.key == .tab else { return .ignored }
+                                    focusedField = tabTarget(from: .text, backward: press.modifiers.contains(.shift))
+                                    return .handled
+                                }
                         }
                         editField("Take") {
                             TextField("Take", text: $take, axis: .vertical)
                                 .dsInput()
                                 .font(DS.reading(14))
                                 .focused($focusedField, equals: .take)
+                                .onKeyPress(phases: .down) { press in
+                                    guard press.key == .tab else { return .ignored }
+                                    focusedField = tabTarget(from: .take, backward: press.modifiers.contains(.shift))
+                                    return .handled
+                                }
                         }
                         editField("URL") {
                             TextField("URL", text: $urlField)
@@ -86,13 +101,28 @@ struct NoteDetailView: View {
                                 .font(DS.mono(13))
                                 .autocorrectionDisabled()
                                 .focused($focusedField, equals: .url)
+                                .onKeyPress(phases: .down) { press in
+                                    guard press.key == .tab else { return .ignored }
+                                    focusedField = tabTarget(from: .url, backward: press.modifiers.contains(.shift))
+                                    return .handled
+                                }
                         }
                         HStack(spacing: 12) {
                             editField("Year") {
                                 TextField("Year", text: $yearField).dsInput().font(DS.ui(13)).focused($focusedField, equals: .year)
+                                    .onKeyPress(phases: .down) { press in
+                                    guard press.key == .tab else { return .ignored }
+                                        focusedField = tabTarget(from: .year, backward: press.modifiers.contains(.shift))
+                                        return .handled
+                                    }
                             }
                             editField("Page") {
                                 TextField("Page", text: $pageField).dsInput().font(DS.ui(13)).focused($focusedField, equals: .page)
+                                    .onKeyPress(phases: .down) { press in
+                                    guard press.key == .tab else { return .ignored }
+                                        focusedField = tabTarget(from: .page, backward: press.modifiers.contains(.shift))
+                                        return .handled
+                                    }
                             }
                         }
                         HStack {
@@ -472,6 +502,14 @@ struct NoteDetailView: View {
             }
         }
         .hidden()
+    }
+
+    /// Tab order for the edit form. SwiftUI's own focus ring wanders
+    /// into the sidebar, so every field hands focus on explicitly.
+    private func tabTarget(from field: EditField, backward: Bool) -> EditField {
+        let order: [EditField] = [.title, .text, .take, .url, .year, .page]
+        guard let idx = order.firstIndex(of: field) else { return field }
+        return order[min(max(idx + (backward ? -1 : 1), 0), order.count - 1)]
     }
 
     private func beginEditing() {
