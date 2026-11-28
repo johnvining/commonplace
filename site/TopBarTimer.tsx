@@ -7,6 +7,7 @@ import * as db from './Database'
 // every 5s; clicking goes to the Time page.
 export default function TopBarTimer() {
   const [timer, setTimer] = useState<{ key: string; kind: string; label?: string; startedAt: number } | null>(null)
+  const [resolvedLabel, setResolvedLabel] = useState('')
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
@@ -35,6 +36,24 @@ export default function TopBarTimer() {
     }
   }, [])
 
+  // A shared timer can arrive with only its subject key (for example,
+  // one started by another client before it supplied a label). Resolve
+  // pile/work keys to their names instead of showing the internal ID.
+  useEffect(() => {
+    setResolvedLabel('')
+    if (!timer || timer.label) return
+    const match = timer.key.match(/^(pile|work):(.+)$/)
+    if (!match) return
+    let alive = true
+    db.getInfo(match[1] === 'pile' ? db.types.pile : db.types.work, match[2])
+      .then((res: any) => {
+        const name = res.data?.data?.name
+        if (alive && name) setResolvedLabel(name)
+      })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [timer?.key, timer?.label])
+
   useEffect(() => {
     if (!timer) return
     setNow(Date.now())
@@ -51,7 +70,7 @@ export default function TopBarTimer() {
   const elapsed = h > 0
     ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
     : `${m}:${String(s).padStart(2, '0')}`
-  const label = timer.label || timer.key.replace(/^(pile|work|title):/, '')
+  const label = timer.label || resolvedLabel || timer.key.replace(/^(pile|work|title):/, '')
 
   return (
     <Link to="/time" className="topbar-timer" title="Open the Time page">
