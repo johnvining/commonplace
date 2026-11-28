@@ -3,6 +3,8 @@ import CommonplaceKit
 import PhotosUI
 #if os(iOS)
 import UIKit
+#elseif os(macOS)
+import AppKit
 #endif
 
 /// Single note: full card, star, edit, delete (mirrors NoteView).
@@ -31,6 +33,7 @@ struct NoteDetailView: View {
     @State private var lightboxIndex: Int?
     @State private var ocrResult: String?
     @State private var suggestedTitle: String?
+    @State private var fewerFields = false
     @State private var suggestedIdeas: [String] = []
     @State private var suggestBusy = false
     @State private var error: String?
@@ -218,7 +221,8 @@ struct NoteDetailView: View {
                 // Labels (Authors/Work/Piles/…) belong to the edit form
                 // only. Read mode shows the linked things themselves,
                 // unlabeled, and tapping one opens it — never deletes.
-                if editing {
+                // Ctrl+M toggles these link sections (fewer/all fields).
+                if editing && !fewerFields {
                     Section("Authors") {
                         PillEditor(
                             placeholder: "Add an author…", tint: DS.accentSoft, selected: $authorOptions,
@@ -326,6 +330,7 @@ struct NoteDetailView: View {
                             PhotosPicker(selection: $photoItems, matching: .images) {
                                 Text(uploading ? "Uploading…" : "Add photos")
                             }
+                            .keyboardShortcut("u", modifiers: [.control])
                             .onChange(of: photoItems) { uploadPhotos() }
                             if uploading { ProgressView() }
                             HStack {
@@ -407,7 +412,64 @@ struct NoteDetailView: View {
             }
             #endif
         }
+        .background { noteShortcutButtons }
         .task { load() }
+    }
+
+    /// Web note shortcuts (Help overlay, Note Editing): Ctrl+E/A/S/F/R,
+    /// images, nick, delete, fields. Only the active mode's set is in
+    /// the hierarchy, so read and edit shortcuts never collide.
+    private var noteShortcutButtons: some View {
+        Group {
+            if editing {
+                Button("") { save() }.keyboardShortcut("a", modifiers: [.control])
+                Button("") { editing = false }.keyboardShortcut(.escape)
+                Button("") { formatText() }.keyboardShortcut("f", modifiers: [.control])
+                Button("") { suggestTitle() }.keyboardShortcut("s", modifiers: [.control])
+                Button("") { runOCR() }.keyboardShortcut("r", modifiers: [.control])
+                Button("") { fewerFields.toggle() }.keyboardShortcut("m", modifiers: [.control])
+                Button("") { fewerFields = false }.keyboardShortcut("l", modifiers: [.control])
+            } else {
+                Button("") { beginEditing() }.keyboardShortcut("e", modifiers: [.control])
+                Button("") { toggleStar() }.keyboardShortcut("s", modifiers: [.control])
+                Button("") { confirming = true }.keyboardShortcut("#", modifiers: [.shift])
+                Button("") { copyNick() }.keyboardShortcut("y", modifiers: [])
+                Button("") { if !imageDatas.isEmpty { lightboxIndex = 0 } }
+                    .keyboardShortcut("z", modifiers: [])
+                Button("") { if !imageDatas.isEmpty { lightboxIndex = 0 } }
+                    .keyboardShortcut("i", modifiers: [.control])
+                Button("") { beginEditing(); fewerFields = false }
+                    .keyboardShortcut("l", modifiers: [.control])
+            }
+            if lightboxIndex != nil {
+                Button("") { lightboxIndex = max(0, (lightboxIndex ?? 1) - 1) }
+                    .keyboardShortcut("j", modifiers: [.control])
+                Button("") { lightboxIndex = min(imageDatas.count - 1, (lightboxIndex ?? -1) + 1) }
+                    .keyboardShortcut("k", modifiers: [.control])
+                Button("") { lightboxIndex = max(0, (lightboxIndex ?? 1) - 1) }
+                    .keyboardShortcut(.leftArrow)
+                Button("") { lightboxIndex = min(imageDatas.count - 1, (lightboxIndex ?? -1) + 1) }
+                    .keyboardShortcut(.rightArrow)
+            }
+        }
+        .hidden()
+    }
+
+    private func beginEditing() {
+        guard let note else { return }
+        title = note.title ?? ""; text = note.text ?? ""; take = note.take ?? ""
+        urlField = note.url ?? ""; yearField = note.year.map(String.init) ?? ""; pageField = note.page ?? ""
+        editing = true
+    }
+
+    private func copyNick() {
+        guard let nick = note?.nick else { return }
+        #if os(iOS)
+        UIPasteboard.general.string = nick
+        #elseif os(macOS)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(nick, forType: .string)
+        #endif
     }
 
     /// Edit-form field: small-caps label above a bordered input,
