@@ -53,33 +53,50 @@ struct MacRootView: View {
         ("settings", "Settings", "gear"),
     ]
 
+    private var timeSection: (id: String, label: String, icon: String) {
+        sections.first { $0.id == "time" }!
+    }
+
+    private var mainSections: [(id: String, label: String, icon: String)] {
+        sections.filter { $0.id != "time" }
+    }
+
+    private func sidebarRow(_ s: (id: String, label: String, icon: String)) -> some View {
+        HStack(spacing: 6) {
+            Label(s.label, systemImage: s.icon)
+            Spacer()
+            // Grey total beside countable sections.
+            if let count = sectionCount(s.id) {
+                Text("\(count)")
+                    .font(DS.ui(11))
+                    .monospacedDigit()
+                    .foregroundStyle(DS.faint)
+            }
+            // Dot when maintenance has open tasks.
+            if s.id == "maintenance", state.maintenancePending > 0 {
+                Circle()
+                    .fill(DS.accent)
+                    .frame(width: 7, height: 7)
+                    .help("\(state.maintenancePending) open maintenance tasks")
+            }
+        }
+        .tag(s.id)
+    }
+
     var body: some View {
         NavigationSplitView {
             List(selection: Binding(
                 get: { section },
                 set: { section = $0; routedType = nil; routedId = nil }
             )) {
+                // Time sits alone at the top, like the website. The
+                // app still opens on Notes below the break.
                 Section {
-                    ForEach(sections, id: \.id) { s in
-                        HStack(spacing: 6) {
-                            Label(s.label, systemImage: s.icon)
-                            Spacer()
-                            // Grey total beside countable sections.
-                            if let count = sectionCount(s.id) {
-                                Text("\(count)")
-                                    .font(DS.ui(11))
-                                    .monospacedDigit()
-                                    .foregroundStyle(DS.faint)
-                            }
-                            // Dot when maintenance has open tasks.
-                            if s.id == "maintenance", state.maintenancePending > 0 {
-                                Circle()
-                                    .fill(DS.accent)
-                                    .frame(width: 7, height: 7)
-                                    .help("\(state.maintenancePending) open maintenance tasks")
-                            }
-                        }
-                        .tag(s.id)
+                    sidebarRow(timeSection)
+                }
+                Section {
+                    ForEach(mainSections, id: \.id) { s in
+                        sidebarRow(s)
                     }
                 }
                 if !state.pins.isEmpty {
