@@ -33,6 +33,10 @@ struct MacRootView: View {
     /// sidebar section clears it and returns to that section's list.
     @State private var routedType: String?
     @State private var routedId: String?
+    /// Sections already built once. They stay mounted (hidden) after
+    /// that, so switching back is a visibility change, not a rebuild
+    /// plus a fresh round of network loads.
+    @State private var visitedSections: Set<String> = ["notes"]
     #if os(macOS)
     @State private var mainWindow: NSWindow?
     #endif
@@ -207,7 +211,9 @@ struct MacRootView: View {
 
     @ViewBuilder
     private var detail: some View {
-        if let routedType, let routedId {
+        ZStack {
+            sectionDetail
+            if let routedType, let routedId {
             VStack(spacing: 0) {
                 HStack {
                     Button {
@@ -233,14 +239,33 @@ struct MacRootView: View {
                     }
                 }
             }
-        } else {
-            sectionDetail
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(DS.surface)
+            .zIndex(1)
+            }
         }
     }
 
-    @ViewBuilder
     private var sectionDetail: some View {
-        switch section ?? "notes" {
+        ZStack {
+            ForEach(sections.filter { visitedSections.contains($0.id) }, id: \.id) { s in
+                let active = (section ?? "notes") == s.id && routedType == nil
+                sectionView(s.id)
+                    .opacity(active ? 1 : 0)
+                    .allowsHitTesting(active)
+                    .accessibilityHidden(!active)
+                    .zIndex(active ? 1 : 0)
+            }
+        }
+        .onChange(of: section) { _, newSection in
+            if let newSection { visitedSections.insert(newSection) }
+        }
+        .task { await prewarmSections() }
+    }
+
+    @ViewBuilder
+    private func sectionView(_ id: String) -> some View {
+        switch id {
         case "time": TimeView(preselectSubject: timePreselect)
         case "piles": PileListView()
         case "works": WorksListView()
@@ -254,6 +279,17 @@ struct MacRootView: View {
         case "maintenance": MaintenanceView()
         case "settings": SettingsView()
         default: NotesView()
+        }
+    }
+
+    /// Build the sections people switch between most, one at a time in
+    /// the background, so their first visit is already built and loaded.
+    private func prewarmSections() async {
+        for id in ["time", "piles", "works", "authors", "ideas", "search"] {
+            if Task.isCancelled { return }
+            try? await Task.sleep(nanoseconds: 120_000_000)
+            if Task.isCancelled { return }
+            visitedSections.insert(id)
         }
     }
 }
