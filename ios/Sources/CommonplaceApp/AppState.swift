@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import SwiftUI
 import CommonplaceKit
 #if canImport(WidgetKit)
 import WidgetKit
@@ -47,6 +48,30 @@ final class AppState: ObservableObject {
     @Published var counts: StatsCounts?
     /// Quick-bar overlay visibility (Cmd+K).
     @Published var quickBarOpen = false
+    /// Keyboard-shortcuts help overlay (? / Ctrl+/).
+    @Published var helpOpen = false
+    /// Appearance cycle for `d`: system -> day -> night (web parity).
+    @Published var themeMode: String {
+        didSet { UserDefaults.standard.set(themeMode, forKey: "app_theme") }
+    }
+
+    var preferredColorScheme: ColorScheme? {
+        switch themeMode {
+        case "day": return .light
+        case "night": return .dark
+        default: return nil
+        }
+    }
+
+    func cycleTheme() {
+        themeMode = themeMode == "system" ? "day" : themeMode == "day" ? "night" : "system"
+    }
+
+    /// Cmd+. / Ctrl+[ — the web's Escape substitutes.
+    func escapeShortcut() {
+        if helpOpen { helpOpen = false }
+        else if quickBarOpen { quickBarOpen = false }
+    }
     /// An entity the quick bar asked the main window to show.
     struct QuickRoute: Equatable { let type: String; let id: String }
     @Published var entityRoute: QuickRoute?
@@ -64,6 +89,7 @@ final class AppState: ObservableObject {
         serverURLString = stored ?? "http://localhost:3000/api"
         username = UserDefaults.standard.string(forKey: "username") ?? "commonplace"
         pendingRoute = UserDefaults.standard.string(forKey: "pending_route")
+        themeMode = UserDefaults.standard.string(forKey: "app_theme") ?? "system"
         if let data = UserDefaults.standard.data(forKey: "time_timer_v1"),
            let obj = try? JSONDecoder().decode([String: String].self, from: data),
            let key = obj["key"], let kind = obj["kind"],

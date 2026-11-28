@@ -23,7 +23,11 @@ struct CommonplaceApp: App {
                 if state.quickBarOpen && state.isSignedIn {
                     QuickBarView().environmentObject(state)
                 }
+                if state.helpOpen && state.isSignedIn {
+                    HelpOverlayView().environmentObject(state)
+                }
             }
+            .preferredColorScheme(state.preferredColorScheme)
             .task {
                 await state.validateSession()
                 if state.isSignedIn {
@@ -89,6 +93,12 @@ struct CommonplaceApp: App {
                 }
                 .keyboardShortcut("t", modifiers: [.command, .shift])
                 .disabled(!state.timerIsRunning)
+            }
+            CommandMenu("Help") {
+                Button("Keyboard Shortcuts") { state.helpOpen.toggle() }
+                    .keyboardShortcut("/", modifiers: [.control])
+                Button("Keyboard Shortcuts (?)") { state.helpOpen.toggle() }
+                    .keyboardShortcut("/", modifiers: [.shift])
             }
             #endif
         }

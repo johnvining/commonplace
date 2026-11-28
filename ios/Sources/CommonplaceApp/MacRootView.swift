@@ -170,6 +170,38 @@ struct MacRootView: View {
         #endif
         // No animations anywhere: instant state changes.
         .transaction { $0.animation = nil }
+        .background { globalShortcutButtons }
+    }
+
+    /// Web global single keys, where macOS gets no menu equivalent:
+    /// h Home, c Create a note, d Day/night/system, view modes, and
+    /// the Escape substitutes. (Typing contexts keep their keys: these
+    /// only fire when a button shortcut can take them.)
+    private var globalShortcutButtons: some View {
+        Group {
+            Button("") { section = "notes"; routedType = nil; routedId = nil }
+                .keyboardShortcut("h", modifiers: [])
+            Button("") {
+                section = "notes"; routedType = nil; routedId = nil
+                NotificationCenter.default.post(name: .macNewNote, object: nil)
+            }
+            .keyboardShortcut("c", modifiers: [])
+            Button("") { state.cycleTheme() }
+                .keyboardShortcut("d", modifiers: [])
+            Button("") { UserDefaults.standard.set("full", forKey: "notesViewMode") }
+                .keyboardShortcut("1", modifiers: [.control, .shift])
+            Button("") { UserDefaults.standard.set("slim", forKey: "notesViewMode") }
+                .keyboardShortcut("2", modifiers: [.control, .shift])
+            Button("") { UserDefaults.standard.set("grid", forKey: "notesViewMode") }
+                .keyboardShortcut("3", modifiers: [.control, .shift])
+            Button("") { UserDefaults.standard.set("tile", forKey: "notesViewMode") }
+                .keyboardShortcut("4", modifiers: [.control, .shift])
+            Button("") { state.escapeShortcut() }
+                .keyboardShortcut(".", modifiers: [.command])
+            Button("") { state.escapeShortcut() }
+                .keyboardShortcut("[", modifiers: [.control])
+        }
+        .hidden()
     }
 
     /// Starred clicks open the item itself, in this window — not a new
